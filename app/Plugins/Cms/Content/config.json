@@ -1,0 +1,11 @@
+{
+    "name": "Cms content module",
+    "image": "images/logo.jpg",
+    "auth": "Hao Ngo",
+    "email": "haongodev@gmail.com",
+    "link": "https://black-cart.Org",
+    "configGroup": "Plugins",
+    "configCode": "Cms",
+    "configKey": "Content",
+    "version": "4.0"
+}

@@ -1,0 +1,11 @@
+{
+    "name": "LoginSocialite module",
+    "image": "images/logo.jpg",
+    "auth": "Hao Ngo",
+    "email": "haongodev@gmail.com",
+    "link": "",
+    "configGroup": "Plugins",
+    "configCode": "Other",
+    "configKey": "LoginSocialite",
+    "version": "1.0"
+}

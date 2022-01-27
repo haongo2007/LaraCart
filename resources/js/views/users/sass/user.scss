@@ -1,0 +1,57 @@
+.user-profile {
+  .user-name {
+    font-weight: bold;
+  }
+  .box-center {
+    padding-top: 10px;
+  }
+  .user-role {
+    padding-top: 10px;
+    font-weight: 400;
+    font-size: 14px;
+  }
+  .box-social {
+    padding-top: 30px;
+    .el-table {
+      border-top: 1px solid #dfe6ec;
+    }
+  }
+  .user-follow {
+    padding-top: 20px;
+  }
+}
+.user-avatar{
+    .pan-item{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg{
+            transition: all .5s;
+            position:absolute;
+            font-size: 32px;
+            visibility: hidden;
+        }
+        &:after{
+            transition: all .5s;
+            cursor: pointer;
+            visibility: hidden;
+            content:'';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: .3;
+            border-radius:50%;
+        }
+    }
+    &:hover{
+        .pan-item{
+            svg{
+                visibility: visible;
+            }
+            &:after{
+                visibility: visible;
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "name": "Shipping standard",
+    "image": "",
+    "auth": "Hao Ngo",
+    "email": "haongodev@gmail.com",
+    "link": "https://black-cart.Org",
+    "configGroup": "Plugins",
+    "configCode": "Shipping",
+    "configKey": "ShippingStandard",
+    "version": "1.2"
+}

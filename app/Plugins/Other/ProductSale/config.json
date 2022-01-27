@@ -1,0 +1,11 @@
+{
+    "name": "Product Sale",
+    "image": "images/flash-sale.png",
+    "auth": "Hao Ngo",
+    "email": "haongodev@gmail.com",
+    "link": "",
+    "configGroup": "Plugins",
+    "configCode": "Other",
+    "configKey": "ProductSale",
+    "version": "1.0"
+}

@@ -1,0 +1,11 @@
+{
+    "name": "Google reCaptcha module",
+    "image": "images/google-captcha.jpg",
+    "auth": "Hao Ngo",
+    "email": "haongodev@gmail.com",
+    "link": "https://black-cart.org",
+    "configGroup": "Plugins",
+    "configCode": "Other",
+    "configKey": "GoogleCaptcha",
+    "version": "1.0"
+}
