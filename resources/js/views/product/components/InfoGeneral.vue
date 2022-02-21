@@ -2,104 +2,119 @@
   <div>
     <el-skeleton :rows="20" animated :loading="loading" />
     <el-row v-show="!loading">
-      <el-col :span="12">
+      <el-form ref="dataGeneralForm" :model="temp" :rules="rules" class="form-container" label-width="150px">
+        <el-col :span="12">
 
-        <el-form-item :label="$t('table.cost')" prop="cost">
-          <el-input-number v-model="temp.cost" style="width: 80%" :controls="false" :min="1" />
-        </el-form-item>
+          <el-form-item :label="$t('table.cost')" prop="cost">
+            <el-input-number v-model="temp.cost" style="width: 100%" :controls="false" :min="1" />
+          </el-form-item>
 
-        <el-form-item :label="$t('table.price')" prop="price">
-          <el-input-number v-model="temp.price" style="width: 80%" :controls="false" :min="1" />
-        </el-form-item>
+          <el-form-item :label="$t('table.price')" prop="price">
+            <el-input-number v-model="temp.price" style="width: 100%" :controls="false" :min="1" />
+          </el-form-item>
 
-        <el-form-item :label="$t('table.tax')" prop="tax">
-          <el-autocomplete
-            v-model="temp.tax"
-            style="width: 80%"
-            value-key="name"
-            class="inline-input"
-            :fetch-suggestions="querySearchTaxAsync"
-            placeholder="Please Input"
-            @select="handleSelect"
-          />
-        </el-form-item>
+          <el-form-item :label="$t('table.tax')" prop="tax.label">
+            <el-autocomplete
+              v-model="temp.tax.label"
+              style="width: 100%"
+              value-key="name"
+              class="inline-input"
+              :fetch-suggestions="querySearchTaxAsync"
+              placeholder="Please Input"
+              @select="handleSelectTax"
+            />
+          </el-form-item>
 
-        <el-form-item :label="$t('table.quantily')" prop="quantily">
-          <el-input-number v-model="temp.quantily" style="width: 80%" :controls="false" />
-        </el-form-item>
+          <el-form-item :label="$t('table.quantily')" prop="quantily">
+            <el-input-number v-model="temp.quantily" style="width: 100%" :controls="false" />
+          </el-form-item>
 
-        <el-form-item :label="$t('table.mi_quantity')" prop="mi_quantity">
-          <el-input-number v-model="temp.mi_quantity" style="width: 80%" :controls="false" />
-        </el-form-item>
+          <el-form-item :label="$t('table.mi_quantity')" prop="minimum">
+            <el-input-number v-model="temp.minimum" style="width: 100%" :controls="false" />
+          </el-form-item>
 
-      </el-col>
-      <el-col :span="12">
+          <el-form-item :label="$t('table.url_config')" prop="alias">
+            <el-input
+              v-model="temp.alias"
+              placeholder="Please input"
+              clearable
+            />
+          </el-form-item>
 
-        <el-form-item :label="$t('table.brand')" prop="brand">
-          <el-autocomplete
-            v-model="temp.brand"
-            style="width: 80%"
-            value-key="name"
-            class="inline-input"
-            :fetch-suggestions="querySearchBrandAsync"
-            placeholder="Please Input"
-            @select="handleSelect"
-          />
-        </el-form-item>
+        </el-col>
+        <el-col :span="12">
 
-        <el-form-item :label="$t('table.supplier')" prop="supplier">
-          <el-autocomplete
-            v-model="temp.supplier"
-            style="width: 80%"
-            value-key="name"
-            class="inline-input"
-            :fetch-suggestions="querySearchSupplierAsync"
-            placeholder="Please Input"
-            @select="handleSelect"
-          />
-        </el-form-item>
+          <el-form-item :label="$t('table.brand')" prop="brand">
+            <el-autocomplete
+              v-model="temp.brand.label"
+              style="width: 100%"
+              value-key="name"
+              class="inline-input"
+              :fetch-suggestions="querySearchBrandAsync"
+              placeholder="Please Input"
+              @select="handleSelectBrand"
+            />
+          </el-form-item>
 
-        <el-form-item :label="$t('table.sku')" prop="sku">
-          <el-input
-            v-model="temp.sku"
-            style="width: 80%"
-            placeholder="Please input"
-            clearable
-          />
-        </el-form-item>
+          <el-form-item :label="$t('table.supplier')" prop="supplier">
+            <el-autocomplete
+              v-model="temp.supplier.label"
+              style="width: 100%"
+              value-key="name"
+              class="inline-input"
+              :fetch-suggestions="querySearchSupplierAsync"
+              placeholder="Please Input"
+              @select="handleSelectSup"
+            />
+          </el-form-item>
 
-        <el-form-item :label="$t('table.category')" prop="category">
-          <el-cascader
-            v-model="temp.category"
-            style="width: 80%"
-            :options="listRecursive"
-            :props="cateRecurProps"
-            :show-all-levels="false"
-            clearable
-            filterable
-          />
-        </el-form-item>
+          <el-form-item :label="$t('table.sku')" prop="sku">
+            <el-input
+              v-model="temp.sku"
+              style="width: 100%"
+              placeholder="Please input"
+              clearable
+            />
+          </el-form-item>
 
-        <el-form-item :label="$t('table.sell_date')" prop="sell_date">
-          <el-date-picker
-            v-model="temp.arDateToSell"
-            style="width: 80%"
-            type="datetimerange"
-            align="right"
-            unlink-panels
-            range-separator="To"
-            start-placeholder="Created date"
-            end-placeholder="End date"
-            :picker-options="pickerOptions"
-            @change="handleFilterDate()"
-          />
-        </el-form-item>
-      </el-col>
+          <el-form-item :label="$t('table.category')" prop="category">
+            <el-cascader style="width: 100%" v-model="temp.category" :props="cateRecurProps" clearable></el-cascader>
+          </el-form-item>
+
+          <el-form-item :label="$t('table.sell_date')" prop="date_available">
+            <el-date-picker
+              v-model="date_available"
+              style="width: 100%"
+              type="datetime"
+              placeholder="Select date and time for available sale"
+              @change="handleFilterDate()"
+              :picker-options="pickerOptions">
+            </el-date-picker>
+          </el-form-item>
+          <el-form-item :label="$t('table.stock')" prop="stock">
+            <el-input
+              v-model="temp.stock"
+              placeholder="Please input"
+              clearable
+            />
+          </el-form-item>
+
+          <el-button-group class="pull-right">
+            <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
+              Previous
+            </el-button>
+            <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+              Next
+            </el-button>
+          </el-button-group>
+        </el-col>
+      </el-form>
     </el-row>
   </div>
 </template>
 
 <script>
+import {parseTime} from '@/filters';
 import CategoryResource from '@/api/category';
 import BrandResource from '@/api/brand';
 import SupplierResource from '@/api/supplier';
@@ -109,31 +124,59 @@ const categoryResource = new CategoryResource();
 const brandResource = new BrandResource();
 const supplierResource = new SupplierResource();
 const taxResource = new TaxResource();
+
+let category_parent = 0;
+
 export default {
   name: 'InfoGeneral',
+  props: ['dataActive','dataRefs'],
   data() {
     return {
       temp: {
-        category: '0',
+        category: '',
         sku: '',
-        brand: '',
-        supplier: '',
+        brand:{
+          label:'',
+          value:0
+        },
+        supplier:{
+          label:'',
+          value:0
+        },
         price: 0,
         cost: 0,
-        tax: '',
+        tax:{
+          label:'',
+          value:0
+        },
         quantily: 0,
-        mi_quantity: 0,
-        arDateToSell: [],
+        minimum: 0,
+        date_available: '',
+        stock: 0,
+        alias: '',
       },
+      date_available:'',
       loading: true,
       brands: [],
       suppliers: [],
       taxs: [],
       cateRecurProps: {
-        children: 'children',
-        label: 'title',
-        value: 'id',
-        checkStrictly: true,
+        checkStrictly: true, 
+        lazy: true,
+        lazyLoad (node, resolve) {
+          var level = node.value;
+          if (!node.value) {
+            level = category_parent;
+          }
+          categoryResource.list({parent:level}).then((res) => {
+            const nodes = res.data.map(item => ({
+                value: item.id,
+                label: item.name,
+                leaf: item.parent
+              }));
+            resolve(nodes);
+          });
+        }
       },
       listRecursive: [{
         id: '0',
@@ -142,30 +185,41 @@ export default {
       }],
       pickerOptions: {
         shortcuts: [{
-          text: 'Last week',
+          text: 'Today',
           onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
+            picker.$emit('pick', new Date());
           },
         }, {
-          text: 'Last month',
+          text: 'Tomorrow',
           onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          },
-        }, {
-          text: 'Last 3 months',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24);
+            picker.$emit('pick', date);
           },
         }],
+      },
+      rules: {
+        cost: [
+          {
+            required: true,
+            message: 'cost is required',
+            trigger: 'blur',
+          },
+        ],
+        price: [
+          {
+            required: true,
+            message: 'price is required',
+            trigger: 'change',
+          },
+        ],
+        sku: [
+          {
+            required: true,
+            message: 'sku is required',
+            trigger: 'blur',
+          },
+        ],
       },
     };
   },
@@ -173,6 +227,19 @@ export default {
     this.getRecursive();
   },
   methods: {
+    backStep() {
+      const active = this.dataActive - 1;
+      this.$emit('handleProcessActive', active);
+    },
+    nextStep() {    
+      this.$refs['dataGeneralForm'].validate((valid) => {
+        if (valid) {
+          const active = this.dataActive + 1;
+          this.$emit('handleProcessActive', active);
+          this.$emit('handleProcessTemp', this.temp);
+        }
+      })
+    },
     async getRecursive(id){
       const { data } = await categoryResource.getRecursive(id);
       data.unshift(this.listRecursive[0]);
@@ -235,10 +302,17 @@ export default {
         return (data.name.toLowerCase().includes(queryString.toLowerCase()) === true);
       };
     },
-    handleSelect(item) {
+    handleSelectTax(item) {
+      this.temp.tax.value = item.id;
+    },
+    handleSelectSup(item) {
+      this.temp.supplier.value = item.id;
+    },
+    handleSelectBrand(item) {
+      this.temp.brand.value = item.id;
     },
     handleFilterDate(){
-
+      this.temp.date_available = parseTime(this.date_available.toString(), '{d}-{m}-{y} {h}:{i}:{s}');
     },
   },
 };

@@ -23,7 +23,7 @@
             width="400"
             trigger="click"
           >
-            <attributes-product :is_new="scope.row.is_new" :data-currency="scope.row.currency" :data-atribute-group="dataAttributeGroup" :data-attribute="scope.row.attribute" @handleAttributeProduct="handleAttributeProduct" />
+            <attributes-product :is-new="scope.row.is_new" :data-currency="scope.row.currency" :data-atribute-group="dataAttributeGroup" :data-attribute="scope.row.attribute" @handleAttributeProduct="handleAttributeProduct" />
             <el-button slot="reference" icon="el-icon-s-tools" size="mini" type="primary" />
           </el-popover>
         </template>

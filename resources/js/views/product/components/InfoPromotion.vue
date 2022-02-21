@@ -1,13 +1,16 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="16" :offset="4">
-        <el-form-item :label="$t('table.promotion_price')" prop="cost">
-          <el-input-number v-model="temp.priceToPromotion" style="width: 100%" :controls="false" />
+      <el-col :span="12">
+        <el-form-item :label="$t('table.promotion_price')" prop="price_promotion">
+          <el-input-number v-model="temp.price_promotion" style="width: 100%" :controls="false" />
         </el-form-item>
-        <el-form-item :label="$t('table.sale_date')" prop="sale_date">
+      </el-col>
+
+      <el-col :span="12">
+        <el-form-item :label="$t('table.sale_date')" prop="date_promotion">
           <el-date-picker
-            v-model="temp.arDateToPromotion"
+            v-model="date_promotion"
             style="width: 100%"
             type="datetimerange"
             align="right"
@@ -16,23 +19,36 @@
             start-placeholder="Start date"
             end-placeholder="End date"
             :picker-options="pickerOptions"
-            @change="handleFilterDate()"
           />
         </el-form-item>
+        <el-button-group class="pull-right">
+          <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
+            Previous
+          </el-button>
+          <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+            Next
+          </el-button>
+        </el-button-group>
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script>
+import { parseTime } from '@/filters';
 export default {
   name: 'InfoPromotion',
+  props: ['dataActive'],
   data() {
     return {
       temp: {
-        priceToPromotion: 0,
-        arDateToPromotion: [],
+        price_promotion: 0,
+        date_promotion: {
+          start: '',
+          end: '',
+        },
       },
+      date_promotion:[],
       pickerOptions: {
         shortcuts: [{
           text: 'Last week',
@@ -65,8 +81,18 @@ export default {
   created() {
   },
   methods: {
-    handleFilterDate(){
-
+    backStep() {
+      const active = this.dataActive - 1;
+      this.$emit('handleProcessActive', active);
+    },
+    nextStep() {  
+      const active = this.dataActive + 1;
+      if (this.date_promotion.length) {
+        this.temp.date_promotion.start = parseTime(this.date_promotion[0], '{d}-{m}-{y} {h}:{i}:{s}');
+        this.temp.date_promotion.end = parseTime(this.date_promotion[1], '{d}-{m}-{y} {h}:{i}:{s}');
+      }
+      this.$emit('handleProcessActive', active);
+      this.$emit('handleProcessTemp', this.temp);
     },
   },
 };

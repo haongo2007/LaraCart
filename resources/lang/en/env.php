@@ -32,4 +32,5 @@ return [
     'PREFIX_CART_CHECKOUT'       => 'Prefix url CHECKOUT',
     'PREFIX_ORDER_SUCCESS'       => 'Prefix url ORDER SUCCESS',
     'PREFIX_SHOP'                => 'Link shop',
+    'MULTI_STORE_PRO'            => 'Multi Store'
 ];

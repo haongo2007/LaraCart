@@ -26,7 +26,6 @@ if (!function_exists('lc_store_block')) {
         return ShopStoreBlockContent::getLayout();
     }
 }
-
 /*
 String to Url
  */

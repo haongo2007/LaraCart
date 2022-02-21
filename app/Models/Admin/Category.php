@@ -40,8 +40,7 @@ class Category extends ShopCategory
         $sort  = Arr::get($dataSearch, 'sort', self::ORDER);
         $status= Arr::get($dataSearch, 'status', self::ACTIVE);
         $title = Arr::get($dataSearch, 'name', '');
-        $parent = Arr::get($dataSearch, 'parent', false);
-        $parent = $parent === 'true' ? true : false;
+        $parent = Arr::get($dataSearch, 'parent', '');
         $arrSort = [
             'id__desc' => trans('category.admin.sort_order.id_desc'),
             'id__asc' => trans('category.admin.sort_order.id_asc'),
@@ -53,7 +52,7 @@ class Category extends ShopCategory
         $tableCategory    = (new ShopCategory)->getTable();
 
         $categoryList     = (new ShopCategory);
-        if (!$parent) {
+        if ($parent != '') {
             $categoryList->with('Parent.descriptionsWithLang:title,category_id');    
         }
         $categoryList->leftJoin($tableDescription, $tableDescription . '.category_id', $tableCategory . '.id')
@@ -63,8 +62,8 @@ class Category extends ShopCategory
                 $sql->where($tableDescription . '.title', 'like', '%' . $title . '%');
             });
         }
-        if ($parent) {
-            $categoryList = $categoryList->where('parent',0);
+        if ($parent != '') {
+            $categoryList = $categoryList->where('parent',$parent);
         }
 
         if (!is_null($status) && is_array($status)) {

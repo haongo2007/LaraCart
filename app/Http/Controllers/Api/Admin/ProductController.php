@@ -20,11 +20,12 @@ use App\Models\Front\ShopCustomField;
 use App\Models\Front\ShopCustomFieldDetail;
 use App\Models\Admin\Product;
 use App\Models\Admin\Category;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Helper\JsonResponse;
 use App\Http\Resources\ProductCollection;
+use Validator;
+use Carbon\Carbon;
 
 class ProductController extends Controller
 {
@@ -78,7 +79,7 @@ class ProductController extends Controller
     {
         $data = [
             'title'                => trans('product.admin.add_new_title'),
-            'kind'                     => BC_PRODUCT_SINGLE,
+            'kind'                     => lc_PRODUCT_SINGLE,
             'title_description'    => trans('product.admin.add_new_des'),
             'icon'                 => 'fa fa-plus',
             'languages'            => $this->languages,
@@ -107,7 +108,7 @@ public function createProductBuild()
     $listProductSingle = (new AdminProduct)->getProductSelectAdmin(['kind' => [0]]);
     $data = [
         'title'                => trans('product.admin.add_new_title_build'),
-        'kind'                 => BC_PRODUCT_BUILD,
+        'kind'                 => lc_PRODUCT_BUILD,
         'title_description'    => trans('product.admin.add_new_des'),
         'icon'                 => 'fa fa-plus',
         'languages'            => $this->languages,
@@ -149,7 +150,7 @@ public function createProductGroup()
 
     $data = [
         'title'                => trans('product.admin.add_new_title_group'),
-        'kind'                 => BC_PRODUCT_GROUP,
+        'kind'                 => lc_PRODUCT_GROUP,
         'title_description'    => trans('product.admin.add_new_des'),
         'icon'                 => 'fa fa-plus',
         'languages'            => $this->languages,
@@ -176,16 +177,61 @@ public function createProductGroup()
  * @return [type] [description]
  */
 
-    public function postCreate()
+    public function store(Request $request)
     {
         
-        $data = request()->all();
-        $langFirst = array_key_first(bc_language_all()->toArray()); //get first code language active
-        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['name'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $data = $request->all();
+        $data['descriptions'] = json_decode($data['descriptions']);
+        $data['brand'] = json_decode($data['brand']);
+        $data['supplier'] = json_decode($data['supplier']);
+        $data['tax'] = json_decode($data['tax']);
+        $data['attribute'] = json_decode($data['attribute']);
+        $data['category'] = json_decode($data['category']);
+        $data['category'] = (int) end($data['category']);
+        $data['date_promotion'] = json_decode($data['date_promotion']);
+
+        $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
+        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
+
+
+        if ($data['attribute'] && $data['kind'] == LC_PRODUCT_SINGLE) {
+            $arrDataAtt = [];
+            foreach ($data['attribute'] as $group => $rowGroup) {
+                if ($rowGroup) {
+                    foreach ($rowGroup->values as $key => $nameAtt) {
+                        if ($nameAtt) {
+                            // $code = '';
+                            $images = '';
+                            // if (array_key_exists('code', $rowGroup)) {
+                            //     $code = $rowGroup['code'][$key];
+                            // }
+                            if (array_key_exists('files', $rowGroup->values[$key])) {
+                                $images = implode(',', $rowGroup->values[$key]->files);
+                            }
+                            // if (array_key_exists('type_show', $rowGroup)) {
+                            //     $type_show = $rowGroup['type_show'][$key];
+                            // }
+                            $arrDataAtt[] = new ShopProductAttribute([
+                                                                    'name' => $nameAtt->name, 
+                                                                    'add_price' => $rowGroup->values[$key]->price,
+                                                                    'attribute_group_id' => $group,
+                                                                    // 'code' => $code,
+                                                                    'images' => $images,
+                                                                    // 'type_show' => $type_show
+                                                                ]);
+                        }
+                    }
+                }
+
+            }
+            // $product->attributes()->saveMany($arrDataAtt);
+        }
+        dd($arrDataAtt);
+
         switch ($data['kind']) {
-            case BC_PRODUCT_SINGLE: // product single
+            case LC_PRODUCT_SINGLE: // product single
                 $arrValidation = [
                     'kind'                       => 'required',
                     'sort'                       => 'numeric|min:0',
@@ -194,12 +240,12 @@ public function createProductGroup()
                     'descriptions.*.keyword'     => 'nullable|string|max:100',
                     'descriptions.*.description' => 'nullable|string|max:100',
                     'descriptions.*.content'     => 'required|string',
-                    'category'                   => 'required',
+                    'category'                   => 'required|numeric|not_in:0',
                     'image'                      => 'required',
-                    'sub_image'                  => 'required',
-                    'type_show_image_desc'       => 'required',
-                    'sku'                        => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|product_sku_unique',
-                    'alias'                      => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|product_alias_unique',
+                    // 'sub_image'                  => 'required',
+                    // 'type_show_image_desc'       => 'required',
+                    'sku'                        => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|unique:shop_product,sku',
+                    'alias'                      => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|unique:shop_product,alias',
                 ];
 
                 //Custom fields
@@ -225,7 +271,7 @@ public function createProductGroup()
                 ];
                 break;
 
-            case BC_PRODUCT_BUILD: //product build
+            case LC_PRODUCT_BUILD: //product build
                 $arrValidation = [
                     'kind'                       => 'required',
                     'sort'                       => 'numeric|min:0',
@@ -251,7 +297,7 @@ public function createProductGroup()
                 ];
                 break;
 
-            case BC_PRODUCT_GROUP: //product group
+            case LC_PRODUCT_GROUP: //product group
                 $arrValidation = [
                     'kind'                       => 'required',
                     'productInGroup'             => 'required',
@@ -284,22 +330,28 @@ public function createProductGroup()
         $validator = Validator::make($data, $arrValidation, $arrMsg ?? []);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([],$validator->messages()), Response::HTTP_BAD_REQUEST);
         }
-
-        $category        = $data['category'] ?? [];
+        $category        = $data['category'] ?? null;
         $attribute       = $data['attribute'] ?? [];
         $descriptions    = $data['descriptions'];
         $productInGroup  = $data['productInGroup'] ?? [];
         $productBuild    = $data['hotSpots'] ?? [];
-        $subImages       = $data['sub_image'] ?? '';
-        $type_show_image_desc = $data['type_show_image_desc'] ?? '';
-        $downloadPath    = $data['download_path'] ?? '';
+        /* UPLOAD IMAGE */
+        if($request->hasFile('image')){
+            $path = 'product/';
+            $fileName = $request->file('image')->hashName();
+            $request->file('image')->storeAs(
+                $path,$fileName
+            );
+            $data['image'] = LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName;
+        }
+        // $subImages       = $data['sub_image'] ?? '';
+        // $type_show_image_desc = $data['type_show_image_desc'] ?? '';
+        // $downloadPath    = $data['download_path'] ?? '';
         $dataInsert = [
-            'brand_id'       => $data['brand_id'] ?? 0,
-            'supplier_id'    => $data['supplier_id'] ?? 0,
+            'brand_id'       => $data['brand']->value ?? 0,
+            'supplier_id'    => $data['supplier']->value ?? 0,
             'category_store_id' => $data['category_store_id'] ?? 0,
             'price'          => $data['price'] ?? 0,
             'sku'            => $data['sku'],
@@ -311,11 +363,11 @@ public function createProductGroup()
             'height'         => $data['height'] ?? 0,
             'length'         => $data['length'] ?? 0,
             'width'          => $data['width'] ?? 0,
-            'kind'           => $data['kind'] ?? BC_PRODUCT_SINGLE,
+            'kind'           => $data['kind'] ?? LC_PRODUCT_SINGLE,
             'alias'          => $data['alias'],
-            'property'       => $data['property'] ?? BC_PROPERTY_PHYSICAL,
+            'property'       => $data['property'] ?? LC_PROPERTY_PHYSICAL,
             'image'          => $data['image'] ?? '',
-            'tax_id'         => $data['tax_id'] ?? 0,
+            'tax_id'         => $data['tax']->value ?? 0,
             'status'         => (!empty($data['status']) ? 1 : 0),
             'sort'           => (int) $data['sort'],
             'minimum'        => (int) ($data['minimum'] ?? 0),
@@ -326,23 +378,24 @@ public function createProductGroup()
             $dataInsert['date_available'] = $data['date_available'];
         }
         //insert product
-        $product = AdminProduct::createProductAdmin($dataInsert);
+        $product = Product::createProductAdmin($dataInsert);
 
         //Promoton price
-        if (isset($data['price_promotion']) && in_array($data['kind'], [BC_PRODUCT_SINGLE, BC_PRODUCT_BUILD])) {
+        if (isset($data['price_promotion']) && $data['price_promotion'] > 0 && in_array($data['kind'], [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])) {
             $arrPromotion['price_promotion'] = $data['price_promotion'];
-            $arrPromotion['date_start'] = $data['price_promotion_start'] ? $data['price_promotion_start'] : null;
-            $arrPromotion['date_end'] = $data['price_promotion_end'] ? $data['price_promotion_end'] : null;
+            $arrPromotion['date_start'] = $data['date_promotion']->start ? Carbon::parse($data['date_promotion']->start)->format('Y-m-d H:i:s') : null;
+            $arrPromotion['date_end'] = $data['date_promotion']->end ? Carbon::parse($data['date_promotion']->end)->format('Y-m-d H:i:s') : null;
             $product->promotionPrice()->create($arrPromotion);
         }
 
         //Insert category
         if ($category) {
+            $category = $category;
             $product->categories()->attach($category);
         }
 
         //Insert group
-        if ($productInGroup && $data['kind'] == BC_PRODUCT_GROUP) {
+        if ($productInGroup && $data['kind'] == LC_PRODUCT_GROUP) {
             $arrDataGroup = [];
             foreach ($productInGroup as $pID) {
                 if ((int) $pID) {
@@ -353,7 +406,7 @@ public function createProductGroup()
         }
 
         //Insert Build
-        if ($productBuild && $data['kind'] == BC_PRODUCT_BUILD) {
+        if ($productBuild && $data['kind'] == LC_PRODUCT_BUILD) {
             $arrDataBuild = [];
             foreach ($productBuild as $key => $value) {
                 $arrDataBuild[] = new ShopProductBuild($value);
@@ -362,7 +415,7 @@ public function createProductGroup()
         }
 
         //Insert attribute
-        if ($attribute && $data['kind'] == BC_PRODUCT_SINGLE) {
+        if ($attribute && $data['kind'] == LC_PRODUCT_SINGLE) {
             $arrDataAtt = [];
             foreach ($attribute as $group => $rowGroup) {
                 if (count($rowGroup)) {
@@ -384,9 +437,9 @@ public function createProductGroup()
                                                                     'name' => $nameAtt, 
                                                                     'add_price' => $rowGroup['add_price'][$key],
                                                                     'attribute_group_id' => $group,
-                                                                    'code' => $code,
+                                                                    // 'code' => $code,
                                                                     'images'=>$images,
-                                                                    'type_show' => $type_show
+                                                                    // 'type_show' => $type_show
                                                                 ]);
                         }
                     }
@@ -397,7 +450,7 @@ public function createProductGroup()
         }
 
         //Insert path download
-        if (!empty($data['property']) && $data['property'] == BC_PROPERTY_DOWNLOAD && $downloadPath) {
+        if (!empty($data['property']) && $data['property'] == LC_PROPERTY_DOWNLOAD && $downloadPath) {
             (new ShopProductDownload)->insert(['product_id' => $product->id, 'path' => $downloadPath]);
         }
 
@@ -427,24 +480,23 @@ public function createProductGroup()
             $dataDes[] = [
                 'product_id'  => $product->id,
                 'lang'        => $code,
-                'name'        => $descriptions[$code]['name'],
-                'keyword'     => $descriptions[$code]['keyword'],
-                'description' => $descriptions[$code]['description'],
-                'content'     => $descriptions[$code]['content'] ?? '',
+                'name'        => $descriptions->$code->title,
+                'keyword'     => implode(',',$descriptions->$code->keyword),
+                'description' => $descriptions->$code->description,
+                'content'     => $descriptions->$code->content ?? '',
             ];
         }
-
-        AdminProduct::insertDescriptionAdmin($dataDes);
+        Product::insertDescriptionAdmin($dataDes);
 
         //Insert sub mages
-        if ($subImages && in_array($data['kind'], [BC_PRODUCT_SINGLE, BC_PRODUCT_BUILD])) {
-            $SubImages = new ShopProductImage(['image'=>$subImages,'type_show'=>$type_show_image_desc]);
-            $product->img()->save($SubImages);
-        }
+        // if ($subImages && in_array($data['kind'], [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])) {
+        //     $SubImages = new ShopProductImage(['image'=>$subImages,'type_show'=>$type_show_image_desc]);
+        //     $product->img()->save($SubImages);
+        // }
 
-        bc_clear_cache('cache_product');
+        lc_clear_cache('cache_product');
 
-        return redirect()->route('admin_product.index')->with('success', trans('product.admin.create_success'));
+        return response()->json(new JsonResponse([],trans('product.admin.create_success')), Response::HTTP_OK);
 
     }
 
@@ -467,7 +519,7 @@ public function createProductGroup()
         // }
         // dd($colors);
 
-        $listProductSingle = (new AdminProduct)->getProductSelectAdmin(['kind' => [BC_PRODUCT_SINGLE]]);
+        $listProductSingle = (new AdminProduct)->getProductSelectAdmin(['kind' => [lc_PRODUCT_SINGLE]]);
 
         $data = [
             'title'                => trans('product.admin.edit'),
@@ -490,7 +542,7 @@ public function createProductGroup()
         ];
 
         //Only prduct single have custom field
-        if ($product->kind == BC_PRODUCT_SINGLE) {
+        if ($product->kind == lc_PRODUCT_SINGLE) {
             $data['customFields'] = (new ShopCustomField)->getCustomField($type = 'product');
         } else {
             $data['customFields'] = [];
@@ -509,13 +561,13 @@ public function createProductGroup()
             return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
         }
         $data = request()->all();
-        $langFirst = array_key_first(bc_language_all()->toArray()); //get first code language active
+        $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['name'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
 
         switch ($product['kind']) {
-            case BC_PRODUCT_SINGLE: // product single
+            case lc_PRODUCT_SINGLE: // product single
                 $arrValidation = [
                     'sort' => 'numeric|min:0',
                     'minimum' => 'numeric|min:0',
@@ -553,7 +605,7 @@ public function createProductGroup()
                     'alias.product_alias_unique'      => trans('product.alias_unique'),
                 ];
                 break;
-            case BC_PRODUCT_BUILD: //product build
+            case lc_PRODUCT_BUILD: //product build
                 $arrValidation = [
                     'sort' => 'numeric|min:0',
                     'minimum' => 'numeric|min:0',
@@ -578,7 +630,7 @@ public function createProductGroup()
                 ];
                 break;
 
-            case BC_PRODUCT_GROUP: //product group
+            case lc_PRODUCT_GROUP: //product group
                 $arrValidation = [
                     'sku' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|product_sku_unique:'.$id,
                     'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|product_alias_unique:'.$id,
@@ -635,7 +687,7 @@ public function createProductGroup()
             'height'       => $data['height'] ?? 0,
             'length'       => $data['length'] ?? 0,
             'width'        => $data['width'] ?? 0,
-            'property'     => $data['property'] ?? BC_PROPERTY_PHYSICAL,
+            'property'     => $data['property'] ?? lc_PROPERTY_PHYSICAL,
             'sku'          => $data['sku'],
             'alias'        => $data['alias'],
             'status'       => (!empty($data['status']) ? 1 : 0),
@@ -652,10 +704,10 @@ public function createProductGroup()
         //Update custom field
         if (!empty($data['fields'])) {
             (new ShopCustomFieldDetail)
-                ->join(BC_DB_PREFIX.'shop_custom_field', BC_DB_PREFIX.'shop_custom_field.id', BC_DB_PREFIX.'shop_custom_field_detail.custom_field_id')
+                ->join(lc_DB_PREFIX.'shop_custom_field', lc_DB_PREFIX.'shop_custom_field.id', lc_DB_PREFIX.'shop_custom_field_detail.custom_field_id')
                 ->select('code', 'name', 'text')
-                ->where(BC_DB_PREFIX.'shop_custom_field_detail.rel_id', $product->id)
-                ->where(BC_DB_PREFIX.'shop_custom_field.type', 'product')
+                ->where(lc_DB_PREFIX.'shop_custom_field_detail.rel_id', $product->id)
+                ->where(lc_DB_PREFIX.'shop_custom_field.type', 'product')
                 ->delete();
 
             $dataField = [];
@@ -678,7 +730,7 @@ public function createProductGroup()
 
         //Promoton price
         $product->promotionPrice()->delete();
-        if (isset($data['price_promotion']) && in_array($product['kind'], [BC_PRODUCT_SINGLE, BC_PRODUCT_BUILD])) {
+        if (isset($data['price_promotion']) && in_array($product['kind'], [lc_PRODUCT_SINGLE, lc_PRODUCT_BUILD])) {
             $arrPromotion['price_promotion'] = $data['price_promotion'];
             $arrPromotion['date_start'] = $data['price_promotion_start'] ? $data['price_promotion_start'] : null;
             $arrPromotion['date_end'] = $data['price_promotion_end'] ? $data['price_promotion_end'] : null;
@@ -705,7 +757,7 @@ public function createProductGroup()
         }
 
         //Update group
-        if ($product['kind'] == BC_PRODUCT_GROUP) {
+        if ($product['kind'] == lc_PRODUCT_GROUP) {
             $product->groups()->delete();
             if (count($productInGroup)) {
                 $arrDataGroup = [];
@@ -720,9 +772,9 @@ public function createProductGroup()
         }
 
         //Update Build
-        if ($product['kind'] == BC_PRODUCT_BUILD) {
+        if ($product['kind'] == lc_PRODUCT_BUILD) {
             $product->builds()->delete();
-            if ($productBuild && $product['kind'] == BC_PRODUCT_BUILD) {
+            if ($productBuild && $product['kind'] == lc_PRODUCT_BUILD) {
                 $arrDataBuild = [];
                 foreach ($productBuild as $key => $value) {
                     $arrDataBuild[] = new ShopProductBuild($value);
@@ -733,13 +785,13 @@ public function createProductGroup()
 
         //Update path download
         (new ShopProductDownload)->where('product_id', $product->id)->delete();
-        if ($product['property'] == BC_PROPERTY_DOWNLOAD && $downloadPath) {
+        if ($product['property'] == lc_PROPERTY_DOWNLOAD && $downloadPath) {
             (new ShopProductDownload)->insert(['product_id' => $product->id, 'path' => $downloadPath]);
         }
 
 
         //Update attribute
-        if ($product['kind'] == BC_PRODUCT_SINGLE) {
+        if ($product['kind'] == lc_PRODUCT_SINGLE) {
             $product->attributes()->delete();
             if (count($attribute)) {
                 $arrDataAtt = [];
@@ -777,13 +829,13 @@ public function createProductGroup()
         }
 
         //Update sub mages
-        if ($subImages && in_array($product['kind'], [BC_PRODUCT_SINGLE, BC_PRODUCT_BUILD])) {
+        if ($subImages && in_array($product['kind'], [lc_PRODUCT_SINGLE, lc_PRODUCT_BUILD])) {
             $product->img()->delete();
             $SubImages = new ShopProductImage(['image'=>$subImages,'type_show'=>$type_show_image_desc]);
             $product->img()->save($SubImages);
         }
 
-        bc_clear_cache('cache_product');
+        lc_clear_cache('cache_product');
 
         return redirect()->route('admin_product.index')->with('success', trans('product.admin.edit_success'));
 
@@ -793,12 +845,11 @@ public function createProductGroup()
         Delete list Item
         Need mothod destroy to boot deleting in model
     */
-    public function deleteList()
+    public function destroy($ids)
     {
         if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
+            return response()->json(new JsonResponse([],trans('admin.method_not_allow')), Response::HTTP_BAD_REQUEST);
         } else {
-            $ids = request('ids');
             $arrID = explode(',', $ids);
             $arrID = array_filter($arrID);
             $arrCantDelete = [];
@@ -812,90 +863,87 @@ public function createProductGroup()
                 }
             }
             if (count($arrDontPermission)) {
-                return response()->json(['error' => 1, 'msg' => trans('admin.remove_dont_permisison') . ': ' . json_encode($arrDontPermission)]);
+                return response()->json(new JsonResponse([],trans('admin.remove_dont_permisison') . ': ' . json_encode($arrDontPermission)), Response::HTTP_BAD_REQUEST);
             } elseif (count($arrCantDelete)) {
-                return response()->json(['error' => 1, 'msg' => trans('product.admin.cant_remove_child') . ': ' . json_encode($arrCantDelete)]);
+                return response()->json(new JsonResponse([],trans('product.admin.cant_remove_child') . ': ' . json_encode($arrCantDelete)),Response::HTTP_BAD_REQUEST);
             }else {
-                AdminProduct::destroy($arrID);
-
-                bc_clear_cache('cache_product');
-
-                return response()->json(['error' => 0, 'msg' => '']);
+                Product::destroy($arrID);
+                lc_clear_cache('cache_product');
+                return response()->json(new JsonResponse([],trans('admin.delete_success')), Response::HTTP_OK);
             }
 
         }
     }
-
     /**
      * Validate attribute product
      */
     public function validateAttribute(array $arrValidation) {
-        if (bc_config_admin('product_brand')) {
-            if (bc_config_admin('product_brand_required')) {
+        if (lc_config_admin('product_brand')) {
+            if (lc_config_admin('product_brand_required')) {
                 $arrValidation['brand_id'] = 'required|numeric';
             } else {
                 $arrValidation['brand_id'] = 'nullable|numeric';
             }
         }
 
-        if (bc_config_admin('product_supplier')) {
-            if (bc_config_admin('product_supplier_required')) {
+        if (lc_config_admin('product_supplier')) {
+            if (lc_config_admin('product_supplier_required')) {
                 $arrValidation['supplier_id'] = 'required';
             } else {
                 $arrValidation['supplier_id'] = 'nullable';
             }
         }
 
-        if (bc_config_admin('product_price')) {
-            if (bc_config_admin('product_price_required')) {
+        if (lc_config_admin('product_price')) {
+            if (lc_config_admin('product_price_required')) {
                 $arrValidation['price'] = 'required|numeric|min:0';
             } else {
                 $arrValidation['price'] = 'nullable|numeric|min:0';
             }
         }
 
-        if (bc_config_admin('product_cost')) {
-            if (bc_config_admin('product_cost_required')) {
+        if (lc_config_admin('product_cost')) {
+            if (lc_config_admin('product_cost_required')) {
                 $arrValidation['cost'] = 'required|numeric|min:0';
             } else {
                 $arrValidation['cost'] = 'nullable|numeric|min:0';
             }
         }
 
-        if (bc_config_admin('product_promotion')) {
-            if (bc_config_admin('product_promotion_required')) {
+        if (lc_config_admin('product_promotion')) {
+            if (lc_config_admin('product_promotion_required')) {
                 $arrValidation['price_promotion'] = 'required|numeric|min:0';
             } else {
                 $arrValidation['price_promotion'] = 'nullable|numeric|min:0';
             }
         }
 
-        if (bc_config_admin('product_stock')) {
-            if (bc_config_admin('product_stock_required')) {
+        if (lc_config_admin('product_stock')) {
+            if (lc_config_admin('product_stock_required')) {
                 $arrValidation['stock'] = 'required|numeric';
             } else {
                 $arrValidation['stock'] = 'nullable|numeric';
             }
         }
 
-        if (bc_config_admin('product_property')) {
-            if (bc_config_admin('product_property_required')) {
+        if (lc_config_admin('product_property')) {
+            if (lc_config_admin('product_property_required')) {
                 $arrValidation['property'] = 'required|string';
             } else {
                 $arrValidation['property'] = 'nullable|string';
             }
         }
 
-        if (bc_config_admin('product_available')) {
-            if (bc_config_admin('product_available_required')) {
+        if (lc_config_admin('product_available')) {
+            if (lc_config_admin('product_available_required')) {
                 $arrValidation['date_available'] = 'required|date';
             } else {
                 $arrValidation['date_available'] = 'nullable|date';
             }
         }
 
-        if (bc_config_admin('product_weight')) {
-            if (bc_config_admin('product_weight_required')) {
+        if (lc_config_admin('product_weight')) {
+            if (lc_config_admin('product_weight_required')) {
                 $arrValidation['weight'] = 'required|numeric';
                 $arrValidation['weight_class'] = 'required|string';
             } else {
@@ -904,8 +952,8 @@ public function createProductGroup()
             }
         }
 
-        if (bc_config_admin('product_length')) {
-            if (bc_config_admin('product_length_required')) {
+        if (lc_config_admin('product_length')) {
+            if (lc_config_admin('product_length_required')) {
                 $arrValidation['length_class'] = 'required|string';
                 $arrValidation['length'] = 'required|numeric|min:0';
                 $arrValidation['width'] = 'required|numeric|min:0';
@@ -924,6 +972,6 @@ public function createProductGroup()
      * Check permisison item
      */
     public function checkPermisisonItem($id) {
-        return (new AdminProduct)->getProductAdmin($id);
+        return (new Product)->getProductAdmin($id);
     }
 }

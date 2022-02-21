@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="20" :offset="2">
+      <el-col :span="24">
         <div style="display: flex;justify-content: space-evenly;align-items: center;">
           <el-upload
             drag
@@ -36,6 +36,38 @@
           <component :is="componentUpload" :get-file="true" />
         </el-dialog>
       </el-col>
+      <div class="pull-right">
+        <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
+          Previous
+        </el-button>
+        <el-popover
+          placement="top"
+          v-model="visiblePopover"
+          width="360">
+          <div style="margin-top: 15px;">
+            <el-tooltip content="Sort" placement="left">
+              <el-input :placeholder="$t('table.sort')" v-model.number="temp.sort">
+                <template slot="append">
+                  <el-tooltip :content="'Status' + ( temp.status == 1 ? ' Active' : ' Deactive' )" placement="top">
+                    <el-switch
+                      v-model="temp.status"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                      active-value="1"
+                      inactive-value="0"
+                    />
+                  </el-tooltip>
+                </template>
+              </el-input>
+            </el-tooltip>
+          </div>
+          <div style="text-align: right; margin: 0">
+            <el-button size="mini" type="text" @click="visiblePopover = false">Cancel</el-button>
+            <el-button type="primary" size="mini" @click="done()">Done</el-button>
+          </div>
+          <el-button type="success" icon="el-icon-check" slot="reference">Upload</el-button>
+        </el-popover>
+      </div>
     </el-row>
   </div>
 </template>
@@ -45,6 +77,7 @@ import FileManager from '@/components/FileManager';
 import EventBus from '@/components/FileManager/eventBus';
 export default {
   name: 'InfoThumbnail',
+  props: ['dataActive'],
   components: {
     FileManager,
   },
@@ -52,7 +85,11 @@ export default {
     return {
       temp: {
         image: '',
+        sort: 1,
+        top: 1,
+        status: '1',
       },
+      visiblePopover: false,
       fileUrl: [
         {
           value: 'https://via.placeholder.com/350x350',
@@ -74,10 +111,16 @@ export default {
       componentUpload: '',
     };
   },
-  created() {
-    EventBus.$on('getFileResponse', this.handlerGeturl);
-  },
   methods: {
+    backStep() {
+      const active = this.dataActive - 1;
+      this.$emit('handleProcessActive', active);
+    },
+    done(){
+      this.$emit('handleProcessTemp', this.temp);
+      this.$emit('handleProcessActive', this.dataActive);
+      this.visiblePopover = false;
+    },
     handlerGeturl(data) {
       if (data) {
         this.fileUrl = [];
@@ -97,11 +140,13 @@ export default {
       this.fileUrl.push({ value: URL.createObjectURL(file.raw), height: 350, width: 550 });
     },
     handleVisibleStorage(){
+      EventBus.$on('getFileResponse', this.handlerGeturl);
       this.$store.commit('fm/setDisks', 'category');
       this.componentUpload = 'FileManager';
       this.dialogStorageVisible = true;
     },
     dialogStorageClose(){
+      EventBus.$off('getFileResponse');
       this.componentUpload = '';
       this.dialogStorageVisible = false;
     },

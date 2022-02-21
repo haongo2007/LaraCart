@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Front\ShopProduct;
 class ShopProductPromotion extends Model
 {
-    public $table = BC_DB_PREFIX.'shop_product_promotion';
+    public $table = 'shop_product_promotion';
     protected $guarded    = [];
     protected $primaryKey = ['product_id'];
     public $incrementing  = false;
-    protected $connection = BC_CONNECTION;
+    protected $connection = LC_CONNECTION;
 
     public function product()
     {

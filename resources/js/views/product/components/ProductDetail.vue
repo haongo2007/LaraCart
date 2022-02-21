@@ -1,5 +1,5 @@
 <template>
-  <el-row :gutter="20" style="margin:0px;">
+  <el-row :gutter="20" style="margin:0px 0px 60px 0px;">
     <div style="padding: 24px;">
       <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
     </div>
@@ -13,64 +13,64 @@
         <div v-for="(content,key,index) in stepContent" :key="key">
 
           <div v-if="componentInfo.hasOwnProperty(key)" v-show="index === active">
-            <component :is="componentInfo[key]" />
+            <component :data-refs="$refs['dataForm']" :data-active="active" @handleProcessTemp="handleProcessTemp" @handleProcessActive="handleProcessActive" :is="componentInfo[key]" />
           </div>
 
           <div v-else v-show="index === active">
-            <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
-              <el-input v-model="temp.descriptions[key].title" />
-            </el-form-item>
+            <el-row>
+              <el-col :span="24">
+                <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
+                  <el-input v-model="temp.descriptions[key].title" />
+                </el-form-item>
 
-            <el-form-item :label="$t('table.tags')">
-              <el-tag
-                v-for="tag in temp.descriptions[key].keyword"
-                :key="tag"
-                closable
-                :disable-transitions="false"
-                @close="handleClose(tag,key)"
-              >
-                {{ tag }}
-              </el-tag>
+                <el-form-item :label="$t('table.tags')">
+                  <el-tag
+                    v-for="tag in temp.descriptions[key].keyword"
+                    :key="tag"
+                    closable
+                    :disable-transitions="false"
+                    @close="handleClose(tag,key)"
+                  >
+                    {{ tag }}
+                  </el-tag>
 
-              <el-input
-                v-if="inputTagsVisible"
-                ref="savekeywordInput"
-                v-model="dynamicTags"
-                class="input-new-tag"
-                size="mini"
-                @keyup.enter.native="handleInputConfirm(key)"
-                @blur="handleInputConfirm(key)"
-              />
-              <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
-            </el-form-item>
+                  <el-input
+                    v-if="inputTagsVisible"
+                    ref="savekeywordInput"
+                    v-model="dynamicTags"
+                    class="input-new-tag"
+                    size="mini"
+                    @keyup.enter.native="handleInputConfirm(key)"
+                    @blur="handleInputConfirm(key)"
+                  />
+                  <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
+                </el-form-item>
 
-            <el-form-item :label="$t('table.description')">
-              <el-input
-                v-model="temp.descriptions[key].description"
-                :rows="2"
-                type="textarea"
-                placeholder="Please input"
-              />
-            </el-form-item>
+                <el-form-item :label="$t('table.description')">
+                  <el-input
+                    v-model="temp.descriptions[key].description"
+                    :rows="2"
+                    type="textarea"
+                    placeholder="Please input"
+                  />
+                </el-form-item>
 
-            <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
-              <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" />
-            </el-form-item>
+                <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
+                  <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-button-group class="pull-right">
+              <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
+                Previous
+              </el-button>
+              <el-button v-if="!action" type="primary" icon="el-icon-arrow-right" @click="nextStep">
+                Next
+              </el-button>
+            </el-button-group>
           </div>
 
         </div>
-
-        <el-button-group class="pull-right">
-          <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
-            Previous
-          </el-button>
-          <el-button v-if="!action" type="primary" icon="el-icon-arrow-right" @click="nextStep">
-            Next
-          </el-button>
-          <el-button v-else="action" type="success" icon="el-icon-check" @click="isEdit?updateData():createData()">
-            Done
-          </el-button>
-        </el-button-group>
       </el-form>
     </el-col>
   </el-row>
@@ -85,16 +85,13 @@ import InfoGeneral from './InfoGeneral';
 import InfoProperty from './InfoProperty';
 import InfoThumbnail from './InfoThumbnail';
 import InfoPromotion from './InfoPromotion';
-import ActionUpload from './ActionUpload';
+import ProductResource from '@/api/product';
+
+const productResource = new ProductResource();
 
 const defaultForm = {
   id: '',
-  alias: '',
-  sort: '',
-  top: '1',
-  parent: '0',
-  status: '1',
-  image: '',
+  kind: '',
   descriptions: {
   },
 };
@@ -108,7 +105,6 @@ export default {
     InfoGeneral,
     InfoProperty,
     InfoThumbnail,
-    ActionUpload,
     InfoPromotion,
   },
   props: {
@@ -131,27 +127,6 @@ export default {
       componentInfo: {},
       temp: Object.assign({}, defaultForm),
       rules: {
-        sort: [
-          {
-            type: 'number',
-            message: 'sort must be a number',
-            trigger: 'blur',
-          },
-        ],
-        parent: [
-          {
-            required: true,
-            message: 'parent is required',
-            trigger: 'change',
-          },
-        ],
-        status: [
-          {
-            required: true,
-            message: 'status is required',
-            trigger: 'change',
-          },
-        ],
         descriptions: [],
       },
       inputTagsVisible: false,
@@ -160,6 +135,7 @@ export default {
   },
   created() {
     this.fetchLanguages();
+    this.temp.kind = this.kind;
     if (this.isEdit){
       const id = this.$route.params && this.$route.params.id;
       this.getRecursive(id);
@@ -181,7 +157,7 @@ export default {
       const keyLang = Object.keys(this.languages)[this.active];
       const keyStep = Object.keys(this.stepContent)[this.active + 1];
       if (this.componentInfo.hasOwnProperty(keyStep)){
-        this.componentInfo[keyStep] = keyStep;
+        this.componentInfo[keyStep] = keyStep;   
       }
       if (keyLang){
         this.$refs['dataForm'].validateField('descriptions.' + keyLang + '.title', this._checkValidate);
@@ -193,9 +169,9 @@ export default {
       }
     },
     _checkValidate(msg){
-      // if (!msg) {
-      this.active++;
-      // }
+      if (!msg) {
+        this.active++;
+      }
     },
     fetchCategory(id) {
       const that = this;
@@ -207,13 +183,6 @@ export default {
             that.temp.descriptions[v.lang].description = v.description;
             that.temp.descriptions[v.lang].keyword = v.keyword != '' ? v.keyword.split(',') : [];
           });
-          // that.fileUrl = data.image+ '&w=644';
-          that.temp.image = data.image;
-          that.temp.parent = data.parent;
-          that.temp.alias = data.alias;
-          that.temp.sort = data.sort;
-          that.temp.top = String(data.top);
-          that.temp.status = String(data.status);
           that.temp.id = data.id;
         })
         .catch(err => {
@@ -281,12 +250,6 @@ export default {
           };
           this.$set(this.componentInfo, 'info-thumbnail', '');
 
-          this.stepContent['action-upload'] = {
-            title: 'Done',
-            icon: 'el-icon-upload',
-          };
-          this.$set(this.componentInfo, 'action-upload', '');
-
           this.loading = false;
         })
         .catch(err => {
@@ -294,41 +257,36 @@ export default {
         });
     },
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const loading = this.$loading({
-            target: '.el-form',
-          });
-          const form_data = new FormData();
-          for (var key in this.temp) {
-            if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
-              form_data.append(key, JSON.stringify(this.temp[key]));
-            } else {
-              form_data.append(key, this.temp[key]);
-            }
-          }
-          categoryResource.store(form_data).then((res) => {
-            if (res) {
-              loading.close();
-              this.$message({
-                type: 'success',
-                message: 'Create successfully',
-              });
-              const view = this.$router.resolve({ name: 'CategoryCreate' }).route;
-              this.$store.dispatch('tagsView/delCachedView', view);
-              this.reloadRedirectToList('CategoryList');
-            } else {
-              this.$message({
-                type: 'error',
-                message: 'Create failed',
-              });
-              loading.close();
-            }
-          }).catch(err => {
-            console.log(err);
-            loading.close();
-          });
+      const loading = this.$loading({
+        target: '.el-form',
+      });
+      const form_data = new FormData();
+      for (var key in this.temp) {
+        if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
+          form_data.append(key, JSON.stringify(this.temp[key]));
+        } else {
+          form_data.append(key, this.temp[key]);
         }
+      }
+      productResource.store(form_data).then((res) => {
+        if (res) {
+          loading.close();
+          this.$message({
+            type: 'success',
+            message: 'Create successfully',
+          });
+          const view = this.$router.resolve({ name: 'ProductCreateSingle' }).route;
+          this.$store.dispatch('tagsView/delCachedView', view);
+          this.reloadRedirectToList('ProductList');
+        } else {
+          this.$message({
+            type: 'error',
+            message: 'Create failed',
+          });
+          loading.close();
+        }
+      }).catch(err => {
+        loading.close();
       });
     },
     updateData() {
@@ -393,6 +351,18 @@ export default {
       this.inputTagsVisible = false;
       this.dynamicTags = '';
     },
+    handleProcessActive(data){
+      if (this.active == data) {
+        this.createData()
+      }else if(this.active < data){
+        this.nextStep();
+      }else{
+        this.backStep();
+      }
+    },
+    handleProcessTemp(data){
+      this.temp = {...this.temp,...data};
+    }
   },
 };
 </script>
@@ -426,5 +396,8 @@ export default {
   .input-new-tag {
     width: 90px;
     vertical-align: bottom;
+  }
+  .el-steps--simple{
+    padding:13px 1%;
   }
 </style>

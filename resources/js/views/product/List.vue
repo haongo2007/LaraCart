@@ -178,7 +178,7 @@
         <template slot-scope="{row}">
           <el-button-group>
             <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="renderRouterEdit(row.kind,row.id)" />
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="" />
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
         </template>
       </el-table-column>
@@ -341,9 +341,38 @@ export default {
         cancelButtonText: 'Cancel',
         type: 'warning',
       }).then(() => {
-
+        this.loading = true;
+        if (multiple) {
+          var id = [];
+          row.map((item) => id.push(item.id));
+        } else {
+          var id = row.id;
+        }
+        var that = this;
+        productResource.destroy(id).then((res) => {
+          if (multiple) {
+            row.forEach(function(v) {
+              const index = that.list.indexOf(v);
+              that.list.splice(index, 1);
+            });
+          } else {
+            const index = that.list.indexOf(row);
+            that.list.splice(index, 1);
+          }
+          this.$message({
+            type: 'success',
+            message: 'Delete successfully',
+          });
+          this.loading = false;
+        }).catch(() => {
+          this.loading = false;
+        });
       }).catch(() => {
-
+        this.loading = false;
+        this.$message({
+          type: 'info',
+          message: 'Delete canceled',
+        });
       });
     },
     handleFilterDate(){

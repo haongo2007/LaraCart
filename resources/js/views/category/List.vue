@@ -8,7 +8,7 @@
             <el-button v-waves type="success" :disabled="loading" @click="handleDownload"><svg-icon icon-class="excel" /></el-button>
           </el-button-group>
           <div class="el-select filter-item el-select--medium">
-            <el-checkbox v-model="listQuery.parent" label="ROOT" border @change="handleFilter" />
+            <el-checkbox v-model="parent" label="ROOT" border @change="handleFilter" />
           </div>
           <el-select v-model="listQuery.sort" :placeholder="$t('table.order')" style="width: 140px" clearable class="filter-item" @change="handleFilter('sort',listQuery.sort)">
             <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" :disabled="item.active" />
@@ -126,7 +126,7 @@ const defaultQuery = {
   name: '',
   type: '',
   sort: '',
-  parent: true,
+  parent: '0',
 };
 
 export default {
@@ -146,6 +146,7 @@ export default {
       total: 0,
       loading: true,
       dialogLoading: true,
+      parent:true,
       listQuery: Object.assign({}, defaultQuery),
       fillterStatusOptions: [{
         label: 'Deactive',
@@ -198,6 +199,11 @@ export default {
     },
     async getList() {
       this.loading = true;
+      if (this.parent === false) {
+        this.listQuery.parent = '';
+      }else{
+        this.listQuery.parent = '0';
+      }
       const data = await categoryResource.list(this.listQuery);
       this.list = data.data;
       this.total = data.meta.total;

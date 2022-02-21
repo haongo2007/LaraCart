@@ -69,7 +69,7 @@ class CategoryController extends Controller
             $request->file('image')->storeAs(
                 $path,$fileName
             );
-            $data['image'] = 'api/getFile?disk=category&path='.$fileName;
+            $data['image'] = LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName;
         }
         $dataInsert = [
             'image'    => $data['image'],

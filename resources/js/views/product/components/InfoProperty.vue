@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="16" :offset="4">
+      <el-col :span="24">
         <el-form-item :label="$t('table.weight_unit')" prop="weight_unit">
           <el-autocomplete
             v-model="temp.weight_unit"
@@ -43,6 +43,14 @@
         </el-form-item>
 
       </el-col>
+      <el-button-group class="pull-right">
+        <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
+          Previous
+        </el-button>
+        <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+          Next
+        </el-button>
+      </el-button-group>
     </el-row>
   </div>
 </template>
@@ -55,6 +63,7 @@ const weightResource = new WeightResource();
 const lengthResource = new LengthResource();
 export default {
   name: 'InfoProperty',
+  props: ['dataActive'],
   data() {
     return {
       temp: {
@@ -74,6 +83,15 @@ export default {
 
   },
   methods: {
+    backStep() {
+      const active = this.dataActive - 1;
+      this.$emit('handleProcessActive', active);
+    },
+    nextStep() {      
+      const active = this.dataActive + 1;
+      this.$emit('handleProcessActive', active);
+      this.$emit('handleProcessTemp', this.temp);
+    },
     querySearchWeightAsync(queryString, cb){
       var weight_units = this.weight_units;
       var results = queryString ? weight_units.filter(this.createFilter(queryString)) : weight_units;

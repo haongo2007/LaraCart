@@ -33,17 +33,17 @@ Route::group([
 
 
 Route::group([
-        'namespace' => 'Api\Front'
+        'namespace' => 'Api\Front',
+        'middleware' => LC_FRONT_MIDDLEWARE,
     ],function() {
     
+
     Route::post('auth/login', 'Auth\LoginController@login');
 
-    Route::group(['middleware' => LC_FRONT_MIDDLEWARE], function () {
         
-        foreach (glob(__DIR__ . '\Front\*.php') as $filename) {
-            require_once $filename;
-        }
+    foreach (glob(__DIR__ . '\Front\*.php') as $filename) {
+        require_once $filename;
+    }
 
-    });
     
 });

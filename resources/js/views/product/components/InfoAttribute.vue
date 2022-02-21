@@ -1,51 +1,65 @@
 <template>
-  <el-container>
-    <el-aside v-loading="loadAttributes" width="200px">
-      <div v-for="(attribute,index) in temp" :key="attribute.id" style="margin: 5px;">
-        <el-button type="warning" icon="el-icon-plus" @click="handleAddAttribute(index)">{{ attribute.name }}</el-button>
-      </div>
-      <div style="margin: 5px;">
-        <el-button :disabled="disabled_clear" type="danger" icon="el-icon-close" @click="handleClearAllAttribute()">Clear</el-button>
-      </div>
-    </el-aside>
-    <el-container v-for="(attribute,index) in temp" :key="attribute.id" v-loading="loadAttributes">
-      <el-header align="center">{{ attribute.name }} ({{ attribute.values.length }})</el-header>
-      <el-main v-for="(value,key) in attribute.values" v-if="attribute.values" :key="key">
-        <div style="display: flex;justify-content: space-between;">
-          <el-form-item label="Name">
-            <el-input v-model="temp[index]['values'][key].name" />
-          </el-form-item>
-          <el-form-item label="Price">
-            <el-input-number v-model="temp[index]['values'][key].price" style="width: 100%" :controls="false" />
-          </el-form-item>
-          <el-form-item label-width="30px">
-            <el-button v-if="attribute.picker" type="success" @click="handleVisibleStorage(index,key)">Pick Image</el-button>
-          </el-form-item>
-          <el-form-item label-width="30px">
-            <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
-          </el-form-item>
-        </div>
-        <div v-if="temp[index]['values'][key].files" v-loading="loadFiles">
-          <lightbox :cells="3" :items="temp[index]['values'][key].files" />
-          <div v-if="temp[index]['values'][key].palette" class="color-Palette">
-            <h1>COLORS</h1>
-            <ul class="swatch__container">
-              <li v-for="color in temp[index]['values'][key].palette" class="swatch__wrapper">
-                <div :style="{ backgroundColor: color.hex }" class="swatch">
-                  <div :style="{ color: color.typeTextColor }" class="swatch__type">№ {{ color.number }}. {{ color.type }}</div>
-                  <div :style="{ color: color.hexTextColor }" class="swatch__hex">{{ color.hex }}</div>
-                  <div :style="{ color: color.nameTextColor }" class="swatch__name">{{ color.name }}</div>
-                </div>
-              </li>
-            </ul>
+  <div>
+    <el-row v-show="!loadAttributes">
+      <el-col :span="2">
+        <div v-loading="loadAttributes" width="200px">
+          <div v-for="(attribute,index) in temp" :key="attribute.id" style="margin: 5px;">
+            <el-button type="warning" icon="el-icon-plus" @click="handleAddAttribute(index)">{{ attribute.name }}</el-button>
+          </div>
+          <div style="margin: 5px;">
+            <el-button :disabled="disabled_clear" type="danger" icon="el-icon-close" @click="handleClearAllAttribute()">Clear</el-button>
           </div>
         </div>
-      </el-main>
-    </el-container>
+      </el-col>
+      <el-col :span="22">
+        <el-col v-for="(attribute,index) in temp" :key="attribute.id" v-loading="loadAttributes" :span="12">
+          <el-header align="center">{{ attribute.name }} ({{ attribute.values.length }})</el-header>
+          <div v-for="(value,key) in attribute.values" v-if="attribute.values" :key="key">
+            <div style="display: flex;justify-content: space-between;">
+              <el-form-item label="Name">
+                <el-input v-model="temp[index]['values'][key].name" />
+              </el-form-item>
+              <el-form-item label="Price">
+                <el-input-number v-model="temp[index]['values'][key].price" style="width: 100%" :controls="false" />
+              </el-form-item>
+              <el-form-item label-width="30px">
+                <el-button v-if="attribute.picker" type="success" @click="handleVisibleStorage(index,key)">Pick Image</el-button>
+              </el-form-item>
+              <el-form-item label-width="30px">
+                <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
+              </el-form-item>
+            </div>
+            <div v-if="temp[index]['values'][key].files" v-loading="loadFiles">
+              <lightbox :cells="3" :items="temp[index]['values'][key].files" />
+              <div v-if="temp[index]['values'][key].palette" class="color-Palette">
+                <h1>COLORS</h1>
+                <ul class="swatch__container">
+                  <li v-for="color in temp[index]['values'][key].palette" class="swatch__wrapper">
+                    <div :style="{ backgroundColor: color.hex }" class="swatch">
+                      <div :style="{ color: color.typeTextColor }" class="swatch__type">№ {{ color.number }}. {{ color.type }}</div>
+                      <div :style="{ color: color.hexTextColor }" class="swatch__hex">{{ color.hex }}</div>
+                      <div :style="{ color: color.nameTextColor }" class="swatch__name">{{ color.name }}</div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </el-col>
+        <el-button-group class="pull-right">
+          <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
+            Previous
+          </el-button>
+          <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+            Next
+          </el-button>
+        </el-button-group>
+      </el-col>
+    </el-row>
     <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
       <component :is="componentStorage" :get-file="true" />
     </el-dialog>
-  </el-container>
+  </div>
 </template>
 
 <script>
@@ -67,6 +81,7 @@ function GetColorName() {
 }
 export default {
   name: 'InfoAttribute',
+  props: ['dataActive'],
   components: {
     Lightbox,
     FileManager,
@@ -86,9 +101,17 @@ export default {
   },
   created() {
     this.fetchAttributeGroup();
-    EventBus.$on('getFileResponse', this.handlerGeturl);
   },
   methods: {
+    backStep() {
+      const active = this.dataActive - 1;
+      this.$emit('handleProcessActive', active);
+    },
+    nextStep() {   
+      const active = this.dataActive + 1;   
+      this.$emit('handleProcessActive', active);
+      this.$emit('handleProcessTemp', {attribute:this.temp});
+    },
     async fetchAttributeGroup(){
       const { data } = await attributeGroupResource.list();
       const that = this;
@@ -118,10 +141,12 @@ export default {
       }
     },
     dialogStorageClose(){
+      EventBus.$off('getFileResponse');
       this.componentStorage = '';
       this.dialogStorageVisible = false;
     },
     handleVisibleStorage(index, key){
+      EventBus.$on('getFileResponse', this.handlerGeturl);
       this.$store.commit('fm/setDisks', 'product');
       this.componentStorage = 'FileManager';
       this.dialogStorageVisible = true;
@@ -154,6 +179,7 @@ export default {
         }
         this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]].palette = colors;
         this.loadFiles = false;
+        console.log(this.temp);
       });
     },
   },

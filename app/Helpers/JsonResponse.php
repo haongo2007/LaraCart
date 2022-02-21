@@ -51,7 +51,7 @@ class JsonResponse implements \JsonSerializable
         }
 
         $this->error = $error;
-        $this->success = !empty($data);
+        $this->success = !empty($data) || !$error;
     }
 
 

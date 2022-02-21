@@ -25,7 +25,7 @@ class CategoryCollection extends JsonResource
             'image' => $this->image
         ];
 
-        if (!$parent = $request->parent === 'true' ? true : false) {
+        if (!$parent = $request->parent === '0' ? true : false) {
             if ($this->Parent) {
                 $res['parent'] = $this->Parent->descriptionsWithLangDefault->title;
                 if ($request->id && !$this->Children->isEmpty()) {

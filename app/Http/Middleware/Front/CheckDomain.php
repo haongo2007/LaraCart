@@ -4,6 +4,8 @@ namespace App\Http\Middleware\Front;
 
 use Closure;
 use App\Models\Front\ShopStore;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 
 class CheckDomain
 {
@@ -18,11 +20,10 @@ class CheckDomain
     {
         if (lc_config_global('MultiVendorPro') || lc_config_global('MultiStorePro')) {
             //Check domain exist
-            $domain = lc_process_domain_store(url('/'));
+            $domain = lc_process_domain_store(basename(request()->headers->get('referer')));
             $arrDomain = ShopStore::getDomainPartner();
-            if (!in_array($domain, $arrDomain) && lc_config_global('domain_strict') && config('app.storeId') != BC_ID_ROOT) {
-                echo view('deny_domain')->render();
-                exit();
+            if (!in_array($domain, $arrDomain) && lc_config_global('domain_strict')) {
+                return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
             }
         }
         return $next($request);

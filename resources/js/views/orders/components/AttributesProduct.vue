@@ -2,7 +2,7 @@
   <el-form ref="form" :model="form" label-width="120px">
     <el-descriptions title="Attribute" direction="vertical" :column="3" border>
       <el-descriptions-item v-for="(item,index) in dataAtributeGroup" :key="index" :label="item">
-        <span v-if="!is_new">
+        <span v-if="!isNew">
           {{ dataAttributed[index].split('__')[0] }} {{ ( dataAttributed[index].split('__')[1] > 0 ? ' + '+dataAttributed[index].split('__')[1] : '') }}
           <el-badge v-if="dataAttributed[index].split('__')[1] > 0" :value="dataCurrency" class="item" type="warning" />
         </span>
@@ -28,6 +28,11 @@ export default {
   computed: {
     dataAttributed(){
       if (this.dataAttribute) {
+        try {
+          JSON.parse(this.dataAttribute);
+        } catch (e) {
+            return this.dataAttribute;
+        }
         return JSON.parse(this.dataAttribute);
       }
     },
