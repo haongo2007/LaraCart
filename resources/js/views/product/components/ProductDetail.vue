@@ -17,7 +17,7 @@
           </div>
 
           <div v-else v-show="index === active">
-            <el-row>
+            <el-row class="el-main-form">
               <el-col :span="24">
                 <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
                   <el-input v-model="temp.descriptions[key].title" />
@@ -60,14 +60,16 @@
                 </el-form-item>
               </el-col>
             </el-row>
-            <el-button-group class="pull-right">
-              <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
-                Previous
-              </el-button>
-              <el-button v-if="!action" type="primary" icon="el-icon-arrow-right" @click="nextStep">
-                Next
-              </el-button>
-            </el-button-group>
+            <el-row >
+              <el-button-group class="pull-right">
+                <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
+                  Previous
+                </el-button>
+                <el-button v-if="!action" type="primary" icon="el-icon-arrow-right" @click="nextStep">
+                  Next
+                </el-button>
+              </el-button-group>
+            </el-row>
           </div>
 
         </div>

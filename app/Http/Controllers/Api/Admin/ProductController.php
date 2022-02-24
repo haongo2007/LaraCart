@@ -20,6 +20,7 @@ use App\Models\Front\ShopCustomField;
 use App\Models\Front\ShopCustomFieldDetail;
 use App\Models\Admin\Product;
 use App\Models\Admin\Category;
+use App\Models\Front\ShopAttributePalette;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Helper\JsonResponse;
@@ -187,48 +188,13 @@ public function createProductGroup()
         $data['tax'] = json_decode($data['tax']);
         $data['attribute'] = json_decode($data['attribute']);
         $data['category'] = json_decode($data['category']);
-        $data['category'] = (int) end($data['category']);
+        $data['category'] = is_array($data['category']) ? end($data['category']) : $data['category'];
         $data['date_promotion'] = json_decode($data['date_promotion']);
 
         $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
-
-
-        if ($data['attribute'] && $data['kind'] == LC_PRODUCT_SINGLE) {
-            $arrDataAtt = [];
-            foreach ($data['attribute'] as $group => $rowGroup) {
-                if ($rowGroup) {
-                    foreach ($rowGroup->values as $key => $nameAtt) {
-                        if ($nameAtt) {
-                            // $code = '';
-                            $images = '';
-                            // if (array_key_exists('code', $rowGroup)) {
-                            //     $code = $rowGroup['code'][$key];
-                            // }
-                            if (array_key_exists('files', $rowGroup->values[$key])) {
-                                $images = implode(',', $rowGroup->values[$key]->files);
-                            }
-                            // if (array_key_exists('type_show', $rowGroup)) {
-                            //     $type_show = $rowGroup['type_show'][$key];
-                            // }
-                            $arrDataAtt[] = new ShopProductAttribute([
-                                                                    'name' => $nameAtt->name, 
-                                                                    'add_price' => $rowGroup->values[$key]->price,
-                                                                    'attribute_group_id' => $group,
-                                                                    // 'code' => $code,
-                                                                    'images' => $images,
-                                                                    // 'type_show' => $type_show
-                                                                ]);
-                        }
-                    }
-                }
-
-            }
-            // $product->attributes()->saveMany($arrDataAtt);
-        }
-        dd($arrDataAtt);
 
         switch ($data['kind']) {
             case LC_PRODUCT_SINGLE: // product single
@@ -415,38 +381,45 @@ public function createProductGroup()
         }
 
         //Insert attribute
-        if ($attribute && $data['kind'] == LC_PRODUCT_SINGLE) {
+        if ($data['attribute'] && $data['kind'] == LC_PRODUCT_SINGLE) {
             $arrDataAtt = [];
-            foreach ($attribute as $group => $rowGroup) {
-                if (count($rowGroup)) {
-                    foreach ($rowGroup['name'] as $key => $nameAtt) {
+            foreach ($data['attribute'] as $group => $rowGroup) {
+                if ($rowGroup) {
+                    foreach ($rowGroup->values as $key => $nameAtt) {
                         if ($nameAtt) {
-                            $code = '';
+                            $arrDataPalette = [];
                             $images = '';
-                            $type_show = '';
-                            if (array_key_exists('code', $rowGroup)) {
-                                $code = $rowGroup['code'][$key];
+                            if (array_key_exists('files', $rowGroup->values[$key])) {
+                                $images = implode(',', $rowGroup->values[$key]->files);
                             }
-                            if (array_key_exists('images', $rowGroup)) {
-                                $images = $rowGroup['images'][$key];
-                            }
-                            if (array_key_exists('type_show', $rowGroup)) {
-                                $type_show = $rowGroup['type_show'][$key];
-                            }
-                            $arrDataAtt[] = new ShopProductAttribute([
-                                                                    'name' => $nameAtt, 
-                                                                    'add_price' => $rowGroup['add_price'][$key],
-                                                                    'attribute_group_id' => $group,
-                                                                    // 'code' => $code,
-                                                                    'images'=>$images,
-                                                                    // 'type_show' => $type_show
-                                                                ]);
+                            $arrDataAtt =  [
+                                                'name' => $nameAtt->name, 
+                                                'add_price' => $rowGroup->values[$key]->price,
+                                                'attribute_group_id' => $rowGroup->id,
+                                                'images' => $images,
+                                                'product_id' => $product->id
+                                            ];
+                            $justProdAttribute = ShopProductAttribute::create($arrDataAtt);
+                            if (array_key_exists('palette', $rowGroup->values[$key])) {
+                                $palette = $rowGroup->values[$key]->palette;
+
+                                foreach ($palette as $keypalette => $valuepalette) {
+                                    $arrDataPalette[] = [
+                                        'name' => $valuepalette->name,
+                                        'type' => $valuepalette->type,
+                                        'hex' => $valuepalette->hex,
+                                        'attribute_id' => $justProdAttribute->id,
+                                        'product_id' => $product->id
+                                    ];
+                                }
+                                ShopAttributePalette::insert($arrDataPalette);
+                            };
                         }
                     }
+
                 }
 
             }
-            $product->attributes()->saveMany($arrDataAtt);
         }
 
         //Insert path download

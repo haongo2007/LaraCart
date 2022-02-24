@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row v-show="!loadAttributes">
+    <el-row v-show="!loadAttributes" class="el-main-form">
       <el-col :span="2">
         <div v-loading="loadAttributes" width="200px">
           <div v-for="(attribute,index) in temp" :key="attribute.id" style="margin: 5px;">
@@ -12,7 +12,7 @@
         </div>
       </el-col>
       <el-col :span="22">
-        <el-col v-for="(attribute,index) in temp" :key="attribute.id" v-loading="loadAttributes" :span="12">
+        <el-col v-for="(attribute,index) in temp" :key="attribute.id" v-loading="loadAttributes" :span="12" style="padding: 0 20px">
           <el-header align="center">{{ attribute.name }} ({{ attribute.values.length }})</el-header>
           <div v-for="(value,key) in attribute.values" v-if="attribute.values" :key="key">
             <div style="display: flex;justify-content: space-between;">
@@ -46,15 +46,17 @@
             </div>
           </div>
         </el-col>
-        <el-button-group class="pull-right">
-          <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-            Previous
-          </el-button>
-          <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
-            Next
-          </el-button>
-        </el-button-group>
       </el-col>
+    </el-row>
+    <el-row>
+      <el-button-group class="pull-right">
+        <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
+          Previous
+        </el-button>
+        <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+          Next
+        </el-button>
+      </el-button-group>
     </el-row>
     <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
       <component :is="componentStorage" :get-file="true" />

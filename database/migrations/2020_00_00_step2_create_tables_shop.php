@@ -383,12 +383,16 @@ class CreateTablesShop extends Migration
             $table->integer('attribute_group_id');
             $table->integer('product_id');
             $table->integer('add_price')->default(0);
-            $table->integer('sort')->default(0);
-            $table->tinyInteger('status')->default(1);
-            $table->text('code')->nullable();
             $table->text('images')->nullable();
-            $table->enum('type_show', ['default', 'threesixty'])->default('default');
             $table->index(['product_id', 'attribute_group_id']);
+            }
+        );
+
+        Schema::create('shop_attribute_palette', function (Blueprint $table) {
+            $table->string('name', 100);
+            $table->string('type',100);
+            $table->string('hex',100);
+            $table->integer('attribute_id');
             }
         );
 

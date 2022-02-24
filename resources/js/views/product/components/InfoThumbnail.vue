@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row>
+    <el-row class="el-main-form">
       <el-col :span="24">
         <div style="display: flex;justify-content: space-evenly;align-items: center;">
           <el-upload
@@ -36,36 +36,38 @@
           <component :is="componentUpload" :get-file="true" />
         </el-dialog>
       </el-col>
+    </el-row>
+    <el-row>
       <div class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-          Previous
+            Previous
         </el-button>
         <el-popover
-          placement="top"
-          v-model="visiblePopover"
-          width="360">
-          <div style="margin-top: 15px;">
-            <el-tooltip content="Sort" placement="left">
-              <el-input :placeholder="$t('table.sort')" v-model.number="temp.sort">
-                <template slot="append">
-                  <el-tooltip :content="'Status' + ( temp.status == 1 ? ' Active' : ' Deactive' )" placement="top">
-                    <el-switch
-                      v-model="temp.status"
-                      active-color="#13ce66"
-                      inactive-color="#ff4949"
-                      active-value="1"
-                      inactive-value="0"
-                    />
-                  </el-tooltip>
-                </template>
-              </el-input>
-            </el-tooltip>
-          </div>
-          <div style="text-align: right; margin: 0">
-            <el-button size="mini" type="text" @click="visiblePopover = false">Cancel</el-button>
-            <el-button type="primary" size="mini" @click="done()">Done</el-button>
-          </div>
-          <el-button type="success" icon="el-icon-check" slot="reference">Upload</el-button>
+            placement="top"
+            v-model="visiblePopover"
+            width="360">
+            <div style="margin-top: 15px;">
+              <el-tooltip content="Sort" placement="left">
+                <el-input :placeholder="$t('table.sort')" v-model.number="temp.sort">
+                  <template slot="append">
+                    <el-tooltip :content="'Status' + ( temp.status == 1 ? ' Active' : ' Deactive' )" placement="top">
+                      <el-switch
+                        v-model="temp.status"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                        active-value="1"
+                        inactive-value="0"
+                      />
+                    </el-tooltip>
+                  </template>
+                </el-input>
+              </el-tooltip>
+            </div>
+            <div style="text-align: right; margin: 0">
+              <el-button size="mini" type="text" @click="visiblePopover = false">Cancel</el-button>
+              <el-button type="primary" size="mini" @click="done()">Done</el-button>
+            </div>
+            <el-button type="success" icon="el-icon-check" slot="reference">Upload</el-button>
         </el-popover>
       </div>
     </el-row>
@@ -141,7 +143,7 @@ export default {
     },
     handleVisibleStorage(){
       EventBus.$on('getFileResponse', this.handlerGeturl);
-      this.$store.commit('fm/setDisks', 'category');
+      this.$store.commit('fm/setDisks', 'product');
       this.componentUpload = 'FileManager';
       this.dialogStorageVisible = true;
     },
@@ -164,5 +166,14 @@ export default {
     display: flex;
     justify-content: space-around;
     align-items: center;
+  }
+  .el-main-form{
+    height: calc(100vh - 360px);
+    margin-bottom: 20px;
+    overflow-y: scroll;
+  }
+  .el-main-form::-webkit-scrollbar {
+      width: 0; 
+      background: transparent; 
   }
 </style>

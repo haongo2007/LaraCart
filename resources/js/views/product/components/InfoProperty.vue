@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row>
+    <el-row class="el-main-form">
       <el-col :span="24">
         <el-form-item :label="$t('table.weight_unit')" prop="weight_unit">
           <el-autocomplete
@@ -43,6 +43,8 @@
         </el-form-item>
 
       </el-col>
+    </el-row>
+    <el-row>
       <el-button-group class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
           Previous

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row>
+    <el-row class="el-main-form">
       <el-col :span="12">
         <el-form-item :label="$t('table.promotion_price')" prop="price_promotion">
           <el-input-number v-model="temp.price_promotion" style="width: 100%" :controls="false" />
@@ -21,16 +21,18 @@
             :picker-options="pickerOptions"
           />
         </el-form-item>
-        <el-button-group class="pull-right">
-          <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-            Previous
-          </el-button>
-          <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
-            Next
-          </el-button>
-        </el-button-group>
       </el-col>
     </el-row>
+    <el-row>
+      <el-button-group class="pull-right">
+        <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
+          Previous
+        </el-button>
+        <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+          Next
+        </el-button>
+      </el-button-group>
+    </el-row>.
   </div>
 </template>
 

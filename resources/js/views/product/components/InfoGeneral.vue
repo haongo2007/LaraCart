@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-skeleton :rows="20" animated :loading="loading" />
-    <el-row v-show="!loading">
+    <el-row v-show="!loading" class="el-main-form">
       <el-form ref="dataGeneralForm" :model="temp" :rules="rules" class="form-container" label-width="150px">
         <el-col :span="12">
 
@@ -91,6 +91,7 @@
               :picker-options="pickerOptions">
             </el-date-picker>
           </el-form-item>
+
           <el-form-item :label="$t('table.stock')" prop="stock">
             <el-input
               v-model="temp.stock"
@@ -99,16 +100,18 @@
             />
           </el-form-item>
 
-          <el-button-group class="pull-right">
-            <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-              Previous
-            </el-button>
-            <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
-              Next
-            </el-button>
-          </el-button-group>
         </el-col>
       </el-form>
+    </el-row>
+    <el-row>
+      <el-button-group class="pull-right">
+        <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
+          Previous
+        </el-button>
+        <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+          Next
+        </el-button>
+      </el-button-group>
     </el-row>
   </div>
 </template>
