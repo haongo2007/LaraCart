@@ -3,6 +3,7 @@
 namespace App\Models\Front;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class ShopLanguage extends Model
 {
@@ -13,6 +14,32 @@ class ShopLanguage extends Model
     private static $getListActive      = null;
     private static $getArrayLanguages = null;
     private static $getCodeActive = null;
+    const ITEM_PER_PAGE = 15;
+    const ACTIVE = ['1'];
+
+    public function getLanguageListAdmin(array $dataSearch)
+    {
+        $limit = Arr::get($dataSearch, 'limit', self::ITEM_PER_PAGE);
+        $status= Arr::get($dataSearch, 'status', self::ACTIVE);
+        $title = Arr::get($dataSearch, 'name', '');
+        $code = Arr::get($dataSearch, 'code', []);
+        $languageList     = (new ShopLanguage);
+
+        if ($title) {
+            $languageList = $languageList->where('name', 'like', '%' . $title . '%');
+        }
+        if(is_array($code)) {
+            $languageList = $languageList->whereIn('code', $code);
+        }
+
+        if (!is_null($status) && is_array($status)) {
+            $languageList = $languageList->whereIn('status',$status);
+        }
+
+        $languageList = $languageList->paginate($limit);
+
+        return $languageList;
+    }
 
     public static function getListAll()
     {

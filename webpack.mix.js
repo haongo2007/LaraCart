@@ -54,7 +54,7 @@ mix
     processCssUrls: false,
   })
   .sass('resources/js/styles/index.scss', 'public/css/app.css', {
-    implementation: require('dart-sass'),
+    implementation: require('sass'),
   });
 
 if (mix.inProduction()) {

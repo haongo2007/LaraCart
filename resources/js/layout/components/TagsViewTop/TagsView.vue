@@ -232,8 +232,12 @@ export default {
       } else {
         this.left = left;
       }
-
-      this.top = e.clientY;
+      console.log(e)
+      if (this.type == 'bottom') {
+        this.top = - (e.screenY - e.pageY + 50); 
+      }else{
+        this.top = e.clientY; 
+      }
       this.visible = true;
       this.selectedTag = tag;
     },
@@ -255,6 +259,22 @@ export default {
     position:fixed;
     z-index: 99;
     bottom:0;
+    .tags-view-item {
+      &.active {
+        background-color: #1890ff;
+        color: #fff;
+        border-color: #1890ff;
+      }
+    }
+  }
+  &.tags-view-top{
+    .tags-view-item {
+      &.active {
+        background-color: #42b983;
+        color: #fff;
+        border-color: #42b983;
+      }
+    }
   }
   .tags-view-wrapper {
     .tags-view-item {
@@ -277,9 +297,6 @@ export default {
         margin-right: 15px;
       }
       &.active {
-        background-color: #42b983;
-        color: #fff;
-        border-color: #42b983;
         &::before {
           content: '';
           background: #fff;
@@ -314,6 +331,9 @@ export default {
       }
     }
   }
+}
+.tags-view-bottom{
+
 }
 </style>
 

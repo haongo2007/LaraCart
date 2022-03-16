@@ -1,5 +1,6 @@
 <?php
-    Route::get('/getActiveLanguage', 'LanguageController@getActiveLanguages');
+    Route::get('/languages/getActiveLanguage', 'LanguageController@getActiveLanguages');
+	Route::apiResource('/languages', 'LanguageController');
     // Route::get('create', function () {
     //     return redirect()->route('admin_language.index');
     // });

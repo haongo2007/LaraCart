@@ -1,42 +1,44 @@
 <template>
   <div>
-    <el-row class="el-main-form">
-      <el-col :span="24">
-        <div style="display: flex;justify-content: space-evenly;align-items: center;">
-          <el-upload
-            drag
-            :multiple="false"
-            :show-file-list="false"
-            action="/"
-            accept="image/jpeg,image/gif,image/png"
-            :auto-upload="false"
-            :on-change="handleChange"
-          >
-            <i class="el-icon-upload" />
-            <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-
-          </el-upload>
-
-          <div class="el-upload el-upload--text" @click="handleVisibleStorage()">
-            <div class="el-upload-dragger">
+    <el-form ref="dataGeneralForm" :model="temp" class="form-container" label-width="150px">
+      <el-row class="el-main-form">
+        <el-col :span="24">
+          <div style="display: flex;justify-content: space-evenly;align-items: center;">
+            <el-upload
+              drag
+              :multiple="false"
+              :show-file-list="false"
+              action="/"
+              accept="image/jpeg,image/gif,image/png"
+              :auto-upload="false"
+              :on-change="handleChange"
+            >
               <i class="el-icon-upload" />
-              <div class="el-upload__text">Click here to Open <em>Storage</em></div>
+              <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+
+            </el-upload>
+
+            <div class="el-upload el-upload--text" @click="handleVisibleStorage()">
+              <div class="el-upload-dragger">
+                <i class="el-icon-upload" />
+                <div class="el-upload__text">Click here to Open <em>Storage</em></div>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="image-uploading">
-          <el-image v-for="(item,index) in fileUrl" :key="index" :style="'width:'+ item.width+'px; height:'+ item.height+'px'" :src="item.value" fit="cover">
-            <div slot="error" class="image-slot">
-              <i class="el-icon-picture-outline" />
-            </div>
-          </el-image>
-        </div>
+          <div class="image-uploading">
+            <el-image v-for="(item,index) in fileUrl" :key="index" :style="'width:'+ item.width+'px; height:'+ item.height+'px'" :src="item.value" fit="cover">
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture-outline" />
+              </div>
+            </el-image>
+          </div>
 
-        <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
-          <component :is="componentUpload" :get-file="true" />
-        </el-dialog>
-      </el-col>
-    </el-row>
+          <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
+            <component :is="componentUpload" :get-file="true" />
+          </el-dialog>
+        </el-col>
+      </el-row>
+    </el-form>
     <el-row>
       <div class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
@@ -48,7 +50,7 @@
             width="360">
             <div style="margin-top: 15px;">
               <el-tooltip content="Sort" placement="left">
-                <el-input :placeholder="$t('table.sort')" v-model.number="temp.sort">
+                <el-input :placeholder="$t('table.sort')" v-model.number="temp.sort" :min="1">
                   <template slot="append">
                     <el-tooltip :content="'Status' + ( temp.status == 1 ? ' Active' : ' Deactive' )" placement="top">
                       <el-switch
@@ -79,7 +81,7 @@ import FileManager from '@/components/FileManager';
 import EventBus from '@/components/FileManager/eventBus';
 export default {
   name: 'InfoThumbnail',
-  props: ['dataActive'],
+  props: ['dataActive','dataProduct'],
   components: {
     FileManager,
   },
@@ -88,7 +90,6 @@ export default {
       temp: {
         image: '',
         sort: 1,
-        top: 1,
         status: '1',
       },
       visiblePopover: false,
@@ -112,6 +113,23 @@ export default {
       dialogStorageVisible: false,
       componentUpload: '',
     };
+  },
+  created() {
+    if (Object.keys(this.dataProduct).length > 0) {
+      if(this.dataProduct.image){
+        this.temp.image = this.dataProduct.image;
+        this.fileUrl = [];
+        this.fileUrl.push({ value: this.temp.image + '&w=350', height: 350, width: 350 });
+        this.fileUrl.push({ value: this.temp.image + '&w=450', height: 350, width: 450 });
+        this.fileUrl.push({ value: this.temp.image + '&w=550', height: 350, width: 550 });
+      }
+      if(this.dataProduct.sort){
+        this.temp.sort = parseInt(this.dataProduct.sort);
+      }
+      if(this.dataProduct.status){
+        this.temp.status = String(this.dataProduct.status);
+      }
+    }
   },
   methods: {
     backStep() {

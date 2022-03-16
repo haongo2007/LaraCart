@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-skeleton :rows="20" animated :loading="loading" />
-    <el-row v-show="!loading" class="el-main-form">
-      <el-form ref="dataGeneralForm" :model="temp" :rules="rules" class="form-container" label-width="150px">
+    <el-form ref="dataGeneralForm" :model="temp" :rules="rules" class="form-container" label-width="150px">
+      <el-row v-show="!loading" class="el-main-form">
         <el-col :span="12">
 
           <el-form-item :label="$t('table.cost')" prop="cost">
@@ -25,12 +25,16 @@
             />
           </el-form-item>
 
-          <el-form-item :label="$t('table.quantily')" prop="quantily">
-            <el-input-number v-model="temp.quantily" style="width: 100%" :controls="false" />
+          <el-form-item :label="$t('table.mi_quantity')" prop="minimum">
+            <el-input-number v-model="temp.minimum" style="width: 100%" :controls="false" :min="1" />
           </el-form-item>
 
-          <el-form-item :label="$t('table.mi_quantity')" prop="minimum">
-            <el-input-number v-model="temp.minimum" style="width: 100%" :controls="false" />
+          <el-form-item :label="$t('table.stock')" prop="stock">
+            <el-input
+              v-model="temp.stock"
+              placeholder="Please input"
+              clearable
+            />
           </el-form-item>
 
           <el-form-item :label="$t('table.url_config')" prop="alias">
@@ -92,17 +96,9 @@
             </el-date-picker>
           </el-form-item>
 
-          <el-form-item :label="$t('table.stock')" prop="stock">
-            <el-input
-              v-model="temp.stock"
-              placeholder="Please input"
-              clearable
-            />
-          </el-form-item>
-
         </el-col>
-      </el-form>
-    </el-row>
+      </el-row>
+    </el-form>
     <el-row>
       <el-button-group class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
@@ -132,7 +128,7 @@ let category_parent = 0;
 
 export default {
   name: 'InfoGeneral',
-  props: ['dataActive','dataRefs'],
+  props: ['dataActive','dataProduct'],
   data() {
     return {
       temp: {
@@ -152,18 +148,18 @@ export default {
           label:'',
           value:0
         },
-        quantily: 0,
-        minimum: 0,
         date_available: '',
         stock: 0,
         alias: '',
       },
+      minimum:0,
       date_available:'',
       loading: true,
       brands: [],
       suppliers: [],
       taxs: [],
       cateRecurProps: {
+        multiple: true, 
         checkStrictly: true, 
         lazy: true,
         lazyLoad (node, resolve) {
@@ -228,8 +224,53 @@ export default {
   },
   created() {
     this.getRecursive();
+    if (Object.keys(this.dataProduct).length > 0) {
+      this.temp.sku = this.dataProduct.sku;
+      
+      if (this.dataProduct.brand_id) {
+        this.querySearchBrandAsync();
+      }
+      if (this.dataProduct.supplier_id) {
+        this.querySearchSupplierAsync();
+      }
+      if (this.dataProduct.tax_id) {
+        this.querySearchTaxAsync();
+      }
+      if (this.dataProduct.categories) {
+        let categories = [];
+        this.dataProduct.categories.forEach(function (v,i) {
+          categories.push(parseInt(v.id))
+        })
+        categories = [...new Set(categories)];
+
+        this.temp.category = categories;
+      }
+      this.temp.price = this.dataProduct.price;
+      this.temp.cost = this.dataProduct.cost;
+      this.temp.minimum = this.dataProduct.minimum;
+      this.temp.date_available = this.dataProduct.date_available ? parseTime(this.dataProduct.date_available.toString(), '{d}-{m}-{y} {h}:{i}:{s}') : '';
+      this.date_available = this.dataProduct.date_available ? parseTime(this.dataProduct.date_available.toString(), '{y}-{m}-{d} {h}:{i}:{s}') : '';
+      this.temp.stock = this.dataProduct.stock;
+      this.temp.alias = this.dataProduct.alias;
+    }
   },
   methods: {
+    cbGetBrands(res) {
+      const selectedBrand = this.brands.filter(brand => brand.id == this.dataProduct.brand_id);
+      this.temp.brand.label = selectedBrand[0].name;
+      this.temp.brand.value = this.dataProduct.brand_id;
+    },
+    cbGetSupplier(res){
+      const selectedSupplier = this.suppliers.filter(supplier => supplier.id == this.dataProduct.supplier_id);
+      this.temp.supplier.label = selectedSupplier[0].name;
+      this.temp.supplier.value = this.dataProduct.supplier_id;
+    },
+    cbGetTax(res){
+      const selectedTax = this.taxs.filter(tax => tax.id == this.dataProduct.tax_id);
+      this.temp.tax.label = selectedTax[0].name;
+      this.temp.tax.value = this.dataProduct.tax_id;
+      this.loading = false;
+    },
     backStep() {
       const active = this.dataActive - 1;
       this.$emit('handleProcessActive', active);
@@ -247,9 +288,12 @@ export default {
       const { data } = await categoryResource.getRecursive(id);
       data.unshift(this.listRecursive[0]);
       this.listRecursive = data;
-      this.loading = false;
+
+      if (Object.keys(this.dataProduct).length == 0) {
+        this.loading = false;
+      }
     },
-    querySearchBrandAsync(queryString, cb) {
+    async querySearchBrandAsync(queryString , cb) {
       var brands = this.brands;
       var results = queryString ? brands.filter(this.createFilter(queryString)) : brands;
 
@@ -257,13 +301,17 @@ export default {
         brandResource.list({ keyword: queryString }).then(response => {
           this.brands = [...this.brands, ...response.data];
           results = response.data;
-          cb(results);
+          if(cb){
+            cb(results)
+          }else{
+            this.cbGetBrands(results);
+          }; 
         })
           .catch(err => {
             console.log(err);
           });
       } else {
-        cb(results);
+        if(cb) cb(results); 
       }
     },
     querySearchSupplierAsync(queryString, cb) {
@@ -274,13 +322,17 @@ export default {
         supplierResource.list({ keyword: queryString }).then(response => {
           this.suppliers = [...this.suppliers, ...response.data];
           results = response.data;
-          cb(results);
+          if(cb){
+            cb(results)
+          }else{
+            this.cbGetSupplier(results);
+          }; 
         })
           .catch(err => {
             console.log(err);
           });
       } else {
-        cb(results);
+        if(cb) cb(results); 
       }
     },
     querySearchTaxAsync(queryString, cb){
@@ -291,13 +343,17 @@ export default {
         taxResource.list({ keyword: queryString }).then(response => {
           this.taxs = [...this.taxs, ...response.data];
           results = response.data;
-          cb(results);
+          if(cb){
+            cb(results)
+          }else{
+            this.cbGetTax(results);
+          }; 
         })
           .catch(err => {
             console.log(err);
           });
       } else {
-        cb(results);
+        if(cb) cb(results);
       }
     },
     createFilter(queryString) {

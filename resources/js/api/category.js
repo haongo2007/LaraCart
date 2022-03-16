@@ -19,6 +19,13 @@ class CategoryResource extends Resource {
       data: { id: id },
     });
   }
+  getNested(ids) {
+    return request({
+      url: '/' + this.uri + '/getNested',
+      method: 'post',
+      data: { ids: ids },
+    });
+  }
   update(id, resource) {
     return request({
       url: '/' + this.uri + '/' + id,

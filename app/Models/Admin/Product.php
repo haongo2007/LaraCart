@@ -31,12 +31,10 @@ class Product extends ShopProduct
      * @return  [type]       [return description]
      */
     public static function getProductAdmin($id) {
-        $tableDescription = (new ShopProductDescription())->getTable();
         $tableProduct = (new ShopProduct())->getTable();
-        return self::where('id', $id)
-        ->leftJoin($tableDescription, $tableDescription . '.product_id', $tableProduct . '.id')
+        return ShopProduct::with('descriptions','categories','promotionPrice','attributes')
         ->where($tableProduct . '.store_id', session('adminStoreId'))
-        ->first();
+        ->where('id', $id)->first();
     }
 
     /**

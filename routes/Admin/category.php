@@ -9,4 +9,5 @@
 // });
 Route::post('/category/getRecursive', 'CategoryController@Recursive');
 Route::post('/category/getChildren', 'CategoryController@getChildren');
+Route::post('/category/getNested', 'CategoryController@getNested');
 Route::apiResource('/category', 'CategoryController');

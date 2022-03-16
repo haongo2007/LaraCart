@@ -1,28 +1,30 @@
 <template>
   <div>
-    <el-row class="el-main-form">
-      <el-col :span="12">
-        <el-form-item :label="$t('table.promotion_price')" prop="price_promotion">
-          <el-input-number v-model="temp.price_promotion" style="width: 100%" :controls="false" />
-        </el-form-item>
-      </el-col>
+    <el-form ref="dataGeneralForm" :model="temp" class="form-container" label-width="150px">
+      <el-row class="el-main-form">
+        <el-col :span="12">
+          <el-form-item :label="$t('table.promotion_price')" prop="price_promotion">
+            <el-input-number v-model="temp.price_promotion" style="width: 100%" :controls="false" />
+          </el-form-item>
+        </el-col>
 
-      <el-col :span="12">
-        <el-form-item :label="$t('table.sale_date')" prop="date_promotion">
-          <el-date-picker
-            v-model="date_promotion"
-            style="width: 100%"
-            type="datetimerange"
-            align="right"
-            unlink-panels
-            range-separator="To"
-            start-placeholder="Start date"
-            end-placeholder="End date"
-            :picker-options="pickerOptions"
-          />
-        </el-form-item>
-      </el-col>
-    </el-row>
+        <el-col :span="12">
+          <el-form-item :label="$t('table.sale_date')" prop="date_promotion">
+            <el-date-picker
+              v-model="date_promotion"
+              style="width: 100%"
+              type="datetimerange"
+              align="right"
+              unlink-panels
+              range-separator="To"
+              start-placeholder="Start date"
+              end-placeholder="End date"
+              :picker-options="pickerOptions"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
     <el-row>
       <el-button-group class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
@@ -40,7 +42,7 @@
 import { parseTime } from '@/filters';
 export default {
   name: 'InfoPromotion',
-  props: ['dataActive'],
+  props: ['dataActive','dataProduct'],
   data() {
     return {
       temp: {
@@ -81,6 +83,13 @@ export default {
     };
   },
   created() {
+    if (Object.keys(this.dataProduct).length > 0) {
+      if(this.dataProduct.promotion_price){
+        this.temp.price_promotion = this.dataProduct.promotion_price.price_promotion;
+        this.date_promotion[0] = parseTime(this.dataProduct.promotion_price.date_start,'{y}-{m}-{d} {h}:{i}:{s}');
+        this.date_promotion[1] = parseTime(this.dataProduct.promotion_price.date_end,'{y}-{m}-{d} {h}:{i}:{s}');
+      }
+    };
   },
   methods: {
     backStep() {

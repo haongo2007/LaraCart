@@ -1,8 +1,16 @@
 import request from '@/utils/request';
+import Resource from '@/api/resource';
 
-export function fetchLanguagesActive() {
-  return request({
-    url: '/getActiveLanguage',
-    method: 'get',
-  });
+class LanguageResource extends Resource {
+  constructor() {
+    super('languages');
+  }
+  fetchLanguagesActive(id) {
+    return request({
+      url: '/languages/getActiveLanguage',
+      method: 'get',
+    });
+  }
 }
+
+export { LanguageResource as default };

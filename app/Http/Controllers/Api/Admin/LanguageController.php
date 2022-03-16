@@ -5,13 +5,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Front\ShopLanguage;
 use App\Helper\JsonResponse;
 use Illuminate\Http\Response;
+use App\Http\Resources\LanguageCollection;
 use Validator;
 
 class LanguageController extends Controller
 {
     public function index()
     {
-        $languages = new ShopLanguage;
+        $searchParams = request()->all();
+        $data = (new ShopLanguage)->getLanguageListAdmin($searchParams);
+        return LanguageCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
     /**

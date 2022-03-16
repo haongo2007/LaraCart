@@ -4,20 +4,19 @@
       <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
     </div>
     <el-col :span="12" :offset="6">
-      <el-skeleton :rows="6" animated :loading="loading" />
-      <el-form ref="dataForm" :model="temp" :rules="rules" class="form-container" label-width="120px">
-        <el-steps v-show="!loading" :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
-          <el-step v-for="(lang,key,index) in languages" :key="index" :title="lang" :icon="key == 'last' ? 'el-icon-picture' : 'el-icon-edit'" />
+      <el-form ref="dataForm" :model="dataTemp" :rules="dataRules" class="form-container" label-width="120px">
+        <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
+          <el-step v-for="(lang,key,index) in dataLanguages" :key="index" :title="lang" :icon="key == 'last' ? 'el-icon-picture' : 'el-icon-edit'" />
         </el-steps>
-        <div v-for="(lang,key,index) in languages" :key="key">
+        <div v-for="(lang,key,index) in dataLanguages" :key="key">
           <div v-if="key != 'last'" v-show="index === active">
             <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
-              <el-input v-model="temp.descriptions[key].title" />
+              <el-input v-model="dataTemp.descriptions[key].title" />
             </el-form-item>
 
             <el-form-item :label="$t('table.tags')">
               <el-tag
-                v-for="tag in temp.descriptions[key].keyword"
+                v-for="tag in dataTemp.descriptions[key].keyword"
                 :key="tag"
                 closable
                 :disable-transitions="false"
@@ -40,7 +39,7 @@
 
             <el-form-item :label="$t('table.description')">
               <el-input
-                v-model="temp.descriptions[key].description"
+                v-model="dataTemp.descriptions[key].description"
                 :rows="2"
                 type="textarea"
                 placeholder="Please input"
@@ -51,13 +50,13 @@
           <div v-if="key === 'last'" v-show="index === active">
 
             <el-form-item :label="$t('table.sort')" prop="sort">
-              <el-input-number v-model.number="temp.sort" :min="1" />
+              <el-input-number v-model.number="dataTemp.sort" :min="1" />
             </el-form-item>
 
             <el-form-item :label="$t('table.top')" prop="top">
-              <el-tooltip :content="'Switch value: ' + temp.top" placement="top">
+              <el-tooltip :content="'Switch value: ' + dataTemp.top" placement="top">
                 <el-switch
-                  v-model="temp.top"
+                  v-model="dataTemp.top"
                   active-color="#13ce66"
                   inactive-color="#ff4949"
                   active-value="1"
@@ -68,7 +67,7 @@
 
             <el-form-item :label="$t('table.parent')" prop="parent">
               <el-cascader
-                v-model="temp.parent"
+                v-model="dataTemp.parent"
                 :options="listRecursive"
                 :props="cateRecurProps"
                 :show-all-levels="false"
@@ -78,9 +77,9 @@
             </el-form-item>
 
             <el-form-item :label="$t('table.status')" prop="status">
-              <el-tooltip :content="'Switch value: ' + temp.status" placement="top">
+              <el-tooltip :content="'Switch value: ' + dataTemp.status" placement="top">
                 <el-switch
-                  v-model="temp.status"
+                  v-model="dataTemp.status"
                   active-color="#13ce66"
                   inactive-color="#ff4949"
                   active-value="1"
@@ -94,12 +93,12 @@
               <el-button size="small" type="success" @click="handleVisibleStorage()">Pick Image</el-button>
             </el-form-item>
             <div class="image-uploading">
-              <el-image v-if="fileUrl" :src="fileUrl">
+              <el-image v-if="dataTemp.fileUrl" :src="dataTemp.fileUrl">
                 <div slot="placeholder" class="image-slot">
                   <i class="el-icon-loading" />
                 </div>
               </el-image>
-              <i v-if="fileUrl" class="el-icon-close" @click="resetImageUpload()" />
+              <i v-if="dataTemp.fileUrl" class="el-icon-close" @click="resetImageUpload()" />
             </div>
             <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
               <component :is="componentStorage" :get-file="true" />
@@ -120,28 +119,16 @@
         </el-button-group>
       </el-form>
     </el-col>
+  <slot />
   </el-row>
 </template>
 
 <script>
 import Sticky from '@/components/Sticky'; // Sticky header
-import { fetchLanguagesActive } from '@/api/languages';
 import FileManager from '@/components/FileManager';
 import EventBus from '@/components/FileManager/eventBus';
 import CategoryResource from '@/api/category';
 const categoryResource = new CategoryResource();
-
-const defaultForm = {
-  id: '',
-  alias: '',
-  sort: '',
-  top: '1',
-  parent: '0',
-  status: '1',
-  image: '',
-  descriptions: {
-  },
-};
 
 export default {
   name: 'CategoryDetail',
@@ -154,16 +141,25 @@ export default {
       type: Boolean,
       default: false,
     },
+    dataTemp: {
+      type: Object,
+      default: false,
+    },
+    dataRules: {
+      type: Object,
+      default: false,
+    },
+    dataLanguages: {
+      type: Object,
+      default: false,
+    },
   },
   data() {
     return {
-      loading: true,
       dialogStorageVisible: false,
       action: false,
-      languages: [],
       active: 0,
       componentStorage: '',
-      fileUrl: '',
       disableUseStorage: false,
       cateRecurProps: {
         children: 'children',
@@ -176,44 +172,16 @@ export default {
         parent: 0,
         title: 'Is parent',
       }],
-      temp: Object.assign({}, defaultForm),
-      rules: {
-        sort: [
-          {
-            type: 'number',
-            message: 'sort must be a number',
-            trigger: 'blur',
-          },
-        ],
-        parent: [
-          {
-            required: true,
-            message: 'parent is required',
-            trigger: 'change',
-          },
-        ],
-        status: [
-          {
-            required: true,
-            message: 'status is required',
-            trigger: 'change',
-          },
-        ],
-        descriptions: [],
-      },
       inputTagsVisible: false,
       dynamicTags: '',
     };
   },
   created() {
-    this.fetchLanguages();
+    let id = '';
     if (this.isEdit){
-      const id = this.$route.params && this.$route.params.id;
-      this.getRecursive(id);
-      this.fetchCategory(id);
-    } else {
-      this.getRecursive();
-    }
+      id = this.$route.params && this.$route.params.id;
+    } 
+    this.getRecursive(id);
     EventBus.$on('getFileResponse', this.handlerGeturl);
   },
   methods: {
@@ -228,79 +196,21 @@ export default {
       }
     },
     nextStep() {
-      const keyLang = Object.keys(this.languages)[this.active];
+      const keyLang = Object.keys(this.dataLanguages)[this.active];
       this.$refs['dataForm'].validateField('descriptions.' + keyLang + '.title', this._checkValidate);
     },
     _checkValidate(msg){
       if (!msg) {
-        const langNum = _.size(this.languages) - 1;
+        const langNum = _.size(this.dataLanguages) - 1;
         if (++this.active == langNum){
           this.action = true;
         }
       }
     },
-    fetchCategory(id) {
-      const that = this;
-      categoryResource.get(id)
-        .then(({ data } = response) => {
-          const desc = data.descriptions;
-          desc.forEach(function(v, i) {
-            that.temp.descriptions[v.lang].title = v.title;
-            that.temp.descriptions[v.lang].description = v.description;
-            that.temp.descriptions[v.lang].keyword = v.keyword != '' ? v.keyword.split(',') : [];
-          });
-          that.fileUrl = data.image + '&w=644';
-          that.temp.image = data.image;
-          that.temp.parent = data.parent;
-          that.temp.alias = data.alias;
-          that.temp.sort = data.sort;
-          that.temp.top = String(data.top);
-          that.temp.status = String(data.status);
-          that.temp.id = data.id;
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
-    fetchLanguages() {
-      fetchLanguagesActive()
-        .then(data => {
-          var that = this;
-          Object.keys(data.data).forEach(function(key, index) {
-            that.$set(that.temp.descriptions, key, {});
-            that.$set(that.temp.descriptions[key], 'description', '');
-            that.$set(that.temp.descriptions[key], 'title', '');
-            that.$set(that.temp.descriptions[key], 'keyword', []);
-
-            that.$set(that.rules.descriptions, key, []);
-
-            that.$set(that.rules.descriptions[key], 'title',
-              [
-                {
-                  required: true,
-                  message: 'Name ' + data.data[key] + ' is required',
-                  trigger: 'blur',
-                },
-                {
-                  min: 3,
-                  message: 'Length min 3',
-                  trigger: 'blur',
-                },
-              ]
-            );
-          });
-          this.languages = data.data;
-          this.languages['last'] = 'Done';
-          this.loading = false;
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
     handlerGeturl(data) {
       if (data) {
-        this.fileUrl = data + '&w=644';
-        this.temp.image = data;
+        this.dataTemp.fileUrl = data + '&w=644';
+        this.dataTemp.image = data;
         this.dialogStorageClose();
       }
     },
@@ -316,11 +226,11 @@ export default {
             target: '.el-form',
           });
           const form_data = new FormData();
-          for (var key in this.temp) {
-            if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
-              form_data.append(key, JSON.stringify(this.temp[key]));
+          for (var key in this.dataTemp) {
+            if ((typeof this.dataTemp[key] === 'object' || typeof this.dataTemp[key] === 'array') && key != 'image') {
+              form_data.append(key, JSON.stringify(this.dataTemp[key]));
             } else {
-              form_data.append(key, this.temp[key]);
+              form_data.append(key, this.dataTemp[key]);
             }
           }
           categoryResource.store(form_data).then((res) => {
@@ -354,16 +264,16 @@ export default {
             target: '.el-form',
           });
           const form_data = new FormData();
-          for (var key in this.temp) {
-            if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
-              form_data.append(key, JSON.stringify(this.temp[key]));
+          for (var key in this.dataTemp) {
+            if ((typeof this.dataTemp[key] === 'object' || typeof this.dataTemp[key] === 'array') && key != 'image') {
+              form_data.append(key, JSON.stringify(this.dataTemp[key]));
             } else {
-              form_data.append(key, this.temp[key]);
+              form_data.append(key, this.dataTemp[key]);
             }
           }
           form_data.append('_method', 'PUT');
 
-          categoryResource.update(this.temp.id, form_data).then((res) => {
+          categoryResource.update(this.dataTemp.id, form_data).then((res) => {
             this.reloadRedirectToList('CategoryList');
 
             this.$message({
@@ -398,12 +308,12 @@ export default {
       this.dialogStorageVisible = false;
     },
     resetImageUpload(){
-      this.temp.image = '';
+      this.dataTemp.image = '';
       this.componentStorage = '';
-      this.fileUrl = '';
+      this.dataTemp.fileUrl = '';
     },
     handleClose(tag, key) {
-      this.temp.descriptions[key].keyword.splice(this.temp.descriptions[key].keyword.indexOf(tag), 1);
+      this.dataTemp.descriptions[key].keyword.splice(this.dataTemp.descriptions[key].keyword.indexOf(tag), 1);
       this.inputTagsVisible = true;
       this.inputTagsVisible = false;
     },
@@ -416,8 +326,8 @@ export default {
     handleInputConfirm(key) {
       const inputTags = this.dynamicTags;
       if (inputTags) {
-        if (!this.temp.descriptions[key].keyword.includes(inputTags)) {
-          this.temp.descriptions[key].keyword.push(inputTags);
+        if (!this.dataTemp.descriptions[key].keyword.includes(inputTags)) {
+          this.dataTemp.descriptions[key].keyword.push(inputTags);
         }
       }
       this.inputTagsVisible = false;

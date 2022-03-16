@@ -39,7 +39,7 @@ class CategoryController extends Controller
         $data = $request->all();
         $data['descriptions'] = json_decode($data['descriptions']);
         $data['parent'] = json_decode($data['parent']);
-        $data['parent_list'] = (is_array($data['parent']) ? implode(',',$data['parent']) : $data['parent']);
+        $data['parent_list'] = $data['parent'] ? implode(',',$data['parent']) : 0;
         $data['parent'] = (is_array($data['parent']) ? end($data['parent']) : $data['parent']);
         $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
@@ -289,10 +289,22 @@ class CategoryController extends Controller
         return $tmp;
     }
     /*
-     * API show
+     * API get childrend
      */
     public function getChildren(Request $request)
     {
+        $category = Category::where('parent',$request->id)->get();
+        if (!$category) {
+            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+        }
+        return response()->json(new JsonResponse(CategoryCollection::collection($category)), Response::HTTP_OK);
+    }
+    /*
+     * API get nested show
+     */
+    public function getNested(Request $request)
+    {
+        dd($request->ids);
         $category = Category::where('parent',$request->id)->get();
         if (!$category) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);

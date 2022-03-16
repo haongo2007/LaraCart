@@ -70,34 +70,37 @@ class ProductController extends Controller
         $max = Product::gettableProduct()->max($type);
         $data = ['max' => $max];
         return response()->json(new JsonResponse($data), Response::HTTP_OK);
-    }
+    }   
 
-/**
- * Form create new item in admin
- * @return [type] [description]
- */
-    public function create()
+    /*
+     * API show
+     */
+    public function show($id)
     {
-        $data = [
-            'title'                => trans('product.admin.add_new_title'),
-            'kind'                     => lc_PRODUCT_SINGLE,
-            'title_description'    => trans('product.admin.add_new_des'),
-            'icon'                 => 'fa fa-plus',
-            'languages'            => $this->languages,
-            'categories'           => $this->categories,
-            'brands'               => (new ShopBrand)->getListAll(),
-            'suppliers'            => (new ShopSupplier)->getListAll(),
-            'taxs'                 => (new ShopTax)->getListAll(),
-            'properties'           => $this->properties,
-            'kinds'                => $this->kinds,
-            'attributeGroup'       => $this->attributeGroup,
-            'listWeight'           => $this->listWeight,
-            'listLength'           => $this->listLength,
-            'customFields'         => (new ShopCustomField)->getCustomField($type = 'product'),
-        ];
+        $product = (new Product)->getProductAdmin($id);
+        if (!$product) {
+            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+        }
 
-        return view($this->templatePathAdmin.'Product.add')
-            ->with($data);
+        // $data = [
+        //     'title'                => trans('product.admin.add_new_title'),
+        //     'kind'                     => lc_PRODUCT_SINGLE,
+        //     'title_description'    => trans('product.admin.add_new_des'),
+        //     'icon'                 => 'fa fa-plus',
+        //     'languages'            => $this->languages,
+        //     'categories'           => $this->categories,
+        //     'brands'               => (new ShopBrand)->getListAll(),
+        //     'suppliers'            => (new ShopSupplier)->getListAll(),
+        //     'taxs'                 => (new ShopTax)->getListAll(),
+        //     'properties'           => $this->properties,
+        //     'kinds'                => $this->kinds,
+        //     'attributeGroup'       => $this->attributeGroup,
+        //     'listWeight'           => $this->listWeight,
+        //     'listLength'           => $this->listLength,
+        //     'customFields'         => (new ShopCustomField)->getCustomField($type = 'product'),
+        // ];
+
+        return response()->json(new JsonResponse($product), Response::HTTP_OK);
     }
 
 /**
@@ -106,7 +109,7 @@ class ProductController extends Controller
  */
 public function createProductBuild()
 {
-    $listProductSingle = (new AdminProduct)->getProductSelectAdmin(['kind' => [0]]);
+    $listProductSingle = (new Product)->getProductSelectAdmin(['kind' => [0]]);
     $data = [
         'title'                => trans('product.admin.add_new_title_build'),
         'kind'                 => lc_PRODUCT_BUILD,
@@ -135,7 +138,7 @@ public function createProductBuild()
  */
 public function createProductGroup()
 {
-    $listProductSingle = (new AdminProduct)->getProductSelectAdmin(['kind' => [0]]);
+    $listProductSingle = (new Product)->getProductSelectAdmin(['kind' => [0]]);
 
     // html select product group
     $htmlSelectGroup = '<div class="select-product">';
@@ -202,7 +205,7 @@ public function createProductGroup()
                     'kind'                       => 'required',
                     'sort'                       => 'numeric|min:0',
                     'minimum'                    => 'numeric|min:0',
-                    'descriptions.*.name'        => 'required|string|max:100',
+                    'descriptions.*.title'        => 'required|string|max:100',
                     'descriptions.*.keyword'     => 'nullable|string|max:100',
                     'descriptions.*.description' => 'nullable|string|max:100',
                     'descriptions.*.content'     => 'required|string',
@@ -227,7 +230,7 @@ public function createProductGroup()
                 $arrValidation = $this->validateAttribute($arrValidation);
                 
                 $arrMsg = [
-                    'descriptions.*.name.required'    => trans('validation.required', ['attribute' => trans('product.name')]),
+                    'descriptions.*.title.required'    => trans('validation.required', ['attribute' => trans('product.name')]),
                     'descriptions.*.content.required' => trans('validation.required', ['attribute' => trans('product.content')]),
                     'category.required'               => trans('validation.required', ['attribute' => trans('product.category')]),
                     'sku.regex'                       => trans('product.sku_validate'),
@@ -478,7 +481,7 @@ public function createProductGroup()
     */
     public function edit($id)
     {
-        $product = (new AdminProduct)->getProductAdmin($id);
+        $product = (new Product)->getProductAdmin($id);
 
         if ($product === null) {
             return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
@@ -492,7 +495,7 @@ public function createProductGroup()
         // }
         // dd($colors);
 
-        $listProductSingle = (new AdminProduct)->getProductSelectAdmin(['kind' => [lc_PRODUCT_SINGLE]]);
+        $listProductSingle = (new Product)->getProductSelectAdmin(['kind' => [lc_PRODUCT_SINGLE]]);
 
         $data = [
             'title'                => trans('product.admin.edit'),
@@ -529,7 +532,7 @@ public function createProductGroup()
     */
     public function postEdit($id)
     {
-        $product = (new AdminProduct)->getProductAdmin($id);
+        $product = (new Product)->getProductAdmin($id);
         if ($product === null) {
             return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
         }
@@ -722,7 +725,7 @@ public function createProductGroup()
                 'content' => $row['content'] ?? '',
             ];
         }
-        AdminProduct::insertDescriptionAdmin($dataDes);
+        Product::insertDescriptionAdmin($dataDes);
 
         $product->categories()->detach();
         if (count($category)) {

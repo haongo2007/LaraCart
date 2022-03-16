@@ -4,62 +4,63 @@
       <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
     </div>
     <el-col :span="20" :offset="2">
-      <el-skeleton :rows="20" animated :loading="loading" />
-      <el-form ref="dataForm" :model="temp" :rules="rules" class="form-container" label-width="150px">
-        <el-steps v-show="!loading" :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
-          <el-step v-for="(step,key,index) in stepContent" :key="index" :title="(step.title ? step.title : step)" :icon="(step.icon ? step.icon : 'el-icon-edit')" />
+      <!-- <el-skeleton :rows="20" animated/> -->
+        <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
+          <el-step v-for="(step,key,index) in dataStepContent" :key="index" :title="(step.title ? step.title : step)" :icon="(step.icon ? step.icon : 'el-icon-edit')" />
         </el-steps>
 
-        <div v-for="(content,key,index) in stepContent" :key="key">
+        <div v-for="(content,key,index) in dataStepContent" :key="key">
 
-          <div v-if="componentInfo.hasOwnProperty(key)" v-show="index === active">
-            <component :data-refs="$refs['dataForm']" :data-active="active" @handleProcessTemp="handleProcessTemp" @handleProcessActive="handleProcessActive" :is="componentInfo[key]" />
+          <div v-if="dataComponentInfo.hasOwnProperty(key)" v-show="index === active">
+            <component :data-product="product" :data-active="active" @handleProcessTemp="handleProcessTemp" @handleProcessActive="handleProcessActive" :is="dataComponentInfo[key]" />
           </div>
-
+          
           <div v-else v-show="index === active">
-            <el-row class="el-main-form">
-              <el-col :span="24">
-                <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
-                  <el-input v-model="temp.descriptions[key].title" />
-                </el-form-item>
+            <el-form ref="dataForm" :model="temp" :rules="dataRules" class="form-container" label-width="150px">
+              <el-row class="el-main-form">
+                <el-col :span="24">
+                  <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
+                    <el-input v-model="temp.descriptions[key].title" />
+                  </el-form-item>
 
-                <el-form-item :label="$t('table.tags')">
-                  <el-tag
-                    v-for="tag in temp.descriptions[key].keyword"
-                    :key="tag"
-                    closable
-                    :disable-transitions="false"
-                    @close="handleClose(tag,key)"
-                  >
-                    {{ tag }}
-                  </el-tag>
+                  <el-form-item :label="$t('table.tags')">
+                    <el-tag
+                      v-for="tag in temp.descriptions[key].keyword"
+                      :key="tag"
+                      closable
+                      :disable-transitions="false"
+                      @close="handleClose(tag,key)"
+                    >
+                      {{ tag }}
+                    </el-tag>
 
-                  <el-input
-                    v-if="inputTagsVisible"
-                    ref="savekeywordInput"
-                    v-model="dynamicTags"
-                    class="input-new-tag"
-                    size="mini"
-                    @keyup.enter.native="handleInputConfirm(key)"
-                    @blur="handleInputConfirm(key)"
-                  />
-                  <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
-                </el-form-item>
+                    <el-input
+                      v-if="inputTagsVisible"
+                      ref="savekeywordInput"
+                      v-model="dynamicTags"
+                      class="input-new-tag"
+                      size="mini"
+                      @keyup.enter.native="handleInputConfirm(key)"
+                      @blur="handleInputConfirm(key)"
+                    />
+                    <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
+                  </el-form-item>
 
-                <el-form-item :label="$t('table.description')">
-                  <el-input
-                    v-model="temp.descriptions[key].description"
-                    :rows="2"
-                    type="textarea"
-                    placeholder="Please input"
-                  />
-                </el-form-item>
+                  <el-form-item :label="$t('table.description')">
+                    <el-input
+                      v-model="temp.descriptions[key].description"
+                      :rows="2"
+                      type="textarea"
+                      placeholder="Please input"
+                    />
+                  </el-form-item>
 
-                <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
-                  <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" />
-                </el-form-item>
-              </el-col>
-            </el-row>
+                  <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
+                    <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" />
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>
             <el-row >
               <el-button-group class="pull-right">
                 <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
@@ -73,7 +74,6 @@
           </div>
 
         </div>
-      </el-form>
     </el-col>
   </el-row>
 </template>
@@ -81,7 +81,6 @@
 <script>
 import Tinymce from '@/components/Tinymce';
 import Sticky from '@/components/Sticky'; // Sticky header
-import { fetchLanguagesActive } from '@/api/languages';
 import InfoAttribute from './InfoAttribute';
 import InfoGeneral from './InfoGeneral';
 import InfoProperty from './InfoProperty';
@@ -89,14 +88,8 @@ import InfoThumbnail from './InfoThumbnail';
 import InfoPromotion from './InfoPromotion';
 import ProductResource from '@/api/product';
 
-const productResource = new ProductResource();
 
-const defaultForm = {
-  id: '',
-  kind: '',
-  descriptions: {
-  },
-};
+const productResource = new ProductResource();
 
 export default {
   name: 'ProductDetail',
@@ -114,34 +107,45 @@ export default {
       type: Boolean,
       default: false,
     },
-    kind: {
-      type: Number,
-      default: false,
+    dataTemp:{
+      type: Object,
+      default:false,
+    },
+    dataLanguages:{
+      type: Object,
+      default:false,
+    },
+    dataComponentInfo:{
+      type: Object,
+      default:false,
+    },
+    dataStepContent:{
+      type: Object,
+      default:false,
+    },
+    dataRules:{
+      type: Object,
+      default:false,
+    },
+    dataProduct:{
+      type: Object,
+      default:false,
     },
   },
   data() {
     return {
-      loading: true,
       action: false,
-      languages: [],
-      stepContent: [],
       active: 0,
-      componentInfo: {},
-      temp: Object.assign({}, defaultForm),
-      rules: {
-        descriptions: [],
-      },
       inputTagsVisible: false,
       dynamicTags: '',
+      temp:{},
+      product:{}
     };
   },
   created() {
-    this.fetchLanguages();
-    this.temp.kind = this.kind;
-    if (this.isEdit){
-      const id = this.$route.params && this.$route.params.id;
-      this.getRecursive(id);
-      this.fetchCategory(id);
+    this.temp = this.dataTemp;
+    if (this.dataProduct) {
+      this.product = this.dataProduct;
     }
   },
   methods: {
@@ -156,107 +160,23 @@ export default {
       }
     },
     nextStep() {
-      const keyLang = Object.keys(this.languages)[this.active];
-      const keyStep = Object.keys(this.stepContent)[this.active + 1];
-      if (this.componentInfo.hasOwnProperty(keyStep)){
-        this.componentInfo[keyStep] = keyStep;   
+      const keyLang = Object.keys(this.dataLanguages)[this.active];
+      const keyStep = Object.keys(this.dataStepContent)[this.active + 1];
+      if (this.dataComponentInfo.hasOwnProperty(keyStep)){
+        this.dataComponentInfo[keyStep] = keyStep;   
       }
       if (keyLang){
-        this.$refs['dataForm'].validateField('descriptions.' + keyLang + '.title', this._checkValidate);
+        this.$refs['dataForm'][this.active].validate((valid) => {
+          if (valid) {
+            this.active++;
+          }
+        })
       } else {
-        const stepNum = _.size(this.stepContent) - 1;
+        const stepNum = _.size(this.dataStepContent) - 1;
         if (++this.active == stepNum){
           this.action = true;
         }
       }
-    },
-    _checkValidate(msg){
-      if (!msg) {
-        this.active++;
-      }
-    },
-    fetchCategory(id) {
-      const that = this;
-      categoryResource.get(id)
-        .then(({ data } = response) => {
-          const desc = data.descriptions;
-          desc.forEach(function(v, i) {
-            that.temp.descriptions[v.lang].title = v.title;
-            that.temp.descriptions[v.lang].description = v.description;
-            that.temp.descriptions[v.lang].keyword = v.keyword != '' ? v.keyword.split(',') : [];
-          });
-          that.temp.id = data.id;
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
-    fetchLanguages() {
-      fetchLanguagesActive()
-        .then(data => {
-          this.languages = Object.assign({}, data.data);
-          var that = this;
-          Object.keys(data.data).forEach(function(key, index) {
-            that.$set(that.temp.descriptions, key, {});
-            that.$set(that.temp.descriptions[key], 'description', '');
-            that.$set(that.temp.descriptions[key], 'title', '');
-            that.$set(that.temp.descriptions[key], 'keyword', []);
-            that.$set(that.temp.descriptions[key], 'content', '');
-
-            that.$set(that.rules.descriptions, key, []);
-
-            that.$set(that.rules.descriptions[key], 'title',
-              [
-                {
-                  required: true,
-                  message: 'Name ' + data.data[key] + ' is required',
-                  trigger: 'blur',
-                },
-                {
-                  min: 3,
-                  message: 'Length min 3',
-                  trigger: 'blur',
-                },
-              ]
-            );
-          });
-          // /// create step form
-          this.stepContent = data.data;
-          this.stepContent['info-general'] = {
-            title: 'General',
-            icon: 'el-icon-view',
-          };
-          this.$set(this.componentInfo, 'info-general', '');
-
-          this.stepContent['info-promotion'] = {
-            title: 'Promotion',
-            icon: 'el-icon-s-promotion',
-          };
-          this.$set(this.componentInfo, 'info-promotion', '');
-
-          this.stepContent['info-attribute'] = {
-            title: 'Attribute',
-            icon: 'el-icon-news',
-          };
-          this.$set(this.componentInfo, 'info-attribute', '');
-
-          this.stepContent['info-property'] = {
-            title: 'Property',
-            icon: 'el-icon-menu',
-          };
-          this.$set(this.componentInfo, 'info-property', '');
-
-          this.stepContent['info-thumbnail'] = {
-            title: 'Thumbnail',
-            icon: 'el-icon-picture-outline',
-          };
-          this.$set(this.componentInfo, 'info-thumbnail', '');
-
-          this.loading = false;
-        })
-        .catch(err => {
-          console.log(err);
-        });
     },
     createData() {
       const loading = this.$loading({
@@ -355,7 +275,11 @@ export default {
     },
     handleProcessActive(data){
       if (this.active == data) {
-        this.createData()
+        if(this.isEdit){
+          this.updateData()
+        }else{
+          this.createData()
+        }
       }else if(this.active < data){
         this.nextStep();
       }else{
@@ -364,7 +288,7 @@ export default {
     },
     handleProcessTemp(data){
       this.temp = {...this.temp,...data};
-    }
+    },
   },
 };
 </script>
