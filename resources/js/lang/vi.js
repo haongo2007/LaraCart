@@ -136,6 +136,7 @@ export default {
     imageUploadTips: 'Since I was using only the vue@1 version, and it is not compatible with mockjs at the moment, I modified it myself, and if you are going to use it, it is better to use official version.',
   },
   table: {
+    filter:'Bộ lọc',
     tags: 'Thẻ',
     description: 'Mô tả',
     dynamicTips1: 'Fixed header, sorted by header order',
@@ -175,7 +176,7 @@ export default {
     range_date: 'Mốc thời gian',
     top: 'Hiển thị ngoài app',
     children: 'DM con',
-    mi_quantity:'SL tối thiểu',
+    mi_quantity: 'SL tối thiểu',
     stock: 'Số lượng',
     promotion_price: 'Giá ưu đãi',
     sale_date: 'Ngày Ưu đãi',

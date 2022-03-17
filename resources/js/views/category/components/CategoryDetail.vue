@@ -119,7 +119,7 @@
         </el-button-group>
       </el-form>
     </el-col>
-  <slot />
+    <slot />
   </el-row>
 </template>
 
@@ -180,7 +180,7 @@ export default {
     let id = '';
     if (this.isEdit){
       id = this.$route.params && this.$route.params.id;
-    } 
+    }
     this.getRecursive(id);
     EventBus.$on('getFileResponse', this.handlerGeturl);
   },

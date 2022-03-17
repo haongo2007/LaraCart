@@ -42,7 +42,7 @@
 import { parseTime } from '@/filters';
 export default {
   name: 'InfoPromotion',
-  props: ['dataActive','dataProduct'],
+  props: ['dataActive', 'dataProduct'],
   data() {
     return {
       temp: {
@@ -52,7 +52,7 @@ export default {
           end: '',
         },
       },
-      date_promotion:[],
+      date_promotion: [],
       pickerOptions: {
         shortcuts: [{
           text: 'Last week',
@@ -84,19 +84,19 @@ export default {
   },
   created() {
     if (Object.keys(this.dataProduct).length > 0) {
-      if(this.dataProduct.promotion_price){
+      if (this.dataProduct.promotion_price){
         this.temp.price_promotion = this.dataProduct.promotion_price.price_promotion;
-        this.date_promotion[0] = parseTime(this.dataProduct.promotion_price.date_start,'{y}-{m}-{d} {h}:{i}:{s}');
-        this.date_promotion[1] = parseTime(this.dataProduct.promotion_price.date_end,'{y}-{m}-{d} {h}:{i}:{s}');
+        this.date_promotion[0] = parseTime(this.dataProduct.promotion_price.date_start, '{y}-{m}-{d} {h}:{i}:{s}');
+        this.date_promotion[1] = parseTime(this.dataProduct.promotion_price.date_end, '{y}-{m}-{d} {h}:{i}:{s}');
       }
-    };
+    }
   },
   methods: {
     backStep() {
       const active = this.dataActive - 1;
       this.$emit('handleProcessActive', active);
     },
-    nextStep() {  
+    nextStep() {
       const active = this.dataActive + 1;
       if (this.date_promotion.length) {
         this.temp.date_promotion.start = parseTime(this.date_promotion[0], '{d}-{m}-{y} {h}:{i}:{s}');

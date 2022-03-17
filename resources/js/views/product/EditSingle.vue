@@ -1,5 +1,5 @@
 <template>
-  <product-detail :is-edit="true" :data-temp="temp" :data-languages="languages" :data-step-content="stepContent" :data-component-info="componentInfo" :data-rules="rules" :data-product="product" v-if="!loading"/>
+  <product-detail v-if="!loading" :is-edit="true" :data-temp="temp" :data-languages="languages" :data-step-content="stepContent" :data-component-info="componentInfo" :data-rules="rules" :data-product="product" />
 </template>
 
 <script>
@@ -7,47 +7,46 @@ import ProductDetail from './components/ProductDetail';
 import LanguageResource from '@/api/languages';
 import ProductResource from '@/api/product';
 
-
 const productResource = new ProductResource();
 const languageResource = new LanguageResource();
 export default {
   name: 'ProductEditSingle',
   components: { ProductDetail },
   data(){
-		return {
-			loading:true,
+    return {
+      loading: true,
     	languages: {},
       componentInfo: {},
       stepContent: {},
-      product:{},
+      product: {},
   		temp: {
 			  id: 0,
 			  kind: 0,
 			  descriptions: {},
-			},
+      },
       rules: {
         descriptions: [],
       },
-  	}
+  	};
   },
-  created(){  	
+  created(){
     this.loadInfoProduct();
   },
-  methods:{
+  methods: {
     loadInfoProduct(){
       const id = this.$route.params && this.$route.params.id;
       productResource.get(id).then(({ data } = response) => {
         this.temp.id = data.id;
         this.temp.kind = data.kind;
         this.product = data;
-        
+
         // get current language
         const codes = [];
         for (var i = 0; i < data.descriptions.length; i++) {
           codes.push(data.descriptions[i].lang);
         }
 
-        languageResource.list({code:codes}).then(({data} = response) => {
+        languageResource.list({ code: codes }).then(({ data } = response) => {
           const newLang = [];
           for (var i = 0; i < data.length; i++) {
             newLang[data[i].code] = data[i].name;
@@ -56,15 +55,14 @@ export default {
           this.setTemp();
         });
       })
-      .catch(err => {
-        console.log(err);
-      });
+        .catch(err => {
+          console.log(err);
+        });
     },
 	  setTemp(){
       var that = this;
-      let data = Object.assign({}, this.languages);
+      const data = Object.assign({}, this.languages);
       Object.keys(data).forEach(function(key, index) {
-
         that.$set(that.temp.descriptions, key, {});
 
         that.$set(that.temp.descriptions[key], 'description', that.product.descriptions[index].description);
@@ -89,14 +87,13 @@ export default {
           ]
         );
 
-        that.$set(that.rules.descriptions[key],'content', [
+        that.$set(that.rules.descriptions[key], 'content', [
           {
             required: true,
             message: 'Content ' + data[key] + ' is required',
             trigger: 'blur',
           },
         ]);
-
       });
       // /// create step form
       this.stepContent = data;

@@ -308,6 +308,7 @@ export default {
               type: 'success',
               message: 'Delete successfully',
             });
+            this.total = this.total - Array(row).length;
           }
           this.loading = false;
         });

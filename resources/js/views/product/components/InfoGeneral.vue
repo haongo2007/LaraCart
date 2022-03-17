@@ -82,7 +82,7 @@
           </el-form-item>
 
           <el-form-item :label="$t('table.category')" prop="category">
-            <el-cascader style="width: 100%" v-model="temp.category" :props="cateRecurProps" clearable></el-cascader>
+            <el-cascader v-model="temp.category" style="width: 100%" :props="cateRecurProps" clearable />
           </el-form-item>
 
           <el-form-item :label="$t('table.sell_date')" prop="date_available">
@@ -91,9 +91,9 @@
               style="width: 100%"
               type="datetime"
               placeholder="Select date and time for available sale"
+              :picker-options="pickerOptions"
               @change="handleFilterDate()"
-              :picker-options="pickerOptions">
-            </el-date-picker>
+            />
           </el-form-item>
 
         </el-col>
@@ -113,7 +113,7 @@
 </template>
 
 <script>
-import {parseTime} from '@/filters';
+import { parseTime } from '@/filters';
 import CategoryResource from '@/api/category';
 import BrandResource from '@/api/brand';
 import SupplierResource from '@/api/supplier';
@@ -124,58 +124,58 @@ const brandResource = new BrandResource();
 const supplierResource = new SupplierResource();
 const taxResource = new TaxResource();
 
-let category_parent = 0;
+const category_parent = 0;
 
 export default {
   name: 'InfoGeneral',
-  props: ['dataActive','dataProduct'],
+  props: ['dataActive', 'dataProduct'],
   data() {
     return {
       temp: {
         category: '',
         sku: '',
-        brand:{
-          label:'',
-          value:0
+        brand: {
+          label: '',
+          value: 0,
         },
-        supplier:{
-          label:'',
-          value:0
+        supplier: {
+          label: '',
+          value: 0,
         },
         price: 0,
         cost: 0,
-        tax:{
-          label:'',
-          value:0
+        tax: {
+          label: '',
+          value: 0,
         },
         date_available: '',
         stock: 0,
         alias: '',
       },
-      minimum:0,
-      date_available:'',
+      minimum: 0,
+      date_available: '',
       loading: true,
       brands: [],
       suppliers: [],
       taxs: [],
       cateRecurProps: {
-        multiple: true, 
-        checkStrictly: true, 
+        multiple: true,
+        checkStrictly: true,
         lazy: true,
-        lazyLoad (node, resolve) {
+        lazyLoad(node, resolve) {
           var level = node.value;
           if (!node.value) {
             level = category_parent;
           }
-          categoryResource.list({parent:level}).then((res) => {
+          categoryResource.list({ parent: level }).then((res) => {
             const nodes = res.data.map(item => ({
-                value: item.id,
-                label: item.name,
-                leaf: item.parent
-              }));
+              value: item.id,
+              label: item.name,
+              leaf: item.parent,
+            }));
             resolve(nodes);
           });
-        }
+        },
       },
       listRecursive: [{
         id: '0',
@@ -226,7 +226,7 @@ export default {
     this.getRecursive();
     if (Object.keys(this.dataProduct).length > 0) {
       this.temp.sku = this.dataProduct.sku;
-      
+
       if (this.dataProduct.brand_id) {
         this.querySearchBrandAsync();
       }
@@ -238,9 +238,9 @@ export default {
       }
       if (this.dataProduct.categories) {
         let categories = [];
-        this.dataProduct.categories.forEach(function (v,i) {
-          categories.push(parseInt(v.id))
-        })
+        this.dataProduct.categories.forEach(function(v, i) {
+          categories.push(parseInt(v.id));
+        });
         categories = [...new Set(categories)];
 
         this.temp.category = categories;
@@ -275,14 +275,14 @@ export default {
       const active = this.dataActive - 1;
       this.$emit('handleProcessActive', active);
     },
-    nextStep() {    
+    nextStep() {
       this.$refs['dataGeneralForm'].validate((valid) => {
         if (valid) {
           const active = this.dataActive + 1;
           this.$emit('handleProcessActive', active);
           this.$emit('handleProcessTemp', this.temp);
         }
-      })
+      });
     },
     async getRecursive(id){
       const { data } = await categoryResource.getRecursive(id);
@@ -293,7 +293,7 @@ export default {
         this.loading = false;
       }
     },
-    async querySearchBrandAsync(queryString , cb) {
+    async querySearchBrandAsync(queryString, cb) {
       var brands = this.brands;
       var results = queryString ? brands.filter(this.createFilter(queryString)) : brands;
 
@@ -301,17 +301,19 @@ export default {
         brandResource.list({ keyword: queryString }).then(response => {
           this.brands = [...this.brands, ...response.data];
           results = response.data;
-          if(cb){
-            cb(results)
-          }else{
+          if (cb){
+            cb(results);
+          } else {
             this.cbGetBrands(results);
-          }; 
+          }
         })
           .catch(err => {
             console.log(err);
           });
       } else {
-        if(cb) cb(results); 
+        if (cb) {
+          cb(results);
+        }
       }
     },
     querySearchSupplierAsync(queryString, cb) {
@@ -322,17 +324,19 @@ export default {
         supplierResource.list({ keyword: queryString }).then(response => {
           this.suppliers = [...this.suppliers, ...response.data];
           results = response.data;
-          if(cb){
-            cb(results)
-          }else{
+          if (cb){
+            cb(results);
+          } else {
             this.cbGetSupplier(results);
-          }; 
+          }
         })
           .catch(err => {
             console.log(err);
           });
       } else {
-        if(cb) cb(results); 
+        if (cb) {
+          cb(results);
+        }
       }
     },
     querySearchTaxAsync(queryString, cb){
@@ -343,17 +347,19 @@ export default {
         taxResource.list({ keyword: queryString }).then(response => {
           this.taxs = [...this.taxs, ...response.data];
           results = response.data;
-          if(cb){
-            cb(results)
-          }else{
+          if (cb){
+            cb(results);
+          } else {
             this.cbGetTax(results);
-          }; 
+          }
         })
           .catch(err => {
             console.log(err);
           });
       } else {
-        if(cb) cb(results);
+        if (cb) {
+          cb(results);
+        }
       }
     },
     createFilter(queryString) {

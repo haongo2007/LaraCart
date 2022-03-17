@@ -85,11 +85,11 @@ function GetColorName() {
 }
 export default {
   name: 'InfoAttribute',
-  props: ['dataActive','dataProduct'],
   components: {
     Lightbox,
     FileManager,
   },
+  props: ['dataActive', 'dataProduct'],
   data() {
     return {
       loadAttributes: true,
@@ -109,15 +109,15 @@ export default {
     if (Object.keys(this.dataProduct).length > 0) {
       if (this.dataProduct.attributes) {
         var oldAttr = [];
-        this.dataProduct.attributes.forEach(function(v,i) {       
+        this.dataProduct.attributes.forEach(function(v, i) {
           if (oldAttr[v['attribute_group_id']] == undefined) {
             oldAttr[v['attribute_group_id']] = [];
-          }   
+          }
           oldAttr[v['attribute_group_id']].push(v);
-        })
-        oldAttr = Object.assign({},oldAttr);
+        });
+        oldAttr = Object.assign({}, oldAttr);
       }
-    }else{
+    } else {
       this.fetchAttributeGroup();
     }
   },
@@ -126,10 +126,10 @@ export default {
       const active = this.dataActive - 1;
       this.$emit('handleProcessActive', active);
     },
-    nextStep() {   
-      const active = this.dataActive + 1;   
+    nextStep() {
+      const active = this.dataActive + 1;
       this.$emit('handleProcessActive', active);
-      this.$emit('handleProcessTemp', {attribute:this.temp});
+      this.$emit('handleProcessTemp', { attribute: this.temp });
     },
     async fetchAttributeGroup(){
       const { data } = await attributeGroupResource.list();

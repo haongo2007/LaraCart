@@ -232,11 +232,11 @@ export default {
       } else {
         this.left = left;
       }
-      console.log(e)
+      console.log(e);
       if (this.type == 'bottom') {
-        this.top = - (e.screenY - e.pageY + 50); 
-      }else{
-        this.top = e.clientY; 
+        this.top = -(e.screenY - e.pageY + 50);
+      } else {
+        this.top = e.clientY;
       }
       this.visible = true;
       this.selectedTag = tag;

@@ -1,9 +1,10 @@
 <template>
   <div ref="rightPanel" :class="{show:show}" class="rightPanel-container">
     <div class="rightPanel-background" />
-    <div class="rightPanel">
+    <div class="rightPanel" :style="{'z-index':zIndex,'max-width':maxWidth}">
       <div class="handle-button" :style="{'top':buttonTop,'background-color':theme}" @click="show=!show">
-        <i :class="show?'el-icon-close': iCon" />
+        <i v-if="!iCon" :class="show?'el-icon-close': 'el-icon-setting'" />
+        <svg-icon v-else :icon-class="iCon"/>
       </div>
       <div class="rightPanel-items">
         <slot />
@@ -27,9 +28,17 @@ export default {
       type: String,
     },
     iCon: {
-      default: 'el-icon-setting',
+      default: '',
       type: String,
     },
+    zIndex:{
+      default:40000,
+      type: Number
+    },
+    maxWidth:{
+      default:'260px',
+      type:String,
+    }
   },
   data() {
     return {
@@ -103,17 +112,14 @@ export default {
 
 .rightPanel {
   background: #fff;
-  z-index: 3000;
   position: fixed;
   height: 100vh;
   width: 100%;
-  max-width: 260px;
   top: 0px;
   left: 0px;
   box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, .05);
   transition: all .25s cubic-bezier(.7, .3, .1, 1);
   transform: translate(100%);
-  z-index: 40000;
   left: auto;
   right: 0px;
 }
@@ -122,7 +128,7 @@ export default {
   transition: all .3s cubic-bezier(.7, .3, .1, 1);
 
   .rightPanel-background {
-    z-index: 20000;
+    z-index: 1999;
     opacity: 1;
     width: 100%;
     height: 100%;

@@ -42,34 +42,35 @@
     <el-row>
       <div class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-            Previous
+          Previous
         </el-button>
         <el-popover
-            placement="top"
-            v-model="visiblePopover"
-            width="360">
-            <div style="margin-top: 15px;">
-              <el-tooltip content="Sort" placement="left">
-                <el-input :placeholder="$t('table.sort')" v-model.number="temp.sort" :min="1">
-                  <template slot="append">
-                    <el-tooltip :content="'Status' + ( temp.status == 1 ? ' Active' : ' Deactive' )" placement="top">
-                      <el-switch
-                        v-model="temp.status"
-                        active-color="#13ce66"
-                        inactive-color="#ff4949"
-                        active-value="1"
-                        inactive-value="0"
-                      />
-                    </el-tooltip>
-                  </template>
-                </el-input>
-              </el-tooltip>
-            </div>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="visiblePopover = false">Cancel</el-button>
-              <el-button type="primary" size="mini" @click="done()">Done</el-button>
-            </div>
-            <el-button type="success" icon="el-icon-check" slot="reference">Upload</el-button>
+          v-model="visiblePopover"
+          placement="top"
+          width="360"
+        >
+          <div style="margin-top: 15px;">
+            <el-tooltip content="Sort" placement="left">
+              <el-input v-model.number="temp.sort" :placeholder="$t('table.sort')" :min="1">
+                <template slot="append">
+                  <el-tooltip :content="'Status' + ( temp.status == 1 ? ' Active' : ' Deactive' )" placement="top">
+                    <el-switch
+                      v-model="temp.status"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                      active-value="1"
+                      inactive-value="0"
+                    />
+                  </el-tooltip>
+                </template>
+              </el-input>
+            </el-tooltip>
+          </div>
+          <div style="text-align: right; margin: 0">
+            <el-button size="mini" type="text" @click="visiblePopover = false">Cancel</el-button>
+            <el-button type="primary" size="mini" @click="done()">Done</el-button>
+          </div>
+          <el-button slot="reference" type="success" icon="el-icon-check">Upload</el-button>
         </el-popover>
       </div>
     </el-row>
@@ -81,10 +82,10 @@ import FileManager from '@/components/FileManager';
 import EventBus from '@/components/FileManager/eventBus';
 export default {
   name: 'InfoThumbnail',
-  props: ['dataActive','dataProduct'],
   components: {
     FileManager,
   },
+  props: ['dataActive', 'dataProduct'],
   data() {
     return {
       temp: {
@@ -116,17 +117,17 @@ export default {
   },
   created() {
     if (Object.keys(this.dataProduct).length > 0) {
-      if(this.dataProduct.image){
+      if (this.dataProduct.image){
         this.temp.image = this.dataProduct.image;
         this.fileUrl = [];
         this.fileUrl.push({ value: this.temp.image + '&w=350', height: 350, width: 350 });
         this.fileUrl.push({ value: this.temp.image + '&w=450', height: 350, width: 450 });
         this.fileUrl.push({ value: this.temp.image + '&w=550', height: 350, width: 550 });
       }
-      if(this.dataProduct.sort){
+      if (this.dataProduct.sort){
         this.temp.sort = parseInt(this.dataProduct.sort);
       }
-      if(this.dataProduct.status){
+      if (this.dataProduct.status){
         this.temp.status = String(this.dataProduct.status);
       }
     }
@@ -191,7 +192,7 @@ export default {
     overflow-y: scroll;
   }
   .el-main-form::-webkit-scrollbar {
-      width: 0; 
-      background: transparent; 
+      width: 0;
+      background: transparent;
   }
 </style>

@@ -5,75 +5,75 @@
     </div>
     <el-col :span="20" :offset="2">
       <!-- <el-skeleton :rows="20" animated/> -->
-        <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
-          <el-step v-for="(step,key,index) in dataStepContent" :key="index" :title="(step.title ? step.title : step)" :icon="(step.icon ? step.icon : 'el-icon-edit')" />
-        </el-steps>
+      <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
+        <el-step v-for="(step,key,index) in dataStepContent" :key="index" :title="(step.title ? step.title : step)" :icon="(step.icon ? step.icon : 'el-icon-edit')" />
+      </el-steps>
 
-        <div v-for="(content,key,index) in dataStepContent" :key="key">
+      <div v-for="(content,key,index) in dataStepContent" :key="key">
 
-          <div v-if="dataComponentInfo.hasOwnProperty(key)" v-show="index === active">
-            <component :data-product="product" :data-active="active" @handleProcessTemp="handleProcessTemp" @handleProcessActive="handleProcessActive" :is="dataComponentInfo[key]" />
-          </div>
-          
-          <div v-else v-show="index === active">
-            <el-form ref="dataForm" :model="temp" :rules="dataRules" class="form-container" label-width="150px">
-              <el-row class="el-main-form">
-                <el-col :span="24">
-                  <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
-                    <el-input v-model="temp.descriptions[key].title" />
-                  </el-form-item>
-
-                  <el-form-item :label="$t('table.tags')">
-                    <el-tag
-                      v-for="tag in temp.descriptions[key].keyword"
-                      :key="tag"
-                      closable
-                      :disable-transitions="false"
-                      @close="handleClose(tag,key)"
-                    >
-                      {{ tag }}
-                    </el-tag>
-
-                    <el-input
-                      v-if="inputTagsVisible"
-                      ref="savekeywordInput"
-                      v-model="dynamicTags"
-                      class="input-new-tag"
-                      size="mini"
-                      @keyup.enter.native="handleInputConfirm(key)"
-                      @blur="handleInputConfirm(key)"
-                    />
-                    <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
-                  </el-form-item>
-
-                  <el-form-item :label="$t('table.description')">
-                    <el-input
-                      v-model="temp.descriptions[key].description"
-                      :rows="2"
-                      type="textarea"
-                      placeholder="Please input"
-                    />
-                  </el-form-item>
-
-                  <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
-                    <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" />
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </el-form>
-            <el-row >
-              <el-button-group class="pull-right">
-                <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
-                  Previous
-                </el-button>
-                <el-button v-if="!action" type="primary" icon="el-icon-arrow-right" @click="nextStep">
-                  Next
-                </el-button>
-              </el-button-group>
-            </el-row>
-          </div>
-
+        <div v-if="dataComponentInfo.hasOwnProperty(key)" v-show="index === active">
+          <component :is="dataComponentInfo[key]" :data-product="product" :data-active="active" @handleProcessTemp="handleProcessTemp" @handleProcessActive="handleProcessActive" />
         </div>
+
+        <div v-else v-show="index === active">
+          <el-form ref="dataForm" :model="temp" :rules="dataRules" class="form-container" label-width="150px">
+            <el-row class="el-main-form">
+              <el-col :span="24">
+                <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
+                  <el-input v-model="temp.descriptions[key].title" />
+                </el-form-item>
+
+                <el-form-item :label="$t('table.tags')">
+                  <el-tag
+                    v-for="tag in temp.descriptions[key].keyword"
+                    :key="tag"
+                    closable
+                    :disable-transitions="false"
+                    @close="handleClose(tag,key)"
+                  >
+                    {{ tag }}
+                  </el-tag>
+
+                  <el-input
+                    v-if="inputTagsVisible"
+                    ref="savekeywordInput"
+                    v-model="dynamicTags"
+                    class="input-new-tag"
+                    size="mini"
+                    @keyup.enter.native="handleInputConfirm(key)"
+                    @blur="handleInputConfirm(key)"
+                  />
+                  <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
+                </el-form-item>
+
+                <el-form-item :label="$t('table.description')">
+                  <el-input
+                    v-model="temp.descriptions[key].description"
+                    :rows="2"
+                    type="textarea"
+                    placeholder="Please input"
+                  />
+                </el-form-item>
+
+                <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
+                  <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+          <el-row>
+            <el-button-group class="pull-right">
+              <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
+                Previous
+              </el-button>
+              <el-button v-if="!action" type="primary" icon="el-icon-arrow-right" @click="nextStep">
+                Next
+              </el-button>
+            </el-button-group>
+          </el-row>
+        </div>
+
+      </div>
     </el-col>
   </el-row>
 </template>
@@ -87,7 +87,6 @@ import InfoProperty from './InfoProperty';
 import InfoThumbnail from './InfoThumbnail';
 import InfoPromotion from './InfoPromotion';
 import ProductResource from '@/api/product';
-
 
 const productResource = new ProductResource();
 
@@ -107,29 +106,29 @@ export default {
       type: Boolean,
       default: false,
     },
-    dataTemp:{
+    dataTemp: {
       type: Object,
-      default:false,
+      default: false,
     },
-    dataLanguages:{
+    dataLanguages: {
       type: Object,
-      default:false,
+      default: false,
     },
-    dataComponentInfo:{
+    dataComponentInfo: {
       type: Object,
-      default:false,
+      default: false,
     },
-    dataStepContent:{
+    dataStepContent: {
       type: Object,
-      default:false,
+      default: false,
     },
-    dataRules:{
+    dataRules: {
       type: Object,
-      default:false,
+      default: false,
     },
-    dataProduct:{
+    dataProduct: {
       type: Object,
-      default:false,
+      default: undefined,
     },
   },
   data() {
@@ -138,8 +137,8 @@ export default {
       active: 0,
       inputTagsVisible: false,
       dynamicTags: '',
-      temp:{},
-      product:{}
+      temp: {},
+      product: {},
     };
   },
   created() {
@@ -163,14 +162,14 @@ export default {
       const keyLang = Object.keys(this.dataLanguages)[this.active];
       const keyStep = Object.keys(this.dataStepContent)[this.active + 1];
       if (this.dataComponentInfo.hasOwnProperty(keyStep)){
-        this.dataComponentInfo[keyStep] = keyStep;   
+        this.dataComponentInfo[keyStep] = keyStep;
       }
       if (keyLang){
         this.$refs['dataForm'][this.active].validate((valid) => {
           if (valid) {
             this.active++;
           }
-        })
+        });
       } else {
         const stepNum = _.size(this.dataStepContent) - 1;
         if (++this.active == stepNum){
@@ -275,19 +274,19 @@ export default {
     },
     handleProcessActive(data){
       if (this.active == data) {
-        if(this.isEdit){
-          this.updateData()
-        }else{
-          this.createData()
+        if (this.isEdit){
+          this.updateData();
+        } else {
+          this.createData();
         }
-      }else if(this.active < data){
+      } else if (this.active < data){
         this.nextStep();
-      }else{
+      } else {
         this.backStep();
       }
     },
     handleProcessTemp(data){
-      this.temp = {...this.temp,...data};
+      this.temp = { ...this.temp, ...data };
     },
   },
 };

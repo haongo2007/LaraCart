@@ -1,5 +1,5 @@
 <template>
-	<category-detail :is-edit="true" :data-temp="temp" :data-rules="rules" :data-languages="languages" v-if="!loading"/>
+  <category-detail v-if="!loading" :is-edit="true" :data-temp="temp" :data-rules="rules" :data-languages="languages" />
 </template>
 
 <script>
@@ -16,9 +16,9 @@ export default {
   components: { CategoryDetail },
   data() {
     return {
-    	loading:true,
-    	languages:[],
-			temp : {
+    	loading: true,
+    	languages: [],
+      temp: {
 			  id: '',
 			  alias: '',
 			  sort: '',
@@ -28,8 +28,8 @@ export default {
 			  image: '',
 			  descriptions: {
 			  },
-			  fileUrl:'',
-			},
+			  fileUrl: '',
+      },
       rules: {
         sort: [
           {
@@ -54,13 +54,13 @@ export default {
         ],
         descriptions: [],
       },
-    }
-	},
-	created() {		
+    };
+  },
+  created() {
     const id = this.$route.params && this.$route.params.id;
     this.fetchCategory(id);
   },
-  methods:{  	
+  methods: {
     fetchCategory(id) {
       const loading = this.$loading({
         target: '.el-row',
@@ -68,7 +68,7 @@ export default {
       categoryResource.get(id)
         .then(({ data } = response) => {
           const desc = data.descriptions;
-          
+
           this.temp.fileUrl = data.image + '&w=644';
           this.temp.image = data.image;
           this.temp.parent = data.parent ? data.parent : String(data.parent);
@@ -84,12 +84,12 @@ export default {
           }
 
           // get current language
-          languageResource.list({code:codes}).then(({data} = response) => {
+          languageResource.list({ code: codes }).then(({ data } = response) => {
             const newLang = [];
             for (var i = 0; i < data.length; i++) {
               newLang[data[i].code] = data[i].name;
             }
-            this.languages = Object.assign({},newLang);
+            this.languages = Object.assign({}, newLang);
             this.languages['last'] = 'Done';
             // set temp follow current language
             this.fetchLanguages(desc);
@@ -131,7 +131,7 @@ export default {
       });
       this.loading = false;
     },
-  }
+  },
 };
 </script>
 

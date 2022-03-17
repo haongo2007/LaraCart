@@ -1,5 +1,5 @@
 <template>
-  <product-detail :is-edit="false" :data-temp="temp" :data-languages="languages" :data-step-content="stepContent" :data-component-info="componentInfo" :data-rules="rules" v-if="!loading"/>
+  <product-detail v-if="!loading" :is-edit="false" :data-temp="temp" :data-languages="languages" :data-step-content="stepContent" :data-component-info="componentInfo" :data-rules="rules" />
 </template>
 
 <script>
@@ -11,8 +11,8 @@ export default {
   name: 'ProductCreateSingle',
   components: { ProductDetail },
   data(){
-		return {
-			loading:true,
+    return {
+      loading: true,
     	languages: {},
       componentInfo: {},
       stepContent: {},
@@ -20,21 +20,21 @@ export default {
 			  id: 0,
 			  kind: 0,
 			  descriptions: {},
-			},
+      },
       rules: {
         descriptions: [],
       },
-  	}
+  	};
   },
-  created(){  	
+  created(){
     this.fetchLanguages();
   },
-  methods:{
+  methods: {
     fetchLanguages() {
       languageResource.fetchLanguagesActive()
         .then(data => {
           this.languages = Object.assign({}, data.data);
-          this.setTemp(); 
+          this.setTemp();
         })
         .catch(err => {
           console.log(err);
@@ -42,9 +42,8 @@ export default {
     },
 	  setTemp(){
       var that = this;
-      let data = Object.assign({}, this.languages);
+      const data = Object.assign({}, this.languages);
       Object.keys(data).forEach(function(key, index) {
-
         that.$set(that.temp.descriptions, key, {});
 
         that.$set(that.temp.descriptions[key], 'description', '');
@@ -69,14 +68,13 @@ export default {
           ]
         );
 
-        that.$set(that.rules.descriptions[key],'content', [
+        that.$set(that.rules.descriptions[key], 'content', [
           {
             required: true,
             message: 'Content ' + data[key] + ' is required',
             trigger: 'blur',
           },
         ]);
-
       });
       // /// create step form
       this.stepContent = data;

@@ -11,6 +11,8 @@ use Carbon\Carbon;
 class Product extends ShopProduct
 {
     const ACTIVE = ['1'];
+    const ITEM_PER_PAGE = 10;
+
     /**
      * Get product table name in admin
      *
@@ -68,6 +70,7 @@ class Product extends ShopProduct
         $from             = $dataSearch['from'] ?? '';
         $to               = $dataSearch['to'] ?? '';
         $status           = $dataSearch['status'] ?? self::ACTIVE;
+        $limit        = $dataSearch['limit'] ?? self::ITEM_PER_PAGE;
 
         $tableDescription = (new ShopProductDescription)->getTable();
         $tablePTC         = (new ShopProductCategory)->getTable();
@@ -132,7 +135,7 @@ class Product extends ShopProduct
         } else {
             $productList = $productList->sort('id', 'desc');
         }
-        $productList = $productList->paginate(20);
+        $productList = $productList->paginate($limit);
 
         return $productList;
     }

@@ -1,5 +1,5 @@
 <template>
-	<category-detail :is-edit="false" :data-temp="temp" :data-rules="rules" :data-languages="languages" v-if="!loading"/>
+  <category-detail v-if="!loading" :is-edit="false" :data-temp="temp" :data-rules="rules" :data-languages="languages" />
 </template>
 
 <script>
@@ -13,9 +13,9 @@ export default {
   components: { CategoryDetail },
   data() {
     return {
-    	loading:true,
-    	languages:[],
-			temp : {
+    	loading: true,
+    	languages: [],
+      temp: {
 			  id: '',
 			  alias: '',
 			  sort: '',
@@ -25,8 +25,8 @@ export default {
 			  image: '',
 			  descriptions: {
 			  },
-			  fileUrl:''
-			},
+			  fileUrl: '',
+      },
       rules: {
         sort: [
           {
@@ -51,12 +51,12 @@ export default {
         ],
         descriptions: [],
       },
-    }
-	},
-	created() {		
+    };
+  },
+  created() {
     this.fetchLanguages();
   },
-  methods:{  	
+  methods: {
     fetchLanguages() {
       languageResource.fetchLanguagesActive()
         .then(data => {
@@ -92,7 +92,7 @@ export default {
           console.log(err);
         });
     },
-  }
+  },
 };
 </script>
 

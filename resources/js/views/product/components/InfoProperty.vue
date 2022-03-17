@@ -67,7 +67,7 @@ const weightResource = new WeightResource();
 const lengthResource = new LengthResource();
 export default {
   name: 'InfoProperty',
-  props: ['dataActive','dataProduct'],
+  props: ['dataActive', 'dataProduct'],
   data() {
     return {
       temp: {
@@ -85,22 +85,22 @@ export default {
   created() {
     if (Object.keys(this.dataProduct).length > 0) {
       console.log(this.dataProduct);
-      if(this.dataProduct.weight){
+      if (this.dataProduct.weight){
         this.temp.weight = this.dataProduct.weight;
       }
-      if(this.dataProduct.width){
+      if (this.dataProduct.width){
         this.temp.width = this.dataProduct.width;
       }
-      if(this.dataProduct.height){
+      if (this.dataProduct.height){
         this.temp.height = this.dataProduct.height;
       }
-      if(this.dataProduct.length){
+      if (this.dataProduct.length){
         this.temp.length = this.dataProduct.length;
       }
-      if(this.dataProduct.weight_class){
+      if (this.dataProduct.weight_class){
         this.querySearchWeightAsync();
       }
-      if(this.dataProduct.length_class){
+      if (this.dataProduct.length_class){
         this.querySearchLengthAsync();
       }
     }
@@ -110,7 +110,7 @@ export default {
       const active = this.dataActive - 1;
       this.$emit('handleProcessActive', active);
     },
-    nextStep() {      
+    nextStep() {
       const active = this.dataActive + 1;
       this.$emit('handleProcessActive', active);
       this.$emit('handleProcessTemp', this.temp);
@@ -131,17 +131,19 @@ export default {
         weightResource.list({ keyword: queryString }).then(response => {
           this.weight_units = [...this.weight_units, ...response.data];
           results = response.data;
-          if(cb){
-            cb(results)
-          }else{
+          if (cb){
+            cb(results);
+          } else {
             this.cbGetWeightCl(results);
-          }; 
+          }
         })
           .catch(err => {
             console.log(err);
           });
       } else {
-        if(cb) cb(results); 
+        if (cb) {
+          cb(results);
+        }
       }
     },
     querySearchLengthAsync(queryString, cb){
@@ -152,17 +154,19 @@ export default {
         lengthResource.list({ keyword: queryString }).then(response => {
           this.length_units = [...this.length_units, ...response.data];
           results = response.data;
-          if(cb){
-            cb(results)
-          }else{
+          if (cb){
+            cb(results);
+          } else {
             this.cbGetLengthCl(results);
-          }; 
+          }
         })
           .catch(err => {
             console.log(err);
           });
       } else {
-        if(cb) cb(results); 
+        if (cb) {
+          cb(results);
+        }
       }
     },
     createFilter(queryString) {
