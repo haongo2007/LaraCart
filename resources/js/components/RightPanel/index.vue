@@ -2,8 +2,8 @@
   <div ref="rightPanel" :class="{show:show}" class="rightPanel-container">
     <div class="rightPanel-background" />
     <div class="rightPanel">
-      <div class="handle-button" :style="{'top':buttonTop+'px','background-color':theme}" @click="show=!show">
-        <i :class="show?'el-icon-close':'el-icon-setting'" />
+      <div class="handle-button" :style="{'top':buttonTop,'background-color':theme}" @click="show=!show">
+        <i :class="show?'el-icon-close': iCon" />
       </div>
       <div class="rightPanel-items">
         <slot />
@@ -23,8 +23,12 @@ export default {
       type: Boolean,
     },
     buttonTop: {
-      default: 250,
-      type: Number,
+      default: '250px',
+      type: String,
+    },
+    iCon: {
+      default: 'el-icon-setting',
+      type: String,
     },
   },
   data() {

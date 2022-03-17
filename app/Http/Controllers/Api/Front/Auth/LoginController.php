@@ -2,13 +2,13 @@
 
 namespace BlackCart\Core\Front\Controllers\Auth;
 
-use App\Http\Controllers\RootFrontController;
+use App\Http\Controllers\Controller;
 use BlackCart\Core\Front\Models\ShopCountry;
 use Auth;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 
-class LoginController extends RootFrontController
+class LoginController extends Controller
 {
     /*
     |--------------------------------------------------------------------------

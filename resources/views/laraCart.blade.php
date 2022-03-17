@@ -25,6 +25,7 @@
     <meta name="msapplication-TileImage" content="/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <link href="{{ mix('css/app.css') }}" type="text/css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" type="text/css" rel="stylesheet">
 </head>
 <body>
     <div id="app">
@@ -35,5 +36,6 @@
     <script src="{{ mix('js/vendor.js') }}"></script>
     <script src="{{ mix('js/manifest.js') }}"></script>
     <script src="{{ mix('js/app.js') }}"></script>
+    <script src="{{ mix('js/FasKit.js') }}"></script>
 </body>
 </html>

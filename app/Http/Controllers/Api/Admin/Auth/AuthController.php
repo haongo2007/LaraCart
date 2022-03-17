@@ -47,7 +47,7 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function info(Request $request)
-    {
+    {   
         return new UserCollection($request->user());
     }
 }

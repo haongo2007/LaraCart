@@ -9,7 +9,7 @@
       </div>
       <app-main />
       <tags-view-bottom v-if="needTagsView" />
-      <right-panel v-if="showSettings">
+      <right-panel v-if="showSettings" :button-top="'90%'">
         <settings />
       </right-panel>
     </div>
