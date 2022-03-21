@@ -242,7 +242,7 @@ export default {
           categories.push(parseInt(v.id));
         });
         categories = [...new Set(categories)];
-        
+
         this.temp.category = categories;
       }
       this.temp.price = this.dataProduct.price;
@@ -252,7 +252,7 @@ export default {
       this.date_available = this.dataProduct.date_available ? parseTime(this.dataProduct.date_available.toString(), '{y}-{m}-{d} {h}:{i}:{s}') : '';
       this.temp.stock = this.dataProduct.stock;
       this.temp.alias = this.dataProduct.alias;
-    }else{      
+    } else {
       this.loading = false;
     }
   },
@@ -269,8 +269,10 @@ export default {
     },
     cbGetTax(res){
       const selectedTax = this.taxs.filter(tax => tax.id == this.dataProduct.tax_id);
-      this.temp.tax.label = selectedTax[0].name;
-      this.temp.tax.value = this.dataProduct.tax_id;
+      if (selectedTax.length > 0) {
+        this.temp.tax.label = selectedTax[0].name;
+        this.temp.tax.value = this.dataProduct.tax_id;
+      }
       this.loading = false;
     },
     backStep() {

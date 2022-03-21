@@ -1,6 +1,6 @@
 
 <template>
-  <div class="drawer-container" v-loading="dataLoading">
+  <div v-loading="dataLoading" class="drawer-container">
     <div>
       <h3 class="drawer-title">
         {{ $t('table.actions') }}
@@ -38,7 +38,7 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="24">            
+          <el-col :span="24">
             <el-input v-model="dataQuery.title" clearable :placeholder="$t('table.name')" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
@@ -64,14 +64,14 @@ export default {
     dataQuery: {
       type: Object,
       default: false,
-    }
+    },
   },
   data() {
     return {
-      list:null,
-      total:0,
-      parent:true,
-      listQuery:{},
+      list: null,
+      total: 0,
+      parent: true,
+      listQuery: {},
       fillterStatusOptions: [{
         label: 'Deactive',
         key: '0',
@@ -100,27 +100,27 @@ export default {
       }],
     };
   },
-  created() {
-    this.getList();
-    EventBus.$on('handleDeleting', this.handleDeleting);
-  },
   watch: {
     'dataQuery.limit': {
       handler(newValue, oldValue) {
         this.getList(newValue);
-      }
+      },
     },
     'dataQuery.page': {
       handler(newValue, oldValue) {
         this.getList(newValue);
-      }
+      },
     },
+  },
+  created() {
+    this.getList();
+    EventBus.$on('handleDeleting', this.handleDeleting);
   },
   methods: {
     async getList() {
       if (this.parent === false) {
         this.dataQuery.parent = '';
-      }else{
+      } else {
         this.dataQuery.parent = '0';
       }
       const data = await categoryResource.list(this.dataQuery);
@@ -128,7 +128,7 @@ export default {
       this.list = data.data;
       this.total = data.meta.total;
 
-      this.$emit('handleListenData', {list:this.list,loading:false,total:this.total,listQuery:this.dataQuery});
+      this.$emit('handleListenData', { list: this.list, loading: false, total: this.total, listQuery: this.dataQuery });
     },
     handleFilter(type, e) {
       if (type === 'sort' && e) {
@@ -181,7 +181,7 @@ export default {
         cancelButtonText: 'Cancel',
         type: 'warning',
       }).then(() => {
-        this.$emit('handleListenData', {loading:true});
+        this.$emit('handleListenData', { loading: true });
         categoryResource.destroy(row.id).then((res) => {
           const index = this.list.indexOf(row);
           this.$message({
@@ -200,11 +200,11 @@ export default {
             });
           } else {
             this.list.splice(index, 1);
-            let total = this.total - Array(row).length;
-            this.$emit('handleListenData', {list:this.list,loading:false,total:total,listQuery:this.dataQuery});
+            const total = this.total - Array(row).length;
+            this.$emit('handleListenData', { list: this.list, loading: false, total: total, listQuery: this.dataQuery });
           }
         }).catch(() => {
-          this.$emit('handleListenData', {loading:false});
+          this.$emit('handleListenData', { loading: false });
         });
       }).catch(() => {
         this.$message({
@@ -214,7 +214,7 @@ export default {
       });
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

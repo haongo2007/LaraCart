@@ -1,6 +1,6 @@
 
 <template>
-  <div class="drawer-container" v-loading="dataLoading">
+  <div v-loading="dataLoading" class="drawer-container">
     <div>
       <h3 class="drawer-title">
         {{ $t('table.actions') }}
@@ -9,7 +9,7 @@
       <div class="drawer-item">
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-button-group >
+            <el-button-group>
               <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'OrderCreate'})" />
               <el-button type="success" :disabled="downloadLoading" @click="handleDownload"><svg-icon icon-class="excel" /></el-button>
               <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
@@ -92,10 +92,10 @@ export default {
       type: Object,
       default: false,
     },
-    dataStatusOptions:{
+    dataStatusOptions: {
       type: Array,
-      default:undefined
-    }
+      default: undefined,
+    },
   },
   data() {
     return {
@@ -158,6 +158,18 @@ export default {
       multiSelectRow: [],
     };
   },
+  watch: {
+    'dataQuery.limit': {
+      handler(newValue, oldValue) {
+        this.getList(newValue);
+      },
+    },
+    'dataQuery.page': {
+      handler(newValue, oldValue) {
+        this.getList(newValue);
+      },
+    },
+  },
   created() {
     this.getList();
     EventBus.$on('listenMultiSelectRow', data => {
@@ -165,24 +177,12 @@ export default {
     });
     EventBus.$on('handleDeleting', this.handleDeleting);
   },
-  watch: {
-    'dataQuery.limit': {
-      handler(newValue, oldValue) {
-        this.getList(newValue);
-      }
-    },
-    'dataQuery.page': {
-      handler(newValue, oldValue) {
-        this.getList(newValue);
-      }
-    },
-  },
   methods: {
     async getList() {
       const data = await ordersResource.list(this.dataQuery);
       this.list = data.data;
       this.total = data.meta.total;
-      this.$emit('handleListenData', {list:this.list,loading:false,total:this.total,listQuery:this.dataQuery});
+      this.$emit('handleListenData', { list: this.list, loading: false, total: this.total, listQuery: this.dataQuery });
     },
     handleDeleting(row, multiple = false) {
       this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
@@ -190,7 +190,7 @@ export default {
         cancelButtonText: 'Cancel',
         type: 'warning',
       }).then(() => {
-        this.$emit('handleListenData', {loading:true});
+        this.$emit('handleListenData', { loading: true });
         if (multiple) {
           var id = [];
           row.map((item) => id.push(item.id));
@@ -213,8 +213,8 @@ export default {
               type: 'success',
               message: 'Delete successfully',
             });
-            let total = this.total - Array(row).length;
-            this.$emit('handleListenData', {list:this.list,loading:false,total:total});
+            const total = this.total - Array(row).length;
+            this.$emit('handleListenData', { list: this.list, loading: false, total: total });
           }
         });
       }).catch(() => {
@@ -225,7 +225,7 @@ export default {
       });
     },
     handleFilter(){
-      this.$emit('handleListenData', {loading:true});
+      this.$emit('handleListenData', { loading: true });
       if (this.arDateToSearch !== null && this.arDateToSearch.length > 0) {
         this.dataQuery.from = parseTime(this.arDateToSearch[0], '{d}-{m}-{y} {h}:{i}:{s}');
         this.dataQuery.to = parseTime(this.arDateToSearch[1], '{d}-{m}-{y} {h}:{i}:{s}');
@@ -240,7 +240,7 @@ export default {
     },
     handleDownload() {
       this.downloadLoading = true;
-      this.$emit('handleListenData', {loading:true});
+      this.$emit('handleListenData', { loading: true });
       import('@/vendor/Export2Excel').then(excel => {
         const tHeader = ['Order#', 'Customer', 'Country', 'Address', 'Phone', 'Email', 'Subtotal', 'Ship fee', 'Discount', 'Total', 'Payment', 'Currency', 'Status', 'Created at'];
         const filterVal = ['id', 'first_name', 'country', 'address3', 'phone', 'email', 'subtotal', 'shipping', 'discount', 'total', 'payment_method', 'currency', 'status', 'created_at'];
@@ -250,7 +250,7 @@ export default {
           data,
           filename: 'Orders-list-' + parseTime(new Date(), '{y}-{m}-{d}'),
         });
-        this.$emit('handleListenData', {loading:false});
+        this.$emit('handleListenData', { loading: false });
         this.downloadLoading = false;
       });
     },
@@ -265,7 +265,7 @@ export default {
       }));
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

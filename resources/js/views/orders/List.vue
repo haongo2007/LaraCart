@@ -1,12 +1,13 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :iCon="'funnel'" >
+      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
         <filter-system-order
-        :data-loading="loading" 
-        :data-query="listQuery"
-        :data-status-options="statusOptions"
-        @handleListenData="handleListenData"/>
+          :data-loading="loading"
+          :data-query="listQuery"
+          :data-status-options="statusOptions"
+          @handleListenData="handleListenData"
+        />
       </right-panel>
     </div>
 
@@ -137,7 +138,7 @@ const orderStatusResource = new OrderStatusResource();
 var statusMap = null;
 export default {
   name: 'OrdersList',
-  components: { Pagination,RightPanel,FilterSystemOrder },
+  components: { Pagination, RightPanel, FilterSystemOrder },
   filters: {
     statusFilter(status, get) {
       const statusFilter = statusMap.filter(v => v.id === status);
@@ -151,7 +152,7 @@ export default {
     return {
       list: null,
       total: 0,
-      loading:true, 
+      loading: true,
       statusOptions: [],
       listQuery: {
         page: 1,
@@ -170,7 +171,7 @@ export default {
   created(){
     this.getListStatus();
   },
-  methods:{
+  methods: {
     async getListStatus() {
       const { data } = await orderStatusResource.list();
       this.statusOptions = data;
@@ -201,6 +202,6 @@ export default {
     handleDeleting(row){
       EventBus.$emit('handleDeleting', row);
     },
-  }
+  },
 };
 </script>

@@ -1,11 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :iCon="'funnel'" >
-        <filter-system-product 
-        :data-loading="loading" 
-        :data-query="listQuery"
-        @handleListenData="handleListenData"/>
+      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
+        <filter-system-product
+          :data-loading="loading"
+          :data-query="listQuery"
+          @handleListenData="handleListenData"
+        />
       </right-panel>
     </div>
 
@@ -122,12 +123,12 @@ import EventBus from '@/components/FileManager/eventBus';
 
 export default {
   name: 'ProductList',
-  components: { Pagination,RightPanel,FilterSystemProduct },
+  components: { Pagination, RightPanel, FilterSystemProduct },
   data() {
     return {
       list: null,
       total: 0,
-      loading:true, 
+      loading: true,
       listQuery: {
         page: 1,
         limit: 10,
@@ -145,7 +146,7 @@ export default {
   created() {
 
   },
-  methods:{
+  methods: {
     handleListenData(data){
       if (data.hasOwnProperty('list')) {
         this.list = data.list;
@@ -180,10 +181,10 @@ export default {
       }
       this.$router.push({ name: rou, params: { id: prid }});
     },
-  }
+  },
 };
 </script>
-<style> 
+<style>
 .el-slider__runway{
   margin:11px 0px !important;
 }

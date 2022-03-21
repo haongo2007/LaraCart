@@ -21,12 +21,12 @@
         <el-skeleton :rows="6" animated :loading="loading" />
         <component
           :is="order_component"
+          v-show="!loading"
           :data-order="info_order"
           :data-order-status="statusOrder"
           :data-shipping-status="statusShipping"
           :data-payment-status="statusPayment"
           :data-payment-method="paymentMethod"
-          v-show="!loading"
           :data-shipping-method="shippingMethod"
           @handleChangeHistory="handleChangeHistory"
         />

@@ -1,11 +1,13 @@
 <template>
-  <product-detail v-show="!loading" 
-    :is-edit="false" 
-    :data-temp="temp" 
-    :data-languages="languages" 
-    :data-step-content="stepContent" 
-    :data-component-info="componentInfo" 
-    :data-rules="rules" />
+  <product-detail
+    v-show="!loading"
+    :is-edit="false"
+    :data-temp="temp"
+    :data-languages="languages"
+    :data-step-content="stepContent"
+    :data-component-info="componentInfo"
+    :data-rules="rules"
+  />
 </template>
 
 <script>
@@ -18,7 +20,7 @@ export default {
   components: { ProductDetail },
   data(){
     return {
-      loading:true,
+      loading: true,
     	languages: {},
       componentInfo: {},
       stepContent: {},

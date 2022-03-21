@@ -30,7 +30,7 @@
                   <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
                 </el-form-item>
               </div>
-              <div v-if="temp[index]['values'][key].files" v-loading="loadFiles">
+              <div v-if="temp[index]['values'][key].files != ''" v-loading="loadFiles">
                 <lightbox :cells="3" :items="temp[index]['values'][key].files" />
                 <div v-if="temp[index]['values'][key].palette" class="color-Palette">
                   <h1>COLORS</h1>
@@ -119,9 +119,10 @@ export default {
     async fetchAttributeGroup(){
       const { data } = await attributeGroupResource.list();
       const that = this;
-      let values = [];
+      const values = [];
       if (Object.keys(this.dataProduct).length > 0) {
         if (this.dataProduct.attributes) {
+          this.disabled_clear = false;
           this.dataProduct.attributes.forEach(function(v, i) {
             if (values[v['attribute_group_id']] == undefined) {
               values[v['attribute_group_id']] = [];
@@ -132,14 +133,23 @@ export default {
       }
       data.forEach(function(v, i) {
         that.$set(that.temp, i, v);
-        that.$set(that.temp[i], 'values', values.length>0 ? values[v.id] : values); 
+        that.$set(that.temp[i], 'values', values.length > 0 ? values[v.id] : []);
+        console.log(values);
+        if (values.length) {
+          values[v.id].forEach(function(val,ind){
+            if (val.files.length>0) {
+              that.$set(that.temp[i]['values'][ind], 'files', val.files);
+              that.$set(that.temp[i]['values'][ind], 'palette', val.palette);
+            }
+          });
+        }
       });
       this.loadAttributes = false;
     },
     handleAddAttribute(key){
       this.disabled_clear = false;
       this.attNum++;
-      this.$set(this.temp[key]['values'], this.temp[key]['values'].length, { name: '', price: '' });
+      this.$set(this.temp[key]['values'], this.temp[key]['values'].length, { name: '', add_price: '' });
     },
     handleClearAllAttribute(){
       this.disabled_clear = true;
@@ -178,7 +188,7 @@ export default {
       this.getPalette(data[0]);
       this.dialogStorageClose();
     },
-    getPalette(imageSrc) {
+    getPalette(imageSrc,currentSelectFile) {
       Vibrant.from(imageSrc).maxColorCount(200).getPalette().then((palette) => {
         const colors = [];
         var number = 0;
@@ -192,9 +202,8 @@ export default {
           const nameTextColor = palette[color].getBodyTextColor();
           colors.push({ number, type, typeTextColor, hex, hexTextColor, name, nameTextColor });
         }
-        this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]].palette = colors;
+        this.temp[currentSelectFile.length>0 ? currentSelectFile[0] : this.currentSelectFile[0]]['values'][currentSelectFile.length>0 ? currentSelectFile[1] :this.currentSelectFile[1]].palette = colors;
         this.loadFiles = false;
-        console.log(this.temp);
       });
     },
   },

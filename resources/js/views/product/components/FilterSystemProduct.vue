@@ -1,6 +1,6 @@
 
 <template>
-  <div class="drawer-container" v-loading="dataLoading">
+  <div v-loading="dataLoading" class="drawer-container">
     <div>
       <h3 class="drawer-title">
         {{ $t('table.actions') }}
@@ -54,7 +54,7 @@
         <el-row :gutter="24">
           <el-col :span="8">
             <el-tooltip class="item" effect="dark" content="Choose value needed filter" placement="bottom-start">
-              <el-radio-group size="mini" v-model="dataQuery.filter_price_by" style="width: 100%;" @change="handleFilterPriceSlide">
+              <el-radio-group v-model="dataQuery.filter_price_by" size="mini" style="width: 100%;" @change="handleFilterPriceSlide">
                 <el-radio-button label="Cost" />
                 <el-radio-button label="Price" />
               </el-radio-group>
@@ -116,6 +116,7 @@ const productResource = new ProductResource();
 const categoryResource = new CategoryResource();
 export default {
   name: 'FilterSystemProduct',
+  directives: { waves },
   props: {
     dataLoading: {
       type: Boolean,
@@ -126,11 +127,10 @@ export default {
       default: false,
     },
   },
-  directives: { waves },
   data() {
     return {
-      list:null,
-      total:0,
+      list: null,
+      total: 0,
       downloadLoading: false,
       arDateToSearch: [],
       maxPrice: null,
@@ -220,19 +220,19 @@ export default {
           },
         }],
       },
-      multiSelectRow:[],
+      multiSelectRow: [],
     };
   },
   watch: {
     'dataQuery.limit': {
       handler(newValue, oldValue) {
         this.getList(newValue);
-      }
+      },
     },
     'dataQuery.page': {
       handler(newValue, oldValue) {
         this.getList(newValue);
-      }
+      },
     },
   },
   created(){
@@ -246,9 +246,9 @@ export default {
   methods: {
     getList() {
       const data = productResource.list(this.dataQuery).then((data) => {
-        this.list = data.data
-        this.total = data.meta.total
-        this.$emit('handleListenData', {list:this.list,loading:false,total:this.total,listQuery:this.dataQuery});
+        this.list = data.data;
+        this.total = data.meta.total;
+        this.$emit('handleListenData', { list: this.list, loading: false, total: this.total, listQuery: this.dataQuery });
       });
     },
     async getListCategory() {
@@ -269,7 +269,7 @@ export default {
         cancelButtonText: 'Cancel',
         type: 'warning',
       }).then(() => {
-        this.$emit('handleListenData', {loading:true});
+        this.$emit('handleListenData', { loading: true });
         if (multiple) {
           var id = [];
           row.map((item) => id.push(item.id));
@@ -291,8 +291,8 @@ export default {
             type: 'success',
             message: 'Delete successfully',
           });
-          let total = this.total - Array(row).length;
-          this.$emit('handleListenData', {list:this.list,loading:false,total:total});
+          const total = this.total - Array(row).length;
+          this.$emit('handleListenData', { list: this.list, loading: false, total: total });
         }).catch(() => {
           this.$message({
             type: 'danger',
@@ -320,7 +320,7 @@ export default {
       this.getMaxPrice(this.dataQuery.filter_price_by);
     },
     handleFilter(){
-      this.$emit('handleListenData', {loading:true});
+      this.$emit('handleListenData', { loading: true });
       this.getList();
     },
     handerDeleteAll(){

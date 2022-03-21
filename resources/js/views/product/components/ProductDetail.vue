@@ -56,7 +56,7 @@
                 </el-form-item>
 
                 <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
-                  <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" :style="{'width': 'calc(100% - 2px)'}"/>
+                  <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" :style="{'width': 'calc(100% - 2px)'}" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -327,6 +327,6 @@ export default {
   }
   .el-content-form{
     padding: 10px;
-    border: 1px solid #eee; 
+    border: 1px solid #eee;
   }
 </style>

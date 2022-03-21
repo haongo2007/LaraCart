@@ -393,6 +393,7 @@ class CreateTablesShop extends Migration
             $table->string('type',100);
             $table->string('hex',100);
             $table->integer('attribute_id');
+            $table->integer('product_id');
             }
         );
 

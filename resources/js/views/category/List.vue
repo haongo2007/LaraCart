@@ -1,11 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :iCon="'funnel'" >
+      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
         <filter-system-category
-        :data-loading="loading" 
-        :data-query="listQuery"
-        @handleListenData="handleListenData"/>
+          :data-loading="loading"
+          :data-query="listQuery"
+          @handleListenData="handleListenData"
+        />
       </right-panel>
     </div>
     <el-table
@@ -94,22 +95,21 @@ import { statusFilter } from '@/filters';
 import { parseTime } from '@/utils';
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 import RightPanel from '@/components/RightPanel';
-import FilterSystemCategory from './components/FilterSystemCategory'; 
+import FilterSystemCategory from './components/FilterSystemCategory';
 import EventBus from '@/components/FileManager/eventBus';
 import CategoryResource from '@/api/category';
 
 const categoryResource = new CategoryResource();
 
-
 export default {
   name: 'CategoryList',
-  components: { Pagination,RightPanel,FilterSystemCategory },
+  components: { Pagination, RightPanel, FilterSystemCategory },
   data() {
     return {
       list: [],
       total: 0,
       loading: true,
-      parent:true,
+      parent: true,
       listQuery: {
         page: 1,
         limit: 20,
@@ -129,7 +129,7 @@ export default {
   created() {
 
   },
-  methods:{
+  methods: {
     async load(row, treeNode, resolve) {
       const id = row.id;
       const { data } = await categoryResource.getChildren(id);
@@ -157,7 +157,7 @@ export default {
     handleDeleting(row){
       EventBus.$emit('handleDeleting', row);
     },
-  }
+  },
 };
 </script>
 <style>
