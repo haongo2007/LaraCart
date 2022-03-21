@@ -4,7 +4,7 @@
     <div class="rightPanel" :style="{'z-index':zIndex,'max-width':maxWidth}">
       <div class="handle-button" :style="{'top':buttonTop,'background-color':theme}" @click="show=!show">
         <i v-if="!iCon" :class="show?'el-icon-close': 'el-icon-setting'" />
-        <svg-icon v-else :icon-class="iCon"/>
+        <svg-icon v-else :icon-class="iCon" />
       </div>
       <div class="rightPanel-items">
         <slot />
@@ -31,14 +31,14 @@ export default {
       default: '',
       type: String,
     },
-    zIndex:{
-      default:40000,
-      type: Number
+    zIndex: {
+      default: 40000,
+      type: Number,
     },
-    maxWidth:{
-      default:'260px',
-      type:String,
-    }
+    maxWidth: {
+      default: '260px',
+      type: String,
+    },
   },
   data() {
     return {

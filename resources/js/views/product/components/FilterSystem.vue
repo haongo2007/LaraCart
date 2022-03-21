@@ -119,7 +119,8 @@ const productResource = new ProductResource();
 const categoryResource = new CategoryResource();
 export default {
   name: 'FilterSystem',
-  props: ['','',''],
+  directives: { waves },
+  props: ['', '', ''],
 
   props: {
     dataLoading: {
@@ -131,11 +132,10 @@ export default {
       default: false,
     },
   },
-  directives: { waves },
   data() {
     return {
-      list:null,
-      total:0,
+      list: null,
+      total: 0,
       downloadLoading: false,
       arDateToSearch: [],
       maxPrice: null,
@@ -225,19 +225,19 @@ export default {
           },
         }],
       },
-      multiSelectRow:[],
+      multiSelectRow: [],
     };
   },
   watch: {
     'dataQuery.limit': {
       handler(newValue, oldValue) {
         this.getList(newValue);
-      }
+      },
     },
     'dataQuery.page': {
       handler(newValue, oldValue) {
         this.getList(newValue);
-      }
+      },
     },
   },
   created(){
@@ -251,9 +251,9 @@ export default {
   methods: {
     getList() {
       const data = productResource.list(this.dataQuery).then((data) => {
-        this.list = data.data
-        this.total = data.meta.total
-        this.$emit('handleListenData', {list:this.list,loading:false,total:this.total,listQuery:this.dataQuery});
+        this.list = data.data;
+        this.total = data.meta.total;
+        this.$emit('handleListenData', { list: this.list, loading: false, total: this.total, listQuery: this.dataQuery });
       });
     },
     async getListCategory() {
@@ -274,7 +274,7 @@ export default {
         cancelButtonText: 'Cancel',
         type: 'warning',
       }).then(() => {
-        this.$emit('handleListenData', {loading:true});
+        this.$emit('handleListenData', { loading: true });
         if (multiple) {
           var id = [];
           row.map((item) => id.push(item.id));
@@ -296,8 +296,8 @@ export default {
             type: 'success',
             message: 'Delete successfully',
           });
-          let total = this.total - Array(row).length;
-          this.$emit('handleListenData', {list:this.list,loading:false,total:total});
+          const total = this.total - Array(row).length;
+          this.$emit('handleListenData', { list: this.list, loading: false, total: total });
         }).catch(() => {
           this.$message({
             type: 'danger',
