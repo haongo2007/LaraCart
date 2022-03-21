@@ -115,15 +115,8 @@ import EventBus from '@/components/FileManager/eventBus';
 const productResource = new ProductResource();
 const categoryResource = new CategoryResource();
 export default {
-<<<<<<< HEAD:resources/js/views/product/components/FilterSystem.vue
-  name: 'FilterSystem',
-  directives: { waves },
-  props: ['', '', ''],
-
-=======
   name: 'FilterSystemProduct',
   directives: { waves },
->>>>>>> 9b8892473d2f520e27625870c30d3a252da1b7f1:resources/js/views/product/components/FilterSystemProduct.vue
   props: {
     dataLoading: {
       type: Boolean,

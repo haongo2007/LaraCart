@@ -35,7 +35,7 @@ export default {
   methods: {
     loadInfoProduct(){
       const loading = this.$loading({
-        target: '.el-form',
+        target: '.app-main',
       });
       const id = this.$route.params && this.$route.params.id;
       productResource.get(id).then(({ data } = response) => {

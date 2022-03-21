@@ -63,7 +63,7 @@ export default {
   methods: {
     fetchCategory(id) {
       const loading = this.$loading({
-        target: '.el-row',
+        target: '.app-main',
       });
       categoryResource.get(id)
         .then(({ data } = response) => {

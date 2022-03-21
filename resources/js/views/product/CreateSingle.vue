@@ -40,7 +40,7 @@ export default {
   methods: {
     fetchLanguages() {
       const loading = this.$loading({
-        target: '.el-row',
+        target: '.app-main',
       });
       languageResource.fetchLanguagesActive()
         .then(data => {

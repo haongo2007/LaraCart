@@ -2,11 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
-<<<<<<< HEAD
-        <filter-system
-=======
         <filter-system-product
->>>>>>> 9b8892473d2f520e27625870c30d3a252da1b7f1
           :data-loading="loading"
           :data-query="listQuery"
           @handleListenData="handleListenData"
@@ -127,11 +123,7 @@ import EventBus from '@/components/FileManager/eventBus';
 
 export default {
   name: 'ProductList',
-<<<<<<< HEAD
-  components: { Pagination, RightPanel, FilterSystem },
-=======
   components: { Pagination, RightPanel, FilterSystemProduct },
->>>>>>> 9b8892473d2f520e27625870c30d3a252da1b7f1
   data() {
     return {
       list: null,

@@ -137,9 +137,10 @@ export default {
         console.log(values);
         if (values.length) {
           values[v.id].forEach(function(val,ind){
-            if (val.files.length>0) {
-              that.$set(that.temp[i]['values'][ind], 'files', val.files);
-              that.$set(that.temp[i]['values'][ind], 'palette', val.palette);
+            if (val.hasOwnProperty('images') && val.images != '') {
+              let files = val.images.split(',');
+              that.$set(that.temp[i]['values'][ind], 'files', files);
+              that.$set(that.temp[i]['values'][ind], 'palette', val.palletes);
             }
           });
         }
@@ -188,7 +189,7 @@ export default {
       this.getPalette(data[0]);
       this.dialogStorageClose();
     },
-    getPalette(imageSrc,currentSelectFile) {
+    getPalette(imageSrc,currentSelectFile = []) {
       Vibrant.from(imageSrc).maxColorCount(200).getPalette().then((palette) => {
         const colors = [];
         var number = 0;
