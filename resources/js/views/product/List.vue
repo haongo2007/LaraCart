@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :iCon="'funnel'">
-        <filter-system 
+      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :iCon="'funnel'" >
+        <filter-system-product 
         :data-loading="loading" 
         :data-query="listQuery"
         @handleListenData="handleListenData"/>
@@ -117,12 +117,12 @@
 <script>
 import RightPanel from '@/components/RightPanel';
 import Pagination from '@/components/Pagination';
-import FilterSystem from './components/FilterSystem';
+import FilterSystemProduct from './components/FilterSystemProduct';
 import EventBus from '@/components/FileManager/eventBus';
 
 export default {
   name: 'ProductList',
-  components: { Pagination,RightPanel,FilterSystem },
+  components: { Pagination,RightPanel,FilterSystemProduct },
   data() {
     return {
       list: null,
@@ -183,3 +183,8 @@ export default {
   }
 };
 </script>
+<style> 
+.el-slider__runway{
+  margin:11px 0px !important;
+}
+</style>

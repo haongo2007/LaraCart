@@ -132,10 +132,6 @@ aside {
   position: relative;
 }
 
-.pagination-container {
-  margin-top: 30px;
-}
-
 .text-center {
   text-align: center
 }
@@ -191,4 +187,9 @@ aside {
 
 .multiselect--active {
   z-index: 1000 !important;
+}
+.el-date-editor {
+  .el-range-separator{
+    padding:0px !important;
+  }
 }

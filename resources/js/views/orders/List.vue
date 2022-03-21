@@ -1,53 +1,13 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-row :gutter="20">
-        <el-col :span="3">
-          <el-button-group style="width: 100%;">
-            <el-button style="width: 33.3%;" type="primary" icon="el-icon-plus" :disabled="loading" class="filter-item" @click="$router.push({ name: 'OrderCreate'})" />
-            <el-button v-waves style="width: 33.3%;" type="success" :disabled="loading" @click="handleDownload"><svg-icon icon-class="excel" /></el-button>
-            <el-button style="width: 33.3%;" type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
-          </el-button-group>
-        </el-col>
-        <el-col :span="9">
-          <el-date-picker
-            v-model="arDateToSearch"
-            style="width: 100%;display: flex;justify-content: space-between;"
-            type="datetimerange"
-            align="right"
-            unlink-panels
-            range-separator="To"
-            start-placeholder="Start date"
-            end-placeholder="End date"
-            :picker-options="pickerOptions"
-            @change="handleFilter()"
-          />
-        </el-col>
-        <el-col :span="6">
-          <el-input v-model="listQuery.customer_name" clearable placeholder="Customer" class="filter-item" @keyup.enter.native="handleFilter" />
-        </el-col>
-        <el-col :span="6">
-          <el-input v-model="listQuery.customer_email" clearable placeholder="Email" class="filter-item" @keyup.enter.native="handleFilter" />
-        </el-col>
-      </el-row>
-      <el-row :gutter="20">
-        <el-col :span="6">
-          <el-input v-model="listQuery.order_id" clearable placeholder="Order ID" class="filter-item" @keyup.enter.native="handleFilter" />
-        </el-col>
-        <el-col :span="6">
-          <el-input v-model="listQuery.customer_phone" clearable placeholder="Phone" class="filter-item" @keyup.enter.native="handleFilter" />
-        </el-col>
-        <el-col :span="6">
-          <el-select v-model="listQuery.status" style="width: 100%" :placeholder="$t('table.status')" class="filter-item" clearable multiple @change="handleFilter">
-            <el-option v-for="item in StatusOptions" :key="item.id" :label="item.name" :value="item.id" />
-          </el-select>
-        </el-col>
-        <el-col :span="6">
-          <el-select v-model="listQuery.sort_order" style="width: 100%" clearable class="filter-item" @change="handleFilter">
-            <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" :disabled="item.active" />
-          </el-select>
-        </el-col>
-      </el-row>
+      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :iCon="'funnel'" >
+        <filter-system-order
+        :data-loading="loading" 
+        :data-query="listQuery"
+        :data-status-options="statusOptions"
+        @handleListenData="handleListenData"/>
+      </right-panel>
     </div>
 
     <el-table
@@ -161,24 +121,23 @@
       </el-table-column>
 
     </el-table>
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="paginationInit" />
   </div>
 </template>
 
 <script>
-import { parseTime } from '@/filters';
-import OrdersResource from '@/api/orders';
+
+import RightPanel from '@/components/RightPanel';
+import FilterSystemOrder from './components/FilterSystemOrder';
 import OrderStatusResource from '@/api/order_status';
 import Pagination from '@/components/Pagination';
-import waves from '@/directive/waves'; // Waves directive
+import EventBus from '@/components/FileManager/eventBus';
 
-const ordersResource = new OrdersResource();
 const orderStatusResource = new OrderStatusResource();
 var statusMap = null;
 export default {
   name: 'OrdersList',
-  components: { Pagination },
-  directives: { waves },
+  components: { Pagination,RightPanel,FilterSystemOrder },
   filters: {
     statusFilter(status, get) {
       const statusFilter = statusMap.filter(v => v.id === status);
@@ -192,9 +151,8 @@ export default {
     return {
       list: null,
       total: 0,
-      loading: true,
-      downloadLoading: false,
-      arDateToSearch: [],
+      loading:true, 
+      statusOptions: [],
       listQuery: {
         page: 1,
         limit: 20,
@@ -207,161 +165,42 @@ export default {
         customer_email: '',
         customer_phone: '',
       },
-      sortOptions: [{
-        label: 'Id DESC',
-        key: 'id__desc',
-        active: false,
-      }, {
-        label: 'Id ASC',
-        key: 'id__asc',
-        active: false,
-      }, {
-        label: 'Created DESC',
-        key: 'created_at__desc',
-        active: false,
-      }, {
-        label: 'Created ASC',
-        key: 'created_at__asc',
-        active: false,
-      }, {
-        label: 'Price DESC',
-        key: 'subtotal__desc',
-        active: false,
-      }, {
-        label: 'Price ASC',
-        key: 'subtotal__asc',
-        active: false,
-      }],
-      StatusOptions: [],
-      pickerOptions: {
-        shortcuts: [{
-          text: 'Last week',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          },
-        }, {
-          text: 'Last month',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          },
-        }, {
-          text: 'Last 3 months',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          },
-        }],
-      },
-      multiSelectRow: [],
     };
   },
-  created() {
+  created(){
     this.getListStatus();
-    this.getList();
   },
-  methods: {
-    async getList() {
-      const data = await ordersResource.list(this.listQuery);
-      this.list = data.data;
-      this.total = data.meta.total;
-      this.loading = false;
-    },
+  methods:{
     async getListStatus() {
       const { data } = await orderStatusResource.list();
-      this.StatusOptions = data;
+      this.statusOptions = data;
       statusMap = data;
     },
-    handleDeleting(row, multiple = false) {
-      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
-      }).then(() => {
-        this.loading = true;
-        if (multiple) {
-          var id = [];
-          row.map((item) => id.push(item.id));
-        } else {
-          var id = row.id;
-        }
-        var that = this;
-        ordersResource.destroy(id).then((res) => {
-          if (res) {
-            if (multiple) {
-              row.forEach(function(v) {
-                const index = that.list.indexOf(v);
-                that.list.splice(index, 1);
-              });
-            } else {
-              const index = that.list.indexOf(row);
-              that.list.splice(index, 1);
-            }
-            this.$message({
-              type: 'success',
-              message: 'Delete successfully',
-            });
-            this.total = this.total - Array(row).length;
-          }
-          this.loading = false;
-        });
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: 'Delete canceled',
-        });
-        this.loading = false;
-      });
-    },
-    handleFilter(){
-      this.loading = true;
-      if (this.arDateToSearch !== null && this.arDateToSearch.length > 0) {
-        this.listQuery.from = parseTime(this.arDateToSearch[0], '{d}-{m}-{y} {h}:{i}:{s}');
-        this.listQuery.to = parseTime(this.arDateToSearch[1], '{d}-{m}-{y} {h}:{i}:{s}');
-      } else {
-        this.listQuery.from = '';
-        this.listQuery.to = '';
+    handleListenData(data){
+      if (data.hasOwnProperty('list')) {
+        this.list = data.list;
       }
-      this.getList();
+      if (data.hasOwnProperty('loading')) {
+        this.loading = data.loading;
+      }
+      if (data.hasOwnProperty('total')) {
+        this.total = data.total;
+      }
+      if (data.hasOwnProperty('listQuery')) {
+        this.listQuery = data.listQuery;
+      }
+    },
+    paginationInit(data){
+      this.loading = true;
+      this.listQuery.page = data.page;
+      this.listQuery.limit = data.limit;
     },
     handleSelectionAllChange(val){
-      this.multiSelectRow = val;
+      EventBus.$emit('listenMultiSelectRow', val);
     },
-    handerDeleteAll(){
-      this.handleDeleting(this.multiSelectRow, true);
+    handleDeleting(row){
+      EventBus.$emit('handleDeleting', row);
     },
-    handleDownload() {
-      this.loading = true;
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['Order#', 'Customer', 'Country', 'Address', 'Phone', 'Email', 'Subtotal', 'Ship fee', 'Discount', 'Total', 'Payment', 'Currency', 'Status', 'Created at'];
-        const filterVal = ['id', 'first_name', 'country', 'address3', 'phone', 'email', 'subtotal', 'shipping', 'discount', 'total', 'payment_method', 'currency', 'status', 'created_at'];
-        const data = this.formatJson(filterVal, this.list);
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'Orders-list-' + parseTime(new Date(), '{y}-{m}-{d}'),
-        });
-        this.loading = false;
-      });
-    },
-    formatJson(filterVal, jsonData) {
-      const getValue = (object, keys) => keys.split('.').reduce((o, k) => (o || {})[k], object);
-      return jsonData.map(v => filterVal.map(j => {
-        console.log(j);
-        if (j === 'created_at') {
-          return parseTime(v[j]);
-        } else {
-          return getValue(v, j);
-        }
-      }));
-    },
-  },
+  }
 };
 </script>

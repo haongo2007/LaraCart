@@ -223,7 +223,7 @@ export default {
     };
   },
   created() {
-    this.getRecursive();
+    // this.getRecursive();
     if (Object.keys(this.dataProduct).length > 0) {
       this.temp.sku = this.dataProduct.sku;
 
@@ -242,7 +242,7 @@ export default {
           categories.push(parseInt(v.id));
         });
         categories = [...new Set(categories)];
-
+        
         this.temp.category = categories;
       }
       this.temp.price = this.dataProduct.price;
@@ -252,6 +252,8 @@ export default {
       this.date_available = this.dataProduct.date_available ? parseTime(this.dataProduct.date_available.toString(), '{y}-{m}-{d} {h}:{i}:{s}') : '';
       this.temp.stock = this.dataProduct.stock;
       this.temp.alias = this.dataProduct.alias;
+    }else{      
+      this.loading = false;
     }
   },
   methods: {

@@ -1,5 +1,5 @@
 <template>
-  <el-row :gutter="20" style="margin:0px;">
+  <el-row :gutter="20" style="margin:0px;overflow-y: scroll;height: calc(100vh - 85px);">
     <div style="padding: 24px;">
       <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
     </div>

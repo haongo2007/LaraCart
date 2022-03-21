@@ -1,13 +1,14 @@
 <template>
   <div ref="rightPanel" :class="{show:show}" class="rightPanel-container">
     <div class="rightPanel-background" />
-    <div class="rightPanel" :style="{'z-index':zIndex,'max-width':maxWidth}">
-      <div class="handle-button" :style="{'top':buttonTop,'background-color':theme}" @click="show=!show">
-        <i v-if="!iCon" :class="show?'el-icon-close': 'el-icon-setting'" />
-        <svg-icon v-else :icon-class="iCon"/>
-      </div>
-      <div class="rightPanel-items">
-        <slot />
+      <div class="rightPanel" :style="{'z-index':zIndex,'max-width':maxWidth}">
+        <div class="handle-button" :style="{'top':buttonTop,'background-color':theme}" @click="show=!show">
+          <i v-if="!iCon" :class="show?'el-icon-close': 'el-icon-setting'" />
+          <svg-icon v-else :icon-class="iCon"/>
+        </div>
+        <div class="rightPanel-items">
+          <slot />
+        </div>
       </div>
     </div>
   </div>
@@ -38,7 +39,7 @@ export default {
     maxWidth:{
       default:'260px',
       type:String,
-    }
+    },
   },
   data() {
     return {
@@ -62,12 +63,14 @@ export default {
       }
     },
   },
-  mounted() {
-    this.insertToBody();
-  },
   beforeDestroy() {
     const elx = this.$refs.rightPanel;
     elx.remove();
+  },
+  mounted(){
+    if (!this.iCon) {
+      this.insertToBody();
+    }
   },
   methods: {
     addEventClick() {

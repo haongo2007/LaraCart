@@ -55,7 +55,7 @@ class Category extends ShopCategory
         if ($parent != '') {
             $categoryList->with('Parent.descriptionsWithLang:title,category_id');    
         }
-        $categoryList->leftJoin($tableDescription, $tableDescription . '.category_id', $tableCategory . '.id')
+        $categoryList = $categoryList->leftJoin($tableDescription, $tableDescription . '.category_id', $tableCategory . '.id')
             ->where($tableDescription . '.lang', lc_get_locale());
         if ($title) {
             $categoryList = $categoryList->where(function ($sql) use($tableDescription, $title){

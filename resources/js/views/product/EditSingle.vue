@@ -34,6 +34,9 @@ export default {
   },
   methods: {
     loadInfoProduct(){
+      const loading = this.$loading({
+        target: '.el-form',
+      });
       const id = this.$route.params && this.$route.params.id;
       productResource.get(id).then(({ data } = response) => {
         this.temp.id = data.id;
@@ -53,6 +56,7 @@ export default {
           }
           this.languages = Object.assign({}, newLang);
           this.setTemp();
+          loading.close();
         });
       })
         .catch(err => {

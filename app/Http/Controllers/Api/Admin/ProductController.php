@@ -209,7 +209,7 @@ public function createProductGroup()
                     'descriptions.*.keyword'     => 'nullable|string|max:100',
                     'descriptions.*.description' => 'nullable|string|max:100',
                     'descriptions.*.content'     => 'required|string',
-                    'category'                   => 'required|numeric|not_in:0',
+                    'category'                   => 'required|not_in:0',
                     'image'                      => 'required',
                     // 'sub_image'                  => 'required',
                     // 'type_show_image_desc'       => 'required',
@@ -392,7 +392,7 @@ public function createProductGroup()
                         if ($nameAtt) {
                             $arrDataPalette = [];
                             $images = '';
-                            if (array_key_exists('files', $rowGroup->values[$key])) {
+                            if (is_array($rowGroup->values[$key]) && array_key_exists('files', $rowGroup->values[$key])) {
                                 $images = implode(',', $rowGroup->values[$key]->files);
                             }
                             $arrDataAtt =  [
@@ -403,7 +403,7 @@ public function createProductGroup()
                                                 'product_id' => $product->id
                                             ];
                             $justProdAttribute = ShopProductAttribute::create($arrDataAtt);
-                            if (array_key_exists('palette', $rowGroup->values[$key])) {
+                            if (is_array($rowGroup->values[$key]) && array_key_exists('palette', $rowGroup->values[$key])) {
                                 $palette = $rowGroup->values[$key]->palette;
 
                                 foreach ($palette as $keypalette => $valuepalette) {

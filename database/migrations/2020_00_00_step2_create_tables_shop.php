@@ -383,7 +383,7 @@ class CreateTablesShop extends Migration
             $table->integer('attribute_group_id');
             $table->integer('product_id');
             $table->integer('add_price')->default(0);
-            $table->integer('sort')->nullable(0);
+            $table->text('images')->nullable();
             $table->index(['product_id', 'attribute_group_id']);
             }
         );
