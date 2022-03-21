@@ -17,11 +17,11 @@
             <el-header align="center">{{ attribute.name }} ({{ attribute.values.length }})</el-header>
             <div v-for="(value,key) in attribute.values" v-if="attribute.values" :key="key">
               <div style="display: flex;justify-content: space-between;">
-                <el-form-item label="Name">
+                <el-form-item label-width="80px" label="Name">
                   <el-input v-model="temp[index]['values'][key].name" />
                 </el-form-item>
-                <el-form-item label="Price">
-                  <el-input-number v-model="temp[index]['values'][key].price" style="width: 100%" :controls="false" />
+                <el-form-item label-width="80px" label="Price">
+                  <el-input-number v-model="temp[index]['values'][key].add_price" style="width: 100%" :controls="false" />
                 </el-form-item>
                 <el-form-item label-width="30px">
                   <el-button v-if="attribute.picker" type="success" @click="handleVisibleStorage(index,key)">Pick Image</el-button>
@@ -30,7 +30,7 @@
                   <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
                 </el-form-item>
               </div>
-              <div v-if="temp[index]['values'][key].files" v-loading="loadFiles">
+              <div v-if="temp[index]['values'][key].files != ''" v-loading="loadFiles">
                 <lightbox :cells="3" :items="temp[index]['values'][key].files" />
                 <div v-if="temp[index]['values'][key].palette" class="color-Palette">
                   <h1>COLORS</h1>
@@ -104,22 +104,7 @@ export default {
     };
   },
   created() {
-    console.log(
-      this.fetchAttributeGroup());
-    if (Object.keys(this.dataProduct).length > 0) {
-      if (this.dataProduct.attributes) {
-        var oldAttr = [];
-        this.dataProduct.attributes.forEach(function(v, i) {
-          if (oldAttr[v['attribute_group_id']] == undefined) {
-            oldAttr[v['attribute_group_id']] = [];
-          }
-          oldAttr[v['attribute_group_id']].push(v);
-        });
-        oldAttr = Object.assign({}, oldAttr);
-      }
-    } else {
-      this.fetchAttributeGroup();
-    }
+    this.fetchAttributeGroup();
   },
   methods: {
     backStep() {
@@ -134,16 +119,37 @@ export default {
     async fetchAttributeGroup(){
       const { data } = await attributeGroupResource.list();
       const that = this;
+      const values = [];
+      if (Object.keys(this.dataProduct).length > 0) {
+        if (this.dataProduct.attributes) {
+          this.disabled_clear = false;
+          this.dataProduct.attributes.forEach(function(v, i) {
+            if (values[v['attribute_group_id']] == undefined) {
+              values[v['attribute_group_id']] = [];
+            }
+            values[v['attribute_group_id']].push(v);
+          });
+        }
+      }
       data.forEach(function(v, i) {
         that.$set(that.temp, i, v);
-        that.$set(that.temp[i], 'values', []);
+        that.$set(that.temp[i], 'values', values.length > 0 ? values[v.id] : []);
+        console.log(values);
+        if (values.length) {
+          values[v.id].forEach(function(val,ind){
+            if (val.files.length>0) {
+              that.$set(that.temp[i]['values'][ind], 'files', val.files);
+              that.$set(that.temp[i]['values'][ind], 'palette', val.palette);
+            }
+          });
+        }
       });
       this.loadAttributes = false;
     },
     handleAddAttribute(key){
       this.disabled_clear = false;
       this.attNum++;
-      this.$set(this.temp[key]['values'], this.temp[key]['values'].length, { name: '', price: '' });
+      this.$set(this.temp[key]['values'], this.temp[key]['values'].length, { name: '', add_price: '' });
     },
     handleClearAllAttribute(){
       this.disabled_clear = true;
@@ -182,7 +188,7 @@ export default {
       this.getPalette(data[0]);
       this.dialogStorageClose();
     },
-    getPalette(imageSrc) {
+    getPalette(imageSrc,currentSelectFile) {
       Vibrant.from(imageSrc).maxColorCount(200).getPalette().then((palette) => {
         const colors = [];
         var number = 0;
@@ -196,9 +202,8 @@ export default {
           const nameTextColor = palette[color].getBodyTextColor();
           colors.push({ number, type, typeTextColor, hex, hexTextColor, name, nameTextColor });
         }
-        this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]].palette = colors;
+        this.temp[currentSelectFile.length>0 ? currentSelectFile[0] : this.currentSelectFile[0]]['values'][currentSelectFile.length>0 ? currentSelectFile[1] :this.currentSelectFile[1]].palette = colors;
         this.loadFiles = false;
-        console.log(this.temp);
       });
     },
   },

@@ -223,7 +223,7 @@ export default {
     };
   },
   created() {
-    this.getRecursive();
+    // this.getRecursive();
     if (Object.keys(this.dataProduct).length > 0) {
       this.temp.sku = this.dataProduct.sku;
 
@@ -252,6 +252,8 @@ export default {
       this.date_available = this.dataProduct.date_available ? parseTime(this.dataProduct.date_available.toString(), '{y}-{m}-{d} {h}:{i}:{s}') : '';
       this.temp.stock = this.dataProduct.stock;
       this.temp.alias = this.dataProduct.alias;
+    } else {
+      this.loading = false;
     }
   },
   methods: {
@@ -267,8 +269,10 @@ export default {
     },
     cbGetTax(res){
       const selectedTax = this.taxs.filter(tax => tax.id == this.dataProduct.tax_id);
-      this.temp.tax.label = selectedTax[0].name;
-      this.temp.tax.value = this.dataProduct.tax_id;
+      if (selectedTax.length > 0) {
+        this.temp.tax.label = selectedTax[0].name;
+        this.temp.tax.value = this.dataProduct.tax_id;
+      }
       this.loading = false;
     },
     backStep() {

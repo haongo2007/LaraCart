@@ -209,7 +209,7 @@ public function createProductGroup()
                     'descriptions.*.keyword'     => 'nullable|string|max:100',
                     'descriptions.*.description' => 'nullable|string|max:100',
                     'descriptions.*.content'     => 'required|string',
-                    'category'                   => 'required|numeric|not_in:0',
+                    'category'                   => 'required|not_in:0',
                     'image'                      => 'required',
                     // 'sub_image'                  => 'required',
                     // 'type_show_image_desc'       => 'required',
@@ -392,18 +392,18 @@ public function createProductGroup()
                         if ($nameAtt) {
                             $arrDataPalette = [];
                             $images = '';
-                            if (array_key_exists('files', $rowGroup->values[$key])) {
+                            if (isset($rowGroup->values[$key]->files)) {
                                 $images = implode(',', $rowGroup->values[$key]->files);
                             }
                             $arrDataAtt =  [
                                                 'name' => $nameAtt->name, 
-                                                'add_price' => $rowGroup->values[$key]->price,
+                                                'add_price' => $rowGroup->values[$key]->add_price,
                                                 'attribute_group_id' => $rowGroup->id,
                                                 'images' => $images,
                                                 'product_id' => $product->id
                                             ];
                             $justProdAttribute = ShopProductAttribute::create($arrDataAtt);
-                            if (array_key_exists('palette', $rowGroup->values[$key])) {
+                            if (isset($rowGroup->values[$key]->palette)) {
                                 $palette = $rowGroup->values[$key]->palette;
 
                                 foreach ($palette as $keypalette => $valuepalette) {

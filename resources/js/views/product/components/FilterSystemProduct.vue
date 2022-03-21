@@ -1,6 +1,6 @@
 
 <template>
-  <div class="drawer-container">
+  <div v-loading="dataLoading" class="drawer-container">
     <div>
       <h3 class="drawer-title">
         {{ $t('table.actions') }}
@@ -30,11 +30,8 @@
 
       <div class="drawer-item">
         <el-row :gutter="24">
-          <el-col :span="24" style="display: flex;justify-content: space-between;">
-            <el-input v-model="dataQuery.keyword" clearable placeholder="Typing for search name, Sku, Description or keyword" class="filter-item" style="width: 100%;margin-right: 10px;" @keyup.enter.native="handleFilter" />
-            <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
-              {{ $t('table.search') }}
-            </el-button>
+          <el-col :span="24">
+            <el-input v-model="dataQuery.keyword" clearable placeholder="Typing for search name, Sku, Description or keyword" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
         <el-row :gutter="24">
@@ -55,15 +52,15 @@
         </el-row>
 
         <el-row :gutter="24">
-          <el-col :span="6">
+          <el-col :span="8">
             <el-tooltip class="item" effect="dark" content="Choose value needed filter" placement="bottom-start">
-              <el-radio-group v-model="dataQuery.filter_price_by" style="width: 100%;" @change="handleFilterPriceSlide">
+              <el-radio-group v-model="dataQuery.filter_price_by" size="mini" style="width: 100%;" @change="handleFilterPriceSlide">
                 <el-radio-button label="Cost" />
                 <el-radio-button label="Price" />
               </el-radio-group>
             </el-tooltip>
           </el-col>
-          <el-col :span="18">
+          <el-col :span="16">
             <el-tooltip class="item" effect="dark" content="Filter price with slider" placement="bottom-start">
               <el-slider
                 v-model="dataQuery.price"
@@ -118,10 +115,15 @@ import EventBus from '@/components/FileManager/eventBus';
 const productResource = new ProductResource();
 const categoryResource = new CategoryResource();
 export default {
+<<<<<<< HEAD:resources/js/views/product/components/FilterSystem.vue
   name: 'FilterSystem',
   directives: { waves },
   props: ['', '', ''],
 
+=======
+  name: 'FilterSystemProduct',
+  directives: { waves },
+>>>>>>> 9b8892473d2f520e27625870c30d3a252da1b7f1:resources/js/views/product/components/FilterSystemProduct.vue
   props: {
     dataLoading: {
       type: Boolean,
@@ -152,7 +154,7 @@ export default {
       sortOptions: [{
         label: 'Id DESC',
         key: 'id__desc',
-        active: true,
+        active: false,
       }, {
         label: 'Id ASC',
         key: 'id__asc',
@@ -319,11 +321,13 @@ export default {
         this.dataQuery.from = '';
         this.dataQuery.to = '';
       }
+      this.getList();
     },
     handleFilterPriceSlide(){
       this.getMaxPrice(this.dataQuery.filter_price_by);
     },
     handleFilter(){
+      this.$emit('handleListenData', { loading: true });
       this.getList();
     },
     handerDeleteAll(){

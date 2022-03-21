@@ -1,5 +1,5 @@
 <template>
-  <el-row :gutter="20" style="margin:0px;">
+  <el-row class="el-main-form" :gutter="20" style="margin:0px;">
     <div style="padding: 24px;">
       <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
     </div>
@@ -447,5 +447,9 @@ export default {
   .input-new-tag {
     width: 90px;
     vertical-align: bottom;
+  }
+  .el-main-form{
+    height: calc(100vh - 142px);
+    overflow-y: scroll;
   }
 </style>

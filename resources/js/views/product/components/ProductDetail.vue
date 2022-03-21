@@ -1,9 +1,9 @@
 <template>
-  <el-row :gutter="20" style="margin:0px 0px 60px 0px;">
+  <el-row :gutter="20">
     <div style="padding: 24px;">
       <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
     </div>
-    <el-col :span="20" :offset="2">
+    <el-col class="el-content-form" :span="22" :offset="1">
       <!-- <el-skeleton :rows="20" animated/> -->
       <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
         <el-step v-for="(step,key,index) in dataStepContent" :key="index" :title="(step.title ? step.title : step)" :icon="(step.icon ? step.icon : 'el-icon-edit')" />
@@ -56,7 +56,7 @@
                 </el-form-item>
 
                 <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
-                  <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" />
+                  <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" :style="{'width': 'calc(100% - 2px)'}" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -324,5 +324,9 @@ export default {
   }
   .el-steps--simple{
     padding:13px 1%;
+  }
+  .el-content-form{
+    padding: 10px;
+    border: 1px solid #eee;
   }
 </style>

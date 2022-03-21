@@ -1,5 +1,13 @@
 <template>
-  <product-detail v-if="!loading" :is-edit="false" :data-temp="temp" :data-languages="languages" :data-step-content="stepContent" :data-component-info="componentInfo" :data-rules="rules" />
+  <product-detail
+    v-show="!loading"
+    :is-edit="false"
+    :data-temp="temp"
+    :data-languages="languages"
+    :data-step-content="stepContent"
+    :data-component-info="componentInfo"
+    :data-rules="rules"
+  />
 </template>
 
 <script>
@@ -31,6 +39,9 @@ export default {
   },
   methods: {
     fetchLanguages() {
+      const loading = this.$loading({
+        target: '.el-row',
+      });
       languageResource.fetchLanguagesActive()
         .then(data => {
           this.languages = Object.assign({}, data.data);
@@ -39,6 +50,8 @@ export default {
         .catch(err => {
           console.log(err);
         });
+      loading.close();
+      this.loading = false;
     },
 	  setTemp(){
       var that = this;
@@ -48,7 +61,7 @@ export default {
 
         that.$set(that.temp.descriptions[key], 'description', '');
         that.$set(that.temp.descriptions[key], 'title', '');
-        that.$set(that.temp.descriptions[key], 'keyword', '');
+        that.$set(that.temp.descriptions[key], 'keyword', []);
         that.$set(that.temp.descriptions[key], 'content', '');
 
         that.$set(that.rules.descriptions, key, []);

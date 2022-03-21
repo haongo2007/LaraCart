@@ -188,7 +188,6 @@ export default {
   }
   .el-main-form{
     height: calc(100vh - 360px);
-    margin-bottom: 20px;
     overflow-y: scroll;
   }
   .el-main-form::-webkit-scrollbar {

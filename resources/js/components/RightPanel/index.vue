@@ -11,6 +11,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script>
@@ -62,12 +63,14 @@ export default {
       }
     },
   },
-  mounted() {
-    this.insertToBody();
-  },
   beforeDestroy() {
     const elx = this.$refs.rightPanel;
     elx.remove();
+  },
+  mounted(){
+    if (!this.iCon) {
+      this.insertToBody();
+    }
   },
   methods: {
     addEventClick() {
