@@ -1,11 +1,11 @@
 <?php
 
-namespace BlackCart\Core\Front\Controllers\Auth;
+namespace App\Http\Controllers\Api\Front\Auth;
 
 use App\Http\Controllers\Controller;
 use BlackCart\Core\Front\Models\ShopCountry;
 use Auth;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+// use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller
@@ -21,7 +21,7 @@ class LoginController extends Controller
     |
      */
 
-    use AuthenticatesUsers;
+    // use AuthenticatesUsers;
 
     /**
      * Where to redirect users after login.
@@ -40,7 +40,7 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-        parent::__construct();
+        // parent::__construct();
         $this->middleware('guest')->except('logout');
     }
 

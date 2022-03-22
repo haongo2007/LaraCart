@@ -30,7 +30,7 @@
                   <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
                 </el-form-item>
               </div>
-              <div v-if="temp[index]['values'][key].files != ''" v-loading="loadFiles">
+              <div v-if="temp[index]['values'][key].images != ''" v-loading="loadFiles">
                 <lightbox :cells="3" :items="temp[index]['values'][key].files" />
                 <div v-if="temp[index]['values'][key].palette" class="color-Palette">
                   <h1>COLORS</h1>
@@ -106,6 +106,17 @@ export default {
   created() {
     this.fetchAttributeGroup();
   },
+  watch: {
+    'attNum': {
+      handler(newValue, oldValue) {
+        if (newValue == 0) {
+          this.disabled_clear = true;
+        }else{
+          this.disabled_clear = false;
+        }
+      },
+    },
+  },
   methods: {
     backStep() {
       const active = this.dataActive - 1;
@@ -122,7 +133,6 @@ export default {
       const values = [];
       if (Object.keys(this.dataProduct).length > 0) {
         if (this.dataProduct.attributes) {
-          this.disabled_clear = false;
           this.dataProduct.attributes.forEach(function(v, i) {
             if (values[v['attribute_group_id']] == undefined) {
               values[v['attribute_group_id']] = [];
@@ -134,26 +144,24 @@ export default {
       data.forEach(function(v, i) {
         that.$set(that.temp, i, v);
         that.$set(that.temp[i], 'values', values.length > 0 ? values[v.id] : []);
-        console.log(values);
         if (values.length) {
           values[v.id].forEach(function(val,ind){
             if (val.hasOwnProperty('images') && val.images != '') {
               let files = val.images.split(',');
               that.$set(that.temp[i]['values'][ind], 'files', files);
-              that.$set(that.temp[i]['values'][ind], 'palette', val.palletes);
+              that.$set(that.temp[i]['values'][ind], 'palette', val.palette);
             }
+            that.attNum++;
           });
         }
       });
       this.loadAttributes = false;
     },
     handleAddAttribute(key){
-      this.disabled_clear = false;
       this.attNum++;
       this.$set(this.temp[key]['values'], this.temp[key]['values'].length, { name: '', add_price: '' });
     },
     handleClearAllAttribute(){
-      this.disabled_clear = true;
       this.attNum = 0;
       const that = this;
       this.temp.forEach(function(i, v) {
@@ -163,7 +171,6 @@ export default {
     handleClearAttribute(index, key){
       this.temp[index].values.splice(key, 1);
       if (this.attNum-- == 0) {
-        this.disabled_clear = true;
       }
     },
     dialogStorageClose(){

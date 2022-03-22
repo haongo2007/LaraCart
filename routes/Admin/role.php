@@ -1,5 +1,5 @@
 <?php
-	use \App\Helper\Acl;
+	// use \App\Helper\Acl;
     // Route::group(['prefix' => 'role'], function () {
     //     Route::get('/', 'Auth\RoleController@index')->name('admin_role.index');
     //     Route::get('create', 'Auth\RoleController@create')->name('admin_role.create');
@@ -9,5 +9,5 @@
     //     Route::post('/delete', 'Auth\RoleController@deleteList')->name('admin_role.delete');
     // });
 	
-    Route::apiResource('roles', 'RoleController')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
+    // Route::apiResource('roles', 'RoleController')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
+    // Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);

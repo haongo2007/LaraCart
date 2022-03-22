@@ -179,7 +179,7 @@ export default {
     },
     createData() {
       const loading = this.$loading({
-        target: '.el-form',
+        target: '.el-row',
       });
       const form_data = new FormData();
       for (var key in this.temp) {
@@ -211,35 +211,30 @@ export default {
       });
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const loading = this.$loading({
-            target: '.el-form',
-          });
-          const form_data = new FormData();
-          for (var key in this.temp) {
-            if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
-              form_data.append(key, JSON.stringify(this.temp[key]));
-            } else {
-              form_data.append(key, this.temp[key]);
-            }
-          }
-          form_data.append('_method', 'PUT');
-
-          categoryResource.update(this.temp.id, form_data).then((res) => {
-            this.reloadRedirectToList('CategoryList');
-
-            this.$message({
-              type: 'success',
-              message: 'Updated successfully',
-            });
-
-            loading.close();
-          }).catch(err => {
-            console.log(err);
-            loading.close();
-          });
+      const loading = this.$loading({
+        target: '.el-row',
+      });
+      console.log(this.temp);
+      const form_data = new FormData();
+      for (var key in this.temp) {
+        if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
+          form_data.append(key, JSON.stringify(this.temp[key]));
+        } else {
+          form_data.append(key, this.temp[key]);
         }
+      }
+      form_data.append('_method', 'PUT');
+      productResource.update(this.temp.id, form_data).then((res) => {
+        this.reloadRedirectToList('ProductList');
+
+        this.$message({
+          type: 'success',
+          message: 'Updated successfully',
+        });
+
+        loading.close();
+      }).catch(err => {
+        loading.close();
       });
     },
     reloadRedirectToList(cpn){

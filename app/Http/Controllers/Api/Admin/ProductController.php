@@ -530,13 +530,15 @@ public function createProductGroup()
     /*
     * update status
     */
-    public function postEdit($id)
+    public function update(Request $request,$id)
     {
+        dd($request->all());
         $product = (new Product)->getProductAdmin($id);
         if ($product === null) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
+            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
-        $data = request()->all();
+        $data = $request->all();
+        dd($data);
         $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['name'];
         $data['alias'] = lc_word_format_url($data['alias']);

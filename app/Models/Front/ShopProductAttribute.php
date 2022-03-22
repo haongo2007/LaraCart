@@ -14,7 +14,7 @@ class ShopProductAttribute extends Model
     {
         return $this->belongsTo(ShopAttributeGroup::class, 'attribute_group_id', 'id');
     }
-    public function palletes()
+    public function palette()
     {
         return $this->hasMany(ShopAttributePalette::class, 'attribute_id','id');
     }
