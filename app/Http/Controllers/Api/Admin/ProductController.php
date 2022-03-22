@@ -176,14 +176,13 @@ public function createProductGroup()
 }
 
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
+    /**
+     * Post create new item in admin
+     * @return [type] [description]
+    */
 
     public function store(Request $request)
     {
-        
         $data = $request->all();
         $data['descriptions'] = json_decode($data['descriptions']);
         $data['brand'] = json_decode($data['brand']);
@@ -350,7 +349,7 @@ public function createProductGroup()
         $product = Product::createProductAdmin($dataInsert);
 
         //Promoton price
-        if (isset($data['price_promotion']) && $data['price_promotion'] > 0 && in_array($data['kind'], [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])) {
+        if (isset($data['price_promotion']) && isset($data['date_promotion']) && $data['price_promotion'] > 0 && in_array($data['kind'], [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])) {
             $arrPromotion['price_promotion'] = $data['price_promotion'];
             $arrPromotion['date_start'] = $data['date_promotion']->start ? Carbon::parse($data['date_promotion']->start)->format('Y-m-d H:i:s') : null;
             $arrPromotion['date_end'] = $data['date_promotion']->end ? Carbon::parse($data['date_promotion']->end)->format('Y-m-d H:i:s') : null;
@@ -476,76 +475,34 @@ public function createProductGroup()
 
     }
 
-    /*
-    * Form edit
-    */
-    public function edit($id)
-    {
-        $product = (new Product)->getProductAdmin($id);
-
-        if ($product === null) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
-        }
-        // $transparent_black = array(0, 0, 0, 0);
-        // $img = Image::make(public_path($product->image))->greyscale()->trim('top-right', null, 25, 50)->contrast(100)->contrast(100)->contrast(100)->contrast(100)->save(public_path('data/product/bar.png'));
-        // $palette = Palette::fromFilename(public_path($product->image));
-        // $topFive = $palette->getMostUsedColors(5);
-        // foreach($topFive as $color => $count) {
-        //     $colors[] = Color::fromIntToHex($color);
-        // }
-        // dd($colors);
-
-        $listProductSingle = (new Product)->getProductSelectAdmin(['kind' => [lc_PRODUCT_SINGLE]]);
-
-        $data = [
-            'title'                => trans('product.admin.edit'),
-            'subTitle'             => '',
-            'title_description'    => '',
-            'icon'                 => 'fa fa-edit',
-            'languages'            => $this->languages,
-            'product'              => $product,
-            'categories'           => $this->categories,
-            'brands'               => (new ShopBrand)->getListAll(),
-            'suppliers'            => (new ShopSupplier)->getListAll(),
-            'taxs'                 => (new ShopTax)->getListAll(),
-            'properties'           => $this->properties,
-            'kinds'                => $this->kinds,
-            'attributeGroup'       => $this->attributeGroup,
-            'listProductSingle'    => $listProductSingle,
-            'listWeight'           => $this->listWeight,
-            'listLength'           => $this->listLength,
-
-        ];
-
-        //Only prduct single have custom field
-        if ($product->kind == lc_PRODUCT_SINGLE) {
-            $data['customFields'] = (new ShopCustomField)->getCustomField($type = 'product');
-        } else {
-            $data['customFields'] = [];
-        }
-        return view($this->templatePathAdmin.'Product.edit')
-            ->with($data);
-    }
-
-    /*
-    * update status
+    /**
+     * Put update item in admin
+     * @return [type] [description]
     */
     public function update(Request $request,$id)
     {
-        dd($request->all());
         $product = (new Product)->getProductAdmin($id);
         if ($product === null) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
+
         $data = $request->all();
-        dd($data);
+        $data['descriptions'] = json_decode($data['descriptions']);
+        $data['brand'] = json_decode($data['brand']);
+        $data['supplier'] = json_decode($data['supplier']);
+        $data['tax'] = json_decode($data['tax']);
+        $data['attribute'] = json_decode($data['attribute']);
+        $data['category'] = json_decode($data['category']);
+        $data['category'] = is_array($data['category']) ? end($data['category']) : $data['category'];
+        $data['date_promotion'] = json_decode($data['date_promotion']);
+
         $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
-        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['name'];
+        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
 
         switch ($product['kind']) {
-            case lc_PRODUCT_SINGLE: // product single
+            case LC_PRODUCT_SINGLE: // product single
                 $arrValidation = [
                     'sort' => 'numeric|min:0',
                     'minimum' => 'numeric|min:0',
@@ -555,10 +512,8 @@ public function createProductGroup()
                     'descriptions.*.content' => 'required|string',
                     'category' => 'required',
                     'image' => 'required',
-                    'sub_image' => 'required',
-                    'type_show_image_desc' => 'required',
-                    'sku' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|product_sku_unique:'.$id,
-                    'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|product_alias_unique:'.$id,
+                    'sku' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|unique:shop_product,sku,'.$id,
+                    'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|unique:shop_product,alias,'.$id,
                 ];
 
                 //Custom fields
@@ -583,7 +538,7 @@ public function createProductGroup()
                     'alias.product_alias_unique'      => trans('product.alias_unique'),
                 ];
                 break;
-            case lc_PRODUCT_BUILD: //product build
+            case LC_PRODUCT_BUILD: //product build
                 $arrValidation = [
                     'sort' => 'numeric|min:0',
                     'minimum' => 'numeric|min:0',
@@ -608,7 +563,7 @@ public function createProductGroup()
                 ];
                 break;
 
-            case lc_PRODUCT_GROUP: //product group
+            case LC_PRODUCT_GROUP: //product group
                 $arrValidation = [
                     'sku' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|product_sku_unique:'.$id,
                     'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|product_alias_unique:'.$id,
@@ -637,9 +592,7 @@ public function createProductGroup()
         $validator = Validator::make($data, $arrValidation, $arrMsg ?? []);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([],$validator->messages()), Response::HTTP_BAD_REQUEST);
         }
         //Edit
 
@@ -647,14 +600,14 @@ public function createProductGroup()
         $attribute       = $data['attribute'] ?? [];
         $productInGroup  = $data['productInGroup'] ?? [];
         $productBuild    = $data['hotSpots'] ?? [];
-        $subImages       = $data['sub_image'] ?? '';
-        $type_show_image_desc = $data['type_show_image_desc'] ?? '';
+        // $subImages       = $data['sub_image'] ?? '';
+        // $type_show_image_desc = $data['type_show_image_desc'] ?? '';
         $downloadPath    = $data['download_path'] ?? '';
         $dataUpdate = [
             'image'        => $data['image'] ?? '',
-            'tax_id'       => $data['tax_id'] ?? 0,
-            'brand_id'     => $data['brand_id'] ?? 0,
-            'supplier_id'  => $data['supplier_id'] ?? 0,
+            'tax_id'       => $data['tax']->value ?? 0,
+            'brand_id'       => $data['brand']->value ?? 0,
+            'supplier_id'    => $data['supplier']->value ?? 0,
             'category_store_id'     => $data['category_store_id'] ?? 0,
             'price'        => $data['price'] ?? 0,
             'cost'         => $data['cost'] ?? 0,
@@ -665,7 +618,7 @@ public function createProductGroup()
             'height'       => $data['height'] ?? 0,
             'length'       => $data['length'] ?? 0,
             'width'        => $data['width'] ?? 0,
-            'property'     => $data['property'] ?? lc_PROPERTY_PHYSICAL,
+            'property'     => $data['property'] ?? LC_PROPERTY_PHYSICAL,
             'sku'          => $data['sku'],
             'alias'        => $data['alias'],
             'status'       => (!empty($data['status']) ? 1 : 0),
@@ -673,6 +626,8 @@ public function createProductGroup()
             'minimum'      => (int) ($data['minimum'] ?? 0),
             'store_id'     => session('adminStoreId'),
         ];
+
+
         if (!empty($data['date_available'])) {
             $dataUpdate['date_available'] = $data['date_available'];
         }
@@ -682,10 +637,10 @@ public function createProductGroup()
         //Update custom field
         if (!empty($data['fields'])) {
             (new ShopCustomFieldDetail)
-                ->join(lc_DB_PREFIX.'shop_custom_field', lc_DB_PREFIX.'shop_custom_field.id', lc_DB_PREFIX.'shop_custom_field_detail.custom_field_id')
+                ->join(LC_DB_PREFIX.'shop_custom_field', LC_DB_PREFIX.'shop_custom_field.id', LC_DB_PREFIX.'shop_custom_field_detail.custom_field_id')
                 ->select('code', 'name', 'text')
-                ->where(lc_DB_PREFIX.'shop_custom_field_detail.rel_id', $product->id)
-                ->where(lc_DB_PREFIX.'shop_custom_field.type', 'product')
+                ->where(LC_DB_PREFIX.'shop_custom_field_detail.rel_id', $product->id)
+                ->where(LC_DB_PREFIX.'shop_custom_field.type', 'product')
                 ->delete();
 
             $dataField = [];
@@ -704,29 +659,31 @@ public function createProductGroup()
             }
         }
 
-
-
         //Promoton price
-        $product->promotionPrice()->delete();
-        if (isset($data['price_promotion']) && in_array($product['kind'], [lc_PRODUCT_SINGLE, lc_PRODUCT_BUILD])) {
+        if (isset($data['price_promotion']) && isset($data['date_promotion']) && $data['price_promotion'] > 0 && in_array($product['kind'], [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])) {
+            $product->promotionPrice()->delete();
             $arrPromotion['price_promotion'] = $data['price_promotion'];
-            $arrPromotion['date_start'] = $data['price_promotion_start'] ? $data['price_promotion_start'] : null;
-            $arrPromotion['date_end'] = $data['price_promotion_end'] ? $data['price_promotion_end'] : null;
+            $arrPromotion['date_start'] = $data['date_promotion']->start ? Carbon::parse($data['date_promotion']->start)->format('Y-m-d H:i:s') : null;
+            $arrPromotion['date_end'] = $data['date_promotion']->end ? Carbon::parse($data['date_promotion']->end)->format('Y-m-d H:i:s') : null;
             $product->promotionPrice()->create($arrPromotion);
         }
 
+        //Insert description
         $product->descriptions()->delete();
+
         $dataDes = [];
-        foreach ($data['descriptions'] as $code => $row) {
+        $languages = $this->languages;
+        foreach ($languages as $code => $value) {
             $dataDes[] = [
-                'product_id' => $id,
-                'lang' => $code,
-                'name' => $row['name'],
-                'keyword' => $row['keyword'],
-                'description' => $row['description'],
-                'content' => $row['content'] ?? '',
+                'product_id'  => $product->id,
+                'lang'        => $code,
+                'name'        => $descriptions->$code->title,
+                'keyword'     => implode(',',$descriptions->$code->keyword),
+                'description' => $descriptions->$code->description,
+                'content'     => $descriptions->$code->content ?? '',
             ];
         }
+
         Product::insertDescriptionAdmin($dataDes);
 
         $product->categories()->detach();
@@ -735,7 +692,7 @@ public function createProductGroup()
         }
 
         //Update group
-        if ($product['kind'] == lc_PRODUCT_GROUP) {
+        if ($product['kind'] == LC_PRODUCT_GROUP) {
             $product->groups()->delete();
             if (count($productInGroup)) {
                 $arrDataGroup = [];
@@ -750,9 +707,9 @@ public function createProductGroup()
         }
 
         //Update Build
-        if ($product['kind'] == lc_PRODUCT_BUILD) {
+        if ($product['kind'] == LC_PRODUCT_BUILD) {
             $product->builds()->delete();
-            if ($productBuild && $product['kind'] == lc_PRODUCT_BUILD) {
+            if ($productBuild && $product['kind'] == LC_PRODUCT_BUILD) {
                 $arrDataBuild = [];
                 foreach ($productBuild as $key => $value) {
                     $arrDataBuild[] = new ShopProductBuild($value);
@@ -763,13 +720,13 @@ public function createProductGroup()
 
         //Update path download
         (new ShopProductDownload)->where('product_id', $product->id)->delete();
-        if ($product['property'] == lc_PROPERTY_DOWNLOAD && $downloadPath) {
+        if ($product['property'] == LC_PROPERTY_DOWNLOAD && $downloadPath) {
             (new ShopProductDownload)->insert(['product_id' => $product->id, 'path' => $downloadPath]);
         }
 
 
         //Update attribute
-        if ($product['kind'] == lc_PRODUCT_SINGLE) {
+        if ($product['kind'] == LC_PRODUCT_SINGLE) {
             $product->attributes()->delete();
             if (count($attribute)) {
                 $arrDataAtt = [];
@@ -807,7 +764,7 @@ public function createProductGroup()
         }
 
         //Update sub mages
-        if ($subImages && in_array($product['kind'], [lc_PRODUCT_SINGLE, lc_PRODUCT_BUILD])) {
+        if ($subImages && in_array($product['kind'], [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])) {
             $product->img()->delete();
             $SubImages = new ShopProductImage(['image'=>$subImages,'type_show'=>$type_show_image_desc]);
             $product->img()->save($SubImages);

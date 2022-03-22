@@ -12,6 +12,15 @@ class ProductResource extends Resource {
       method: 'get',
     });
   }
+
+  
+  update(id, resource) {
+    return request({
+      url: '/' + this.uri + '/' + id,
+      method: 'post',
+      data: resource,
+    });
+  }
 }
 
 export { ProductResource as default };

@@ -181,7 +181,7 @@ export default {
       const loading = this.$loading({
         target: '.el-row',
       });
-      const form_data = new FormData();
+      let form_data = new FormData();
       for (var key in this.temp) {
         if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
           form_data.append(key, JSON.stringify(this.temp[key]));
@@ -215,7 +215,7 @@ export default {
         target: '.el-row',
       });
       console.log(this.temp);
-      const form_data = new FormData();
+      let form_data = new FormData();
       for (var key in this.temp) {
         if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
           form_data.append(key, JSON.stringify(this.temp[key]));
