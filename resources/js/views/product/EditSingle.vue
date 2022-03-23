@@ -15,6 +15,7 @@ export default {
   data(){
     return {
       loading: true,
+      spiner:null,
     	languages: {},
       componentInfo: {},
       stepContent: {},
@@ -30,35 +31,28 @@ export default {
   	};
   },
   created(){
-    this.loadInfoProduct();
+    this.spiner = this.$loading({
+      target: '.app-main',
+    });
+    const id = this.$route.params && this.$route.params.id;
+    productResource.get(id).then(({ data } = response) => {
+      this.temp.id = data.id;
+      this.temp.kind = data.kind;
+      this.product = data;
+
+      this.fetchLanguages();
+    }).catch(err => {
+      console.log(err);
+    });
+
   },
   methods: {
-    loadInfoProduct(){
-      const loading = this.$loading({
-        target: '.app-main',
-      });
-      const id = this.$route.params && this.$route.params.id;
-      productResource.get(id).then(({ data } = response) => {
-        this.temp.id = data.id;
-        this.temp.kind = data.kind;
-        this.product = data;
-
-        // get current language
-        const codes = [];
-        for (var i = 0; i < data.descriptions.length; i++) {
-          codes.push(data.descriptions[i].lang);
-        }
-
-        languageResource.list({ code: codes }).then(({ data } = response) => {
-          const newLang = [];
-          for (var i = 0; i < data.length; i++) {
-            newLang[data[i].code] = data[i].name;
-          }
-          this.languages = Object.assign({}, newLang);
+    fetchLanguages() {
+      languageResource.fetchLanguagesActive()
+        .then(data => {
+          this.languages = data.data;
           this.setTemp();
-          loading.close();
-        });
-      })
+        })
         .catch(err => {
           console.log(err);
         });
@@ -68,11 +62,12 @@ export default {
       const data = Object.assign({}, this.languages);
       Object.keys(data).forEach(function(key, index) {
         that.$set(that.temp.descriptions, key, {});
-
-        that.$set(that.temp.descriptions[key], 'description', that.product.descriptions[index].description);
-        that.$set(that.temp.descriptions[key], 'title', that.product.descriptions[index].name);
-        that.$set(that.temp.descriptions[key], 'keyword', that.product.descriptions[index].keyword != '' ? that.product.descriptions[index].keyword.split(',') : []);
-        that.$set(that.temp.descriptions[key], 'content', that.product.descriptions[index].content);
+        if (that.product.descriptions.hasOwnProperty(index)) {
+          that.$set(that.temp.descriptions[key], 'description', that.product.descriptions[index].description);
+          that.$set(that.temp.descriptions[key], 'title', that.product.descriptions[index].name);
+          that.$set(that.temp.descriptions[key], 'keyword', that.product.descriptions[index].keyword != '' ? that.product.descriptions[index].keyword.split(',') : []);
+          that.$set(that.temp.descriptions[key], 'content', that.product.descriptions[index].content);
+        }
 
         that.$set(that.rules.descriptions, key, []);
 
@@ -131,6 +126,7 @@ export default {
       };
       this.$set(this.componentInfo, 'info-thumbnail', '');
       this.loading = false;
+      this.spiner.close();
     },
   },
 };

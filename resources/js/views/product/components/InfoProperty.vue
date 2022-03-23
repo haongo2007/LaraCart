@@ -5,13 +5,13 @@
         <el-col :span="24">
           <el-form-item :label="$t('table.weight_unit')" prop="weight_unit">
             <el-autocomplete
-              v-model="temp.weight_unit"
+              v-model="temp.weight_class.description"
               style="width: 100%"
               value-key="description"
               class="inline-input"
               :fetch-suggestions="querySearchWeightAsync"
               placeholder="Please Input"
-              @select="handleSelect"
+              @select="handleSelectWeight"
             />
           </el-form-item>
 
@@ -21,13 +21,13 @@
 
           <el-form-item :label="$t('table.length_unit')" prop="length_unit">
             <el-autocomplete
-              v-model="temp.length_unit"
+              v-model="temp.length_class.description"
               style="width: 100%"
               value-key="description"
               class="inline-input"
               :fetch-suggestions="querySearchLengthAsync"
               placeholder="Please Input"
-              @select="handleSelect"
+              @select="handleSelectLength"
             />
           </el-form-item>
 
@@ -71,9 +71,15 @@ export default {
   data() {
     return {
       temp: {
-        weight_unit: '',
+        weight_class: {
+          description: '',
+          value: '',
+        },
         weight: '',
-        length_unit: '',
+        length_class: {
+          description: '',
+          value: '',
+        },
         length: '',
         height: '',
         width: '',
@@ -117,11 +123,13 @@ export default {
     },
     cbGetWeightCl(res){
       const selectedWeightUnit = this.weight_units.filter(unit => unit.name == this.dataProduct.weight_class);
-      this.temp.weight_unit = selectedWeightUnit[0].description;
+      this.temp.weight_class.value = selectedWeightUnit[0].name;
+      this.temp.weight_class.description = selectedWeightUnit[0].description;
     },
     cbGetLengthCl(res){
       const selectedLengthClass = this.length_units.filter(unit => unit.name == this.dataProduct.length_class);
-      this.temp.length_unit = selectedLengthClass[0].description;
+      this.temp.length_class.value = selectedLengthClass[0].name;
+      this.temp.length_class.description = selectedLengthClass[0].description;
     },
     querySearchWeightAsync(queryString, cb){
       var weight_units = this.weight_units;
@@ -174,8 +182,11 @@ export default {
         return (data.description.toLowerCase().includes(queryString.toLowerCase()) === true);
       };
     },
-    handleSelect(item){
-
+    handleSelectWeight(item){
+      this.temp.weight_class.value = item.name;
+    },
+    handleSelectLength(item){
+      this.temp.length_class.value = item.name;
     },
   },
 };

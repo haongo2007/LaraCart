@@ -214,7 +214,6 @@ export default {
       const loading = this.$loading({
         target: '.el-row',
       });
-      console.log(this.temp);
       let form_data = new FormData();
       for (var key in this.temp) {
         if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
@@ -225,14 +224,13 @@ export default {
       }
       form_data.append('_method', 'PUT');
       productResource.update(this.temp.id, form_data).then((res) => {
-        this.reloadRedirectToList('ProductList');
-
+        loading.close();
         this.$message({
           type: 'success',
           message: 'Updated successfully',
         });
 
-        loading.close();
+        this.reloadRedirectToList('ProductList');
       }).catch(err => {
         loading.close();
       });

@@ -3,7 +3,7 @@
     <div style="padding: 24px;">
       <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
     </div>
-    <el-col :span="12" :offset="6">
+    <el-col :span="18" :offset="3">
       <el-form ref="dataForm" :model="dataTemp" :rules="dataRules" class="form-container" label-width="120px">
         <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
           <el-step v-for="(lang,key,index) in dataLanguages" :key="index" :title="lang" :icon="key == 'last' ? 'el-icon-picture' : 'el-icon-edit'" />

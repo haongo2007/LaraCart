@@ -213,7 +213,10 @@ export default {
     },
     toLastView(visitedViews) {
       if (visitedViews) {
-        const latestView = visitedViews.slice(-1)[0];
+        let latestView = visitedViews.slice(-1)[0];
+        if (latestView == undefined) {
+          latestView = '/';
+        }
         this.$router.push(latestView);
       } else {
         // You can set another route
@@ -232,7 +235,6 @@ export default {
       } else {
         this.left = left;
       }
-      console.log(e);
       if (this.type == 'bottom') {
         this.top = -(e.screenY - e.pageY + 50);
       } else {

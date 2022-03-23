@@ -307,7 +307,7 @@ public function createProductGroup()
         $productBuild    = $data['hotSpots'] ?? [];
         /* UPLOAD IMAGE */
         if($request->hasFile('image')){
-            $path = 'product/';
+            $path = 'public/product/';
             $fileName = $request->file('image')->hashName();
             $request->file('image')->storeAs(
                 $path,$fileName
@@ -383,7 +383,7 @@ public function createProductGroup()
         }
 
         //Insert attribute
-        if ($data['attribute'] && $data['kind'] == LC_PRODUCT_SINGLE) {
+        if ($attribute && $data['kind'] == LC_PRODUCT_SINGLE) {
             $arrDataAtt = [];
             foreach ($data['attribute'] as $group => $rowGroup) {
                 if ($rowGroup) {
@@ -485,15 +485,20 @@ public function createProductGroup()
         if ($product === null) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
-
         $data = $request->all();
         $data['descriptions'] = json_decode($data['descriptions']);
         $data['brand'] = json_decode($data['brand']);
         $data['supplier'] = json_decode($data['supplier']);
         $data['tax'] = json_decode($data['tax']);
         $data['attribute'] = json_decode($data['attribute']);
+        $data['length_class'] = json_decode($data['length_class'])->value ?? $product->length_class;
+        $data['weight_class'] = json_decode($data['weight_class'])->value ?? $product->weight_class;
+        /// detach category
         $data['category'] = json_decode($data['category']);
-        $data['category'] = is_array($data['category']) ? end($data['category']) : $data['category'];
+        array_walk_recursive($data['category'], function ($value, $key) use (&$category){
+            $category[] = $value;
+        }, $category);
+
         $data['date_promotion'] = json_decode($data['date_promotion']);
 
         $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
@@ -596,29 +601,39 @@ public function createProductGroup()
         }
         //Edit
 
-        $category        = $data['category'] ?? [];
+        $category        = array_unique($category) ?? [];
         $attribute       = $data['attribute'] ?? [];
         $productInGroup  = $data['productInGroup'] ?? [];
+        $descriptions    = $data['descriptions'];
         $productBuild    = $data['hotSpots'] ?? [];
-        // $subImages       = $data['sub_image'] ?? '';
+        $subImages       = $data['sub_image'] ?? '';
         // $type_show_image_desc = $data['type_show_image_desc'] ?? '';
         $downloadPath    = $data['download_path'] ?? '';
+        /* UPLOAD IMAGE */
+        if($request->hasFile('image')){
+            $path = 'public/product/';
+            $fileName = $request->file('image')->hashName();
+            $request->file('image')->storeAs(
+                $path,$fileName
+            );
+            $data['image'] = LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName;
+        }
         $dataUpdate = [
-            'image'        => $data['image'] ?? '',
-            'tax_id'       => $data['tax']->value ?? 0,
-            'brand_id'       => $data['brand']->value ?? 0,
-            'supplier_id'    => $data['supplier']->value ?? 0,
+            'image'        => $data['image'] ?? $product->image,
+            'tax_id'       => $data['tax']->value ?? $product->tax_id,
+            'brand_id'       => $data['brand']->value ?? $product->brand_id,
+            'supplier_id'    => $data['supplier']->value ?? $product->supplier_id,
             'category_store_id'     => $data['category_store_id'] ?? 0,
-            'price'        => $data['price'] ?? 0,
-            'cost'         => $data['cost'] ?? 0,
-            'stock'        => $data['stock'] ?? 0,
-            'weight_class' => $data['weight_class'] ?? '',
-            'length_class' => $data['length_class'] ?? '',
-            'weight'       => $data['weight'] ?? 0,
-            'height'       => $data['height'] ?? 0,
-            'length'       => $data['length'] ?? 0,
-            'width'        => $data['width'] ?? 0,
-            'property'     => $data['property'] ?? LC_PROPERTY_PHYSICAL,
+            'price'        => $data['price'] ?? $product->price,
+            'cost'         => $data['cost'] ?? $product->cost,
+            'stock'        => $data['stock'] ?? $product->stock,
+            'weight_class' => $data['weight_class'],
+            'length_class' => $data['length_class'],
+            'weight'       => $data['weight'] ?? $product->weight,
+            'height'       => $data['height'] ?? $product->height,
+            'length'       => $data['length'] ?? $product->length,
+            'width'        => $data['width'] ?? $product->width,
+            'property'     => $data['property'] ?? $product->property,
             'sku'          => $data['sku'],
             'alias'        => $data['alias'],
             'status'       => (!empty($data['status']) ? 1 : 0),
@@ -719,48 +734,53 @@ public function createProductGroup()
         }
 
         //Update path download
-        (new ShopProductDownload)->where('product_id', $product->id)->delete();
         if ($product['property'] == LC_PROPERTY_DOWNLOAD && $downloadPath) {
+            (new ShopProductDownload)->where('product_id', $product->id)->delete();
             (new ShopProductDownload)->insert(['product_id' => $product->id, 'path' => $downloadPath]);
         }
 
 
         //Update attribute
-        if ($product['kind'] == LC_PRODUCT_SINGLE) {
+        if ($attribute && $data['kind'] == LC_PRODUCT_SINGLE) {
             $product->attributes()->delete();
-            if (count($attribute)) {
-                $arrDataAtt = [];
-                foreach ($attribute as $group => $rowGroup) {
-                    if (count($rowGroup)) {
-                        foreach ($rowGroup['name'] as $key => $nameAtt) {
-                            if ($nameAtt) {
-                                $code = '';
-                                $images = '';
-                                if (array_key_exists('code', $rowGroup)) {
-                                    $code = $rowGroup['code'][$key];
-                                }
-                                if (array_key_exists('images', $rowGroup)) {
-                                    $images = $rowGroup['images'][$key];
-                                }
-                                if (array_key_exists('type_show', $rowGroup)) {
-                                    $type_show = $rowGroup['type_show'][$key];
-                                }
-                                $arrDataAtt[] = new ShopProductAttribute([
-                                                                        'name' => $nameAtt, 
-                                                                        'add_price' => $rowGroup['add_price'][$key],
-                                                                        'attribute_group_id' => $group,
-                                                                        'code' => $code,
-                                                                        'images'=>$images,
-                                                                        'type_show' => $type_show
-                                                                    ]);
+            $arrDataAtt = [];
+            foreach ($attribute as $group => $rowGroup) {
+                if ($rowGroup) {
+                    foreach ($rowGroup->values as $key => $nameAtt) {
+                        if ($nameAtt) {
+                            $arrDataPalette = [];
+                            $images = '';
+                            if (isset($rowGroup->values[$key]->files)) {
+                                $images = implode(',', $rowGroup->values[$key]->files);
                             }
+                            $arrDataAtt =  [
+                                                'name' => $nameAtt->name, 
+                                                'add_price' => $rowGroup->values[$key]->add_price,
+                                                'attribute_group_id' => $rowGroup->id,
+                                                'images' => $images,
+                                                'product_id' => $product->id
+                                            ];
+                            $justProdAttribute = ShopProductAttribute::create($arrDataAtt);
+                            if (isset($rowGroup->values[$key]->palette)) {
+                                $palette = $rowGroup->values[$key]->palette;
+
+                                foreach ($palette as $keypalette => $valuepalette) {
+                                    $arrDataPalette[] = [
+                                        'name' => $valuepalette->name,
+                                        'type' => $valuepalette->type,
+                                        'hex' => $valuepalette->hex,
+                                        'attribute_id' => $justProdAttribute->id,
+                                        'product_id' => $product->id
+                                    ];
+                                }
+                                ShopAttributePalette::insert($arrDataPalette);
+                            };
                         }
                     }
 
                 }
-                $product->attributes()->saveMany($arrDataAtt);
-            }
 
+            }
         }
 
         //Update sub mages
@@ -771,9 +791,7 @@ public function createProductGroup()
         }
 
         lc_clear_cache('cache_product');
-
-        return redirect()->route('admin_product.index')->with('success', trans('product.admin.edit_success'));
-
+        return response()->json(new JsonResponse([],trans('product.admin.edit_success')), Response::HTTP_OK);
     }
 
     /*
