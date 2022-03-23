@@ -90,6 +90,8 @@ export default {
     productEditSingle: 'Edit Product (Single)',
     productEditBundle: 'Edit Product (Bundle)',
     productEditGroup: 'Edit Product (Group)',
+    configShop:'Shop Configuration',
+    shop: 'Shop',
   },
   navbar: {
     logOut: 'Log Out',
@@ -199,6 +201,10 @@ export default {
     height: 'Height',
     weight: 'Weight',
     width: 'Width',
+    domain: 'Domain',
+    template: 'Template',
+    logo: 'Logo',
+    active: 'Active',
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

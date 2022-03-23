@@ -1,20 +1,22 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use App\Models\Front\ShopLanguage;
 use App\Models\Front\ShopCurrency;
-use BlackCart\Core\Admin\Models\AdminConfig;
+use App\Models\Admin\Config;
+use App\Models\Admin\Store;
 use App\Models\Front\ShopTax;
+use App\Http\Resources\StoreCollection;
 
-class StoreConfigController extends RootAdminController
+class StoreConfigController extends Controller
 {
     public $templates, $currencies, $languages, $timezones;
 
     public function __construct()
     {
-        parent::__construct();
-        $allTemplate = bc_get_all_template();
+        // parent::__construct();
+        $allTemplate = lc_get_all_template();
         $templates = [];
         foreach ($allTemplate as $key => $template) {
             $templates[$key] = empty($template['config']['name']) ? $key : $template['config']['name'];
@@ -30,7 +32,15 @@ class StoreConfigController extends RootAdminController
     }
 
     public function index() {
+        $searchParams = request()->all();
+        $data = (new Store)->getStoreListAdmin($searchParams);
+        return StoreCollection::collection($data)->additional(['message' => 'Successfully']);
+    }
+
+    public function show($id='')
+    {
         $id = session('adminStoreId');
+        
         $data = [
             'title' => trans('admin.menu_titles.config_store_default'),
             'subTitle' => '',
@@ -43,14 +53,14 @@ class StoreConfigController extends RootAdminController
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $customerConfigs = AdminConfig::getListConfigByCode($dataCustomerConfig);
+        $customerConfigs = Config::getListConfigByCode($dataCustomerConfig);
         
         $dataCustomerConfigRequired = [
             'code' => 'customer_config_attribute_required',
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $customerConfigsRequired = AdminConfig::getListConfigByCode($dataCustomerConfigRequired);
+        $customerConfigsRequired = Config::getListConfigByCode($dataCustomerConfigRequired);
         //End customer
 
         //Product config
@@ -62,49 +72,49 @@ class StoreConfigController extends RootAdminController
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $productConfig = AdminConfig::getListConfigByCode($productConfigQuery);
+        $productConfig = Config::getListConfigByCode($productConfigQuery);
 
         $productConfigAttributeQuery = [
             'code' => 'product_config_attribute',
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $productConfigAttribute = AdminConfig::getListConfigByCode($productConfigAttributeQuery);
+        $productConfigAttribute = Config::getListConfigByCode($productConfigAttributeQuery);
 
         $productConfigAttributeRequiredQuery = [
             'code' => 'product_config_attribute_required',
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $productConfigAttributeRequired = AdminConfig::getListConfigByCode($productConfigAttributeRequiredQuery);
+        $productConfigAttributeRequired = Config::getListConfigByCode($productConfigAttributeRequiredQuery);
 
         $orderConfigQuery = [
             'code' => 'order_config',
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $orderConfig = AdminConfig::getListConfigByCode($orderConfigQuery);
+        $orderConfig = Config::getListConfigByCode($orderConfigQuery);
 
         $configDisplayQuery = [
             'code' => 'display_config',
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $configDisplay = AdminConfig::getListConfigByCode($configDisplayQuery);
+        $configDisplay = Config::getListConfigByCode($configDisplayQuery);
 
         $configCaptchaQuery = [
             'code' => 'captcha_config',
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $configCaptcha = AdminConfig::getListConfigByCode($configCaptchaQuery);
+        $configCaptcha = Config::getListConfigByCode($configCaptchaQuery);
 
         $configCustomizeQuery = [
             'code' => 'admin_custom_config',
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $configCustomize = AdminConfig::getListConfigByCode($configCustomizeQuery);
+        $configCustomize = Config::getListConfigByCode($configCustomizeQuery);
 
         
 
@@ -114,7 +124,7 @@ class StoreConfigController extends RootAdminController
             'groupBy' => 'code',
             'sort'    => 'asc',
         ];
-        $emailConfig = AdminConfig::getListConfigByCode($emailConfigQuery);
+        $emailConfig = Config::getListConfigByCode($emailConfigQuery);
 
         $data['emailConfig'] = $emailConfig;
         $data['smtp_method'] = ['' => 'None Secirity', 'TLS' => 'TLS', 'SSL' => 'SSL'];
@@ -148,7 +158,6 @@ class StoreConfigController extends RootAdminController
         return view($this->templatePathAdmin.'screen.config_store_default')
         ->with($data);
     }
-
     /*
     Update value config store
     */
@@ -169,7 +178,7 @@ class StoreConfigController extends RootAdminController
         }
 
         try {
-            AdminConfig::where('key', $name)
+            Config::where('key', $name)
                 ->where('store_id', $storeId)
                 ->update(['value' => $value]);
             $error = 0;

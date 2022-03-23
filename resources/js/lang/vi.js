@@ -92,6 +92,8 @@ export default {
     productEditSingle: 'Sửa sản phẩm (Đơn)',
     productEditBundle: 'Sửa sản phẩm (Bộ)',
     productEditGroup: 'Sửa sản phẩm (Nhóm)',
+    configShop:'Thiết lập cửa hàng',
+    shop: 'Cửa hàng',
   },
   navbar: {
     logOut: 'Đăng xuất',
@@ -196,6 +198,10 @@ export default {
     height: 'Cao',
     weight: 'Nặng',
     width: 'Rộng',
+    domain: 'Tên miền',
+    template: 'Giao diện',
+    logo: 'Logo',
+    active: 'Kích hoạt',
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

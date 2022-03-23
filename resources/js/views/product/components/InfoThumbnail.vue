@@ -49,7 +49,7 @@
           placement="top"
           width="360"
         >
-          <div style="margin-top: 15px;">
+          <div style="margin-bottom: 15px;">
             <el-tooltip content="Sort" placement="left">
               <el-input v-model.number="temp.sort" :placeholder="$t('table.sort')" :min="1">
                 <template slot="append">
