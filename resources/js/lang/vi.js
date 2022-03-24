@@ -94,6 +94,7 @@ export default {
     productEditGroup: 'Sửa sản phẩm (Nhóm)',
     configShop:'Thiết lập cửa hàng',
     shop: 'Cửa hàng',
+    shopEdit: 'Thông tin cửa hàng',
   },
   navbar: {
     logOut: 'Đăng xuất',

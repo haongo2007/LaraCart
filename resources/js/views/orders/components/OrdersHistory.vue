@@ -18,7 +18,7 @@
       </el-table-column>
       <el-table-column
         label="Content"
-        min-width="580"
+        min-width="450"
       >
         <template slot-scope="scope">
           <span v-html="scope.row.content" />

@@ -92,6 +92,7 @@ export default {
     productEditGroup: 'Edit Product (Group)',
     configShop:'Shop Configuration',
     shop: 'Shop',
+    shopEdit: 'Shop Infomation',
   },
   navbar: {
     logOut: 'Log Out',

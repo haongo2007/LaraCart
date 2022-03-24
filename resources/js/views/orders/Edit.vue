@@ -13,11 +13,11 @@
       </div>
     </el-row>
     <el-row :gutter="20" style="margin:0px 0px 20px 0px;">
-      <el-col :span="6" class="toPrint">
+      <el-col :span="12" class="toPrint">
         <el-skeleton :rows="6" animated :loading="loading" />
         <component :is="customer_component" v-show="!loading" :data-order="info_order" :data-country="listCountry" @handleChangeHistory="handleChangeHistory" />
       </el-col>
-      <el-col :span="6" class="toPrint">
+      <el-col :span="12" class="toPrint">
         <el-skeleton :rows="6" animated :loading="loading" />
         <component
           :is="order_component"
@@ -31,12 +31,15 @@
           @handleChangeHistory="handleChangeHistory"
         />
       </el-col>
+    </el-row>
 
-      <el-col :span="12">
+    <el-row :gutter="20" style="margin:0px 0px 20px 0px;">
+      <el-col :span="24">
         <el-skeleton :rows="6" animated :loading="loading" />
         <component :is="products_component" v-show="!loading" :data-attribute-group="dataAttributeGroup" :data-products="info_order" @handleChangeHistory="handleChangeHistory" @handleChangeInvoice="handleChangeInvoice" />
       </el-col>
     </el-row>
+    
     <el-row :gutter="20" style="margin:0px;">
       <el-col :span="8" class="toPrint">
         <el-skeleton :rows="6" animated :loading="loading" />

@@ -7,6 +7,8 @@ use App\Models\Front\ShopCurrency;
 use App\Models\Admin\Config;
 use App\Models\Admin\Store;
 use App\Models\Front\ShopTax;
+use App\Helper\JsonResponse;
+use Illuminate\Http\Response;
 use App\Http\Resources\StoreCollection;
 
 class StoreConfigController extends Controller
@@ -37,17 +39,57 @@ class StoreConfigController extends Controller
         return StoreCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-    public function show($id='')
+    public function show($id)
     {
-        $id = session('adminStoreId');
         
-        $data = [
-            'title' => trans('admin.menu_titles.config_store_default'),
-            'subTitle' => '',
-            'icon' => 'fas fa-cogs',        
-        ];
+        $store = (new Store)->with('descriptions')->find($id);
+        if (!$store) {
+            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+        }
 
-        // Customer config
+        return response()->json(new JsonResponse($store), Response::HTTP_OK);
+    }
+    /*
+    Update value config store
+    */
+    public function update()
+    {
+        $data = request()->all();
+        $name = $data['name'];
+        $value = $data['value'];
+        $storeId = $data['storeId'] ?? '';
+        if (!$storeId) {
+            return response()->json([
+                'error' => 1,
+                'field' => 'storeId',
+                'value' => $storeId,
+                'msg'   => 'Store ID can not empty!',
+                ]
+            );
+        }
+
+        try {
+            Config::where('key', $name)
+                ->where('store_id', $storeId)
+                ->update(['value' => $value]);
+            $error = 0;
+            $msg = trans('admin.update_success');
+        } catch (\Throwable $e) {
+            $error = 1;
+            $msg = $e->getMessage();
+        }
+        return response()->json([
+            'error' => $error,
+            'field' => $name,
+            'value' => $value,
+            'msg'   => $msg,
+            ]
+        );
+
+    }
+    public function getConfig($id)
+    {
+        //Customer config
         $dataCustomerConfig = [
             'code' => 'customer_config_attribute',
             'storeId' => $id,
@@ -141,7 +183,7 @@ class StoreConfigController extends Controller
         $data['productConfig']                  = $productConfig;
         $data['productConfigAttribute']         = $productConfigAttribute;
         $data['productConfigAttributeRequired'] = $productConfigAttributeRequired;
-        $data['pluginCaptchaInstalled']         = bc_get_plugin_captcha_installed();
+        $data['pluginCaptchaInstalled']         = lc_get_plugin_captcha_installed();
         $data['taxs']                           = $taxs;
         $data['configDisplay']                  = $configDisplay;
         $data['orderConfig']                    = $orderConfig;
@@ -152,49 +194,10 @@ class StoreConfigController extends Controller
         $data['languages']                      = $this->languages;
         $data['currencies']                     = $this->currencies;
         $data['storeId']                        = $id;
-        $data['urlUpdateConfig']                = bc_route_admin('admin_config.update');
-        $data['urlUpdateConfigGlobal']          = bc_route_admin('admin_config_global.update');
+        $data['urlUpdateConfig']                = lc_route_admin('admin_config.update');
+        $data['urlUpdateConfigGlobal']          = lc_route_admin('admin_config_global.update');
 
-        return view($this->templatePathAdmin.'screen.config_store_default')
-        ->with($data);
-    }
-    /*
-    Update value config store
-    */
-    public function update()
-    {
-        $data = request()->all();
-        $name = $data['name'];
-        $value = $data['value'];
-        $storeId = $data['storeId'] ?? '';
-        if (!$storeId) {
-            return response()->json([
-                'error' => 1,
-                'field' => 'storeId',
-                'value' => $storeId,
-                'msg'   => 'Store ID can not empty!',
-                ]
-            );
-        }
-
-        try {
-            Config::where('key', $name)
-                ->where('store_id', $storeId)
-                ->update(['value' => $value]);
-            $error = 0;
-            $msg = trans('admin.update_success');
-        } catch (\Throwable $e) {
-            $error = 1;
-            $msg = $e->getMessage();
-        }
-        return response()->json([
-            'error' => $error,
-            'field' => $name,
-            'value' => $value,
-            'msg'   => $msg,
-            ]
-        );
-
+        return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }
 
 }

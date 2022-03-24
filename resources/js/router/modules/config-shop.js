@@ -13,7 +13,7 @@ const configShopRoutes = {
   },
   children: [
     {
-      path: 'shop-list',
+      path: 'shop',
       component: () => import('@/views/shop/List'),
       name: 'ShopList',
       meta: {
@@ -23,6 +23,17 @@ const configShopRoutes = {
         roles: ['Manager'],
         parent: 'root',
       },
+    },
+    {
+      path: 'shop/edit/:id(\\d+)',
+      component: () => import('@/views/shop/Edit'),
+      name: 'ShopEdit',
+      meta: {
+        title: 'shopEdit',
+        permissions: ['Shop manager'],
+        parent: 'ShopList',
+      },
+      hidden: true,
     },
   ],
 };

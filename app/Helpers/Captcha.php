@@ -49,7 +49,7 @@ if (!function_exists('lc_get_plugin_captcha_installed')) {
      */
     function lc_get_plugin_captcha_installed($onlyActive = true)
     {
-        $listPluginInstalled =  \BlackCart\Core\Admin\Models\AdminConfig::getPluginCaptchaCode($onlyActive);
+        $listPluginInstalled =  \App\Models\Admin\Config::getPluginCaptchaCode($onlyActive);
         $arrPlugin = [];
         if($listPluginInstalled) {
             foreach ($listPluginInstalled as $key => $plugin) {

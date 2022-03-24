@@ -11,11 +11,7 @@
           <el-col :span="24">
             <el-button-group>
               <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'CategoryCreate'}).catch(() => {})" />
-              <el-button type="success" :disabled="dataLoading" @click="handleDownload"><svg-icon icon-class="excel" /></el-button>
             </el-button-group>
-            <div class="el-select filter-item el-select--medium">
-              <el-checkbox v-model="parent" label="ROOT" border @change="handleFilter" />
-            </div>
           </el-col>
         </el-row>
       </div>
@@ -25,21 +21,26 @@
       </h3>
       <div class="drawer-item">
 
-        <el-row :gutter="20">
-          <el-col :span="12">
+        <el-row :gutter="24">
+          <el-col :span="8">
             <el-select v-model="dataQuery.sort" :placeholder="$t('table.order')" style="width:100%" clearable class="filter-item" @change="handleFilter('sort',dataQuery.sort)">
               <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" :disabled="item.active" />
             </el-select>
           </el-col>
-          <el-col :span="12">
-            <el-select v-model="dataQuery.status" :placeholder="$t('table.status')" style="width: 100%" class="filter-item" clearable multiple @change="handleFilter('filter',dataQuery.status)">
+          <el-col :span="8">
+            <el-select v-model="dataQuery.status" :placeholder="$t('table.status')" style="width: 100%" class="filter-item" clearable multiple @change="handleFilter('status',dataQuery.status)">
               <el-option v-for="item in fillterStatusOptions" :key="item.key" :label="item.label" :value="item.key" />
+            </el-select>
+          </el-col>
+          <el-col :span="8">
+            <el-select v-model="dataQuery.active" :placeholder="$t('table.active')" style="width: 100%" class="filter-item" clearable multiple @change="handleFilter('active',dataQuery.active)">
+              <el-option v-for="item in fillterActiveOptions" :key="item.key" :label="item.label" :value="item.key" />
             </el-select>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-input v-model="dataQuery.title" clearable :placeholder="$t('table.name')" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.contain" clearable placeholder="Typing for search domain, template, email or phone" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
       </div>
@@ -51,9 +52,9 @@
 
 import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
-import CategoryResource from '@/api/category';
+import StoreResource from '@/api/store';
 
-const categoryResource = new CategoryResource();
+const storeResource = new StoreResource();
 export default {
   name: 'FilterSystemCategory',
   props: {
@@ -70,7 +71,6 @@ export default {
     return {
       list: null,
       total: 0,
-      parent: true,
       listQuery: {},
       fillterStatusOptions: [{
         label: 'Deactive',
@@ -79,7 +79,16 @@ export default {
       }, {
         label: 'Active',
         key: '1',
-        active: true,
+        active: false,
+      }],
+      fillterActiveOptions: [{
+        label: 'Deactive',
+        key: '0',
+        active: false,
+      }, {
+        label: 'Active',
+        key: '1',
+        active: false,
       }],
       sortOptions: [{
         label: 'Id DESC',
@@ -88,14 +97,6 @@ export default {
       }, {
         label: 'Id ASC',
         key: 'id__asc',
-        active: false,
-      }, {
-        label: 'Title A-Z',
-        key: 'title__asc',
-        active: false,
-      }, {
-        label: 'Title Z-A',
-        key: 'title__desc',
         active: false,
       }],
     };
@@ -114,17 +115,10 @@ export default {
   },
   created() {
     this.getList();
-    EventBus.$on('handleDeleting', this.handleDeleting);
   },
   methods: {
     async getList() {
-      if (this.parent === false) {
-        this.dataQuery.parent = '';
-      } else {
-        this.dataQuery.parent = '0';
-      }
-      const data = await categoryResource.list(this.dataQuery);
-
+      const data = await storeResource.list(this.dataQuery);
       this.list = data.data;
       this.total = data.meta.total;
 
@@ -139,8 +133,16 @@ export default {
             elem.active = false;
           }
         });
-      } else if (type === 'filter' && e) {
+      } else if (type === 'status' && e) {
         this.fillterStatusOptions.filter(function(elem){
+          if (elem.key === e){
+            elem.active = true;
+          } else {
+            elem.active = false;
+          }
+        });
+      } else if (type === 'active' && e) {
+        this.fillterActiveOptions.filter(function(elem){
           if (elem.key === e){
             elem.active = true;
           } else {
@@ -151,67 +153,6 @@ export default {
       this.dataQuery.page = 1;
 
       this.getList();
-    },
-    handleDownload() {
-      import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['Id', 'Name', 'Parent', 'Sort', 'Show on app', 'Status'];
-        const filterVal = ['id', 'name', 'parent', 'sort', 'top', 'status'];
-        const data = this.formatJson(filterVal, this.list);
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'Category-list-' + parseTime(new Date(), '{y}-{m}-{d}'),
-        });
-      });
-    },
-    formatJson(filterVal, jsonData) {
-      const getValue = (object, keys) => keys.split('.').reduce((o, k) => (o || {})[k], object);
-
-      return jsonData.map(v => filterVal.map(j => {
-        if (j === 'timestamp') {
-          return parseTime(v[j]);
-        } else {
-          return getValue(v, j);
-        }
-      }));
-    },
-    handleDeleting(row) {
-      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
-      }).then(() => {
-        this.$emit('handleListenData', { loading: true });
-        categoryResource.destroy(row.id).then((res) => {
-          const index = this.list.indexOf(row);
-          this.$message({
-            type: 'success',
-            message: 'Delete successfully',
-          });
-          if (index == -1) {
-            const view = this.$router.resolve({ name: 'CategoryList' }).route;
-            this.$store.dispatch('tagsView/delCachedView', view).then(() => {
-              const { fullPath } = view;
-              this.$nextTick(() => {
-                this.$router.replace({
-                  path: '/redirect' + fullPath,
-                });
-              });
-            });
-          } else {
-            this.list.splice(index, 1);
-            const total = this.total - Array(row).length;
-            this.$emit('handleListenData', { list: this.list, loading: false, total: total, listQuery: this.dataQuery });
-          }
-        }).catch(() => {
-          this.$emit('handleListenData', { loading: false });
-        });
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: 'Delete canceled',
-        });
-      });
     },
   },
 };

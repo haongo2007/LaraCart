@@ -2,11 +2,11 @@
   <div class="app-container">
     <div class="filter-container">
       <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
-        <!-- <filter-system-category
+        <filter-system-shop
           :data-loading="loading"
           :data-query="listQuery"
           @handleListenData="handleListenData"
-        /> -->
+        />
       </right-panel>
     </div>
     <el-table
@@ -22,12 +22,12 @@
       </el-table-column>
       <el-table-column :label="$t('table.domain')" min-width="80px">
         <template slot-scope="scope">
-          <el-tag>{{ scope.row.domain }}</el-tag>
+          {{ scope.row.domain }}
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.template')" min-width="80px" prop="template">
         <template slot-scope="scope">
-          <el-tag>{{ scope.row.template }}</el-tag>
+          {{ scope.row.template }}
         </template>
       </el-table-column>
       <el-table-column :label="$t('table.logo')" min-width="80px" prop="logo">
@@ -39,47 +39,47 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('phone')" min-width="80px" align="center" prop="phone">
+      <el-table-column :label="$t('phone')" min-width="70px" align="center" prop="phone">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('email')" min-width="80px" align="center" prop="email">
+      <el-table-column :label="$t('email')" min-width="120px" align="center" prop="email">
         <template slot-scope="scope">
           <span>{{ scope.row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('address')" min-width="80px" align="center" prop="address">
+      <el-table-column :label="$t('address')" min-width="120px" align="center" prop="address">
         <template slot-scope="scope">
           <span>{{ scope.row.address }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('currency')" min-width="80px" align="center" prop="currency">
+      <el-table-column :label="$t('currency')" min-width="60px" align="center" prop="currency">
         <template slot-scope="scope">
           <span>{{ scope.row.currency }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" min-width="80px" align="center" prop="status">
+      <el-table-column :label="$t('table.status')" min-width="60px" align="center" prop="status">
+        <template slot-scope="{row}">
+          <el-tag :type="row.status | statusFilter">
+            {{ row.status | statusFilter('name') }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.active')" class-name="status-col" min-width="70px" prop="active">
         <template slot-scope="{row}">
           <el-switch
-            v-model="value2"
+            v-model="row.active"
+            :active-value="1"
             active-color="#13ce66"
+            :inactive-value="0"
             inactive-color="#ff4949">
           </el-switch>  
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.active')" class-name="status-col" min-width="80px" prop="active">
+      <el-table-column :label="$t('table.actions')" align="center" min-width="50px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <el-switch
-            v-model="value2"
-            active-color="#13ce66"
-            inactive-color="#ff4949">
-          </el-switch>  
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.actions')" align="center" min-width="80px" class-name="small-padding fixed-width">
-        <template slot-scope="{row}">
-          <router-link :to="{ name: 'CategoryEdit',params:{id:row.id} }">
+          <router-link :to="{ name: 'ShopEdit',params:{id:row.id} }">
             <el-button type="primary" size="mini" icon="el-icon-edit">
               {{ $t('table.edit') }}
             </el-button>
@@ -97,41 +97,31 @@ import { statusFilter } from '@/filters';
 import { parseTime } from '@/utils';
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 import RightPanel from '@/components/RightPanel';
-// import FilterSystemShop from './components/FilterSystemShop';
+import FilterSystemShop from './components/FilterSystemShop';
 import EventBus from '@/components/FileManager/eventBus';
-import StoreResource from '@/api/store';
 
-const storeResource = new StoreResource();
 
 export default {
   name: 'ShopList',
-  components: { Pagination, RightPanel, },//FilterSystemShop },
+  components: { Pagination, RightPanel,FilterSystemShop },
   data() {
     return {
       list: [],
       total: 0,
-      loading: false,
-      parent: true,
-      value2:true,
+      loading: true,
       listQuery: {
         page: 1,
         limit: 20,
-        status: ['1'],
-        name: '',
-        type: '',
+        status: [],
+        active: [],
         sort: 'id__desc',
-        parent: '0',
+        contain: '',
       },
     };
   },
   created() {
-    this.getList();
   },
   methods: {
-    async getList(){
-      const data = await storeResource.list();
-      this.list = data.data;
-    },
     handleListenData(data){
       if (data.hasOwnProperty('list')) {
         this.list = data.list;
@@ -150,9 +140,6 @@ export default {
       this.loading = true;
       this.listQuery.page = data.page;
       this.listQuery.limit = data.limit;
-    },
-    handleDeleting(row){
-      EventBus.$emit('handleDeleting', row);
     },
   },
 };

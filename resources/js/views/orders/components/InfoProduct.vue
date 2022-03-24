@@ -8,7 +8,7 @@
     </div>
     <el-table
       :data="dataProducts.details"
-      height="322"
+      max-height="322"
       style="width: 100%"
     >
       <el-table-column
