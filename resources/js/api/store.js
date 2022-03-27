@@ -3,11 +3,11 @@ import Resource from '@/api/resource';
 
 class StoreResource extends Resource {
   constructor() {
-    super('store-config');
+    super('store');
   }
   getConfig(id) {
     return request({
-      url: '/getConfig/'+id,
+      url: '/'+this.uri+'/getConfig/'+id,
       method: 'get',
     });
   }

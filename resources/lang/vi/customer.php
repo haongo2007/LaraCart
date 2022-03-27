@@ -65,6 +65,7 @@ return [
         'lasttname_kana' => 'Sử dụng họ KANA',
         'address1'       => 'Sử dụng Tỉnh/Thành',
         'address2'       => 'Sử dụng Quận/Huyện',
+        'address3'       => 'Sử dụng Phường/Xã',
         'company'        => 'Sử dụng Công Ty',
         'postcode'       => 'Sử dụng Mã bưu chính',
         'country'        => 'Sử dụng Quốc Gia',

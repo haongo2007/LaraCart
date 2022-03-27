@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
-        <filter-system-shop
+        <filter-system-store
           :data-loading="loading"
           :data-query="listQuery"
           @handleListenData="handleListenData"
@@ -77,12 +77,13 @@
           </el-switch>  
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" align="center" min-width="50px" class-name="small-padding fixed-width">
+      <el-table-column :label="$t('table.actions')" align="center" min-width="100px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <router-link :to="{ name: 'ShopEdit',params:{id:row.id} }">
-            <el-button type="primary" size="mini" icon="el-icon-edit">
-              {{ $t('table.edit') }}
-            </el-button>
+          <router-link :to="{ name: 'StoreEdit',params:{id:row.id} }">
+            <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
+          </router-link>
+          <router-link :to="{ name: 'StoreConfig',params:{id:row.id} }">
+            <el-button type="primary" size="mini" icon="el-icon-s-tools"></el-button>
           </router-link>
         </template>
       </el-table-column>
@@ -97,13 +98,13 @@ import { statusFilter } from '@/filters';
 import { parseTime } from '@/utils';
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 import RightPanel from '@/components/RightPanel';
-import FilterSystemShop from './components/FilterSystemShop';
+import FilterSystemStore from './components/FilterSystemStore';
 import EventBus from '@/components/FileManager/eventBus';
 
 
 export default {
-  name: 'ShopList',
-  components: { Pagination, RightPanel,FilterSystemShop },
+  name: 'StoreList',
+  components: { Pagination, RightPanel,FilterSystemStore },
   data() {
     return {
       list: [],

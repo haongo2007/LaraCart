@@ -56,7 +56,7 @@ import StoreResource from '@/api/store';
 
 const storeResource = new StoreResource();
 export default {
-  name: 'FilterSystemCategory',
+  name: 'FilterSystemStore',
   props: {
     dataLoading: {
       type: Boolean,

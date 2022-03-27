@@ -81,6 +81,11 @@ return [
         'tax'       => 'Thuế',
     ],
     'admin'                 => [
+        'product_buy_out_of_stock' => 'Mua sản phẩm đã hết hàng',
+        'shipping_off'         => 'Tắt chức năng giao hàng',
+        'payment_off'          => 'Tắt chức năng thanh toán',
+        'shop_allow_guest'     => 'Mua hàng không cần đăng nhập',
+        'product_preorder'     => 'Cho phép đặt hàng trước',
         'title'                => 'Quản lý đơn hàng',
         'config_title'         => 'Cấu hình đơn hàng',
         'create_success'       => 'Tạo đơn hàng thành công!',

@@ -87,6 +87,11 @@ return [
         'tax'       => 'Tax',
     ],
     'admin'                 => [
+        'product_buy_out_of_stock' => 'Buy products that are out of stock',
+        'shipping_off'         => 'Turn off the shipping function',
+        'payment_off'          => 'Turn off the payment function',
+        'shop_allow_guest'     => 'Purchase without login',
+        'product_preorder'     => 'Accept Preorder',
         'title'                => 'Order manager',
         'config_title'         => 'Config info order',
         'create_success'       => 'Create new order success!',

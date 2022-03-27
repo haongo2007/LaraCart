@@ -23,7 +23,7 @@ import errorRoutes from './modules/error';
 import excelRoutes from './modules/excel';
 import permissionRoutes from './modules/permission';
 import storeManagerRoutes from './modules/store-manager';
-import configShopRoutes from './modules/config-shop';
+import configStoreRoutes from './modules/store';
 
 /**
  * Sub-menu only appear when children.length>=1
@@ -99,7 +99,7 @@ export const asyncRoutes = [
     ],
   },
   storeManagerRoutes,
-  configShopRoutes,
+  configStoreRoutes,
   {
     path: '/profile',
     component: Layout,

@@ -1,15 +1,15 @@
 <template>
-  <shop-info v-if="!loading" :is-edit="true" :data-loading="loading" :data-info="shopInfo" />
+  <store-info v-if="!loading" :is-edit="true" :data-loading="loading" :data-info="shopInfo" />
 </template>
 
 <script>
-import ShopInfo from './components/ShopInfo';
+import StoreInfo from './components/StoreInfo';
 import StoreResource from '@/api/store';
 
 const storeResource = new StoreResource();
 export default {
-  name: 'ShopEdit',
-  components: { ShopInfo },
+  name: 'StoreEdit',
+  components: { StoreInfo },
   data(){
     return {
       loading:true,

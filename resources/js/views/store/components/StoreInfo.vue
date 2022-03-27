@@ -193,7 +193,15 @@
                       { max: 100, message: 'Last name max length 100 character'}
                     ]"
                   >
-                    <el-input v-model="temp.language" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'language')" />
+
+                    <el-select v-model="temp.language" placeholder="Select" filterable style="width: 100%;">
+                      <el-option
+                        v-for="(item,index) in temp.languages"
+                        :key="index"
+                        :label="item.name"
+                        :value="index"
+                      />
+                    </el-select>
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
@@ -222,7 +230,14 @@
                       { required: true, message: 'Currency is required'}
                     ]"
                   >
-                    <el-input v-model="temp.currency" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'currency')" />
+                    <el-select v-model="temp.currency" placeholder="Select" filterable style="width: 100%;">
+                      <el-option
+                        v-for="(item,index) in temp.currencies"
+                        :key="index"
+                        :label="item"
+                        :value="index"
+                      />
+                    </el-select>
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
@@ -309,7 +324,14 @@
                       { required: true, message: 'Timezone is required'}
                     ]"
                   >
-                    <el-input v-model="temp.timezone" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'timezone')" />
+                    <el-select v-model="temp.timezone" placeholder="Select" filterable style="width: 100%;">
+                      <el-option
+                        v-for="(item,index) in temp.timezones"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
@@ -359,7 +381,7 @@
                   v-model="visible[11]"
                   placement="top"
                   title="Time Working"
-                  width="200"
+                  width="376"
                 >
                   <el-form-item
                     prop="time_active"
@@ -367,7 +389,13 @@
                       { required: true, message: 'Time Working is required'}
                     ]"
                   >
-                    <el-input v-model="temp.time_active" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'time_active')" />
+                    <el-time-picker
+                      is-range
+                      v-model="temp.time_active"
+                      range-separator="To"
+                      start-placeholder="Start time"
+                      end-placeholder="End time">
+                    </el-time-picker>
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
@@ -387,7 +415,7 @@
           <el-skeleton :rows="6" animated :loading="dataLoading" />
           <el-descriptions class="margin-top" :column="1" border>
               
-              <el-descriptions-item :content-style="{'text-align': 'right'}" :column="2">
+              <el-descriptions-item :content-style="{'text-align': 'left'}" :column="2">
                 <template slot="label">
                   <i class="el-icon-s-marketing" />
                   App Name
@@ -395,7 +423,7 @@
                 <div v-for="item in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em"/>
                   <el-popover
-                    v-model="visible[1]"
+                    v-model="item.title.visible"
                     placement="top"
                     title="Number phone"
                     width="200"
@@ -407,7 +435,7 @@
                         { max: 100, message: 'Last name max length 100 character'}
                       ]"
                     >
-                      <el-input v-model="item.title" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'long_phone')" />
+                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'long_phone')" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
@@ -415,12 +443,12 @@
                         <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'long_phone')">Confirm</el-button>
                       </el-button-group>
                     </div>
-                    <span slot="reference" class="border-edit">{{ item.title ? item.title : 'Empty' }}</span>
+                    <span slot="reference" class="border-edit">{{ item.title.value ? item.title.value : 'Empty' }}</span>
                   </el-popover>
                 </div>
               </el-descriptions-item>
 
-              <el-descriptions-item :content-style="{'text-align': 'right'}">
+              <el-descriptions-item :content-style="{'text-align': 'left'}">
                 <template slot="label">
                   <i class="el-icon-key" />
                   Keyword
@@ -428,7 +456,7 @@
                 <div v-for="item in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
                   <el-popover
-                    v-model="visible[2]"
+                    v-model="item.keyword.visible"
                     placement="top"
                     title="Email address"
                     width="200"
@@ -440,7 +468,7 @@
                         { max: 100, message: 'Last name max length 100 character'}
                       ]"
                     >
-                      <el-input v-model="temp.email" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'email')" />
+                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'email')" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
@@ -448,12 +476,12 @@
                         <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'email')">Confirm</el-button>
                       </el-button-group>
                     </div>
-                    <span slot="reference" class="border-edit">{{ item.keyword ? item.keyword  : 'Empty'}}</span>
+                    <span slot="reference" class="border-edit">{{ item.keyword.value ? item.keyword.value  : 'Empty'}}</span>
                   </el-popover>
                 </div>
               </el-descriptions-item>
 
-              <el-descriptions-item :content-style="{'text-align': 'right'}">
+              <el-descriptions-item :content-style="{'text-align': 'left'}">
                 <template slot="label">
                   <i class="el-icon-document-copy" />
                   Description
@@ -461,7 +489,7 @@
                 <div v-for="item in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
                   <el-popover
-                    v-model="visible[3]"
+                    v-model="item.description.visible"
                     placement="top"
                     title="Address"
                     width="200"
@@ -473,7 +501,7 @@
                         { max: 100, message: 'Last name max length 100 character'}
                       ]"
                     >
-                      <el-input v-model="temp.address" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'address')" />
+                      <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'address')" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
@@ -481,12 +509,12 @@
                         <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'address')">Confirm</el-button>
                       </el-button-group>
                     </div>
-                    <span slot="reference" class="border-edit">{{ item.description ? item.description : 'Empty' }}</span>
+                    <span slot="reference" class="border-edit">{{ item.description.value ? item.description.value : 'Empty' }}</span>
                   </el-popover>
                 </div>
               </el-descriptions-item>
 
-            </el-descriptions>
+          </el-descriptions>
         </el-col>
       </el-form>
     </el-row>
@@ -506,7 +534,7 @@ import FileManager from '@/components/FileManager';
 const storeResource = new StoreResource();
 
 export default {
-  name: 'ShopInfo',
+  name: 'StoreInfo',
   components:{FileManager},
   props: {
     isEdit: {
@@ -533,18 +561,20 @@ export default {
     };
   },
   created() {
-    let id = this.dataInfo.id;
-    let data = storeResource.getConfig(id);
-    let that = this;
     this.temp = Object.assign({}, this.dataInfo);
-    Object.keys(this.temp).forEach(function(key) {
-      that.visible[key] = false;
-    });
-    console.log(this.temp);
+
+    for (var i = 0; i <=11; i++) {
+      this.visible[i] = false;
+    }
+    this.temp.descriptions.forEach(function(v,i) {
+      v.description = {value:v.description,visible:false};
+      v.title = {value:v.title,visible:false};
+      v.keyword = {value:v.keyword,visible:false};
+    })
   },
   methods: {
     goBackList(){
-      this.$router.push({ name: 'ShopList' });
+      this.$router.push({ name: 'StoreList' });
     },
     handleVisibleStorage(index, key){
       EventBus.$on('getFileResponse', this.handlerGeturl);

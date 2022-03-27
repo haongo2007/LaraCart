@@ -157,6 +157,17 @@ class Config extends Model
         } elseif ($keyBy) {
             $data = $data->keyBy($keyBy);
         }
+        if($groupBy) {
+            foreach ($data as $keys => $values) {
+                foreach ($values as $key => $value) {
+                    $value->detail = lc_language_render($value->detail);
+                }
+            }
+        }else{
+            foreach ($data as $key => $value) {
+                $value->detail = lc_language_render($value->detail);
+            }
+        }
         return $data;
     }
 }

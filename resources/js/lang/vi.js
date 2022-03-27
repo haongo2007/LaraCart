@@ -92,9 +92,9 @@ export default {
     productEditSingle: 'Sửa sản phẩm (Đơn)',
     productEditBundle: 'Sửa sản phẩm (Bộ)',
     productEditGroup: 'Sửa sản phẩm (Nhóm)',
-    configShop:'Thiết lập cửa hàng',
-    shop: 'Cửa hàng',
-    shopEdit: 'Thông tin cửa hàng',
+    configStore:'Thiết lập cửa hàng',
+    store: 'Cửa hàng',
+    infomation: 'Thông tin cửa hàng',
   },
   navbar: {
     logOut: 'Đăng xuất',
@@ -203,6 +203,7 @@ export default {
     template: 'Giao diện',
     logo: 'Logo',
     active: 'Kích hoạt',
+    config: 'Cấu hình',
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

@@ -90,9 +90,9 @@ export default {
     productEditSingle: 'Edit Product (Single)',
     productEditBundle: 'Edit Product (Bundle)',
     productEditGroup: 'Edit Product (Group)',
-    configShop:'Shop Configuration',
-    shop: 'Shop',
-    shopEdit: 'Shop Infomation',
+    configStore:'Store Config',
+    store: 'Store',
+    infomation: 'Store Infomation',
   },
   navbar: {
     logOut: 'Log Out',
@@ -206,6 +206,7 @@ export default {
     template: 'Template',
     logo: 'Logo',
     active: 'Active',
+    config: 'Config',
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',
