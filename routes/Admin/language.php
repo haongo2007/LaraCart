@@ -1,4 +1,6 @@
 <?php
+
+    Route::get('/languages/changeLanguage/{lang}', 'LanguageController@changeLanguages');
     Route::get('/languages/getActiveLanguage', 'LanguageController@getActiveLanguages');
 	Route::apiResource('/languages', 'LanguageController');
     // Route::get('create', function () {

@@ -57,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
      * @var array
      */
     protected $routeMiddleware = [
-        'localization'     => \App\Http\Middleware\Front\Localization::class,
+        'localization'     => \App\Http\Middleware\Localization::class,
         'email.verify'     => \App\Http\Middleware\Front\EmailIsVerified::class,
         'currency'         => \App\Http\Middleware\Front\Currency::class,
         'checkdomain'      => \App\Http\Middleware\Front\CheckDomain::class,
@@ -75,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
      */
     protected $middlewareGroups = [
         'admin' => [
+            'localization',
             'admin.permission',
             'admin.log',
             'admin.storeId',

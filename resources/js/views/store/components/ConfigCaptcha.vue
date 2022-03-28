@@ -1,12 +1,9 @@
 <template>
   <div class="block-tables">
-    <el-form ref="dataForm" :model="temp" class="form-container">
-      <el-descriptions class="margin-top" title="Config Admin" :column="1" border>
-        <el-descriptions-item v-for="(item,index) in dataCaptcha.captcha">
-          <template slot="label">
-            <i class="el-icon-tickets" />
-            {{ item.detail }}
-          </template>
+    <el-form ref="dataForm" :model="temp" class="form-config-container">
+      <el-descriptions class="margin-top" title="Config Captcha" :column="1" border>
+        <el-descriptions-item v-for="(item,index) in dataConfig.captcha" :key="index" :label="item.detail">
+          <!-- /// captcha method -->
           <el-popover
             v-if="index == 'captcha_method'"
             v-model="visible[0]"
@@ -30,12 +27,13 @@
             </div>
             <span slot="reference" class="border-edit">{{ item.value ? item.value : 'Empty' }}</span>
           </el-popover>
+          <!-- /// captcha page selected -->
           <el-popover
             v-else-if="index == 'captcha_page'"
             v-model="visible[1]"
             placement="top"
             title="Captcha page"
-            width="200"
+            width="400"
           >
             <el-form-item
               prop="captcha_page"
@@ -44,7 +42,7 @@
               <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">Check all</el-checkbox>
 
               <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-                <el-checkbox v-for="(page,title) in dataCaptcha.captcha_page" :label="page" :key="title">{{page}}</el-checkbox>
+                <el-checkbox v-for="(page,title) in dataConfig.captcha_page" :label="page" :key="title">{{page}}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -53,8 +51,9 @@
                 <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
               </el-button-group>
             </div>
-            <span slot="reference" class="border-edit">{{ item.value ? item.value : 'Empty' }}</span>
+            <span slot="reference" class="border-edit">{{ JSON.parse(item.value).length ? item.value : 'Empty' }}</span>
           </el-popover>
+          <!-- /// active captcha -->
           <el-switch
             v-else-if="index == 'captcha_mode'"
             v-model="value2"
@@ -74,7 +73,7 @@
 export default {
   name: 'ConfigCaptcha',
   props: {
-    dataCaptcha: {
+    dataConfig: {
       type: Object,
       default: false,
     },
@@ -100,8 +99,8 @@ export default {
     },
     handleCheckedCitiesChange(value) {
       let checkedCount = value.length;
-      this.checkAll = checkedCount === this.dataCaptcha.captcha_page.length;
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.dataCaptcha.captcha_page.length;
+      this.checkAll = checkedCount === this.dataConfig.captcha_page.length;
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.dataConfig.captcha_page.length;
     },
     handleConfirm(i, key){
       this.cancelAction = false;
@@ -127,11 +126,5 @@ export default {
     border-bottom: 1px dotted #606266;
       color: #1890ff;
       cursor: pointer;
-  }
-  .form-container{
-    border: 1px solid #eee;
-    width: 50%;
-    padding: 20px;
-    border-radius: 5px;
   }
 </style>

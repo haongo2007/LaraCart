@@ -37,7 +37,6 @@ class StoreController extends Controller
         if (!$store) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
-        
         $store['timezones'] = $this->timezones;
         $store['languages'] = $this->languages;
         $store['currencies'] =$this->currencies;
@@ -151,7 +150,6 @@ class StoreController extends Controller
         $data['storeId']                        = $id;
         $data['urlUpdateConfig']                = lc_route_admin('admin_config.update');
         $data['urlUpdateConfigGlobal']          = lc_route_admin('admin_config_global.update');
-
         return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }
 }

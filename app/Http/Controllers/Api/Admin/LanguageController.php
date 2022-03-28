@@ -6,6 +6,7 @@ use App\Models\Front\ShopLanguage;
 use App\Helper\JsonResponse;
 use Illuminate\Http\Response;
 use App\Http\Resources\LanguageCollection;
+use Session;
 use Validator;
 
 class LanguageController extends Controller
@@ -188,6 +189,25 @@ public function edit($id)
             ShopLanguage::destroy($arrID);
             return response()->json(['error' => 0, 'msg' => '']);
         }
+    }
+
+    public function changeLanguages($lang)
+    {
+        //Set language
+        $languages = ShopLanguage::where('code',$lang)->first();
+        if (!$languages) {
+            return response()->json(new JsonResponse([], 'Languages Do not exist'), Response::HTTP_FORBIDDEN);
+        }
+        if (!Session::has('locale')) {
+            $detectLocale = lc_store('language') ?? config('app.locale');
+        } else {
+            $detectLocale = session('locale');
+        }
+        session(['locale' => $lang]);
+        app()->setLocale($lang);
+        //End language
+        return response()->json(new JsonResponse($languages,'Successfully' ), Response::HTTP_OK);
+
     }
 
 }

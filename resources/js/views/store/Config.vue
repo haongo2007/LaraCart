@@ -9,29 +9,8 @@
     <el-row :gutter="20" style="margin:0px 0px 20px 0px;">
       <el-col :span="24">
         <el-tabs type="card" tab-position="top">
-          <el-tab-pane label="Admin">
-            <config-admin />
-          </el-tab-pane>
-          <el-tab-pane label="Captcha">
-            <components :is="comp_captcha" :data-captcha="captchaConfig"/>
-          </el-tab-pane>
-          <el-tab-pane label="Customer">
-            <config-customer />
-          </el-tab-pane>
-          <el-tab-pane label="Display">
-            <config-display />
-          </el-tab-pane>
-          <el-tab-pane label="Email">
-            <config-email />
-          </el-tab-pane>
-          <el-tab-pane label="Order">
-            <config-order />
-          </el-tab-pane>
-          <el-tab-pane label="Product">
-            <config-product />
-          </el-tab-pane>
-          <el-tab-pane label="Url">
-            <config-url />
+          <el-tab-pane v-for="(item,index) in comp" :label="index" :key="index">
+            <components :is="item.value" :data-config="item.dataConfig"/>
           </el-tab-pane>
         </el-tabs>
       </el-col>
@@ -65,15 +44,77 @@ export default {
   },
   data(){
     return {
-      captchaConfig:{},
-      comp_captcha:'',
+      customerConfig:{},
+      comp:{
+        'Admin': {
+          'value':'',
+          'dataConfig' : {}
+        },
+        Captcha: {
+          'value':'',
+          'dataConfig' : {}
+        },
+        Customer: {
+          'value':'',
+          'dataConfig' : {}
+        },
+        Display: {
+          'value':'',
+          'dataConfig' : {}
+        },
+        Email: {
+          'value':'',
+          'dataConfig' : {}
+        },
+        Order: {
+          'value':'',
+          'dataConfig' : {}
+        },
+        Product: {
+          'value':'',
+          'dataConfig' : {}
+        },
+        Url: {
+          'value':'',
+          'dataConfig' : {}
+        }
+      }
   	};
   },
   created(){
     const id = this.$route.params && this.$route.params.id;
     storeResource.getConfig(id).then(({ data } = response) => {
-      this.captchaConfig = {captcha_page: data.captcha_page,captcha:data.configCaptcha};
-      this.comp_captcha = 'ConfigCaptcha';
+      this.$set(this.comp.Admin,'value', 'ConfigAdmin');
+       
+      this.$set(this.comp.Captcha,'value','ConfigCaptcha');
+      this.$set(this.comp.Captcha,'dataConfig',{captcha_page: data.captcha_page,captcha:data.configCaptcha});
+
+
+      this.$set(this.comp.Customer,'value','ConfigCustomer');
+      this.$set(this.comp.Customer,'dataConfig',{customerConfigs: data.customerConfigs,customerConfigsRequired:data.customerConfigsRequired});
+
+
+      this.$set(this.comp.Display,'value','ConfigDisplay');
+      this.$set(this.comp.Display,'dataConfig',{configDisplay: data.configDisplay});
+
+
+      this.$set(this.comp.Email,'value','ConfigEmail');
+      this.$set(this.comp.Email,'dataConfig',{emailConfig: data.emailConfig});
+
+
+      this.$set(this.comp.Order,'value','ConfigOrder');
+      this.$set(this.comp.Order,'dataConfig',{orderConfig: data.orderConfig});
+
+
+      this.$set(this.comp.Product,'value','ConfigProduct');
+      this.$set(this.comp.Product,'dataConfig',{
+        productConfig: data.productConfig,
+        productConfigAttribute:data.productConfigAttribute,
+        productConfigAttributeRequired:data.productConfigAttributeRequired
+      });
+
+
+      this.$set(this.comp.Url,'value','ConfigUrl');
     }).catch(err => {
       console.log(err);
     });
@@ -86,3 +127,11 @@ export default {
   },
 };
 </script>
+<style type="text/css">
+  .form-config-container{
+    border: 1px solid #eee;
+    width: 50%;
+    padding: 20px;
+    border-radius: 5px;
+  }
+</style>

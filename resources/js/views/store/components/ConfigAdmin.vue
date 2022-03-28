@@ -1,12 +1,8 @@
 <template>
   <div class="block-tables">
-    <el-form ref="dataForm" :model="temp" class="form-container">
+    <el-form ref="dataForm" :model="temp" class="form-config-container">
       <el-descriptions class="margin-top" title="Config Admin" :column="1" border>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-tickets" />
-            Admin name
-          </template>
+        <el-descriptions-item label="Admin name">
           <el-popover
             v-model="visible[0]"
             placement="top"
@@ -30,11 +26,7 @@
             <span slot="reference" class="border-edit">{{ temp.admin_name ? temp.admin_name : 'Empty' }}</span>
           </el-popover>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-tickets" />
-            Admin title
-          </template>
+        <el-descriptions-item label="Admin title">
           <el-popover
             v-model="visible[1]"
             placement="top"
@@ -58,11 +50,7 @@
             <span slot="reference" class="border-edit">{{ temp.admin_title ? temp.admin_title : 'Empty' }}</span>
           </el-popover>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-tickets" />
-            Admin logo
-          </template>
+        <el-descriptions-item label="Admin logo">
           <el-popover
             v-model="visible[2]"
             placement="top"
@@ -122,11 +110,5 @@ export default {
     border-bottom: 1px dotted #606266;
       color: #1890ff;
       cursor: pointer;
-  }
-  .form-container{
-    border: 1px solid #eee;
-    width: 50%;
-    padding: 20px;
-    border-radius: 5px;
   }
 </style>

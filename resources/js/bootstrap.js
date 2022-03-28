@@ -1,4 +1,6 @@
 window._ = require('lodash');
+import Cookies from 'js-cookie';
+
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -9,6 +11,7 @@ window._ = require('lodash');
 window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.headers.common['X-localization'] = Cookies.get('language');
 window.axios.defaults.withCredentials = true;
 
 /**

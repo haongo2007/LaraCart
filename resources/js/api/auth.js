@@ -21,7 +21,6 @@ export function logout() {
     method: 'post',
   });
 }
-
 // export function csrf() {
 //   return request({
 //     url: '/sanctum/csrf-cookie',
