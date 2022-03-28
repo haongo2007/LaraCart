@@ -19,7 +19,9 @@ class Localization
     {
         //Set language
         $currentLocale = $request->header('x-localization');
-        app()->setLocale($currentLocale);
+        if ($currentLocale) {
+            app()->setLocale($currentLocale);   
+        }
         //End language
         return $next($request);
     }

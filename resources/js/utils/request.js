@@ -1,6 +1,7 @@
 import '@/bootstrap';
 import { Message } from 'element-ui';
 import { isLogged, setLogged } from '@/utils/auth';
+import Cookies from 'js-cookie';
 
 // Create axios instance
 const service = window.axios.create({
@@ -14,6 +15,9 @@ service.interceptors.request.use(
     const token = isLogged();
     if (token) {
       config.headers['Authorization'] = 'Bearer ' + isLogged(); // Set JWT token
+    }
+    if (Cookies.get('language')) {
+      config.headers['x-localization'] = Cookies.get('language'); // Set Language
     }
     return config;
   },

@@ -57,7 +57,11 @@ class StoreController extends Controller
             'storeId' => $id,
             'keyBy' => 'key',
         ];
-        $customerConfigsRequired = Config::getListConfigByCode($dataCustomerConfigRequired);
+        $customerConfigsRequired = Config::getListConfigByCode($dataCustomerConfigRequired)->toArray();
+
+        foreach ($customerConfigs as $key => $value) {
+            $value->required = ['value' => $customerConfigsRequired[$key.'_required']['value'],'id' => $customerConfigsRequired[$key.'_required']['id']];
+        }
         //End customer
 
         //Product config
@@ -134,7 +138,6 @@ class StoreController extends Controller
         ];
         //End email
         $data['customerConfigs']                = $customerConfigs;
-        $data['customerConfigsRequired']        = $customerConfigsRequired;
         $data['productConfig']                  = $productConfig;
         $data['productConfigAttribute']         = $productConfigAttribute;
         $data['productConfigAttributeRequired'] = $productConfigAttributeRequired;

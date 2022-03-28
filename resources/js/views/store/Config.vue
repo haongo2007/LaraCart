@@ -91,7 +91,7 @@ export default {
 
 
       this.$set(this.comp.Customer,'value','ConfigCustomer');
-      this.$set(this.comp.Customer,'dataConfig',{customerConfigs: data.customerConfigs,customerConfigsRequired:data.customerConfigsRequired});
+      this.$set(this.comp.Customer,'dataConfig',data.customerConfigs);
 
 
       this.$set(this.comp.Display,'value','ConfigDisplay');

@@ -31,6 +31,13 @@ export default {
     handleSetLanguage(lang) {
       this.$i18n.locale = lang;
       this.$store.dispatch('app/setLanguage', lang);
+
+      this.$store.dispatch('tagsView/delAllCachedViews');
+      const fullPath = this.$router.currentRoute.fullPath;
+      this.$router.replace({
+        path: '/redirect' + fullPath,
+      });
+
       this.$message({
         message: 'Switch Language Success',
         type: 'success',
