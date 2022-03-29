@@ -1,71 +1,69 @@
 <template>
-  <div class="block-tables">
-    <el-form ref="dataForm" :model="temp" class="form-config-container">
-      <el-descriptions class="margin-top" title="Config Captcha" :column="1" border>
-        <el-descriptions-item v-for="(item,index) in dataConfig.captcha" :key="index" :label="item.detail">
-          <!-- /// captcha method -->
-          <el-popover
-            v-if="index == 'captcha_method'"
-            v-model="visible[0]"
-            placement="top"
-            title="Admin name"
-            width="200"
+  <el-form ref="dataForm" :model="temp" class="form-config-container">
+    <el-descriptions class="margin-top" title="Config Captcha" :column="1" border>
+      <el-descriptions-item v-for="(item,index) in dataConfig.captcha" :key="index" :label="item.detail">
+        <!-- /// captcha method -->
+        <el-popover
+          v-if="index == 'captcha_method'"
+          v-model="visible[0]"
+          placement="top"
+          title="Admin name"
+          width="200"
+        >
+          <el-form-item
+            prop="admin_name"
+            :rules="[
+              { required: true, message: 'Admin name is required'},
+            ]"
           >
-            <el-form-item
-              prop="admin_name"
-              :rules="[
-                { required: true, message: 'Admin name is required'},
-              ]"
-            >
-              <el-input v-model="temp.admin_name" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_name')" />
-            </el-form-item>
-            <div style="text-align: right; margin: 12px 0px 0px 0px">
-              <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
-              </el-button-group>
-            </div>
-            <span slot="reference" class="border-edit">{{ item.value ? item.value : 'Empty' }}</span>
-          </el-popover>
-          <!-- /// captcha page selected -->
-          <el-popover
-            v-else-if="index == 'captcha_page'"
-            v-model="visible[1]"
-            placement="top"
-            title="Captcha page"
-            width="400"
+            <el-input v-model="temp.admin_name" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_name')" />
+          </el-form-item>
+          <div style="text-align: right; margin: 12px 0px 0px 0px">
+            <el-button-group>
+              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
+              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
+            </el-button-group>
+          </div>
+          <span slot="reference" class="border-edit">{{ item.value ? item.value : 'Empty' }}</span>
+        </el-popover>
+        <!-- /// captcha page selected -->
+        <el-popover
+          v-else-if="index == 'captcha_page'"
+          v-model="visible[1]"
+          placement="top"
+          title="Captcha page"
+          width="400"
+        >
+          <el-form-item
+            prop="captcha_page"
+            :rules="[]"
           >
-            <el-form-item
-              prop="captcha_page"
-              :rules="[]"
-            >
-              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">Check all</el-checkbox>
+            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">Check all</el-checkbox>
 
-              <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-                <el-checkbox v-for="(page,title) in dataConfig.captcha_page" :label="page" :key="title">{{page}}</el-checkbox>
-              </el-checkbox-group>
-            </el-form-item>
-            <div style="text-align: right; margin: 12px 0px 0px 0px">
-              <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
-              </el-button-group>
-            </div>
-            <span slot="reference" class="border-edit">{{ JSON.parse(item.value).length ? item.value : 'Empty' }}</span>
-          </el-popover>
-          <!-- /// active captcha -->
-          <el-switch
-            v-else-if="index == 'captcha_mode'"
-            v-model="value2"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            active-value="1"
-            inactive-value="0">
-          </el-switch>
-        </el-descriptions-item>
-      </el-descriptions>
-    </el-form>
-  </div>
+            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+              <el-checkbox v-for="(page,title) in dataConfig.captcha_page" :label="page" :key="title">{{page}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <div style="text-align: right; margin: 12px 0px 0px 0px">
+            <el-button-group>
+              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
+              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
+            </el-button-group>
+          </div>
+          <span slot="reference" class="border-edit">{{ JSON.parse(item.value).length ? item.value : 'Empty' }}</span>
+        </el-popover>
+        <!-- /// active captcha -->
+        <el-switch
+          v-else-if="index == 'captcha_mode'"
+          v-model="value2"
+          active-color="#13ce66"
+          inactive-color="#ff4949"
+          active-value="1"
+          inactive-value="0">
+        </el-switch>
+      </el-descriptions-item>
+    </el-descriptions>
+  </el-form>
 </template>
 
 <script>

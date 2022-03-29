@@ -110,7 +110,7 @@ export default {
       this.$set(this.comp.Product,'dataConfig',{
         productConfig: data.productConfig,
         productConfigAttribute:data.productConfigAttribute,
-        productConfigAttributeRequired:data.productConfigAttributeRequired
+        taxs:data.taxs
       });
 
 

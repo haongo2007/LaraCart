@@ -89,6 +89,13 @@ class StoreController extends Controller
         ];
         $productConfigAttributeRequired = Config::getListConfigByCode($productConfigAttributeRequiredQuery);
 
+        foreach ($productConfigAttribute as $key => $value) {
+            if ($productConfigAttributeRequired->has($key.'_required')) {
+            $value->required = ['value' => $productConfigAttributeRequired[$key.'_required']['value'],'id' => $productConfigAttributeRequired[$key.'_required']['id']];
+            }
+        }
+        //End Product config
+
         $orderConfigQuery = [
             'code' => 'order_config',
             'storeId' => $id,
@@ -140,7 +147,6 @@ class StoreController extends Controller
         $data['customerConfigs']                = $customerConfigs;
         $data['productConfig']                  = $productConfig;
         $data['productConfigAttribute']         = $productConfigAttribute;
-        $data['productConfigAttributeRequired'] = $productConfigAttributeRequired;
         $data['pluginCaptchaInstalled']         = lc_get_plugin_captcha_installed();
         $data['taxs']                           = $taxs;
         $data['configDisplay']                  = $configDisplay;

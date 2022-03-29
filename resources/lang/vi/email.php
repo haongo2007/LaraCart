@@ -12,6 +12,8 @@ return [
     'smtp_load_config' => 'Tải thông tin cấu hình',
     'smtp_load_config_file' => 'Sử dụng file cấu hình',
     'smtp_load_config_database' => 'Sử dụng database',
+    'smtp_name'        => 'Tên gửi mail',
+    'smtp_from'        => 'Địa chỉ email gửi',
     'admin'            => [
         'title'          => 'Cấu hình email',
         'create_success' => 'Tạo mới thành công!',
@@ -43,6 +45,8 @@ return [
     ],
 
     'email_action'     => [
+        'customer_verify' =>'Send account verification email',
+        'order_success_to_cutomer_pdf' => 'Gửi đơn hàng thành công cho khách kèm PDF',
         'manager'                  => 'Quản lý action',
         'type'                     => 'Loại gửi mail',
         'mode'                     => 'Chế độ',

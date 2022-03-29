@@ -24,6 +24,7 @@ import excelRoutes from './modules/excel';
 import permissionRoutes from './modules/permission';
 import storeManagerRoutes from './modules/store-manager';
 import configStoreRoutes from './modules/store';
+import systemRoutes from './modules/system';
 
 /**
  * Sub-menu only appear when children.length>=1
@@ -100,6 +101,7 @@ export const asyncRoutes = [
   },
   storeManagerRoutes,
   configStoreRoutes,
+  systemRoutes,
   {
     path: '/profile',
     component: Layout,

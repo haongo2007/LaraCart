@@ -12,6 +12,8 @@ return [
     'smtp_load_config' => 'SMTP load config',
     'smtp_load_config_file' => 'Load file config',
     'smtp_load_config_database' => 'Load from database',
+    'smtp_name'        => 'Email name',
+    'smtp_from'        => 'Send email from',
     'admin'            => [
         'title'          => 'Config Email',
         'create_success' => 'Create new item success!',
@@ -44,6 +46,8 @@ return [
 
     ],
     'email_action'     => [
+        'customer_verify' => 'Gửi email xác thực tài khoản',
+        'order_success_to_cutomer_pdf' => 'Successfully sent orders to customers with PDF',
         'manager'                  => 'Email action manager',
         'type'                     => 'Action type',
         'mode'                     => 'Action mode',

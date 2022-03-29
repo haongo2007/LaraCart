@@ -1,82 +1,80 @@
 <template>
-  <div class="block-tables">
-    <el-form ref="dataForm" :model="temp" class="form-config-container">
-      <el-descriptions class="margin-top" title="Config Admin" :column="1" border>
-        <el-descriptions-item label="Admin name">
-          <el-popover
-            v-model="visible[0]"
-            placement="top"
-            title="Admin name"
-            width="200"
+  <el-form ref="dataForm" :model="temp" class="form-config-container">
+    <el-descriptions class="margin-top" title="Config Admin" :column="1" border>
+      <el-descriptions-item label="Admin name">
+        <el-popover
+          v-model="visible[0]"
+          placement="top"
+          title="Admin name"
+          width="200"
+        >
+          <el-form-item
+            prop="admin_name"
+            :rules="[
+              { required: true, message: 'Admin name is required'},
+            ]"
           >
-            <el-form-item
-              prop="admin_name"
-              :rules="[
-                { required: true, message: 'Admin name is required'},
-              ]"
-            >
-              <el-input v-model="temp.admin_name" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_name')" />
-            </el-form-item>
-            <div style="text-align: right; margin: 12px 0px 0px 0px">
-              <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
-              </el-button-group>
-            </div>
-            <span slot="reference" class="border-edit">{{ temp.admin_name ? temp.admin_name : 'Empty' }}</span>
-          </el-popover>
-        </el-descriptions-item>
-        <el-descriptions-item label="Admin title">
-          <el-popover
-            v-model="visible[1]"
-            placement="top"
-            title="Admin title"
-            width="200"
+            <el-input v-model="temp.admin_name" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_name')" />
+          </el-form-item>
+          <div style="text-align: right; margin: 12px 0px 0px 0px">
+            <el-button-group>
+              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
+              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
+            </el-button-group>
+          </div>
+          <span slot="reference" class="border-edit">{{ temp.admin_name ? temp.admin_name : 'Empty' }}</span>
+        </el-popover>
+      </el-descriptions-item>
+      <el-descriptions-item label="Admin title">
+        <el-popover
+          v-model="visible[1]"
+          placement="top"
+          title="Admin title"
+          width="200"
+        >
+          <el-form-item
+            prop="admin_title"
+            :rules="[
+              { required: true, message: 'Admin title is required'},
+            ]"
           >
-            <el-form-item
-              prop="admin_title"
-              :rules="[
-                { required: true, message: 'Admin title is required'},
-              ]"
-            >
-              <el-input v-model="temp.admin_title" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_title')" />
-            </el-form-item>
-            <div style="text-align: right; margin: 12px 0px 0px 0px">
-              <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_title')">Confirm</el-button>
-              </el-button-group>
-            </div>
-            <span slot="reference" class="border-edit">{{ temp.admin_title ? temp.admin_title : 'Empty' }}</span>
-          </el-popover>
-        </el-descriptions-item>
-        <el-descriptions-item label="Admin logo">
-          <el-popover
-            v-model="visible[2]"
-            placement="top"
-            title="Admin logo"
-            width="200"
+            <el-input v-model="temp.admin_title" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_title')" />
+          </el-form-item>
+          <div style="text-align: right; margin: 12px 0px 0px 0px">
+            <el-button-group>
+              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
+              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_title')">Confirm</el-button>
+            </el-button-group>
+          </div>
+          <span slot="reference" class="border-edit">{{ temp.admin_title ? temp.admin_title : 'Empty' }}</span>
+        </el-popover>
+      </el-descriptions-item>
+      <el-descriptions-item label="Admin logo">
+        <el-popover
+          v-model="visible[2]"
+          placement="top"
+          title="Admin logo"
+          width="200"
+        >
+          <el-form-item
+            prop="admin_logo"
+            :rules="[
+              { required: true, message: 'Admin logo is required'},
+            ]"
           >
-            <el-form-item
-              prop="admin_logo"
-              :rules="[
-                { required: true, message: 'Admin logo is required'},
-              ]"
-            >
-              <el-input v-model="temp.admin_logo" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_logo')" />
-            </el-form-item>
-            <div style="text-align: right; margin: 12px 0px 0px 0px">
-              <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_logo')">Confirm</el-button>
-              </el-button-group>
-            </div>
-            <span slot="reference" class="border-edit">{{ temp.admin_logo ? temp.admin_logo : 'Empty' }}</span>
-          </el-popover>
-        </el-descriptions-item>
-      </el-descriptions>
-    </el-form>
-  </div>
+            <el-input v-model="temp.admin_logo" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_logo')" />
+          </el-form-item>
+          <div style="text-align: right; margin: 12px 0px 0px 0px">
+            <el-button-group>
+              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
+              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_logo')">Confirm</el-button>
+            </el-button-group>
+          </div>
+          <span slot="reference" class="border-edit">{{ temp.admin_logo ? temp.admin_logo : 'Empty' }}</span>
+        </el-popover>
+      </el-descriptions-item>
+    </el-descriptions>
+  </el-form>
 </template>
 
 <script>
