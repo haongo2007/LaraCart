@@ -3,7 +3,7 @@ import Layout from '@/layout';
 const configStoreRoutes = {
   path: '/store',
   component: Layout,
-  redirect: 'noredirect',
+  redirect: '/store/list',
   name: 'configStore',
   alwaysShow: true,
   meta: {

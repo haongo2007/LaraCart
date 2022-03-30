@@ -23,8 +23,9 @@ import errorRoutes from './modules/error';
 import excelRoutes from './modules/excel';
 import permissionRoutes from './modules/permission';
 import storeManagerRoutes from './modules/store-manager';
-import configStoreRoutes from './modules/store';
+import configStoreRoutes from './modules/store-config';
 import systemRoutes from './modules/system';
+import dashboardRoutes from './modules/dashboard';
 
 /**
  * Sub-menu only appear when children.length>=1
@@ -86,19 +87,7 @@ export const constantRoutes = [
 
 // routes has children routes
 export const asyncRoutes = [
-  {
-    path: '',
-    component: Layout,
-    redirect: 'dashboard',
-    children: [
-      {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', parent: 'root' },
-      },
-    ],
-  },
+  dashboardRoutes,
   storeManagerRoutes,
   configStoreRoutes,
   systemRoutes,
