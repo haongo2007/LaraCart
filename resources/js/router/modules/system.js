@@ -11,14 +11,20 @@ const systemRoutes = {
     roles: ['Manager'],
   },
   children: [
-    
     {
-        path: 'setting/order-status',
+      path: 'setting',
       component: Layout,
-        component: () => import('@/views/category/List'),
-        name: 'CategoryList',
-        meta: { title: 'dragTable' },
-      },
+      component: () => import('@/views/category/List'),
+      name: 'Setting',
+      meta: { title: 'Setting',parent:'root', level:'1'},
+    },
+    {
+      path: 'order-status',
+      component: Layout,
+      component: () => import('@/views/orders/List'),
+      name: 'OrderStatus',
+      meta: { title: 'OrderStatus',parent:'root', level:'1-1' },
+    },
   ],
 };
 export default systemRoutes;
