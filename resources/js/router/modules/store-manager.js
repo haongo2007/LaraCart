@@ -9,7 +9,6 @@ const storeManagerRoutes = {
   meta: {
     title: 'storeManager',
     icon: 'theme',
-    roles: ['Manager'],
   },
   children: [
     {
@@ -19,8 +18,7 @@ const storeManagerRoutes = {
       meta: {
         title: 'Orders',
         icon: 'form',
-        permissions: ['Orders manager'],
-        roles: ['Manager'],
+        permissions: ['Order manager'],
         parent: 'root',
       },
     },
@@ -30,7 +28,7 @@ const storeManagerRoutes = {
       name: 'OrderCreate',
       meta: {
         title: 'orderCreate',
-        permissions: ['Orders manager'],
+        permissions: ['Order manager'],
         parent: 'OrdersList',
       },
       hidden: true,
@@ -41,7 +39,7 @@ const storeManagerRoutes = {
       name: 'OrderEdit',
       meta: {
         title: 'orderEdit',
-        permissions: ['Orders manager'],
+        permissions: ['Order manager'],
         parent: 'OrdersList',
       },
       hidden: true,
@@ -55,7 +53,6 @@ const storeManagerRoutes = {
         title: 'Product',
         icon: 'shopping',
         permissions: ['Product manager'],
-        roles: ['Manager'],
         parent: 'root',
       },
     },
@@ -134,7 +131,6 @@ const storeManagerRoutes = {
         title: 'Category',
         icon: 'list',
         permissions: ['Category manager'],
-        roles: ['Manager'],
         parent: 'root',
       },
     },

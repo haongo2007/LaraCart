@@ -1,4 +1,4 @@
-import { asyncRoutes, constantRoutes } from '@/router';
+import { asyncRoutes, constantRoutes,menuSidebar } from '@/router';
 
 /**
  * Check if it matches the current user right by meta.role
@@ -57,6 +57,7 @@ function filterAsyncRoutes(routes, roles, permissions) {
 const state = {
   routes: [],
   addRoutes: [],
+  menus:[],
 };
 
 const mutations = {
@@ -64,18 +65,24 @@ const mutations = {
     state.addRoutes = routes;
     state.routes = constantRoutes.concat(routes);
   },
+  SET_MENUS: (state, menus) => {
+    state.menus = menus;
+  },
 };
 
 const actions = {
   generateRoutes({ commit }, { roles, permissions }) {
     return new Promise(resolve => {
       let accessedRoutes;
+      let accessedMenus = menuSidebar;
       if (roles.includes('Administrator')) {
         accessedRoutes = asyncRoutes || [];
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles, permissions);
+        accessedMenus = filterAsyncRoutes(menuSidebar, roles, permissions);
       }
 
+      commit('SET_MENUS', accessedMenus);
       commit('SET_ROUTES', accessedRoutes);
       resolve(accessedRoutes);
     });

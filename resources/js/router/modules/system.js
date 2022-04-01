@@ -25,6 +25,13 @@ const systemRoutes = {
       name: 'OrderStatus',
       meta: { title: 'OrderStatus',parent:'root', level:'1-1' },
     },
+    {
+      path: 'shipping-status',
+      component: Layout,
+      component: () => import('@/views/orders/List'),
+      name: 'ShippingStatus',
+      meta: { title: 'ShippingStatus',parent:'root', level:'1-2' },
+    },
   ],
 };
 export default systemRoutes;

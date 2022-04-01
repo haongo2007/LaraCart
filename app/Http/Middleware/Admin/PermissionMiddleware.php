@@ -56,14 +56,13 @@ class PermissionMiddleware
             } else {
                 if (!request()->ajax()) {
                     if (collect($this->viewWithoutToMessage())->contains($request->path())) {
-                        return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
+                        return Permission::error();
                     }
-                    return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
+                        return Permission::error();
                 } else {
                     if (collect($this->viewWithoutToMessage())->contains($request->path())) {
-                        return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
+                        return Permission::error();
                     }
-                    return Permission::error();
                 }
             }
         }
