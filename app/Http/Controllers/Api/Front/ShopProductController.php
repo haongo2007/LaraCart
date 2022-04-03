@@ -36,7 +36,7 @@ class ShopProductController extends Controller
      * All products
      * @return [view]
      */
-    private function _allProducts()
+    private function index()
     {
         $sortBy = 'sort';
         $sortOrder = 'asc';
@@ -145,18 +145,19 @@ class ShopProductController extends Controller
      * @param [type] ...$params
      * @return void
      */
-    public function show($params) 
+    public function show($req) 
     {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            $alias = $params[1] ?? '';
-            $storeId = $params[2] ?? '';
-            bc_lang_switch($lang);
-        } else {
-            $alias = $params[0] ?? '';
-            $storeId = $params[1] ?? '';
-        }
-        return $this->_productDetail($alias,'alias', $storeId);
+        // if (config('app.seoLang')) {
+        //     $lang = $req[0] ?? '';
+        //     $alias = $req[1] ?? '';
+        //     $storeId = $req[2] ?? '';
+        //     bc_lang_switch($lang);
+        // } else {
+        //     $alias = $req[0] ?? '';
+        //     $storeId = $req[1] ?? '';
+        // }
+        $alias = $req;
+        return $this->_productDetail($alias,'alias',1);
     }
 
     /**
@@ -172,7 +173,7 @@ class ShopProductController extends Controller
     private function _productDetail($alias,$type, $storeId,$view = '.Product.detail')
     {
         $product = (new ShopProduct)->getDetail($alias, $type, $storeId);
-        if ($product && $product->status && (!bc_config('product_stock', $storeId) || bc_config('product_display_out_of_stock', $storeId) || $product->stock > 0)) {
+        if ($product && $product->status && (!lc_config('product_stock', $storeId) || lc_config('product_display_out_of_stock', $storeId) || $product->stock > 0)) {
             //Update last view
             $product->view += 1;
             $product->date_lastview = date('Y-m-d H:i:s');
@@ -194,7 +195,6 @@ class ShopProductController extends Controller
             //     ->setLimit(bc_config('product_relation', $storeId))
             //     ->setRandom()
             //     ->getData();
-            dd($product);
             return response()->json(new JsonResponse($product), Response::HTTP_OK);
             // bc_check_view($this->templatePath . $view);
             // return view($this->templatePath . $view,

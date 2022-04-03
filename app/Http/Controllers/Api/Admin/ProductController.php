@@ -307,7 +307,7 @@ public function createProductGroup()
         $productBuild    = $data['hotSpots'] ?? [];
         /* UPLOAD IMAGE */
         if($request->hasFile('image')){
-            $path = 'public/product/';
+            $path = 'product/';
             $fileName = $request->file('image')->hashName();
             $request->file('image')->storeAs(
                 $path,$fileName

@@ -1,4 +1,5 @@
-import { asyncRoutes, constantRoutes,menuSidebar } from '@/router';
+import { asyncRoutes, constantRoutes } from '@/router';
+import { menuSidebar } from '@/router/modules/menu-sidebar';
 
 /**
  * Check if it matches the current user right by meta.role
