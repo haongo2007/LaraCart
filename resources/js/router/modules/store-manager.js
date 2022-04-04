@@ -13,7 +13,7 @@ const storeManagerRoutes = {
   children: [
     {
       path: 'orders',
-      component: () => import('@/views/orders/List'),
+      component: () => import('@/views/store-manager/orders/List'),
       name: 'OrdersList',
       meta: {
         title: 'Orders',
@@ -24,7 +24,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'orders/create',
-      component: () => import('@/views/orders/Create'),
+      component: () => import('@/views/store-manager/orders/Create'),
       name: 'OrderCreate',
       meta: {
         title: 'orderCreate',
@@ -35,7 +35,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'orders/edit/:id(\\d+)',
-      component: () => import('@/views/orders/Edit'),
+      component: () => import('@/views/store-manager/orders/Edit'),
       name: 'OrderEdit',
       meta: {
         title: 'orderEdit',
@@ -47,7 +47,7 @@ const storeManagerRoutes = {
     // //////////////end orders
     {
       path: 'product',
-      component: () => import('@/views/product/List'),
+      component: () => import('@/views/store-manager/product/List'),
       name: 'ProductList',
       meta: {
         title: 'Product',
@@ -58,7 +58,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'product/createsingle',
-      component: () => import('@/views/product/CreateSingle'),
+      component: () => import('@/views/store-manager/product/CreateSingle'),
       name: 'ProductCreateSingle',
       meta: {
         title: 'productCreateSingle',
@@ -69,7 +69,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'product/createGroup',
-      component: () => import('@/views/product/CreateGroup'),
+      component: () => import('@/views/store-manager/product/CreateGroup'),
       name: 'ProductCreateGroup',
       meta: {
         title: 'productCreateGroup',
@@ -80,7 +80,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'product/createBundle',
-      component: () => import('@/views/product/CreateBundle'),
+      component: () => import('@/views/store-manager/product/CreateBundle'),
       name: 'ProductCreateBundle',
       meta: {
         title: 'productCreateBundle',
@@ -91,7 +91,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'product/editSingle/:id(\\d+)',
-      component: () => import('@/views/product/EditSingle'),
+      component: () => import('@/views/store-manager/product/EditSingle'),
       name: 'ProductEditSingle',
       meta: {
         title: 'productEditSingle',
@@ -102,7 +102,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'product/editGroup/:id(\\d+)',
-      component: () => import('@/views/product/EditGroup'),
+      component: () => import('@/views/store-manager/product/EditGroup'),
       name: 'ProductEditGroup',
       meta: {
         title: 'productEditGroup',
@@ -113,7 +113,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'product/editBundle/:id(\\d+)',
-      component: () => import('@/views/product/EditBundle'),
+      component: () => import('@/views/store-manager/product/EditBundle'),
       name: 'ProductEditBundle',
       meta: {
         title: 'productEditBundle',
@@ -125,7 +125,7 @@ const storeManagerRoutes = {
     // //////////////end product
     {
       path: 'category',
-      component: () => import('@/views/category/List'),
+      component: () => import('@/views/store-manager/category/List'),
       name: 'CategoryList',
       meta: {
         title: 'Category',
@@ -136,7 +136,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'category/create',
-      component: () => import('@/views/category/Create'),
+      component: () => import('@/views/store-manager/category/Create'),
       name: 'CategoryCreate',
       meta: {
         title: 'categoryCreate',
@@ -147,7 +147,7 @@ const storeManagerRoutes = {
     },
     {
       path: 'category/edit/:id(\\d+)',
-      component: () => import('@/views/category/Edit'),
+      component: () => import('@/views/store-manager/category/Edit'),
       name: 'CategoryEdit',
       meta: {
         title: 'categoryEdit',

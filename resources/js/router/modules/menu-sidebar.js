@@ -21,12 +21,6 @@ export const menuSidebar = [
       {
         path: 'orders',
         name: 'OrdersList',
-        meta: {
-          title: 'Orders',
-          icon: 'form',
-          permissions: ['Order manager'],
-          parent: 'root',
-        },
       },
       // //////////////end orders
       {
@@ -58,81 +52,81 @@ export const menuSidebar = [
     alwaysShow: true,
     meta: {
       title: 'content',
-      icon: 'el-icon-s-management',
+      icon: 'content',
     },
     children: [
       {
-        path: '/list',
-        meta: { title: 'banner'},
+        path: '/banner',
+        meta: { title: 'banner',icon: 'el-icon-collection-tag'},
       },
       {
         path: '/page',
-        meta: { title: 'page'},
+        meta: { title: 'page',icon:'el-icon-tickets'},
       },
       {
         path: '/blog-news',
-        meta: { title: 'blogNews'},
+        meta: { title: 'blogNews',icon:'el-icon-document-copy'},
       }
     ],
   },
   {
-    path: '/maketing',
+    path: '/marketing',
     alwaysShow: true,
     meta: {
-      title: 'maketing',
-      icon: 'el-icon-key',
+      title: 'marketing',
+      icon: 'marketing',
     },
     children: [
       {
         path: '/email-template',
-        meta: { title: 'emailTemplate'},
+        meta: { title: 'emailTemplate',icon:'email-template'},
       },
       {
         path: '/coupon-discount',
-        meta: { title: 'couponDiscount'},
+        meta: { title: 'couponDiscount',icon:'el-icon-discount'},
       },
       {
         path: '/product-flashsale',
-        meta: { title: 'productFlashsale'},
+        meta: { title: 'productFlashsale',icon:'flash-sale'},
       },
       {
         path: '/customer-manager',
         alwaysShow: true,
-        meta: { title: 'customerManager'},
+        meta: { title: 'customerManager',icon:'customer-manager'},
         children:[
           {
             path: '/customer-manager/list',
             name: 'List',
-            meta: { title: 'customerManager',parent:'root',},
+            meta: { title: 'customerManager',parent:'root',icon:'customer-manager'},
           },
           {
             path: '/customer-manager/subcribe',
             name: 'Subcribe',
-            meta: { title: 'subcribe',parent:'root',},
+            meta: { title: 'subcribe',parent:'root',icon:'subcribe'},
           },
         ]
       },
       {
         path: '/seo-manager',
         alwaysShow: true,
-        meta: { title: 'seoManager'},
+        meta: { title: 'seoManager',icon:'seo'},
         children:[
           {
             path: '/seo-manager/config',
             name: 'Config',
-            meta: { title: 'config',parent:'root',},
+            meta: { title: 'config',parent:'root',icon:'admin'},
           },
         ]
       },
       {
         path: '/report-analytics',
         alwaysShow: true,
-        meta: { title: 'reportAnalytics'},
+        meta: { title: 'reportAnalytics',icon:'el-icon-data-analysis'},
         children:[
           {
             path: '/report-analytics/product-report',
             name: 'ProductRepost',
-            meta: { title: 'productReport',parent:'root',},
+            meta: { title: 'productReport',parent:'root',icon:'el-icon-pie-chart'},
           },
         ]
       },
@@ -162,146 +156,146 @@ export const menuSidebar = [
     alwaysShow: true,
     meta: {
       title: 'system',
-      icon: 'el-icon-s-tools',
+      icon: 'system',
     },
     children: [
       {
         path: '/users-permissions',
         alwaysShow: true,
-        meta: { title: 'usersPermissions'},
+        meta: { title: 'usersPermissions',icon:'peoples'},
         children:[
           {
-            path: '/users-permissions/user',
+            path: '/users-permissions/users',
             name: 'Users',
-            meta: { title: 'users',parent:'root',},
+            meta: { title: 'users',parent:'root',icon:'user'},
           },
           {
             path: '/users-permissions/roles',
             name: 'Roles',
-            meta: { title: 'roles',parent:'root',},
+            meta: { title: 'roles',parent:'root',icon:'role'},
           },
           {
             path: '/users-permissions/permissions',
             name: 'Permissions',
-            meta: { title: 'permissions',parent:'root',},
+            meta: { title: 'permissions',parent:'root',icon:'permissions'},
           },
         ]
       },
       {
         path: '/setting',
         alwaysShow: true,
-        meta: { title: 'setting'},
+        meta: { title: 'setting',icon:'settings'},
         children:[
           {
-            path: '/system-config/order-status',
+            path: '/setting/order-status',
             name: 'OrderStatus',
-            meta: { title: 'orderStatus',parent:'root',},
+            meta: { title: 'orderStatus',parent:'root',icon:'el-icon-s-order'},
           },
           {
-            path: '/system-config/shipping-status',
+            path: '/setting/shipping-status',
             name: 'ShippingStatus',
-            meta: { title: 'shippingStatus',parent:'root',},
+            meta: { title: 'shippingStatus',parent:'root',icon:'el-icon-truck'},
           },
           {
-            path: '/system-config/payment-status',
+            path: '/setting/payment-status',
             name: 'PaymentStatus',
-            meta: { title: 'paymentStatus',parent:'root',},
+            meta: { title: 'paymentStatus',parent:'root',icon:'el-icon-money'},
           },
           {
-            path: '/system-config/suppliers',
+            path: '/setting/suppliers',
             name: 'Suppliers',
-            meta: { title: 'suppliers',parent:'root',},
+            meta: { title: 'suppliers',parent:'root',icon:'el-icon-s-shop'},
           },
           {
-            path: '/system-config/brand',
+            path: '/setting/brand',
             name: 'Brand',
-            meta: { title: 'brand',parent:'root',},
+            meta: { title: 'brand',parent:'root',icon:'el-icon-medal'},
           },
           {
-            path: '/system-config/custom-field',
+            path: '/setting/custom-field',
             name: 'CustomField',
-            meta: { title: 'customField',parent:'root',},
+            meta: { title: 'customField',parent:'root',icon:'el-icon-postcard'},
           },
           {
-            path: '/system-config/weight-unit',
+            path: '/setting/weight-unit',
             name: 'WeightUnit',
-            meta: { title: 'weightUnit',parent:'root',},
+            meta: { title: 'weightUnit',parent:'root',icon:'el-icon-sold-out'},
           },
           {
-            path: '/system-config/length-unit',
+            path: '/setting/length-unit',
             name: 'LengthUnit',
-            meta: { title: 'lengthUnit',parent:'root',},
+            meta: { title: 'lengthUnit',parent:'root',icon:'el-icon-sell'},
           },
           {
-            path: '/system-config/attribute-group',
+            path: '/setting/attribute-group',
             name: 'AttributeGroup',
-            meta: { title: 'attributeGroup',parent:'root',},
+            meta: { title: 'attributeGroup',parent:'root',icon:'el-icon-news'},
           },
           {
-            path: '/system-config/tax-manager',
+            path: '/setting/tax-manager',
             name: 'TaxManager',
-            meta: { title: 'taxManager',parent:'root',},
+            meta: { title: 'taxManager',parent:'root',icon:'el-icon-s-check'},
           },
         ]
       },
       {
         path: '/admin-global',
         alwaysShow: true,
-        meta: { title: 'adminGlobal'},
+        meta: { title: 'adminGlobal',icon:'el-icon-s-claim'},
         children:[
           {
             path: '/admin-global/menu',
             name: 'Menu',
-            meta: { title: 'menu',parent:'root',},
+            meta: { title: 'menu',parent:'root',icon:'el-icon-menu'},
           },
           {
             path: '/admin-global/env-config',
             name: 'EnviromentConfig',
-            meta: { title: 'enviromentConfig',parent:'root',},
+            meta: { title: 'enviromentConfig',parent:'root',icon:'el-icon-s-tools'},
           },
           {
             path: '/admin-global/backup-db',
             name: 'BackupDatabase',
-            meta: { title: 'backupDatabase',parent:'root',},
+            meta: { title: 'backupDatabase',parent:'root',icon:'el-icon-refresh'},
           },
           {
             path: '/admin-global/cache-manager',
             name: 'CacheManager',
-            meta: { title: 'cacheManager',parent:'root',},
+            meta: { title: 'cacheManager',parent:'root',icon:'el-icon-refresh-left'},
           },
         ]
       },
       {
-        path: '/error-log',
+        path: '/errors-logs',
         alwaysShow: true,
-        meta: { title: 'errorLog'},
+        meta: { title: 'errorsLogs',icon:'404'},
         children:[
           {
-            path: '/error-log/operationLog',
-            name: 'OperationLog',
-            meta: { title: 'operationLog',parent:'root',},
+            path: '/errors-logs/operationLogs',
+            name: 'OperationLogs',
+            meta: { title: 'operationLogs',parent:'root',icon:'el-icon-document'},
           },
           {
-            path: '/error-log/webhook',
+            path: '/errors-logs/webhook',
             name: 'Webhook',
-            meta: { title: 'webHook',parent:'root',},
+            meta: { title: 'webHook',parent:'root',icon:'el-icon-connection'},
           },
         ]
       },
       {
         path: '/localization',
         alwaysShow: true,
-        meta: { title: 'localization'},
+        meta: { title: 'localization',icon:'language'},
         children:[
           {
             path: '/localization/languages',
             name: 'Languages',
-            meta: { title: 'languages',parent:'root',},
+            meta: { title: 'languages',parent:'root',icon:'language'},
           },
           {
             path: '/localization/currency',
             name: 'Currency',
-            meta: { title: 'currency',parent:'root',},
+            meta: { title: 'currency',parent:'root',icon:'dollar'},
           },
         ]
       },

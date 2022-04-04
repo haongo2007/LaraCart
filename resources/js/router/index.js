@@ -25,6 +25,8 @@ import permissionRoutes from './modules/permission';
 import storeManagerRoutes from './modules/store-manager';
 import configStoreRoutes from './modules/store-config';
 import systemRoutes from './modules/system';
+import marketingRoutes from './modules/marketing';
+import contentRoutes from './modules/content';
 import dashboardRoutes from './modules/dashboard';
 
 /**
@@ -91,6 +93,8 @@ export const asyncRoutes = [
   storeManagerRoutes,
   configStoreRoutes,
   systemRoutes,
+  marketingRoutes,
+  contentRoutes,
   {
     path: '/profile',
     component: Layout,
