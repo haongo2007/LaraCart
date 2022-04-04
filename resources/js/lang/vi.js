@@ -121,7 +121,7 @@ export default {
     Storage: 'Bộ nhớ',
     Products: 'Products',
     storeManager: 'Quản lý cửa hàng',
-    Orders: 'Đơn hàng',
+    orders: 'Đơn hàng',
     orderEdit: 'Sửa đơn hàng',
     orderCreate: 'Tạo đơn hàng',
     productCategory: 'Sản Phẩm & Danh mục',

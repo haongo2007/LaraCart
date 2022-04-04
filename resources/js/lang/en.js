@@ -119,7 +119,7 @@ export default {
     Storage: 'Storage',
     Products: 'Products',
     storeManager: 'Store Manager',
-    Orders: 'Orders',
+    orders: 'Orders',
     orderEdit: 'Edit Order',
     orderCreate: 'Create Order',
     productCategory: 'Products & Category',
