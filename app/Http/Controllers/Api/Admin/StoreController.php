@@ -33,9 +33,11 @@ class StoreController extends Controller
     }
 
     public function show($id) {
-        $store = (new Store)->with('descriptions')->find($id);
-        if (!$store) {
-            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+        if ($id) {   
+            $store = (new Store)->with('descriptions')->find($id);
+            if (!$store) {
+                return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+            }
         }
         $store['timezones'] = $this->timezones;
         $store['languages'] = $this->languages;

@@ -30,6 +30,7 @@ export default {
     menu: 'Menu Admin',
     adminGlobal: 'Admin Global',
     configStore:'Config Store',
+    storeCreate:'Create Store',
     system:'System',
     setting:'Setting',
     orderStatus: 'Order Status',

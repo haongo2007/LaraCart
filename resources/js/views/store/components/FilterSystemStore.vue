@@ -10,7 +10,7 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-button-group>
-              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'CategoryCreate'}).catch(() => {})" />
+              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'StoreCreate'}).catch(() => {})" />
             </el-button-group>
           </el-col>
         </el-row>

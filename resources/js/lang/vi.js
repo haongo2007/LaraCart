@@ -34,6 +34,7 @@ export default {
     menu: 'Admin Menu',
     adminGlobal: 'Quản trị chung',
     configStore:'Thiết lập cửa hàng',
+    storeCreate:'Tạo mới của hàng',
     system:'Hệ thống',
     setting:'Thiết lập',
     orderStatus: 'TT đơn hàng',

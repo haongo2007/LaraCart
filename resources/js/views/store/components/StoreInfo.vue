@@ -19,7 +19,7 @@
                 <div @click="handleVisibleStorage()">
                   <el-image 
                     style="width: 100px;cursor: pointer;"
-                    :src="temp.logo"
+                    :src="temp.logo ? temp.logo :'api/system/getFile?disk=store&path=logo.png&w=260'"
                     fit="contain">
                   </el-image>
                 </div>
@@ -51,7 +51,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'phone')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.phone }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.phone ? temp.phone : 'Empty' }}</span>
                 </el-popover>
               </el-descriptions-item>
 
@@ -81,7 +81,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'long_phone')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.long_phone }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.long_phone ? temp.long_phone : 'Empty' }}</span>
                 </el-popover>
               </el-descriptions-item>
 
@@ -111,7 +111,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'email')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.email }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.email ? temp.email : 'Empty' }}</span>
                 </el-popover>
               </el-descriptions-item>
 
@@ -141,7 +141,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'address')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.address }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.address ? temp.address : 'Empty' }}</span>
                 </el-popover>
               </el-descriptions-item>
 
@@ -171,7 +171,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'domain')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.domain }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.domain ? temp.domain : 'Empty' }}</span>
                 </el-popover>
               </el-descriptions-item>
 
@@ -209,7 +209,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'language')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.language }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.language ? temp.language : 'Empty' }}</span>
                 </el-popover>
               </el-descriptions-item>
 
@@ -245,7 +245,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'currency')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.currency }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.currency ? temp.currency : 'Empty' }}</span>
                 </el-popover>
               </el-descriptions-item>
 
@@ -425,22 +425,21 @@
                   <el-popover
                     v-model="item.title.visible"
                     placement="top"
-                    title="Number phone"
+                    title="App Name"
                     width="200"
                   >
                     <el-form-item
-                      prop="long_phone"
+                      prop="title"
                       :rules="[
-                        { required: true, message: 'Number Phone is required'},
-                        { max: 100, message: 'Last name max length 100 character'}
+                        { required: true, message: 'App name is required'},
                       ]"
                     >
-                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'long_phone')" />
+                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'title')" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'long_phone')">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'title')">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.title.value ? item.title.value : 'Empty' }}</span>
@@ -458,22 +457,21 @@
                   <el-popover
                     v-model="item.keyword.visible"
                     placement="top"
-                    title="Email address"
+                    title="Keyword"
                     width="200"
                   >
                     <el-form-item
-                      prop="email"
+                      prop="keyword"
                       :rules="[
-                        { required: true, message: 'Email is required'},
-                        { max: 100, message: 'Last name max length 100 character'}
+                        { required: true, message: 'Keyword is required'},
                       ]"
                     >
-                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'email')" />
+                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'keyword')" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'email')">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'keyword')">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.keyword.value ? item.keyword.value  : 'Empty'}}</span>
@@ -491,22 +489,21 @@
                   <el-popover
                     v-model="item.description.visible"
                     placement="top"
-                    title="Address"
+                    title="Description"
                     width="200"
                   >
                     <el-form-item
-                      prop="address"
+                      prop="descriptions.description"
                       :rules="[
-                        { required: true, message: 'Address is required'},
-                        { max: 100, message: 'Last name max length 100 character'}
+                        { required: true, message: 'Description is required'}
                       ]"
                     >
-                      <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'address')" />
+                      <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'Description')" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'address')">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'Description')">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.description.value ? item.description.value : 'Empty' }}</span>
@@ -562,15 +559,31 @@ export default {
   },
   created() {
     this.temp = Object.assign({}, this.dataInfo);
-
     for (var i = 0; i <=11; i++) {
       this.visible[i] = false;
     }
+    if (!this.isEdit) {
+      let i = 0;
+      this.$set(this.temp,'descriptions',[]);
+      this.$set(this.temp,'language','');
+      this.$set(this.temp,'currency','');
+      this.$set(this.temp,'domain','');
+      this.$set(this.temp,'address','');
+      this.$set(this.temp,'email','');
+      this.$set(this.temp,'long_phone','');
+      this.$set(this.temp,'phone','');
+
+      for (var prop in this.temp.languages) {   
+        this.$set(this.temp.descriptions,i,{});
+        i++;
+      };
+    }
     this.temp.descriptions.forEach(function(v,i) {
-      v.description = {value:v.description,visible:false};
-      v.title = {value:v.title,visible:false};
-      v.keyword = {value:v.keyword,visible:false};
-    })
+      v.description = {value:v.description?v.description:'',visible:false};
+      v.title = {value:v.title?v.title:'',visible:false};
+      v.keyword = {value:v.keyword?v.keyword:'',visible:false};
+    });
+    console.log(this.temp);
   },
   methods: {
     goBackList(){

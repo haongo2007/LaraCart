@@ -36,6 +36,17 @@ const configStoreRoutes = {
       hidden: true,
     },
     {
+      path: 'create',
+      component: () => import('@/views/store/Create'),
+      name: 'StoreCreate',
+      meta: {
+        title: 'storeCreate',
+        permissions: ['Store manager'],
+        parent: 'StoreList',
+      },
+      hidden: true,
+    },
+    {
       path: 'config/:id(\\d+)',
       component: () => import('@/views/store/Config'),
       name: 'StoreConfig',
