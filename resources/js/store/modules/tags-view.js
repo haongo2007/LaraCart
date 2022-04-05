@@ -99,7 +99,15 @@ const actions = {
   delView({ dispatch, state }, view) {
     return new Promise(resolve => {
       dispatch('delVisitedView', view);
-      dispatch('delCachedView', view);
+      let parent = view.meta.parent;
+      if (parent != 'root' ) {
+        let obj = state.visitedViews.filter((item) => (item.meta.parent == parent && item.name == view.name));
+        if (obj.length == 0) {
+          dispatch('delCachedView', view);
+        }
+      }else{        
+        dispatch('delCachedView', view);
+      }
       resolve({
         visitedViews: [...state.visitedViews],
         cachedViews: [...state.cachedViews],

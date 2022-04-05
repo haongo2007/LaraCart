@@ -420,7 +420,7 @@
                   <i class="el-icon-s-marketing" />
                   App Name
                 </template>
-                <div v-for="item in temp.descriptions">
+                <div v-for="(item,index) in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em"/>
                   <el-popover
                     v-model="item.title.visible"
@@ -429,17 +429,16 @@
                     width="200"
                   >
                     <el-form-item
-                      prop="title"
                       :rules="[
                         { required: true, message: 'App name is required'},
                       ]"
                     >
-                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'title')" />
+                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,index+'.title.value',item.lang)" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'title')">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,index+'.title.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.title.value ? item.title.value : 'Empty' }}</span>
@@ -452,7 +451,7 @@
                   <i class="el-icon-key" />
                   Keyword
                 </template>
-                <div v-for="item in temp.descriptions">
+                <div v-for="(item,index) in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
                   <el-popover
                     v-model="item.keyword.visible"
@@ -466,12 +465,12 @@
                         { required: true, message: 'Keyword is required'},
                       ]"
                     >
-                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'keyword')" />
+                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,index+'.keyword.value',item.lang)" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'keyword')">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,index+'.keyword.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.keyword.value ? item.keyword.value  : 'Empty'}}</span>
@@ -484,7 +483,7 @@
                   <i class="el-icon-document-copy" />
                   Description
                 </template>
-                <div v-for="item in temp.descriptions">
+                <div v-for="(item,index) in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
                   <el-popover
                     v-model="item.description.visible"
@@ -498,12 +497,12 @@
                         { required: true, message: 'Description is required'}
                       ]"
                     >
-                      <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'Description')" />
+                      <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,index+'.description.value',item.lang)" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'Description')">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,index+'.description.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.description.value ? item.description.value : 'Empty' }}</span>
@@ -574,16 +573,16 @@ export default {
       this.$set(this.temp,'phone','');
 
       for (var prop in this.temp.languages) {   
-        this.$set(this.temp.descriptions,i,{});
+        this.$set(this.temp.descriptions,i,{lang:prop});
         i++;
       };
     }
+    let that = this;
     this.temp.descriptions.forEach(function(v,i) {
-      v.description = {value:v.description?v.description:'',visible:false};
-      v.title = {value:v.title?v.title:'',visible:false};
-      v.keyword = {value:v.keyword?v.keyword:'',visible:false};
+      that.$set(that.temp.descriptions[i],'description',{value:v.description?v.description:'',visible:false});
+      that.$set(that.temp.descriptions[i],'title',{value:v.title?v.title:'',visible:false});
+      that.$set(that.temp.descriptions[i],'keyword',{value:v.keyword?v.keyword:'',visible:false});
     });
-    console.log(this.temp);
   },
   methods: {
     goBackList(){
@@ -604,19 +603,54 @@ export default {
       this.temp.logo = data[0];
       this.dialogStorageClose();
     },
-    handleConfirm(i, key){
+    handleConfirm(i, key,lang){
       this.cancelAction = false;
       this.$refs['dataForm'].validateField(key, this._checkValidate);
       if (this.cancelAction) {
         return false;
       }
-      const id = this.$route.params.id;
+      let id = 0;
+      if (this.isEdit) {
+        id = this.$route.params.id;  
+      }
       const params = {
         name: key,
         value: this.temp[key],
       };
 
+      if (lang) {
+        let newKey = key.split('.');
+        params['name'] = newKey[1];
+        params['lang'] = lang;
+        params.value = this.temp.descriptions[newKey[0]][newKey[1]][newKey[2]];
+      }
+      console.log(params);
+      return false;
+
       this.btnLoading = true;
+      storeResource.update(id, params).then((res) => {
+        if (res) {
+          this.$message({
+            type: 'success',
+            message: 'Update successfully',
+          });
+          this.btnLoading = false;
+          this.visible[i] = false;
+          this.dataOrder[key] = this.temp[key];
+          this.$emit('handleChangeHistory', res.data.history);
+        } else {
+          this.$message({
+            type: 'error',
+            message: 'Update failed',
+          });
+          this.btnLoading = false;
+          this.visible[i] = false;
+        }
+      }).catch(err => {
+          console.log(err);
+          this.btnLoading = false;
+          this.visible[i] = false;
+      });
      
     },
     handleCancel(i){
