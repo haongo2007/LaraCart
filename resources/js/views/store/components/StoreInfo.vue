@@ -31,6 +31,7 @@
                   Number Phone
                 </template>
                 <el-popover
+                  @hide="handleCancel(0,'phone')"
                   v-model="visible[0]"
                   placement="top"
                   title="Number phone"
@@ -40,15 +41,14 @@
                     prop="phone"
                     :rules="[
                       { required: true, message: 'Number Phone is required'},
-                      { max: 100, message: 'Last name max length 100 character'}
                     ]"
                   >
-                    <el-input v-model="temp.phone" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'phone')" />
+                    <el-input v-model="temp.phone" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(0,'phone')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'phone')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(0)">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(0,'phone')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.phone ? temp.phone : 'Empty' }}</span>
@@ -61,23 +61,23 @@
                   Number Phone (Other)
                 </template>
                 <el-popover
+                  @hide="handleCancel(1,'long_phone')"
                   v-model="visible[1]"
                   placement="top"
-                  title="Number phone"
+                  title="Number phone (other)"
                   width="200"
                 >
                   <el-form-item
                     prop="long_phone"
                     :rules="[
-                      { required: true, message: 'Number Phone is required'},
-                      { max: 100, message: 'Last name max length 100 character'}
+                      { required: true, message: 'Number Phone other is required'},
                     ]"
                   >
-                    <el-input v-model="temp.long_phone" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'long_phone')" />
+                    <el-input v-model="temp.long_phone" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(1,'long_phone')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(1,'long_phone')">cancel</el-button>
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'long_phone')">Confirm</el-button>
                     </el-button-group>
                   </div>
@@ -91,6 +91,7 @@
                   Email address
                 </template>
                 <el-popover
+                  @hide="handleCancel(2,'email')"
                   v-model="visible[2]"
                   placement="top"
                   title="Email address"
@@ -100,15 +101,14 @@
                     prop="email"
                     :rules="[
                       { required: true, message: 'Email is required'},
-                      { max: 100, message: 'Last name max length 100 character'}
                     ]"
                   >
                     <el-input v-model="temp.email" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'email')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'email')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(2,'email')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(2,'email')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.email ? temp.email : 'Empty' }}</span>
@@ -121,6 +121,7 @@
                   Address
                 </template>
                 <el-popover
+                  @hide="handleCancel(3,'address')"
                   v-model="visible[3]"
                   placement="top"
                   title="Address"
@@ -130,15 +131,14 @@
                     prop="address"
                     :rules="[
                       { required: true, message: 'Address is required'},
-                      { max: 100, message: 'Last name max length 100 character'}
                     ]"
                   >
                     <el-input v-model="temp.address" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'address')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'address')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(3,'address')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(3,'address')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.address ? temp.address : 'Empty' }}</span>
@@ -151,6 +151,7 @@
                   Domain
                 </template>
                 <el-popover
+                  @hide="handleCancel(4,'domain')"
                   v-model="visible[4]"
                   placement="top"
                   title="Domain"
@@ -160,15 +161,14 @@
                     prop="domain"
                     :rules="[
                       { required: true, message: 'Domain is required'},
-                      { max: 100, message: 'Last name max length 100 character'}
                     ]"
                   >
                     <el-input v-model="temp.domain" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'domain')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'domain')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(4,'domain')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(4,'domain')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.domain ? temp.domain : 'Empty' }}</span>
@@ -181,6 +181,7 @@
                   Default language
                 </template>
                 <el-popover
+                  @hide="handleCancel(5,'language')"
                   v-model="visible[5]"
                   placement="top"
                   title="Default language"
@@ -190,7 +191,6 @@
                     prop="language"
                     :rules="[
                       { required: true, message: 'Domain is required'},
-                      { max: 100, message: 'Last name max length 100 character'}
                     ]"
                   >
 
@@ -205,8 +205,8 @@
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'language')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(5,'language')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(5,'language')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.language ? temp.language : 'Empty' }}</span>
@@ -219,6 +219,7 @@
                   Default currency
                 </template>
                 <el-popover
+                  @hide="handleCancel(6,'currency')"
                   v-model="visible[6]"
                   placement="top"
                   title="Default currency"
@@ -241,8 +242,8 @@
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'currency')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(6,'currency')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(6,'currency')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.currency ? temp.currency : 'Empty' }}</span>
@@ -255,6 +256,7 @@
                   Office
                 </template>
                 <el-popover
+                  @hide="handleCancel(7,'office')"
                   v-model="visible[7]"
                   placement="top"
                   title="Office"
@@ -270,8 +272,8 @@
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'office')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(7,'office')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(7,'office')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.office ? temp.office : 'Empty' }}</span>
@@ -284,6 +286,7 @@
                   Warehouse
                 </template>
                 <el-popover
+                  @hide="handleCancel(8,'warehouse')"
                   v-model="visible[8]"
                   placement="top"
                   title="Warehouse"
@@ -295,11 +298,11 @@
                       { required: true, message: 'Warehouse is required'}
                     ]"
                   >
-                    <el-input v-model="temp.warehouse" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'warehouse')" />
+                    <el-input v-model="temp.warehouse" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(8,'warehouse')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(8,'warehouse')">cancel</el-button>
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'warehouse')">Confirm</el-button>
                     </el-button-group>
                   </div>
@@ -313,6 +316,7 @@
                   Timezone
                 </template>
                 <el-popover
+                  @hide="handleCancel(9,'timezone')"
                   v-model="visible[9]"
                   placement="top"
                   title="Timezone"
@@ -335,8 +339,8 @@
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'timezone')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(9,'timezone')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(9,'timezone')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.timezone ? temp.timezone : 'Empty' }}</span>
@@ -349,6 +353,7 @@
                   Template
                 </template>
                 <el-popover
+                  @hide="handleCancel(10,'template')"
                   v-model="visible[10]"
                   placement="top"
                   title="Template"
@@ -364,8 +369,8 @@
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'template')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(10,'template')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(10,'template')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.template ? temp.template : 'Empty' }}</span>
@@ -378,6 +383,7 @@
                   Time Working
                 </template>
                 <el-popover
+                  @hide="handleCancel(11,'time_active')"
                   v-model="visible[11]"
                   placement="top"
                   title="Time Working"
@@ -399,8 +405,8 @@
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
                     <el-button-group>
-                      <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'time_active')">Confirm</el-button>
+                      <el-button type="danger" size="mini" @click="handleCancel(11,'time_active')">cancel</el-button>
+                      <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(11,'time_active')">Confirm</el-button>
                     </el-button-group>
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.time_active ? temp.time_active : 'Empty' }}</span>
@@ -423,22 +429,24 @@
                 <div v-for="(item,index) in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em"/>
                   <el-popover
+                    @hide="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')"
                     v-model="item.title.visible"
                     placement="top"
                     title="App Name"
                     width="200"
                   >
                     <el-form-item
+                      :prop="'descriptions.'+index+'.title.value'"
                       :rules="[
                         { required: true, message: 'App name is required'},
                       ]"
                     >
-                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,index+'.title.value',item.lang)" />
+                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.title.value',item.lang)" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
-                        <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,index+'.title.value',item.lang)">Confirm</el-button>
+                        <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')">cancel</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.title.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.title.value ? item.title.value : 'Empty' }}</span>
@@ -454,23 +462,24 @@
                 <div v-for="(item,index) in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
                   <el-popover
+                    @hide="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')"
                     v-model="item.keyword.visible"
                     placement="top"
                     title="Keyword"
                     width="200"
                   >
                     <el-form-item
-                      prop="keyword"
+                      :prop="'descriptions.'+index+'.keyword.value'"
                       :rules="[
                         { required: true, message: 'Keyword is required'},
                       ]"
                     >
-                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,index+'.keyword.value',item.lang)" />
+                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.keyword.value',item.lang)" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
-                        <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,index+'.keyword.value',item.lang)">Confirm</el-button>
+                        <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')">cancel</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.keyword.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.keyword.value ? item.keyword.value  : 'Empty'}}</span>
@@ -486,13 +495,14 @@
                 <div v-for="(item,index) in temp.descriptions">
                   <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
                   <el-popover
+                    @hide="handleCancel(index+'.'+'description.visible',index+'.'+'description.value')"
                     v-model="item.description.visible"
                     placement="top"
                     title="Description"
                     width="200"
                   >
                     <el-form-item
-                      prop="descriptions.description"
+                      :prop="'descriptions.'+index+'.description.value'"
                       :rules="[
                         { required: true, message: 'Description is required'}
                       ]"
@@ -501,7 +511,7 @@
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
-                        <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
+                        <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'description.visible',index+'.'+'description.value')">cancel</el-button>
                         <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,index+'.description.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
@@ -559,7 +569,7 @@ export default {
   created() {
     this.temp = Object.assign({}, this.dataInfo);
     for (var i = 0; i <=11; i++) {
-      this.visible[i] = false;
+      this.$set(this.visible,i,false);
     }
     if (!this.isEdit) {
       let i = 0;
@@ -653,8 +663,16 @@ export default {
       });
      
     },
-    handleCancel(i){
-      this.visible[i] = false;
+    handleCancel(i,key){
+      if(typeof i == 'string'){
+        let newI = i.split('.');
+        let newKey = key.split('.');
+        this.temp.descriptions[newI[0]][newI[1]][newI[2]] = false;
+        this.temp.descriptions[newKey[0]][newKey[1]][newKey[2]] = '';
+      }else{
+        this.visible[i] = false;
+        this.temp[key] = ''; 
+      }
     },
     _checkValidate(msg){
       if (msg != '' && msg != undefined) {
