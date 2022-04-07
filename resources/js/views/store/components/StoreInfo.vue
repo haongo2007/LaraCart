@@ -441,12 +441,12 @@
                         { required: true, message: 'App name is required'},
                       ]"
                     >
-                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.title.value',item.lang)" />
+                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.title.value',item.lang)">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.title.value ? item.title.value : 'Empty' }}</span>
@@ -474,12 +474,12 @@
                         { required: true, message: 'Keyword is required'},
                       ]"
                     >
-                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.keyword.value',item.lang)" />
+                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.keyword.value',item.lang)">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.keyword.value ? item.keyword.value  : 'Empty'}}</span>
@@ -507,12 +507,12 @@
                         { required: true, message: 'Description is required'}
                       ]"
                     >
-                      <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,index+'.description.value',item.lang)" />
+                      <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)" />
                     </el-form-item>
                     <div style="text-align: right; margin: 12px 0px 0px 0px">
                       <el-button-group>
                         <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'description.visible',index+'.'+'description.value')">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,index+'.description.value',item.lang)">Confirm</el-button>
+                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)">Confirm</el-button>
                       </el-button-group>
                     </div>
                     <span slot="reference" class="border-edit">{{ item.description.value ? item.description.value : 'Empty' }}</span>
@@ -634,8 +634,6 @@ export default {
         params['lang'] = lang;
         params.value = this.temp.descriptions[newKey[0]][newKey[1]][newKey[2]];
       }
-      console.log(params);
-      return false;
 
       this.btnLoading = true;
       storeResource.update(id, params).then((res) => {
