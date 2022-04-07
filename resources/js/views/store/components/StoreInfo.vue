@@ -30,13 +30,12 @@
                   <i class="el-icon-phone" />
                   Number Phone
                 </template>
-                <el-popover
+                <el-popover v-if="isEdit"
                   @hide="handleCancel(0,'phone')"
                   v-model="visible[0]"
                   placement="top"
                   title="Number phone"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="phone"
                     :rules="[
@@ -53,6 +52,14 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.phone ? temp.phone : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                  v-else
+                  prop="phone"
+                  :rules="[
+                    { required: true, message: 'Number Phone is required'},
+                  ]">
+                  <el-input v-model="temp.phone" placeholder="Please input" @keyup.enter.native="handleConfirm(0,'phone')" />
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -61,12 +68,12 @@
                   Number Phone (Other)
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(1,'long_phone')"
                   v-model="visible[1]"
                   placement="top"
                   title="Number phone (other)"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="long_phone"
                     :rules="[
@@ -83,6 +90,14 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.long_phone ? temp.long_phone : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                  v-else
+                  prop="long_phone"
+                  :rules="[
+                    { required: true, message: 'Number Phone other is required'},
+                  ]">
+                  <el-input v-model="temp.long_phone" placeholder="Please input" @keyup.enter.native="handleConfirm(1,'long_phone')" />
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -91,12 +106,12 @@
                   Email address
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(2,'email')"
                   v-model="visible[2]"
                   placement="top"
                   title="Email address"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="email"
                     :rules="[
@@ -113,6 +128,14 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.email ? temp.email : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                  v-else
+                  prop="email"
+                  :rules="[
+                    { required: true, message: 'Email is required'},
+                  ]">
+                  <el-input v-model="temp.email" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'email')" />
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -121,12 +144,12 @@
                   Address
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(3,'address')"
                   v-model="visible[3]"
                   placement="top"
                   title="Address"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="address"
                     :rules="[
@@ -143,6 +166,14 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.address ? temp.address : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                  v-else
+                  prop="address"
+                  :rules="[
+                    { required: true, message: 'Address is required'},
+                  ]">
+                  <el-input v-model="temp.address" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'address')" />
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -151,12 +182,12 @@
                   Domain
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(4,'domain')"
                   v-model="visible[4]"
                   placement="top"
                   title="Domain"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="domain"
                     :rules="[
@@ -173,6 +204,14 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.domain ? temp.domain : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                  v-else
+                  prop="domain"
+                  :rules="[
+                    { required: true, message: 'Domain is required'},
+                  ]">
+                  <el-input v-model="temp.domain" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'domain')" />
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -181,12 +220,12 @@
                   Default language
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(5,'language')"
                   v-model="visible[5]"
                   placement="top"
                   title="Default language"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="language"
                     :rules="[
@@ -211,6 +250,22 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.language ? temp.language : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                  v-else
+                  prop="language"
+                  :rules="[
+                    { required: true, message: 'Domain is required'},
+                  ]">
+
+                  <el-select v-model="temp.language" placeholder="Select" filterable style="width: 100%;">
+                    <el-option
+                      v-for="(item,index) in temp.languages"
+                      :key="index"
+                      :label="item.name"
+                      :value="index"
+                    />
+                  </el-select>
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -219,12 +274,12 @@
                   Default currency
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(6,'currency')"
                   v-model="visible[6]"
                   placement="top"
                   title="Default currency"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="currency"
                     :rules="[
@@ -248,6 +303,21 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.currency ? temp.currency : 'Empty' }}</span>
                 </el-popover>
+                  <el-form-item
+                    v-else
+                    prop="currency"
+                    :rules="[
+                      { required: true, message: 'Currency is required'}
+                    ]">
+                    <el-select v-model="temp.currency" placeholder="Select" filterable style="width: 100%;">
+                      <el-option
+                        v-for="(item,index) in temp.currencies"
+                        :key="index"
+                        :label="item"
+                        :value="index"
+                      />
+                    </el-select>
+                  </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -256,12 +326,12 @@
                   Office
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(7,'office')"
                   v-model="visible[7]"
                   placement="top"
                   title="Office"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="office"
                     :rules="[
@@ -278,6 +348,14 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.office ? temp.office : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                    v-else
+                    prop="office"
+                    :rules="[
+                      { required: true, message: 'Office is required'}
+                    ]">
+                  <el-input v-model="temp.office" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'office')" />
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -286,12 +364,12 @@
                   Warehouse
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(8,'warehouse')"
                   v-model="visible[8]"
                   placement="top"
                   title="Warehouse"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="warehouse"
                     :rules="[
@@ -308,6 +386,14 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.warehouse ? temp.warehouse : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                    v-else
+                    prop="warehouse"
+                    :rules="[
+                      { required: true, message: 'Warehouse is required'}
+                    ]">
+                  <el-input v-model="temp.warehouse" placeholder="Please input" @keyup.enter.native="handleConfirm(8,'warehouse')" />
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -316,12 +402,12 @@
                   Timezone
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(9,'timezone')"
                   v-model="visible[9]"
                   placement="top"
                   title="Timezone"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="timezone"
                     :rules="[
@@ -345,6 +431,21 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.timezone ? temp.timezone : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                    v-else
+                    prop="timezone"
+                    :rules="[
+                      { required: true, message: 'Timezone is required'}
+                    ]">
+                    <el-select v-model="temp.timezone" placeholder="Select" filterable style="width: 100%;">
+                      <el-option
+                        v-for="(item,index) in temp.timezones"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -353,12 +454,12 @@
                   Template
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(10,'template')"
                   v-model="visible[10]"
                   placement="top"
                   title="Template"
-                  width="200"
-                >
+                  width="200">
                   <el-form-item
                     prop="template"
                     :rules="[
@@ -375,6 +476,14 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.template ? temp.template : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                    v-else
+                    prop="template"
+                    :rules="[
+                      { required: true, message: 'Template is required'}
+                    ]">
+                    <el-input v-model="temp.template" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'template')" />
+                </el-form-item>
               </el-descriptions-item>
 
               <el-descriptions-item :content-style="{'text-align': 'right'}">
@@ -383,12 +492,12 @@
                   Time Working
                 </template>
                 <el-popover
+                  v-if="isEdit"
                   @hide="handleCancel(11,'time_active')"
                   v-model="visible[11]"
                   placement="top"
                   title="Time Working"
-                  width="376"
-                >
+                  width="376">
                   <el-form-item
                     prop="time_active"
                     :rules="[
@@ -411,8 +520,22 @@
                   </div>
                   <span slot="reference" class="border-edit">{{ temp.time_active ? temp.time_active : 'Empty' }}</span>
                 </el-popover>
+                <el-form-item
+                  v-else
+                  prop="time_active"
+                  :rules="[
+                    { required: true, message: 'Time Working is required'}
+                  ]">
+                  <el-time-picker
+                    style="width: 100%"
+                    is-range
+                    v-model="temp.time_active"
+                    range-separator="To"
+                    start-placeholder="Start time"
+                    end-placeholder="End time">
+                  </el-time-picker>
+                </el-form-item>
               </el-descriptions-item>
-
             </el-descriptions>
           </div>
         </el-col>
@@ -427,30 +550,42 @@
                   App Name
                 </template>
                 <div v-for="(item,index) in temp.descriptions">
-                  <svg-icon :icon-class="'flag-'+item.lang" style="width:2em"/>
-                  <el-popover
-                    @hide="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')"
-                    v-model="item.title.visible"
-                    placement="top"
-                    title="App Name"
-                    width="200"
-                  >
-                    <el-form-item
-                      :prop="'descriptions.'+index+'.title.value'"
-                      :rules="[
-                        { required: true, message: 'App name is required'},
-                      ]"
+                  <div v-if="isEdit">
+                    <svg-icon :icon-class="'flag-'+item.lang" style="width:2em"/>
+                    <el-popover
+                      @hide="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')"
+                      v-model="item.title.visible"
+                      placement="top"
+                      title="App Name"
+                      width="200"
                     >
-                      <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)" />
-                    </el-form-item>
-                    <div style="text-align: right; margin: 12px 0px 0px 0px">
-                      <el-button-group>
-                        <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)">Confirm</el-button>
-                      </el-button-group>
-                    </div>
-                    <span slot="reference" class="border-edit">{{ item.title.value ? item.title.value : 'Empty' }}</span>
-                  </el-popover>
+                      <el-form-item
+                        :prop="'descriptions.'+index+'.title.value'"
+                        :rules="[
+                          { required: true, message: 'App name is required'},
+                        ]"
+                      >
+                        <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)" />
+                      </el-form-item>
+                      <div style="text-align: right; margin: 12px 0px 0px 0px">
+                        <el-button-group>
+                          <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')">cancel</el-button>
+                          <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)">Confirm</el-button>
+                        </el-button-group>
+                      </div>
+                      <span slot="reference" class="border-edit">{{ item.title.value ? item.title.value : 'Empty' }}</span>
+                    </el-popover>
+                  </div>
+                  <el-form-item
+                    v-else
+                    :prop="'descriptions.'+index+'.title.value'"
+                    :rules="[
+                      { required: true, message: 'App name is required'},
+                    ]">
+                    <el-input v-model="item.title.value" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)" >
+                      <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" slot="suffix" />
+                    </el-input>
+                  </el-form-item>
                 </div>
               </el-descriptions-item>
 
@@ -460,30 +595,42 @@
                   Keyword
                 </template>
                 <div v-for="(item,index) in temp.descriptions">
-                  <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
-                  <el-popover
-                    @hide="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')"
-                    v-model="item.keyword.visible"
-                    placement="top"
-                    title="Keyword"
-                    width="200"
-                  >
-                    <el-form-item
-                      :prop="'descriptions.'+index+'.keyword.value'"
-                      :rules="[
-                        { required: true, message: 'Keyword is required'},
-                      ]"
+                  <div v-if="isEdit">
+                    <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
+                    <el-popover
+                      @hide="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')"
+                      v-model="item.keyword.visible"
+                      placement="top"
+                      title="Keyword"
+                      width="200"
                     >
-                      <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)" />
-                    </el-form-item>
-                    <div style="text-align: right; margin: 12px 0px 0px 0px">
-                      <el-button-group>
-                        <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)">Confirm</el-button>
-                      </el-button-group>
-                    </div>
-                    <span slot="reference" class="border-edit">{{ item.keyword.value ? item.keyword.value  : 'Empty'}}</span>
-                  </el-popover>
+                      <el-form-item
+                        :prop="'descriptions.'+index+'.keyword.value'"
+                        :rules="[
+                          { required: true, message: 'Keyword is required'},
+                        ]"
+                      >
+                        <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)" />
+                      </el-form-item>
+                      <div style="text-align: right; margin: 12px 0px 0px 0px">
+                        <el-button-group>
+                          <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')">cancel</el-button>
+                          <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)">Confirm</el-button>
+                        </el-button-group>
+                      </div>
+                      <span slot="reference" class="border-edit">{{ item.keyword.value ? item.keyword.value  : 'Empty'}}</span>
+                    </el-popover>
+                  </div>
+                  <el-form-item
+                    v-else
+                    :prop="'descriptions.'+index+'.keyword.value'"
+                    :rules="[
+                      { required: true, message: 'Keyword is required'},
+                    ]">
+                    <el-input v-model="item.keyword.value" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)" >                                      
+                      <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" slot="suffix" />
+                    </el-input>
+                  </el-form-item>
                 </div>
               </el-descriptions-item>
 
@@ -493,33 +640,47 @@
                   Description
                 </template>
                 <div v-for="(item,index) in temp.descriptions">
-                  <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
-                  <el-popover
-                    @hide="handleCancel(index+'.'+'description.visible',index+'.'+'description.value')"
-                    v-model="item.description.visible"
-                    placement="top"
-                    title="Description"
-                    width="200"
-                  >
-                    <el-form-item
-                      :prop="'descriptions.'+index+'.description.value'"
-                      :rules="[
-                        { required: true, message: 'Description is required'}
-                      ]"
+                  <div v-if="isEdit">
+                    <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
+                    <el-popover
+                      @hide="handleCancel(index+'.'+'description.visible',index+'.'+'description.value')"
+                      v-model="item.description.visible"
+                      placement="top"
+                      title="Description"
+                      width="200"
                     >
-                      <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)" />
-                    </el-form-item>
-                    <div style="text-align: right; margin: 12px 0px 0px 0px">
-                      <el-button-group>
-                        <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'description.visible',index+'.'+'description.value')">cancel</el-button>
-                        <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)">Confirm</el-button>
-                      </el-button-group>
-                    </div>
-                    <span slot="reference" class="border-edit">{{ item.description.value ? item.description.value : 'Empty' }}</span>
-                  </el-popover>
+                      <el-form-item
+                        :prop="'descriptions.'+index+'.description.value'"
+                        :rules="[
+                          { required: true, message: 'Description is required'}
+                        ]"
+                      >
+                        <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)" />
+                      </el-form-item>
+                      <div style="text-align: right; margin: 12px 0px 0px 0px">
+                        <el-button-group>
+                          <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'description.visible',index+'.'+'description.value')">cancel</el-button>
+                          <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)">Confirm</el-button>
+                        </el-button-group>
+                      </div>
+                      <span slot="reference" class="border-edit">{{ item.description.value ? item.description.value : 'Empty' }}</span>
+                    </el-popover>
+                  </div>
+                  <el-form-item
+                    v-else
+                    :prop="'descriptions.'+index+'.description.value'"
+                    :rules="[
+                      { required: true, message: 'Description is required'}
+                    ]">
+                    <el-input v-model="item.description.value" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)" >
+                      <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" slot="suffix" />
+                    </el-input>
+                  </el-form-item>
                 </div>
               </el-descriptions-item>
-
+              <template slot="extra" extra="bottom">
+                <el-button v-if="!isEdit" type="primary" @click="saveStore()" size="small">Save</el-button>
+              </template>
           </el-descriptions>
         </el-col>
       </el-form>
@@ -677,6 +838,9 @@ export default {
         this.cancelAction = true;
       }
     },
+    saveStore(){
+      console.log(this.temp);
+    }
   }
 };
 </script>
