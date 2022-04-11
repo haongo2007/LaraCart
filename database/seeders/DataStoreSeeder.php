@@ -12,9 +12,11 @@ class DataStoreSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run($storeId)
     {
-        $storeId = empty(session('lastStoreId')) ? 1 : session('lastStoreId');
+        if (!$storeId) {
+          $storeId = empty(session('lastStoreId')) ? 1 : session('lastStoreId');
+        }
         DB::connection(config('const.LC_CONNECTION'))->table('admin_config')->insertOrIgnore(
             [
             ['group' => '', 'code' => 'product_config_attribute', 'key' => 'product_brand', 'value' => '1', 'sort' => '0', 'detail' => 'lang::product.config_manager.brand', 'store_id' => $storeId],
@@ -105,27 +107,6 @@ class DataStoreSeeder extends Seeder
             ['group' => '', 'code' => 'smtp_config', 'key' => 'smtp_port', 'value' => '', 'sort' => '5', 'detail' => 'lang::email.smtp_port', 'store_id' => $storeId],
             ['group' => '', 'code' => 'smtp_config', 'key' => 'smtp_name', 'value' => '', 'sort' => '6', 'detail' => 'lang::email.smtp_name', 'store_id' => $storeId],
             ['group' => '', 'code' => 'smtp_config', 'key' => 'smtp_from', 'value' => '', 'sort' => '7', 'detail' => 'lang::email.smtp_from', 'store_id' => $storeId],
-
-            ['group' => '', 'code' => 'url_config', 'key' => 'SUFFIX_URL', 'value' => '.html', 'sort' => '0', 'detail' => 'lang::url.SUFFIX_URL', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_SHOP', 'value' => 'shop', 'sort' => '0', 'detail' => 'lang::env.PREFIX_SHOP', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_BRAND', 'value' => 'brand', 'sort' => '0', 'detail' => 'lang::env.PREFIX_BRAND', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_CATEGORY', 'value' => 'category', 'sort' => '0', 'detail' => 'lang::env.PREFIX_CATEGORY', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_SUB_CATEGORY', 'value' => 'sub-category', 'sort' => '0', 'detail' => 'lang::env.PREFIX_SUB_CATEGORY', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_PRODUCT', 'value' => 'product', 'sort' => '0', 'detail' => 'lang::env.PREFIX_PRODUCT', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_SEARCH', 'value' => 'search', 'sort' => '0', 'detail' => 'lang::env.PREFIX_SEARCH', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_CONTACT', 'value' => 'contact', 'sort' => '0', 'detail' => 'lang::env.PREFIX_CONTACT', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_NEWS', 'value' => 'news', 'sort' => '0', 'detail' => 'lang::env.PREFIX_NEWS', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_MEMBER', 'value' => 'customer', 'sort' => '0', 'detail' => 'lang::env.PREFIX_MEMBER', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_MEMBER_ORDER_LIST', 'value' => 'order-list', 'sort' => '0', 'detail' => 'lang::env.PREFIX_MEMBER_ORDER_LIST', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_MEMBER_CHANGE_PWD', 'value' => 'change-password', 'sort' => '0', 'detail' => 'lang::env.PREFIX_MEMBER_CHANGE_PWD', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_MEMBER_CHANGE_INFO', 'value' => 'change-info', 'sort' => '0', 'detail' => 'lang::env.PREFIX_MEMBER_CHANGE_INFO', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_CMS_CATEGORY', 'value' => 'cms-category', 'sort' => '0', 'detail' => 'lang::env.PREFIX_CMS_CATEGORY', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_CMS_ENTRY', 'value' => 'entry', 'sort' => '0', 'detail' => 'lang::env.PREFIX_CMS_ENTRY', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_CART_WISHLIST', 'value' => 'wishlst', 'sort' => '0', 'detail' => 'lang::env.PREFIX_CART_WISHLIST', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_CART_COMPARE', 'value' => 'compare', 'sort' => '0', 'detail' => 'lang::env.PREFIX_CART_COMPARE', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_CART_DEFAULT', 'value' => 'cart', 'sort' => '0', 'detail' => 'lang::env.PREFIX_CART_DEFAULT', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_CART_CHECKOUT', 'value' => 'checkout', 'sort' => '0', 'detail' => 'lang::env.PREFIX_CART_CHECKOUT', 'store_id' => $storeId],
-            ['group' => '', 'code' => 'url_config', 'key' => 'PREFIX_ORDER_SUCCESS', 'value' => 'order-success', 'sort' => '0', 'detail' => 'lang::env.PREFIX_ORDER_SUCCESS', 'store_id' => $storeId],
             
             ['group' => '', 'code' => 'captcha_config', 'key' => 'captcha_mode', 'value' => '0', 'sort' => '20', 'detail' => 'lang::captcha.captcha_mode', 'store_id' => $storeId],
             ['group' => '', 'code' => 'captcha_config', 'key' => 'captcha_page', 'value' => '[]', 'sort' => '10', 'detail' => 'lang::captcha.captcha_page', 'store_id' => $storeId],

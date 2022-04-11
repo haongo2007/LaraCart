@@ -24,6 +24,7 @@ class User extends Model implements AuthenticatableContract
     protected static $canChangeConfig = null;
     protected static $listStoreId = null;
     protected static $listStore = null;
+    protected static $currentStoreId = null;
 
     /**
      * A user has and belongs to many roles.
@@ -311,7 +312,9 @@ class User extends Model implements AuthenticatableContract
                 ->get()
                 ->keyBy('id');
         }
-        return self::$listStore;
+        return self::$listStore->map(function ($store) {
+            return $store->descriptions->keyBy('lang');
+        });
     }
 
 }

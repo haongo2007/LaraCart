@@ -1,103 +1,92 @@
 <template>
   <el-form ref="dataForm" :model="temp" class="form-config-container">
     <el-descriptions class="margin-top" title="Config Admin" :column="1" border>
-      <el-descriptions-item label="Admin name">
+      <el-descriptions-item v-for="(item,index) in temp" :label="item.detail" :key="index">
         <el-popover
-          v-model="visible[0]"
+          v-if="index != 'ADMIN_LOGO'"
+          v-model="visible[item.id]"
           placement="top"
           title="Admin name"
           width="200"
         >
           <el-form-item
-            prop="admin_name"
-            :rules="[
-              { required: true, message: 'Admin name is required'},
-            ]"
-          >
-            <el-input v-model="temp.admin_name" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_name')" />
+            prop="admin_name">
+            <el-input v-model="item.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(item.id,index)" />
           </el-form-item>
           <div style="text-align: right; margin: 12px 0px 0px 0px">
             <el-button-group>
-              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
+              <el-button type="danger" size="mini" @click="handleCancel(item.id)">cancel</el-button>
+              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(item.id,index)">Confirm</el-button>
             </el-button-group>
           </div>
-          <span slot="reference" class="border-edit">{{ temp.admin_name ? temp.admin_name : 'Empty' }}</span>
+          <span slot="reference" class="border-edit">{{ item.value ? item.value : 'Empty' }}</span>
         </el-popover>
-      </el-descriptions-item>
-      <el-descriptions-item label="Admin title">
-        <el-popover
-          v-model="visible[1]"
-          placement="top"
-          title="Admin title"
-          width="200"
-        >
-          <el-form-item
-            prop="admin_title"
-            :rules="[
-              { required: true, message: 'Admin title is required'},
-            ]"
-          >
-            <el-input v-model="temp.admin_title" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_title')" />
-          </el-form-item>
-          <div style="text-align: right; margin: 12px 0px 0px 0px">
-            <el-button-group>
-              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_title')">Confirm</el-button>
-            </el-button-group>
-          </div>
-          <span slot="reference" class="border-edit">{{ temp.admin_title ? temp.admin_title : 'Empty' }}</span>
-        </el-popover>
-      </el-descriptions-item>
-      <el-descriptions-item label="Admin logo">
-        <el-popover
-          v-model="visible[2]"
-          placement="top"
-          title="Admin logo"
-          width="200"
-        >
-          <el-form-item
-            prop="admin_logo"
-            :rules="[
-              { required: true, message: 'Admin logo is required'},
-            ]"
-          >
-            <el-input v-model="temp.admin_logo" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_logo')" />
-          </el-form-item>
-          <div style="text-align: right; margin: 12px 0px 0px 0px">
-            <el-button-group>
-              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_logo')">Confirm</el-button>
-            </el-button-group>
-          </div>
-          <span slot="reference" class="border-edit">{{ temp.admin_logo ? temp.admin_logo : 'Empty' }}</span>
-        </el-popover>
+        <div v-else @click="handleVisibleStorage()">
+          <el-image 
+            style="width: 100px;cursor: pointer;"
+            :src="item.value ? item.value :'api/system/getFile?disk=store&path=logo.png&w=260'"
+            fit="contain">
+          </el-image>
+        </div>
       </el-descriptions-item>
     </el-descriptions>
+    <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
+      <component :is="componentStorage" :get-file="true" />
+    </el-dialog>
   </el-form>
 </template>
 
 <script>
 
+import EventBus from '@/components/FileManager/eventBus';
+import FileManager from '@/components/FileManager';
 export default {
   name: 'ConfigAdmin',
-  props: ['dataAdminConfig'],
+  components:{FileManager},
+  props: ['dataConfig'],
   data(){
     return {
       btnLoading: false,
-      visible:[false,false,false],
+      visible:{},
       temp:{
-        admin_name:'',
-        admin_title:'',
-        admin_logo:''
-      }
+      },
+      componentStorage: '',
+      dialogStorageVisible:false,
   	};
   },
   created(){
+    this.temp = this.dataConfig;
+    let that = this;
+    for(var prop in this.temp) {
+      that.$set(that.visible,this.temp[prop].id,false);
+    }
   },
   methods: {
     handleCancel(i){
       this.visible[i] = false;
+    },
+    handleConfirm(i,key){
+      this.btnLoading = true;
+      let data = this.temp[key];
+      this.$emit('handleUpdate', data);
+      this.btnLoading = false;
+      this.visible[i] = false;
+    },
+    handleVisibleStorage(index, key){
+      EventBus.$on('getFileResponse', this.handlerGeturl);
+      this.$store.commit('fm/setDisks', 'store');
+      this.componentStorage = 'FileManager';
+      this.dialogStorageVisible = true;
+    },  
+    dialogStorageClose(){
+      EventBus.$off('getFileResponse');
+      this.componentStorage = '';
+      this.dialogStorageVisible = false;
+    },
+    handlerGeturl(data) {
+      this.temp.ADMIN_LOGO.value = data[0];
+      this.$emit('handleUpdate', this.temp.ADMIN_LOGO);
+      this.dialogStorageClose();
     },
   },
 };

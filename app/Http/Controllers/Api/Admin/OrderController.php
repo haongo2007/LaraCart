@@ -51,6 +51,8 @@ class OrderController extends Controller
     public function index()
     {
         $searchParams = request()->all();
+        $searchParams['storeId_list'] = request()->header()['x-store'];
+
         $data = (new Order)->getOrderListAdmin($searchParams);
         return OrderCollection::collection($data)->additional(['message' => 'Successfully']);
     }

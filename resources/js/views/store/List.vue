@@ -69,6 +69,7 @@
       <el-table-column :label="$t('table.active')" class-name="status-col" min-width="70px" prop="active">
         <template slot-scope="{row}">
           <el-switch
+            @change="handleChange(row.id,row.active,'active')"
             v-model="row.active"
             :active-value="1"
             active-color="#13ce66"
@@ -100,7 +101,9 @@ import Pagination from '@/components/Pagination'; // Secondary package based on 
 import RightPanel from '@/components/RightPanel';
 import FilterSystemStore from './components/FilterSystemStore';
 import EventBus from '@/components/FileManager/eventBus';
+import StoreResource from '@/api/store';
 
+const storeResource = new StoreResource();
 
 export default {
   name: 'StoreList',
@@ -123,6 +126,41 @@ export default {
   created() {
   },
   methods: {
+    handleChange(id,val,key){
+      let params = {};
+      params[key] = val;
+      if (val == 0) {
+        this.$confirm('this action will put your app into maintenance mode, are you sure ?', 'Warning', {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning',
+        }).then(() => {
+          this.updateData(id,params);
+        }).catch(err => {
+          let row = this.list.findIndex((item) => item.id == id);
+          this.list[row].active = 1;
+        });
+      }else{        
+        this.updateData(id,params);
+      }
+    },
+    updateData(id,params){
+      storeResource.update(id, params).then((res) => {
+        if (res) {
+          this.$message({
+            type: 'success',
+            message: 'Update successfully',
+          });
+        } else {
+          this.$message({
+            type: 'error',
+            message: 'Update failed',
+          });
+        }
+      }).catch(err => {
+         console.log(err);
+      });
+    },
     handleListenData(data){
       if (data.hasOwnProperty('list')) {
         this.list = data.list;

@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="dataForm" :model="temp" class="form-config-container">
+  <el-form class="form-config-container">
     <div class="margin-top el-descriptions">
        <div class="el-descriptions__header">
           <div class="el-descriptions__title">Config Customer</div>
@@ -19,6 +19,7 @@
                    </td>
                    <td colspan="1" class="el-descriptions-item__cell el-descriptions-item__content">
                       <el-switch
+                        @change="handleValue(item)"
                         v-model="item.value"
                         active-color="#13ce66"
                         inactive-color="#ff4949"
@@ -28,6 +29,7 @@
                    </td>
                    <td colspan="1" class="el-descriptions-item__cell el-descriptions-item__content">
                       <el-switch
+                        @change="handleValue(item)"
                         v-model="item.required.value"
                         active-color="#13ce66"
                         inactive-color="#ff4949"
@@ -55,17 +57,14 @@ export default {
   },
   data(){
     return {
-      temp:{
-      }
   	};
   },
   created(){
   },
   methods: {
-    handleCancel(i){
-      this.visible[i] = false;
-    },
-    
+    handleValue(item){
+      this.$emit('handleUpdate', item);
+    }
   },
 };
 </script>

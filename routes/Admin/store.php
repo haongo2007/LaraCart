@@ -5,6 +5,4 @@
 //     Route::get('/process/{storeId}', 'AdminStoreInfoController@switchStore')->name('admin_store.switch');
 // });
 
-Route::get('/store/getConfig/{id}', 'StoreController@getConfig');
-
 Route::apiResource('/store', 'StoreController');

@@ -7,6 +7,7 @@ use App\Models\Front\ShopProductDescription;
 use App\Models\Front\ShopAttributeGroup;
 use App\Models\Front\ShopProductCategory;
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 
 class Product extends ShopProduct
 {
@@ -20,10 +21,17 @@ class Product extends ShopProduct
      *
      * @return  [type]       [return description]
      */
-    public static function gettableProduct()
+    public static function gettableProduct($storeId)
     {
         $tableProduct = (new ShopProduct())->getTable();
-        return self::where($tableProduct . '.store_id', session('adminStoreId'));
+
+        if (!is_array($storeId) && $storeId != '') {
+            $storeId = [$storeId];
+        }
+        if (empty($storeId) && Admin::user()->isAdministrator()) {
+            $storeId = Admin::user()->listStoreId();
+        }
+        return self::whereIn($tableProduct . '.store_id', $storeId);
     }
     /**
      * Get product detail in admin
@@ -32,10 +40,16 @@ class Product extends ShopProduct
      *
      * @return  [type]       [return description]
      */
-    public static function getProductAdmin($id) {
+    public static function getProductAdmin($id,$storeId) {
         $tableProduct = (new ShopProduct())->getTable();
+        if (!is_array($storeId) && $storeId != '') {
+            $storeId = [$storeId];
+        }
+        if (empty($storeId) && Admin::user()->isAdministrator()) {
+            $storeId = Admin::user()->listStoreId();
+        }
         return ShopProduct::with('descriptions','categories','promotionPrice','attributes','attributes.palette')
-        ->where($tableProduct . '.store_id', session('adminStoreId'))
+        ->whereIn($tableProduct . '.store_id', $storeId)
         ->where('id', $id)->first();
     }
 
@@ -62,15 +76,16 @@ class Product extends ShopProduct
             'sku__asc'  => trans('product.admin.sort_order.sku_asc'),
         ];
         
-        $keyword          = $dataSearch['keyword'] ?? '';
-        $categories       = $dataSearch['category'] ?? [];
-        $sort_order       = $dataSearch['sort_order'] ?? 'id__desc';
-        $price            = $dataSearch['price'] ?? '';
-        $filter_price_by  = $dataSearch['filter_price_by'] ?? 'Cost';
-        $from             = $dataSearch['from'] ?? '';
-        $to               = $dataSearch['to'] ?? '';
-        $status           = $dataSearch['status'] ?? self::ACTIVE;
-        $limit        = $dataSearch['limit'] ?? self::ITEM_PER_PAGE;
+        $keyword          = Arr::get($dataSearch,'keyword', '');
+        $categories       = Arr::get($dataSearch,'category', []);
+        $sort_order       = Arr::get($dataSearch,'sort_order', 'id__desc');
+        $price            = Arr::get($dataSearch,'price', '');
+        $filter_price_by  = Arr::get($dataSearch,'filter_price_by', 'Cost');
+        $from             = Arr::get($dataSearch,'from', '');
+        $to               = Arr::get($dataSearch,'to', '');
+        $status           = Arr::get($dataSearch,'status', self::ACTIVE);
+        $limit            = Arr::get($dataSearch,'limit', self::ITEM_PER_PAGE);
+        $storeId          = Arr::get($dataSearch,'storeId_list', []);
 
         $tableDescription = (new ShopProductDescription)->getTable();
         $tablePTC         = (new ShopProductCategory)->getTable();
@@ -92,14 +107,21 @@ class Product extends ShopProduct
                 ->leftJoin($tableDescription, $tableDescription . '.product_id', $tableProduct . '.id')
                 ->join($tablePTC, $tablePTC . '.product_id', $tableProduct . '.id')
                 ->whereIn($tablePTC . '.category_id', $category_id)
-                ->where($tableProduct . '.store_id', session('adminStoreId'))
                 ->where($tableDescription . '.lang', lc_get_locale());
         } else {
             $productList = (new ShopProduct)
                 ->leftJoin($tableDescription, $tableDescription . '.product_id', $tableProduct . '.id')
-                ->where($tableProduct . '.store_id', session('adminStoreId'))
                 ->where($tableDescription . '.lang', lc_get_locale());
         }
+
+        if (!is_array($storeId) && $storeId != '') {
+            $storeId = [$storeId];
+        }
+        if (empty($storeId) && Admin::user()->isAdministrator()) {
+            $storeId = Admin::user()->listStoreId();
+        }
+
+        $productList = $productList->whereIn($tableProduct . '.store_id', $storeId);
 
         if ($keyword) {
             $productList = $productList->where(function ($sql) use($tableDescription, $tableProduct, $keyword){
@@ -136,7 +158,6 @@ class Product extends ShopProduct
             $productList = $productList->sort('id', 'desc');
         }
         $productList = $productList->paginate($limit);
-
         return $productList;
     }
 

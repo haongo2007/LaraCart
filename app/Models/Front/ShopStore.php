@@ -20,7 +20,7 @@ class ShopStore extends Model
     {
         return $this->hasMany(ShopStoreDescription::class, 'store_id', 'id');
     }
-
+    
     public function products()
     {
         return $this->hasMany(ShopProduct::class, 'store_id', 'id');

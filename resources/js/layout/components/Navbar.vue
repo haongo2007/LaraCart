@@ -5,6 +5,16 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
+      <el-select v-model="currentStore" @change="handleChangeStore" collapse-tags multiple v-if="Object.keys(storeList).length > 1" multiple placeholder="Choose Store" class="avatar-container right-menu-item hover-effect">
+        <el-option
+          size="mini"
+          v-for="(item,index) in storeList" :key="index"
+          :label="item[currenLang].title"
+          :value="index">
+        </el-option>
+      </el-select>
+
+
       <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
 
@@ -55,6 +65,7 @@ import Screenfull from '@/components/Screenfull';
 import SizeSelect from '@/components/SizeSelect';
 import LangSelect from '@/components/LangSelect';
 import Search from '@/components/HeaderSearch';
+import Cookies from 'js-cookie';
 
 export default {
   components: {
@@ -65,6 +76,11 @@ export default {
     LangSelect,
     Search,
   },
+  data() {
+    return {
+      currentStore:[],
+    };
+  },
   computed: {
     ...mapGetters([
       'sidebar',
@@ -73,6 +89,16 @@ export default {
       'device',
       'userId',
     ]),
+    storeList(){
+      let storeList = this.$store.state.user.storeList;
+      return storeList;
+    },
+    currenLang(){
+      return this.$store.getters.language;
+    }
+  },
+  created(){
+    this.currentStore = JSON.parse(Cookies.get('store'));
   },
   methods: {
     toggleSideBar() {
@@ -81,7 +107,16 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout');
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+      Cookies.remove('store');
     },
+    handleChangeStore(){
+      Cookies.set('store', JSON.stringify(this.currentStore));
+      this.$store.dispatch('tagsView/delAllCachedViews');
+      const fullPath = this.$router.currentRoute.fullPath;
+      this.$router.replace({
+        path: '/redirect' + fullPath,
+      });
+    }
   },
 };
 </script>

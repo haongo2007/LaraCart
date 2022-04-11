@@ -9,6 +9,7 @@ use App\Models\Admin\Store;
 use App\Models\Front\ShopTax;
 use App\Helper\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use App\Http\Resources\StoreCollection;
 
 class StoreController extends Controller
@@ -23,11 +24,11 @@ class StoreController extends Controller
         $this->currencies = ShopCurrency::getCodeActive();
         $this->languages = ShopLanguage::getListActive();
         $this->timezones = $timezones;
-
     }
 
     public function index() {
         $searchParams = request()->all();
+        $searchParams['storeId_list'] = request()->header()['x-store'];
         $data = (new Store)->getStoreListAdmin($searchParams);
         return StoreCollection::collection($data)->additional(['message' => 'Successfully']);
     }
@@ -45,122 +46,57 @@ class StoreController extends Controller
         return response()->json(new JsonResponse($store), Response::HTTP_OK);
     }
     
-    public function getConfig($id)
+    public function store(Request $request)
     {
-        //Customer config
-        $dataCustomerConfig = [
-            'code' => 'customer_config_attribute',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $customerConfigs = Config::getListConfigByCode($dataCustomerConfig);
-        $dataCustomerConfigRequired = [
-            'code' => 'customer_config_attribute_required',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $customerConfigsRequired = Config::getListConfigByCode($dataCustomerConfigRequired)->toArray();
-
-        foreach ($customerConfigs as $key => $value) {
-            $value->required = ['value' => $customerConfigsRequired[$key.'_required']['value'],'id' => $customerConfigsRequired[$key.'_required']['id']];
+        $data = array_filter($request->all());
+        $data['status'] = 1;
+        $data['active'] = 0;
+        $descriptions = $data['descriptions'];
+        if (array_key_exists('time_active', $data)) {
+            $data['time_active'] = json_encode($data['time_active']);
         }
-        //End customer
+        unset($data['descriptions']);
+        $stored = Store::create($data);
+        foreach ($descriptions as $key => $value) {
+            $descriptions[$key]['description'] = $value['description']['value'];
+            $descriptions[$key]['title'] = $value['title']['value'];
+            $descriptions[$key]['keyword'] = $value['keyword']['value'];
+            $descriptions[$key]['store_id'] = $stored->id;
+        }
+        Store::insertDescription($descriptions);
+        $seeder = new \Database\Seeders\DataStoreSeeder();
+        $seeder->run($stored->id);
+        return response()->json(new JsonResponse([]), Response::HTTP_OK);
+    }
 
-        //Product config
-        $taxs = ShopTax::pluck('name', 'id')->toArray();
-        $taxs[0] = trans('tax.admin.non_tax');
-
-        $productConfigQuery = [
-            'code' => 'product_config',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $productConfig = Config::getListConfigByCode($productConfigQuery);
-
-        $productConfigAttributeQuery = [
-            'code' => 'product_config_attribute',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $productConfigAttribute = Config::getListConfigByCode($productConfigAttributeQuery);
-
-        $productConfigAttributeRequiredQuery = [
-            'code' => 'product_config_attribute_required',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $productConfigAttributeRequired = Config::getListConfigByCode($productConfigAttributeRequiredQuery);
-
-        foreach ($productConfigAttribute as $key => $value) {
-            if ($productConfigAttributeRequired->has($key.'_required')) {
-            $value->required = ['value' => $productConfigAttributeRequired[$key.'_required']['value'],'id' => $productConfigAttributeRequired[$key.'_required']['id']];
+    public function update(Request $request,$id)
+    {
+        $store = Store::find($id);
+        if(!$store){
+            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+        }
+        $data = $request->all();
+        if (array_key_exists('time_active', $data)) {
+            $data['time_active'] = json_encode($data['time_active']);
+        }
+        if (array_key_exists('descriptions', $data)) {
+            $descriptions = $data['descriptions'];
+            unset($data['descriptions']);
+        }
+        $data = array_filter($data,'strlen');
+        if (isset($descriptions)) {
+            foreach ($descriptions as $key => $value) {
+                $descriptions[$key]['description'] = $value['description']['value'];
+                $descriptions[$key]['title'] = $value['title']['value'];
+                $descriptions[$key]['keyword'] = $value['keyword']['value'];
+                $descriptions[$key]['store_id'] = $value['store_id'];
             }
+            $store->descriptions()->delete();
+            Store::insertDescription($descriptions);
         }
-        //End Product config
-
-        $orderConfigQuery = [
-            'code' => 'order_config',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $orderConfig = Config::getListConfigByCode($orderConfigQuery);
-
-        $configDisplayQuery = [
-            'code' => 'display_config',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $configDisplay = Config::getListConfigByCode($configDisplayQuery);
-
-        $configCaptchaQuery = [
-            'code' => 'captcha_config',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $configCaptcha = Config::getListConfigByCode($configCaptchaQuery);
-
-        $configCustomizeQuery = [
-            'code' => 'admin_custom_config',
-            'storeId' => $id,
-            'keyBy' => 'key',
-        ];
-        $configCustomize = Config::getListConfigByCode($configCustomizeQuery);
-
-        
-
-        $emailConfigQuery = [
-            'code' => ['smtp_config', 'email_action'],
-            'storeId' => $id,
-            'groupBy' => 'code',
-            'sort'    => 'asc',
-        ];
-        $emailConfig = Config::getListConfigByCode($emailConfigQuery);
-
-        $data['emailConfig'] = $emailConfig;
-        $data['smtp_method'] = ['' => 'None Secirity', 'TLS' => 'TLS', 'SSL' => 'SSL'];
-        $data['captcha_page'] = [
-            'register' => trans('captcha.captcha_page_register'), 
-            'forgot'   => trans('captcha.captcha_page_forgot_password'), 
-            'checkout' => trans('captcha.captcha_page_checkout'), 
-            'contact'  => trans('captcha.captcha_page_contact'),
-            'review'   => trans('captcha.captcha_page_review'),
-        ];
-        //End email
-        $data['customerConfigs']                = $customerConfigs;
-        $data['productConfig']                  = $productConfig;
-        $data['productConfigAttribute']         = $productConfigAttribute;
-        $data['pluginCaptchaInstalled']         = lc_get_plugin_captcha_installed();
-        $data['taxs']                           = $taxs;
-        $data['configDisplay']                  = $configDisplay;
-        $data['orderConfig']                    = $orderConfig;
-        $data['configCaptcha']                  = $configCaptcha;
-        $data['configCustomize']                = $configCustomize;
-        $data['timezones']                      = $this->timezones;
-        $data['languages']                      = $this->languages;
-        $data['currencies']                     = $this->currencies;
-        $data['storeId']                        = $id;
-        $data['urlUpdateConfig']                = lc_route_admin('admin_config.update');
-        $data['urlUpdateConfigGlobal']          = lc_route_admin('admin_config_global.update');
-        return response()->json(new JsonResponse($data), Response::HTTP_OK);
+        if (!empty($data)) {
+            $store->update($data);
+        }
+        return response()->json(new JsonResponse([]), Response::HTTP_OK);
     }
 }

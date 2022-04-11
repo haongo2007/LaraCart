@@ -4,6 +4,4 @@
 //     Route::post('/update', 'AdminStoreConfigController@update')->name('admin_config.update');
 // });
 
-Route::get('/getConfig/{id}', 'StoreConfigController@getConfig');
-
 Route::apiResource('/store-config', 'StoreConfigController');

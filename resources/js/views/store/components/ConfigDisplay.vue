@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="dataForm" :model="temp" class="form-config-container">
+  <el-form ref="dataForm" class="form-config-container">
     <el-descriptions class="margin-top" title="Config Display" :column="1" border>
       <el-descriptions-item :label="item.detail" v-for="(item,index) in dataConfig.configDisplay" :key="index">
         <el-popover
@@ -9,17 +9,13 @@
           width="200"
           >
             <el-form-item
-              prop="admin_name"
-              :rules="[
-                { required: true, message: item.detail+' is required'},
-              ]"
-            >
-              <el-input v-model="item.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_name')" />
+              prop="admin_name">
+              <el-input v-model="item.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(item,index)" />
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(index)">cancel</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(item,index)">Confirm</el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ item.value ? item.value : 'Empty' }}</span>
@@ -41,16 +37,24 @@ export default {
   },
   data(){
     return {
+      btnLoading:false,
       visible:{},
-      temp:{}
   	};
   },
   created(){
-    this.dataConfig.configDisplay.forEach(function(v,i){
-      this.$set(this.visible,i,false);
-    });
+    for (var prop in this.dataConfig.displayConfig) {   
+      this.$set(this.visible,prop,false);
+    };
   },
   methods: {
+    handleConfirm(item,i){
+      this.btnLoading = true;
+      this.$emit('handleUpdate', item);
+      this.visible[i] = false;
+    },
+    handleCancel(i){
+      this.visible[i] = false;
+    }
   },
 };
 </script>

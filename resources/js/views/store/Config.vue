@@ -10,7 +10,7 @@
       <el-col :span="24">
         <el-tabs type="card" tab-position="top">
           <el-tab-pane v-for="(item,index) in comp" :label="index" :key="index">
-            <components :is="item.value" :data-config="item.dataConfig"/>
+            <components :is="item.value" :btn-Loading="btnLoading" :data-config="item.dataConfig" @handleUpdate="handleUpdate"/>
           </el-tab-pane>
         </el-tabs>
       </el-col>
@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import StoreResource from '@/api/store';
+import StoreConfigResource from '@/api/store-config';
 import ConfigAdmin from './components/ConfigAdmin';
 import ConfigCaptcha from './components/ConfigCaptcha';
 import ConfigCustomer from './components/ConfigCustomer';
@@ -27,9 +27,8 @@ import ConfigDisplay from './components/ConfigDisplay';
 import ConfigEmail from './components/ConfigEmail';
 import ConfigOrder from './components/ConfigOrder';
 import ConfigProduct from './components/ConfigProduct';
-import ConfigUrl from './components/ConfigUrl';
 
-const storeResource = new StoreResource();
+const storeconfigResource = new StoreConfigResource();
 export default {
   name: 'StoreConfig',
   components: { 
@@ -40,11 +39,12 @@ export default {
     ConfigEmail,
     ConfigOrder,
     ConfigProduct,
-    ConfigUrl 
   },
   data(){
     return {
+      id:null,
       customerConfig:{},
+      btnLoading:false,
       comp:{
         'Admin': {
           'value':'',
@@ -74,20 +74,20 @@ export default {
           'value':'',
           'dataConfig' : {}
         },
-        Url: {
-          'value':'',
-          'dataConfig' : {}
-        }
       }
   	};
   },
   created(){
-    const id = this.$route.params && this.$route.params.id;
-    storeResource.getConfig(id).then(({ data } = response) => {
+    const loading = this.$loading({
+      target: '.app-main',
+    });
+    let id = this.id = this.$route.params && this.$route.params.id;
+    storeconfigResource.get(id).then(({ data } = response) => {
       this.$set(this.comp.Admin,'value', 'ConfigAdmin');
+      this.$set(this.comp.Admin,'dataConfig',data.adminConfig);
        
       this.$set(this.comp.Captcha,'value','ConfigCaptcha');
-      this.$set(this.comp.Captcha,'dataConfig',{captcha_page: data.captcha_page,captcha:data.configCaptcha});
+      this.$set(this.comp.Captcha,'dataConfig',{captchaInstalled:data.pluginCaptchaInstalled,captcha_page: data.captcha_page,captcha:data.captchaConfig});
 
 
       this.$set(this.comp.Customer,'value','ConfigCustomer');
@@ -95,11 +95,11 @@ export default {
 
 
       this.$set(this.comp.Display,'value','ConfigDisplay');
-      this.$set(this.comp.Display,'dataConfig',{configDisplay: data.configDisplay});
+      this.$set(this.comp.Display,'dataConfig',{configDisplay: data.displayConfig});
 
 
       this.$set(this.comp.Email,'value','ConfigEmail');
-      this.$set(this.comp.Email,'dataConfig',{emailConfig: data.emailConfig});
+      this.$set(this.comp.Email,'dataConfig',{emailConfig: data.emailConfig,smtp_method: data.smtp_method});
 
 
       this.$set(this.comp.Order,'value','ConfigOrder');
@@ -113,8 +113,7 @@ export default {
         taxs:data.taxs
       });
 
-
-      this.$set(this.comp.Url,'value','ConfigUrl');
+      loading.close();
     }).catch(err => {
       console.log(err);
     });
@@ -123,7 +122,23 @@ export default {
     goBackList(){
       this.$router.push({ name: 'StoreList' });
     },
-    
+    handleUpdate(data){
+      storeconfigResource.update(this.id,data).then((res) => {
+        if (res) {
+          this.$message({
+            type: 'success',
+            message: 'Update successfully',
+          });
+        } else {
+          this.$message({
+            type: 'error',
+            message: 'Update failed',
+          });
+        }
+      }).catch(err => {
+          console.log(err);
+      });
+    }
   },
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="dataForm" :model="temp" class="form-config-container" style="width: 100%;">
+  <el-form ref="dataForm" class="form-config-container" style="width: 100%;">
     <el-row :gutter="20" style="margin:0px">
       <el-col :span="12" style="padding: 0;">
         <el-descriptions class="margin-top" title="Config Product" :column="1" border>
@@ -9,32 +9,27 @@
               v-model="visible"
               placement="top"
               :title="item.detail"
-              width="200"
-            >
-              <el-form-item
-                prop="admin_title"
-                :rules="[
-                  { required: true, message: item.detail+' is required'},
-                ]"
-              >
-                <el-select v-model="temp.tax" placeholder="Select" filterable style="width: 100%;">
+              width="200" >
+              <el-form-item>
+                <el-select v-model="item.value" placeholder="Select" filterable style="width: 100%;">
                   <el-option
-                    v-for="(item,index) in dataConfig.taxs"
-                    :key="index"
-                    :label="item"
-                    :value="index"
+                    v-for="(tax,key) in dataConfig.taxs"
+                    :key="key"
+                    :label="tax"
+                    :value="key"
                   />
                 </el-select>
               </el-form-item>
               <div style="text-align: right; margin: 12px 0px 0px 0px">
                 <el-button-group>
-                  <el-button type="danger" size="mini">cancel</el-button>
-                  <el-button type="primary" size="mini" :loading="btnLoading" >Confirm</el-button>
+                  <el-button type="danger" @click="handleCancel()" size="mini">cancel</el-button>
+                  <el-button type="primary" @click="handleConfirm(item)" size="mini" :loading="btnLoading" >Confirm</el-button>
                 </el-button-group>
               </div>
               <span slot="reference" class="border-edit">{{ dataConfig.taxs[item.value] }}</span>
             </el-popover>
             <el-switch v-else
+              @change="handleActive(item)"
               v-model="item.value"
               active-color="#13ce66"
               inactive-color="#ff4949"
@@ -64,6 +59,7 @@
                      </td>
                      <td colspan="1" class="el-descriptions-item__cell el-descriptions-item__content">
                         <el-switch
+                          @change="handleActive(item)"
                           v-model="item.value"
                           active-color="#13ce66"
                           inactive-color="#ff4949"
@@ -73,6 +69,7 @@
                      </td>
                      <td colspan="1" class="el-descriptions-item__cell el-descriptions-item__content" v-if="item.required">
                         <el-switch
+                          @change="handleActive(item)"
                           v-model="item.required.value"
                           active-color="#13ce66"
                           inactive-color="#ff4949"
@@ -104,16 +101,20 @@ export default {
     return {
       visible:false,
       btnLoading:false,
-      temp:{
-        tax:'',
-      }
   	};
   },
-  created(){
-    this.temp.tax = this.dataConfig.productConfig.product_tax.value;
-  },
+  created(){},
   methods: {
-    
+    handleCancel(){
+      this.visible = false;
+    },
+    handleConfirm(item){
+      this.visible = false;
+      this.$emit('handleUpdate', item);
+    },
+    handleActive(item){
+      this.$emit('handleUpdate', item);
+    }
   },
 };
 </script>

@@ -1,6 +1,7 @@
 import { login, logout, getInfo } from '@/api/auth';
 import { isLogged, setLogged, removeToken } from '@/utils/auth';
 import router, { resetRouter } from '@/router';
+import Cookies from 'js-cookie';
 
 const state = {
   token_name: 'server:full',
@@ -13,6 +14,7 @@ const state = {
   roles: [],
   permissions: [],
   online: false,
+  storeList:[],
 };
 
 const mutations = {
@@ -36,6 +38,12 @@ const mutations = {
   },
   SET_PERMISSIONS: (state, permissions) => {
     state.permissions = permissions;
+  },
+  SET_STORE_LIST: (state, store) => {
+    state.storeList = store;
+  },
+  SET_STORE_CURRENT: (state, store) => {
+    Cookies.set('store', store);
   },
 };
 
@@ -67,7 +75,7 @@ const actions = {
             reject('Verification failed, please Login again.');
           }
 
-          const { roles, name, avatar, introduction, permissions, id } = data;
+          const { roles, name, avatar, introduction, permissions, id,store } = data;
           // roles must be a non-empty array
           if (!roles || roles.length <= 0) {
             reject('getInfo: roles must be a non-null array!');
@@ -78,6 +86,11 @@ const actions = {
           commit('SET_AVATAR', avatar);
           commit('SET_INTRODUCTION', introduction);
           commit('SET_ID', id);
+          commit('SET_STORE_LIST', store);
+          if (!roles.includes('Administrator')) {
+            // let first = store.splice(0,1);
+            commit('SET_STORE_CURRENT', Object.keys(store)[0]);
+          }
           resolve(data);
         }).catch(error => {
           reject(error);

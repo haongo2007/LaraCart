@@ -53,6 +53,8 @@ class Order extends ShopOrder
         $sort_order   = $dataSearch['sort_order'] ?? 'id__desc';
         $status       = $dataSearch['status'] ?? [];
         $limit        = $dataSearch['limit'] ?? self::ITEM_PER_PAGE;
+        $storeId      = $dataSearch['storeId_list'];
+
         $arrSort = [
             'id__desc'         => trans('order.admin.sort_order.id_desc'),
             'id__asc'          => trans('order.admin.sort_order.id_asc'),
@@ -62,6 +64,16 @@ class Order extends ShopOrder
             'created_at__asc'  => trans('order.admin.sort_order.date_asc'),
         ];
         $orderList = (new ShopOrder);
+
+        if (!is_array($storeId) && $storeId != '') {
+            $storeId = [$storeId];
+        }
+        if (empty($storeId) && Admin::user()->isAdministrator()) {
+            $storeId = Admin::user()->listStoreId();
+        }
+        
+        $orderList = $orderList->whereIn('store_id', $storeId);
+
         if($status && is_array($status)) {
             $orderList = $orderList->whereIn('status', $status);
         }
@@ -90,12 +102,12 @@ class Order extends ShopOrder
             });
         }
         
+
         if ($from && $to) {
             $orderList = $orderList->where(function ($sql) use($from,$to){
                 $sql->Where([['created_at', '>=' , Carbon::parse($from)->format('Y-m-d H:i:s')],['created_at', '<=' , Carbon::parse($to)->format('Y-m-d H:i:s')]]);
             });
         }
-
 
         if ($sort_order && array_key_exists($sort_order, $arrSort)) {
             $field = explode('__', $sort_order)[0];

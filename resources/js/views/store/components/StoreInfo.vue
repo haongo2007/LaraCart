@@ -37,11 +37,7 @@
                   title="Number phone"
                   width="200">
                   <el-form-item
-                    prop="phone"
-                    :rules="[
-                      { required: true, message: 'Number Phone is required'},
-                    ]"
-                  >
+                    prop="phone">
                     <el-input v-model="temp.phone" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(0,'phone')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -75,11 +71,7 @@
                   title="Number phone (other)"
                   width="200">
                   <el-form-item
-                    prop="long_phone"
-                    :rules="[
-                      { required: true, message: 'Number Phone other is required'},
-                    ]"
-                  >
+                    prop="long_phone">
                     <el-input v-model="temp.long_phone" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(1,'long_phone')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -92,10 +84,7 @@
                 </el-popover>
                 <el-form-item
                   v-else
-                  prop="long_phone"
-                  :rules="[
-                    { required: true, message: 'Number Phone other is required'},
-                  ]">
+                  prop="long_phone">
                   <el-input v-model="temp.long_phone" placeholder="Please input" @keyup.enter.native="handleConfirm(1,'long_phone')" />
                 </el-form-item>
               </el-descriptions-item>
@@ -113,11 +102,7 @@
                   title="Email address"
                   width="200">
                   <el-form-item
-                    prop="email"
-                    :rules="[
-                      { required: true, message: 'Email is required'},
-                    ]"
-                  >
+                    prop="email">
                     <el-input v-model="temp.email" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'email')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -151,11 +136,7 @@
                   title="Address"
                   width="200">
                   <el-form-item
-                    prop="address"
-                    :rules="[
-                      { required: true, message: 'Address is required'},
-                    ]"
-                  >
+                    prop="address">
                     <el-input v-model="temp.address" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'address')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -168,10 +149,7 @@
                 </el-popover>
                 <el-form-item
                   v-else
-                  prop="address"
-                  :rules="[
-                    { required: true, message: 'Address is required'},
-                  ]">
+                  prop="address">
                   <el-input v-model="temp.address" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'address')" />
                 </el-form-item>
               </el-descriptions-item>
@@ -189,11 +167,7 @@
                   title="Domain"
                   width="200">
                   <el-form-item
-                    prop="domain"
-                    :rules="[
-                      { required: true, message: 'Domain is required'},
-                    ]"
-                  >
+                    prop="domain">
                     <el-input v-model="temp.domain" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'domain')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -227,11 +201,7 @@
                   title="Default language"
                   width="200">
                   <el-form-item
-                    prop="language"
-                    :rules="[
-                      { required: true, message: 'Domain is required'},
-                    ]"
-                  >
+                    prop="language">
 
                     <el-select v-model="temp.language" placeholder="Select" filterable style="width: 100%;">
                       <el-option
@@ -248,7 +218,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(5,'language')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.language ? temp.language : 'Empty' }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.language ? temp.languages[temp.language].name : 'Empty' }}</span>
                 </el-popover>
                 <el-form-item
                   v-else
@@ -259,7 +229,7 @@
 
                   <el-select v-model="temp.language" placeholder="Select" filterable style="width: 100%;">
                     <el-option
-                      v-for="(item,index) in temp.languages"
+                      v-for="(item,index) in samp.languages"
                       :key="index"
                       :label="item.name"
                       :value="index"
@@ -281,11 +251,7 @@
                   title="Default currency"
                   width="200">
                   <el-form-item
-                    prop="currency"
-                    :rules="[
-                      { required: true, message: 'Currency is required'}
-                    ]"
-                  >
+                    prop="currency">
                     <el-select v-model="temp.currency" placeholder="Select" filterable style="width: 100%;">
                       <el-option
                         v-for="(item,index) in temp.currencies"
@@ -301,7 +267,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(6,'currency')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.currency ? temp.currency : 'Empty' }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.currency ? temp.currencies[temp.currency] : 'Empty' }}</span>
                 </el-popover>
                   <el-form-item
                     v-else
@@ -311,7 +277,7 @@
                     ]">
                     <el-select v-model="temp.currency" placeholder="Select" filterable style="width: 100%;">
                       <el-option
-                        v-for="(item,index) in temp.currencies"
+                        v-for="(item,index) in samp.currencies"
                         :key="index"
                         :label="item"
                         :value="index"
@@ -333,11 +299,7 @@
                   title="Office"
                   width="200">
                   <el-form-item
-                    prop="office"
-                    :rules="[
-                      { required: true, message: 'Office is required'}
-                    ]"
-                  >
+                    prop="office">
                     <el-input v-model="temp.office" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'office')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -350,10 +312,7 @@
                 </el-popover>
                 <el-form-item
                     v-else
-                    prop="office"
-                    :rules="[
-                      { required: true, message: 'Office is required'}
-                    ]">
+                    prop="office">
                   <el-input v-model="temp.office" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'office')" />
                 </el-form-item>
               </el-descriptions-item>
@@ -371,11 +330,7 @@
                   title="Warehouse"
                   width="200">
                   <el-form-item
-                    prop="warehouse"
-                    :rules="[
-                      { required: true, message: 'Warehouse is required'}
-                    ]"
-                  >
+                    prop="warehouse">
                     <el-input v-model="temp.warehouse" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(8,'warehouse')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -388,10 +343,7 @@
                 </el-popover>
                 <el-form-item
                     v-else
-                    prop="warehouse"
-                    :rules="[
-                      { required: true, message: 'Warehouse is required'}
-                    ]">
+                    prop="warehouse">
                   <el-input v-model="temp.warehouse" placeholder="Please input" @keyup.enter.native="handleConfirm(8,'warehouse')" />
                 </el-form-item>
               </el-descriptions-item>
@@ -409,11 +361,7 @@
                   title="Timezone"
                   width="200">
                   <el-form-item
-                    prop="timezone"
-                    :rules="[
-                      { required: true, message: 'Timezone is required'}
-                    ]"
-                  >
+                    prop="timezone">
                     <el-select v-model="temp.timezone" placeholder="Select" filterable style="width: 100%;">
                       <el-option
                         v-for="(item,index) in temp.timezones"
@@ -439,7 +387,7 @@
                     ]">
                     <el-select v-model="temp.timezone" placeholder="Select" filterable style="width: 100%;">
                       <el-option
-                        v-for="(item,index) in temp.timezones"
+                        v-for="(item,index) in samp.timezones"
                         :key="index"
                         :label="item"
                         :value="item"
@@ -461,11 +409,7 @@
                   title="Template"
                   width="200">
                   <el-form-item
-                    prop="template"
-                    :rules="[
-                      { required: true, message: 'Template is required'}
-                    ]"
-                  >
+                    prop="template">
                     <el-input v-model="temp.template" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'template')" />
                   </el-form-item>
                   <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -499,14 +443,10 @@
                   title="Time Working"
                   width="376">
                   <el-form-item
-                    prop="time_active"
-                    :rules="[
-                      { required: true, message: 'Time Working is required'}
-                    ]"
-                  >
+                    prop="time_active">
                     <el-time-picker
                       is-range
-                      v-model="temp.time_active"
+                      v-model="time_active"
                       range-separator="To"
                       start-placeholder="Start time"
                       end-placeholder="End time">
@@ -518,14 +458,11 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(11,'time_active')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.time_active ? temp.time_active : 'Empty' }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.time_active ? temp.time_active[0]+" -> "+temp.time_active[1] : 'Empty' }}</span>
                 </el-popover>
                 <el-form-item
                   v-else
-                  prop="time_active"
-                  :rules="[
-                    { required: true, message: 'Time Working is required'}
-                  ]">
+                  prop="time_active">
                   <el-time-picker
                     style="width: 100%"
                     is-range
@@ -560,17 +497,13 @@
                       width="200"
                     >
                       <el-form-item
-                        :prop="'descriptions.'+index+'.title.value'"
-                        :rules="[
-                          { required: true, message: 'App name is required'},
-                        ]"
-                      >
-                        <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)" />
+                        :prop="'descriptions.'+index+'.title.value'">
+                        <el-input v-model="item.title.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.title.visible',index+'.title.value',item.lang)" />
                       </el-form-item>
                       <div style="text-align: right; margin: 12px 0px 0px 0px">
                         <el-button-group>
                           <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')">cancel</el-button>
-                          <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)">Confirm</el-button>
+                          <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.title.visible',index+'.title.value',item.lang)">Confirm</el-button>
                         </el-button-group>
                       </div>
                       <span slot="reference" class="border-edit">{{ item.title.value ? item.title.value : 'Empty' }}</span>
@@ -578,11 +511,8 @@
                   </div>
                   <el-form-item
                     v-else
-                    :prop="'descriptions.'+index+'.title.value'"
-                    :rules="[
-                      { required: true, message: 'App name is required'},
-                    ]">
-                    <el-input v-model="item.title.value" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.title.value',item.lang)" >
+                    :prop="'descriptions.'+index+'.title.value'">
+                    <el-input v-model="item.title.value" placeholder="Please input" >
                       <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" slot="suffix" />
                     </el-input>
                   </el-form-item>
@@ -605,17 +535,13 @@
                       width="200"
                     >
                       <el-form-item
-                        :prop="'descriptions.'+index+'.keyword.value'"
-                        :rules="[
-                          { required: true, message: 'Keyword is required'},
-                        ]"
-                      >
-                        <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)" />
+                        :prop="'descriptions.'+index+'.keyword.value'">
+                        <el-input v-model="item.keyword.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.keyword.visible',index+'.keyword.value',item.lang)" />
                       </el-form-item>
                       <div style="text-align: right; margin: 12px 0px 0px 0px">
                         <el-button-group>
                           <el-button type="danger" size="mini" @click="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')">cancel</el-button>
-                          <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)">Confirm</el-button>
+                          <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index+'.keyword.visible',index+'.keyword.value',item.lang)">Confirm</el-button>
                         </el-button-group>
                       </div>
                       <span slot="reference" class="border-edit">{{ item.keyword.value ? item.keyword.value  : 'Empty'}}</span>
@@ -623,11 +549,8 @@
                   </div>
                   <el-form-item
                     v-else
-                    :prop="'descriptions.'+index+'.keyword.value'"
-                    :rules="[
-                      { required: true, message: 'Keyword is required'},
-                    ]">
-                    <el-input v-model="item.keyword.value" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.keyword.value',item.lang)" >                                      
+                    :prop="'descriptions.'+index+'.keyword.value'">
+                    <el-input v-model="item.keyword.value" placeholder="Please input">                                      
                       <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" slot="suffix" />
                     </el-input>
                   </el-form-item>
@@ -650,11 +573,7 @@
                       width="200"
                     >
                       <el-form-item
-                        :prop="'descriptions.'+index+'.description.value'"
-                        :rules="[
-                          { required: true, message: 'Description is required'}
-                        ]"
-                      >
+                        :prop="'descriptions.'+index+'.description.value'">
                         <el-input v-model="item.description.value" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)" />
                       </el-form-item>
                       <div style="text-align: right; margin: 12px 0px 0px 0px">
@@ -668,18 +587,15 @@
                   </div>
                   <el-form-item
                     v-else
-                    :prop="'descriptions.'+index+'.description.value'"
-                    :rules="[
-                      { required: true, message: 'Description is required'}
-                    ]">
-                    <el-input v-model="item.description.value" placeholder="Please input" @keyup.enter.native="handleConfirm(index+'.description.visible',index+'.description.value',item.lang)" >
+                    :prop="'descriptions.'+index+'.description.value'">
+                    <el-input v-model="item.description.value" placeholder="Please input" >
                       <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" slot="suffix" />
                     </el-input>
                   </el-form-item>
                 </div>
               </el-descriptions-item>
               <template slot="extra" extra="bottom">
-                <el-button v-if="!isEdit" type="primary" @click="saveStore()" size="small">Save</el-button>
+                <el-button v-if="!isEdit" :loading="btnLoading" type="primary" @click="createData()" size="small">Save</el-button>
               </template>
           </el-descriptions>
         </el-col>
@@ -697,6 +613,7 @@
 import StoreResource from '@/api/store';
 import EventBus from '@/components/FileManager/eventBus';
 import FileManager from '@/components/FileManager';
+import { parseTime } from '@/filters';
 
 const storeResource = new StoreResource();
 
@@ -719,20 +636,23 @@ export default {
   },
   data() {
     return {
+      id:0,
       visible: {},
       btnLoading: false,
       temp: {},
+      samp:{},
       componentStorage: '',
       dialogStorageVisible:false,
       cancelAction:false,
+      time_active:'',
     };
   },
   created() {
-    this.temp = Object.assign({}, this.dataInfo);
     for (var i = 0; i <=11; i++) {
       this.$set(this.visible,i,false);
     }
     if (!this.isEdit) {
+      this.samp = Object.assign({}, this.dataInfo);
       let i = 0;
       this.$set(this.temp,'descriptions',[]);
       this.$set(this.temp,'language','');
@@ -742,11 +662,23 @@ export default {
       this.$set(this.temp,'email','');
       this.$set(this.temp,'long_phone','');
       this.$set(this.temp,'phone','');
+      this.$set(this.temp,'timezone','');
+      this.$set(this.temp,'template','');
+      this.$set(this.temp,'warehouse','');
+      this.$set(this.temp,'office','');
+      this.$set(this.temp,'time_active','');
+      this.$set(this.temp,'logo','');
 
-      for (var prop in this.temp.languages) {   
+      for (var prop in this.samp.languages) {   
         this.$set(this.temp.descriptions,i,{lang:prop});
         i++;
       };
+    }else{
+      this.id = this.$route.params.id;  
+      this.temp = Object.assign({}, this.dataInfo);
+      if (this.temp.time_active.length) {
+        this.temp.time_active = JSON.parse(this.temp.time_active);
+      }
     }
     let that = this;
     this.temp.descriptions.forEach(function(v,i) {
@@ -754,6 +686,13 @@ export default {
       that.$set(that.temp.descriptions[i],'title',{value:v.title?v.title:'',visible:false});
       that.$set(that.temp.descriptions[i],'keyword',{value:v.keyword?v.keyword:'',visible:false});
     });
+  },
+  watch: {
+    'dataQuery.limit': {
+      handler(newValue, oldValue) {
+        this.getList(newValue);
+      },
+    },
   },
   methods: {
     goBackList(){
@@ -772,6 +711,10 @@ export default {
     },
     handlerGeturl(data) {
       this.temp.logo = data[0];
+      if(this.isEdit){
+        let params = {logo:data[0]};
+        this.updateData('',params);
+      }
       this.dialogStorageClose();
     },
     handleConfirm(i, key,lang){
@@ -780,57 +723,25 @@ export default {
       if (this.cancelAction) {
         return false;
       }
-      let id = 0;
-      if (this.isEdit) {
-        id = this.$route.params.id;  
-      }
-      const params = {
-        name: key,
-        value: this.temp[key],
-      };
-
-      if (lang) {
-        let newKey = key.split('.');
-        params['name'] = newKey[1];
-        params['lang'] = lang;
-        params.value = this.temp.descriptions[newKey[0]][newKey[1]][newKey[2]];
-      }
-
       this.btnLoading = true;
-      storeResource.update(id, params).then((res) => {
-        if (res) {
-          this.$message({
-            type: 'success',
-            message: 'Update successfully',
-          });
-          this.btnLoading = false;
-          this.visible[i] = false;
-          this.dataOrder[key] = this.temp[key];
-          this.$emit('handleChangeHistory', res.data.history);
-        } else {
-          this.$message({
-            type: 'error',
-            message: 'Update failed',
-          });
-          this.btnLoading = false;
-          this.visible[i] = false;
-        }
-      }).catch(err => {
-          console.log(err);
-          this.btnLoading = false;
-          this.visible[i] = false;
-      });
-     
+      let params = {};
+      if(key == 'time_active'){
+        this.temp.time_active = [parseTime(this.time_active[0], '{h}:{i}:{s}'),parseTime(this.time_active[1], '{h}:{i}:{s}')];
+      }
+      if (lang) {
+        params['descriptions'] = this.temp.descriptions;
+      }else{
+        params[key] = this.temp[key];
+      }      
+      this.updateData(i,params);     
     },
     handleCancel(i,key){
       if(typeof i == 'string'){
         let newI = i.split('.');
         let newKey = key.split('.');
         this.temp.descriptions[newI[0]][newI[1]][newI[2]] = false;
-        this.temp.descriptions[newKey[0]][newKey[1]][newKey[2]] = '';
       }else{
         this.visible[i] = false;
-        this.temp[key] = ''; 
       }
     },
     _checkValidate(msg){
@@ -838,8 +749,77 @@ export default {
         this.cancelAction = true;
       }
     },
-    saveStore(){
-      console.log(this.temp);
+    reloadRedirectToList(cpn){
+      const view = this.$router.resolve({ name: cpn }).route;
+      this.$store.dispatch('tagsView/delCachedView', view).then(() => {
+        const { fullPath } = view;
+        this.$router.replace({
+          path: '/redirect' + fullPath,
+        });
+      });
+    },
+    updateData(i,params){
+      storeResource.update(this.id,params).then((res) => {
+        if (res) {
+          this.$message({
+            type: 'success',
+            message: 'Update successfully',
+          });
+          if (i) {
+            console.log(i);
+            if (typeof i == 'string') {
+              i = i.split('.');
+              this.temp.descriptions[i[0]][i[1]][i[2]] = false;
+            }else{
+              this.visible[i] = false;
+            }
+            this.btnLoading = false;
+          }
+        } else {
+          this.$message({
+            type: 'error',
+            message: 'Update failed',
+          });
+          this.btnLoading = false;
+        }
+      }).catch(err => {
+          console.log(err);
+          this.btnLoading = false;
+      });
+    },
+    createData(){
+      let that = this;
+      for (var key in this.temp) {
+        this.$refs['dataForm'].validateField(key, this._checkValidate);
+      }
+      if (this.cancelAction) {
+        return false;
+      }
+      this.btnLoading = true;
+      if (this.temp.time_active.length) {
+        this.temp.time_active = [parseTime(this.temp.time_active[0], '{h}:{i}:{s}'),parseTime(this.temp.time_active[1], '{h}:{i}:{s}')];
+      }
+      storeResource.store(this.temp).then((res) => {
+        if (res) {
+          this.$message({
+            type: 'success',
+            message: 'Create successfully',
+          });
+          this.btnLoading = false;
+          const view = this.$router.resolve({ name: 'StoreCreate' }).route;
+          this.$store.dispatch('tagsView/delCachedView', view);
+          this.reloadRedirectToList('StoreList');
+        } else {
+          this.$message({
+            type: 'error',
+            message: 'Create failed',
+          });
+          this.btnLoading = false;
+        }
+      }).catch(err => {
+          console.log(err);
+          this.btnLoading = false;
+      });
     }
   }
 };

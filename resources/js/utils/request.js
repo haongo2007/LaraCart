@@ -19,6 +19,9 @@ service.interceptors.request.use(
     if (Cookies.get('language')) {
       config.headers['x-localization'] = Cookies.get('language'); // Set Language
     }
+    if (Cookies.get('store')) {
+      config.headers['x-store'] = Cookies.get('store'); // Set store
+    }
     return config;
   },
   error => {

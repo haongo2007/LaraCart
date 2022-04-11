@@ -15,22 +15,22 @@ const systemRoutes = {
     {
       path: '/users-permissions/users',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/system/users-permissions/users/List'),
+      name: 'UsersList',
       meta: { title: 'users',parent:'root',},
     },
     {
       path: '/users-permissions/roles',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/system/users-permissions/roles/List'),
+      name: 'RolesList',
       meta: { title: 'roles',parent:'root',},
     },
     {
       path: '/users-permissions/permissions',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/system/users-permissions/permissions/List'),
+      name: 'PermissionsList',
       meta: { title: 'permissions',parent:'root',},
     },
     //setting

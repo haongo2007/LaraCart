@@ -31,6 +31,7 @@ class UserCollection extends JsonResource
                 $this->allPermissions()->toArray()
             ),
             'avatar' => $this->avatar ? asset($this->avatar) : 'api/getFile?disk='.env('FILESYSTEM_DRIVER', 'local').'&path='.urlencode('avatar/default.jpg'),
+            'store' => $this->listStore(),
         ];
     }
 }

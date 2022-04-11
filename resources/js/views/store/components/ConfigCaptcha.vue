@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="dataForm" :model="temp" class="form-config-container">
+  <el-form class="form-config-container">
     <el-descriptions class="margin-top" title="Config Captcha" :column="1" border>
       <el-descriptions-item v-for="(item,index) in dataConfig.captcha" :key="index" :label="item.detail">
         <!-- /// captcha method -->
@@ -8,20 +8,22 @@
           v-model="visible[0]"
           placement="top"
           title="Admin name"
-          width="200"
-        >
-          <el-form-item
-            prop="admin_name"
-            :rules="[
-              { required: true, message: 'Admin name is required'},
-            ]"
-          >
-            <el-input v-model="temp.admin_name" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'admin_name')" />
-          </el-form-item>
+          width="200">
+            <el-form-item
+              prop="captcha_method">
+              <el-select v-model="item.value" placeholder="Select" filterable @change="handleChangePlugins">
+                <el-option
+                  v-for="(type,i) in dataConfig.captchaInstalled"
+                  :key="i"
+                  :label="type"
+                  :value="type"
+                />
+              </el-select>
+            </el-form-item>
           <div style="text-align: right; margin: 12px 0px 0px 0px">
             <el-button-group>
-              <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
+              <el-button type="danger" size="mini" @click="handleCancel(0)">cancel</el-button>
+              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(item,0,'captcha_method')">Confirm</el-button>
             </el-button-group>
           </div>
           <span slot="reference" class="border-edit">{{ item.value ? item.value : 'Empty' }}</span>
@@ -32,30 +34,33 @@
           v-model="visible[1]"
           placement="top"
           title="Captcha page"
-          width="400"
-        >
-          <el-form-item
-            prop="captcha_page"
-            :rules="[]"
-          >
-            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">Check all</el-checkbox>
-
-            <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-              <el-checkbox v-for="(page,title) in dataConfig.captcha_page" :label="page" :key="title">{{page}}</el-checkbox>
+          width="400">
+          <el-form-item prop="captcha_page">
+            <el-checkbox-group v-model="item.value" @change="handleCheckedPageCaptcha">
+              <el-checkbox v-for="(page,id) in dataConfig.captcha_page" :label="id" :key="id">{{page}}</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
+
           <div style="text-align: right; margin: 12px 0px 0px 0px">
             <el-button-group>
               <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'admin_name')">Confirm</el-button>
+              <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(item,1,'captcha_page')">Confirm</el-button>
             </el-button-group>
           </div>
-          <span slot="reference" class="border-edit">{{ JSON.parse(item.value).length ? item.value : 'Empty' }}</span>
+          <span slot="reference" class="border-edit" v-if="item.value.length">
+            <span v-for="page in captchaPageTitle">
+              {{ page }}<br>
+            </span> 
+          </span>
+          <span v-else slot="reference" class="border-edit">
+            Empty
+          </span>
         </el-popover>
         <!-- /// active captcha -->
         <el-switch
           v-else-if="index == 'captcha_mode'"
-          v-model="value2"
+          v-model="item.value"
+          @change="handleActiveCaptcha(item)"
           active-color="#13ce66"
           inactive-color="#ff4949"
           active-value="1"
@@ -78,43 +83,57 @@ export default {
   },
   data(){
     return {
-      value2:1,
       btnLoading:false,
-      visible:[false,false],
-      temp:{},
-      checkAll: false,
-      checkedCities: [],
-      isIndeterminate: true
+      visible:{},
+      captchaInstalled:'',
   	};
   },
   created(){
-
+    this.dataConfig.captcha.captcha_page.value = JSON.parse(this.dataConfig.captcha.captcha_page.value);
+  },
+  computed:{
+    captchaPageTitle(){
+      let arr = [];
+      let key = this.dataConfig.captcha.captcha_page.value;
+      for(let prop in this.dataConfig.captcha_page) {
+        let res = key.filter((item) => item === prop);
+        if (res.length > 0) {
+          arr.push(this.dataConfig.captcha_page[prop]);
+        }
+      };
+      return arr;
+    }
   },
   methods: {
-    handleCheckAllChange(val) {
-      this.checkedCities = val ? val : [];
-      this.isIndeterminate = false;
-    },
-    handleCheckedCitiesChange(value) {
-      let checkedCount = value.length;
-      this.checkAll = checkedCount === this.dataConfig.captcha_page.length;
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.dataConfig.captcha_page.length;
-    },
-    handleConfirm(i, key){
-      this.cancelAction = false;
-      this.$refs['dataForm'].validateField(key, this._checkValidate);
-      if (this.cancelAction) {
-        return false;
+    handleChangePlugins(val){
+      let obj = JSON.parse(JSON.stringify(this.dataConfig.captchaInstalled));
+      let res;
+      for(let prop in obj){
+        if (obj[prop] == val) {
+          res = prop;
+        }
       }
-      const id = this.$route.params.id;
-      const params = {
-        name: key,
-        value: this.temp[key],
-      };
-
-      this.btnLoading = true;
-     
+      this.captchaInstalled = res;
     },
+    handleActiveCaptcha(data){
+      this.$emit('handleUpdate', data);
+    },
+    handleCheckedPageCaptcha(value) {
+      console.log(value);
+    },
+    handleConfirm(item,i,type){
+      this.btnLoading = true;
+      item = {...item};
+      if (type == 'captcha_method') {
+        item.value = this.captchaInstalled;
+      }
+      this.$emit('handleUpdate', item);
+      this.btnLoading = false;
+      this.visible[i] = false;
+    },
+    handleCancel(i){
+      this.visible[i] = false;
+    }
   },
 };
 </script>
