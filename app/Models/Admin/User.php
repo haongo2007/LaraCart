@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 use App\Models\Front\ShopStore;
 use App\Models\Admin\Admin;
+use Illuminate\Support\Arr;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Model implements AuthenticatableContract
@@ -19,6 +20,7 @@ class User extends Model implements AuthenticatableContract
     protected $hidden  = [
         'password', 'remember_token',
     ];
+    const ITEM_PER_PAGE = 15;
     protected static $allPermissions = null;
     protected static $allViewPermissions = null;
     protected static $canChangeConfig = null;
@@ -315,4 +317,43 @@ class User extends Model implements AuthenticatableContract
         return self::$listStore;
     }
 
+    public static function getUsersListAdmin(array $dataSearch) {
+
+        $limit = Arr::get($dataSearch, 'limit', self::ITEM_PER_PAGE);
+        $role  = Arr::get($dataSearch, 'role', []);
+        $keyword = Arr::get($dataSearch, 'keyword', '');
+        $storeId = Arr::get($dataSearch, 'storeId_list', []);
+        
+        $userstoreTable = (new UserStore)->getTable();
+        $storeTable = (new Store)->getTable();
+
+        $usersList = (new self);
+        $usersTable = $usersList->getTable();
+
+        $usersList = $usersList->select($storeTable.'.*',$usersTable.'.*');
+
+        if (!is_array($storeId) && $storeId != '') {
+            $storeId = [$storeId];
+        }
+        if (empty($storeId) && Admin::user()->isAdministrator()) {
+            $storeId = Admin::user()->listStoreId();
+        }
+
+        $usersList = $usersList->join($userstoreTable, $userstoreTable . '.user_id', $usersTable . '.id')
+        ->join($storeTable, $storeTable . '.id', $userstoreTable . '.store_id')
+        ->whereIn($storeTable.'.id',$storeId);
+
+        if (!empty($role)) {
+            $usersList->whereHas('roles', function($q) use ($role) { $q->whereIn('name', $role); });
+        }
+
+        if (!empty($keyword)) {
+            $usersList->where('name', 'LIKE', '%' . $keyword . '%');
+            $usersList->where('email', 'LIKE', '%' . $keyword . '%');
+        }
+
+        $usersList = $usersList->paginate($limit);
+
+        return $usersList;
+    }
 }

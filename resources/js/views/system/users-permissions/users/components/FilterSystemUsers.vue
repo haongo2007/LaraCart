@@ -23,8 +23,8 @@
 
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-select v-model="dataQuery.role" :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
-              <el-option v-for="item in roles" :key="item" :label="item | uppercaseFirst" :value="item" />
+            <el-select multiple collapse-tags v-model="dataQuery.role" :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
+              <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
             </el-select>
           </el-col>
           <el-col :span="12">
@@ -41,8 +41,10 @@
 import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
 import UserResource from '@/api/user';
+import RoleResource from '@/api/role';
 
 const userResource = new UserResource();
+const roleResource = new RoleResource();
 export default {
   name: 'FilterSystemUsers',
   props: {
@@ -59,7 +61,7 @@ export default {
     return {
       list: null,
       total: 0,
-      listQuery: {},
+      roles:[],
     };
   },
   watch: {
@@ -76,6 +78,7 @@ export default {
   },
   created() {
     this.getList();
+    this.getListRole();
   },
   methods: {
     async getList() {
@@ -85,9 +88,12 @@ export default {
 
       this.$emit('handleListenData', { list: this.list, loading: false, total: this.total, listQuery: this.dataQuery });
     },
+    async getListRole(){
+      const data = await roleResource.list();
+      this.roles = data.data;
+    },
     handleFilter(type, e) {
       this.dataQuery.page = 1;
-
       this.getList();
     },
   },

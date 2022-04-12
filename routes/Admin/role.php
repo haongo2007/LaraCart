@@ -9,5 +9,5 @@
     //     Route::post('/delete', 'Auth\RoleController@deleteList')->name('admin_role.delete');
     // });
 	
-    // Route::apiResource('roles', 'RoleController')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::apiResource('role', 'RoleController');
     // Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);

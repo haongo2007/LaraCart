@@ -1,3 +1,4 @@
+
 <template>
   <div class="app-container">
     <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">

@@ -36,22 +36,10 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $searchParams = $request->all();
-        $userQuery = User::query();
-        $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
-        $role = Arr::get($searchParams, 'role', '');
-        $keyword = Arr::get($searchParams, 'keyword', '');
-
-        if (!empty($role)) {
-            $userQuery->whereHas('roles', function($q) use ($role) { $q->where('name', $role); });
-        }
-
-        if (!empty($keyword)) {
-            $userQuery->where('name', 'LIKE', '%' . $keyword . '%');
-            $userQuery->where('email', 'LIKE', '%' . $keyword . '%');
-        }
-
-        return UserCollection::collection($userQuery->paginate($limit));
+        $searchParams = request()->all();
+        $searchParams['storeId_list'] = request()->header()['x-store'];
+        $data = (new User)->getUsersListAdmin($searchParams);
+        return UserCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
     /**

@@ -3,7 +3,7 @@ import Resource from '@/api/resource';
 
 class RoleResource extends Resource {
   constructor() {
-    super('roles');
+    super('role');
   }
 
   permissions(id) {
