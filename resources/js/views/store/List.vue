@@ -20,17 +20,22 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.domain')" min-width="80px">
+      <el-table-column :label="$t('table.name')" min-width="200px">
+        <template slot-scope="scope">
+          {{ scope.row.descriptions[0].title }}
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('table.domain')" min-width="120px">
         <template slot-scope="scope">
           {{ scope.row.domain }}
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.template')" min-width="80px" prop="template">
+      <el-table-column :label="$t('table.template')" min-width="150px" prop="template">
         <template slot-scope="scope">
           {{ scope.row.template }}
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.logo')" min-width="80px" prop="logo">
+      <el-table-column :label="$t('table.logo')" min-width="100px" prop="logo">
         <template slot-scope="scope">
           <el-image :src="scope.row.logo+'&w=260'">
             <div slot="error" class="image-slot">
@@ -39,7 +44,7 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('phone')" min-width="70px" align="center" prop="phone">
+      <el-table-column :label="$t('phone')" min-width="100px" align="center" prop="phone">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
@@ -49,24 +54,24 @@
           <span>{{ scope.row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('address')" min-width="120px" align="center" prop="address">
+      <el-table-column :label="$t('address')" min-width="150px" align="center" prop="address">
         <template slot-scope="scope">
           <span>{{ scope.row.address }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('currency')" min-width="60px" align="center" prop="currency">
+      <el-table-column :label="$t('currency')" min-width="100px" align="center" prop="currency">
         <template slot-scope="scope">
           <span>{{ scope.row.currency }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.status')" min-width="60px" align="center" prop="status">
+      <el-table-column :label="$t('table.status')" min-width="100px" align="center" prop="status">
         <template slot-scope="{row}">
           <el-tag :type="row.status | statusFilter">
             {{ row.status | statusFilter('name') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.active')" class-name="status-col" min-width="70px" prop="active">
+      <el-table-column :label="$t('table.active')" class-name="status-col" min-width="100px" prop="active">
         <template slot-scope="{row}">
           <el-switch
             @change="handleChange(row.id,row.active,'active')"
@@ -78,7 +83,7 @@
           </el-switch>  
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" align="center" min-width="100px" class-name="small-padding fixed-width">
+      <el-table-column :label="$t('table.actions')" align="center" min-width="150px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <router-link :to="{ name: 'StoreEdit',params:{id:row.id} }">
             <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>

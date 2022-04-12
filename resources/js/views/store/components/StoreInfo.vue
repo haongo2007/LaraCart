@@ -676,7 +676,7 @@ export default {
     }else{
       this.id = this.$route.params.id;  
       this.temp = Object.assign({}, this.dataInfo);
-      if (this.temp.time_active.length) {
+      if (this.temp.time_active) {
         this.temp.time_active = JSON.parse(this.temp.time_active);
       }
     }

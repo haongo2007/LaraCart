@@ -20,6 +20,11 @@ class ShopStore extends Model
     {
         return $this->hasMany(ShopStoreDescription::class, 'store_id', 'id');
     }
+
+    public function descriptionsCurrentLang()
+    {
+        return $this->hasMany(ShopStoreDescription::class, 'store_id', 'id')->where('lang',lc_get_locale());
+    }
     
     public function products()
     {

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserCollection;
+use App\Http\Resources\InfoCollection;
 use App\Helper\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -48,6 +48,6 @@ class AuthController extends Controller
      */
     public function info(Request $request)
     {   
-        return new UserCollection($request->user());
+        return new InfoCollection($request->user());
     }
 }

@@ -204,6 +204,7 @@ export const menuSidebar = [
           {
             path: '/users-permissions/users',
             meta: { 
+              permissions: ['Users manager'],
               title: 'users',
               icon:'user'
             },

@@ -8,7 +8,6 @@ const systemRoutes = {
   meta: {
     title: 'System',
     icon: 'table',
-    roles: ['Manager'],
   },
   children: [
     //users permission
@@ -17,7 +16,7 @@ const systemRoutes = {
       component: Layout,
       component: () => import('@/views/system/users-permissions/users/List'),
       name: 'UsersList',
-      meta: { title: 'users',parent:'root',},
+      meta: { title: 'users',parent:'root',permissions: ['Users manager']},
     },
     {
       path: '/users-permissions/roles',

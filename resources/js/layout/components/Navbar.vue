@@ -9,7 +9,7 @@
         <el-option
           size="mini"
           v-for="(item,index) in storeList" :key="index"
-          :label="item[currenLang].title"
+          :label="item.descriptions_current_lang[0].title"
           :value="index">
         </el-option>
       </el-select>
@@ -93,12 +93,9 @@ export default {
       let storeList = this.$store.state.user.storeList;
       return storeList;
     },
-    currenLang(){
-      return this.$store.getters.language;
-    }
   },
   created(){
-    this.currentStore = JSON.parse(Cookies.get('store'));
+    this.currentStore = Cookies.get('store') ? JSON.parse(Cookies.get('store')) : '';
   },
   methods: {
     toggleSideBar() {

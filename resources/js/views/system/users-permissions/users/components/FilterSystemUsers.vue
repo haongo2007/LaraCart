@@ -23,12 +23,12 @@
 
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-select v-model="dataQuery.role" :placeholder="$t('table.role')" clearable style="width: 90px" class="filter-item" @change="handleFilter">
+            <el-select v-model="dataQuery.role" :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
               <el-option v-for="item in roles" :key="item" :label="item | uppercaseFirst" :value="item" />
             </el-select>
           </el-col>
           <el-col :span="12">
-            <el-input v-model="dataQuery.keyword" :placeholder="$t('table.keyword')" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.keyword" :placeholder="$t('table.keyword')" style="width: 100%;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
       </div>
@@ -40,9 +40,9 @@
 
 import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
-import StoreResource from '@/api/store';
+import UserResource from '@/api/user';
 
-const storeResource = new StoreResource();
+const userResource = new UserResource();
 export default {
   name: 'FilterSystemUsers',
   props: {
@@ -79,38 +79,13 @@ export default {
   },
   methods: {
     async getList() {
-      const data = await storeResource.list(this.dataQuery);
+      const data = await userResource.list(this.dataQuery);
       this.list = data.data;
       this.total = data.meta.total;
 
       this.$emit('handleListenData', { list: this.list, loading: false, total: this.total, listQuery: this.dataQuery });
     },
     handleFilter(type, e) {
-      if (type === 'sort' && e) {
-        this.sortOptions.filter(function(elem){
-          if (elem.key === e){
-            elem.active = true;
-          } else {
-            elem.active = false;
-          }
-        });
-      } else if (type === 'status' && e) {
-        this.fillterStatusOptions.filter(function(elem){
-          if (elem.key === e){
-            elem.active = true;
-          } else {
-            elem.active = false;
-          }
-        });
-      } else if (type === 'active' && e) {
-        this.fillterActiveOptions.filter(function(elem){
-          if (elem.key === e){
-            elem.active = true;
-          } else {
-            elem.active = false;
-          }
-        });
-      }
       this.dataQuery.page = 1;
 
       this.getList();

@@ -80,7 +80,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = (new Product)->getProductAdmin($id,$request->header('x-store'));
+        $product = (new Product)->getProductAdmin($id,request()->header('x-store'));
         if (!$product) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }

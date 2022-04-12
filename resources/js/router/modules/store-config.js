@@ -9,7 +9,6 @@ const configStoreRoutes = {
   meta: {
     title: 'configStore',
     icon: 'store-setting',
-    roles: ['Manager'],
   },
   children: [
     {
@@ -19,8 +18,7 @@ const configStoreRoutes = {
       meta: {
         title: 'Store',
         icon: 'book-shop',
-        permissions: ['shop list manager'],
-        roles: ['Manager'],
+        permissions: ['Store manager'],
         parent: 'root',
       },
     },

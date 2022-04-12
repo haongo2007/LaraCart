@@ -24,7 +24,8 @@ class StoreCollection extends JsonResource
             'domain' => $this->domain,
             'currency' => $this->currency,
             'status' => $this->status,
-            'active' => $this->active
+            'active' => $this->active,
+            'descriptions' => $this->descriptionsCurrentLang
         ];
     }
 }

@@ -9,9 +9,9 @@
 //     Route::post('/delete', 'Auth\UsersController@deleteList')->name('admin_user.delete');
 // });
 
-    Route::apiResource('users', 'UserController')->middleware('permission:' . Acl::PERMISSION_USER_MANAGE);
+    Route::apiResource('users', 'UserController');
     Route::put('users/{user}', 'UserController@update');
-    Route::get('users/{user}/permissions', 'UserController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
-    Route::put('users/{user}/permissions', 'UserController@updatePermissions')->middleware('permission:' .Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::get('users/{user}/permissions', 'UserController@permissions');
+    Route::put('users/{user}/permissions', 'UserController@updatePermissions');
     Route::get('user','UserController@show');
     Route::post('update/avatar', 'UserController@updateAvatar');

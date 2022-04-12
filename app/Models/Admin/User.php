@@ -284,7 +284,7 @@ class User extends Model implements AuthenticatableContract
         if (self::$listStoreId === null) {
             $admin = Admin::user();
             $allStore = ShopStore::pluck('id')->all();
-            if($admin->isAdministrator() || $admin->isViewAll()) {
+            if($admin->isAdministrator()) {
                 $arrStore =  $allStore;
             } else {
                 $arrStore = UserStore::where('user_id', $admin->id)->pluck('store_id')->all();
@@ -307,14 +307,12 @@ class User extends Model implements AuthenticatableContract
     public static function listStore()
     {
         if (self::$listStore === null) {
-            self::$listStore = ShopStore::with('descriptions')
+            self::$listStore = ShopStore::with('descriptionsCurrentLang')
                 ->whereIn('id', self::listStoreId())
                 ->get()
                 ->keyBy('id');
         }
-        return self::$listStore->map(function ($store) {
-            return $store->descriptions->keyBy('lang');
-        });
+        return self::$listStore;
     }
 
 }

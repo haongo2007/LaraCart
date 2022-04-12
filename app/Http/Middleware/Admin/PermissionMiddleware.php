@@ -48,10 +48,7 @@ class PermissionMiddleware
         //Group view all
         // this group can view all path, but cannot change data
         if (Admin::user()->isViewAll()) {
-            if ($request->method() == 'GET'
-                && !collect($this->viewWithoutToMessage())->contains($request->path())
-                && !collect($this->viewWithout())->contains($request->path())
-            ) {
+            if ($request->method() == 'GET' && !collect($this->viewWithoutToMessage())->contains($request->path())){
                 return $next($request);
             } else {
                 if (!request()->ajax()) {

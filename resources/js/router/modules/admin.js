@@ -21,19 +21,19 @@ const adminRoutes = {
       meta: { title: 'userProfile', noCache: true, permissions: ['manage user'] },
       hidden: true,
     },
-    {
-      path: 'users',
-      component: () => import('@/views/users/List'),
-      name: 'UserList',
-      meta: { title: 'users', icon: 'user', permissions: ['manage user'] },
-    },
+    // {
+    //   path: 'users',
+    //   component: () => import('@/views/users/List'),
+    //   name: 'UserList',
+    //   meta: { title: 'users', icon: 'user', permissions: ['manage user'] },
+    // },
     /** Role and permission */
-    {
-      path: 'roles',
-      component: () => import('@/views/role-permission/List'),
-      name: 'RoleList',
-      meta: { title: 'rolePermission', icon: 'role', permissions: ['manage permission'] },
-    },
+    // {
+    //   path: 'roles',
+    //   component: () => import('@/views/role-permission/List'),
+    //   name: 'RoleList',
+    //   meta: { title: 'rolePermission', icon: 'role', permissions: ['manage permission'] },
+    // },
     {
       path: 'articles/create',
       component: () => import('@/views/articles/Create'),
