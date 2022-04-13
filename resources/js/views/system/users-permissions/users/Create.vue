@@ -33,10 +33,9 @@
 
         <el-form-item :label="$t('user.role')" prop="role">
           <el-select v-model="temp.role" placeholder="Select role" prop="role" filterable style="width: 100%;">
-              <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
+            <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
           </el-select>
         </el-form-item>
-
 
         <el-form-item :label="$t('user.password')" prop="password">
           <el-input v-model="temp.password" show-password />
@@ -60,22 +59,21 @@ import UserResource from '@/api/user';
 const roleResource = new RoleResource();
 const userResource = new UserResource();
 
-
 const defaultForm = {
-    name:'',
-    email:'',
-    password:'',
-    confirmPassword:'',
-    role:'',
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  role: '',
 };
 
 export default {
   name: 'UserCreate',
   data() {
     return {
-      loading:true,
-      roles:[],
-      temp:Object.assign({},defaultForm),
+      loading: true,
+      roles: [],
+      temp: Object.assign({}, defaultForm),
       rules: {
         email: [
           {

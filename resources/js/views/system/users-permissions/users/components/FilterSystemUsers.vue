@@ -23,7 +23,7 @@
 
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-select multiple collapse-tags v-model="dataQuery.role" :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
+            <el-select v-model="dataQuery.role" multiple collapse-tags :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
               <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
             </el-select>
           </el-col>
@@ -61,7 +61,7 @@ export default {
     return {
       list: null,
       total: 0,
-      roles:[],
+      roles: [],
     };
   },
   watch: {

@@ -17,14 +17,14 @@ const adminRoutes = {
       path: 'users/edit/:id(\\d+)',
       component: () => import('@/views/users/UserProfile'),
       name: 'UserProfile',
-      meta: { title: 'userProfile', noCache: true},
+      meta: { title: 'userProfile', noCache: true },
       hidden: true,
     },
     {
       path: 'users',
       component: () => import('@/views/users/List'),
       name: 'UserList',
-      meta: { title: 'users', icon: 'user',},
+      meta: { title: 'users', icon: 'user' },
     },
     /** Role and permission */
     // {

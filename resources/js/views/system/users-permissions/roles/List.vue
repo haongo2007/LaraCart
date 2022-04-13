@@ -40,7 +40,7 @@ import FilterSystemRoles from './components/FilterSystemRoles';
 
 export default {
   name: 'RolesList',
-  components: { Pagination,RightPanel,FilterSystemRoles },
+  components: { Pagination, RightPanel, FilterSystemRoles },
   data() {
     return {
       list: [],
@@ -51,9 +51,9 @@ export default {
         limit: 15,
         keyword: '',
       },
-    }
+    };
   },
-  methods:{
+  methods: {
     handleListenData(data){
       if (data.hasOwnProperty('list')) {
         this.list = data.list;
@@ -73,7 +73,7 @@ export default {
       this.listQuery.page = data.page;
       this.listQuery.limit = data.limit;
     },
-  }
+  },
 };
 </script>
 
