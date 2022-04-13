@@ -4,6 +4,7 @@ export default {
     return: 'Trở về',
   },
   route: {
+    userCreate:'Tạo người dùng',
     content:'Bài viết',
     banner:'Ảnh bìa',
     page:'Trang',
@@ -284,6 +285,8 @@ export default {
     'confirmPassword': 'Nhập lại mật khẩu',
     'name': 'Tên',
     'email': 'Địa chỉ email',
+    'first_name':'Họ',
+    'last_name':'Tên',
   },
   roles: {
     description: {

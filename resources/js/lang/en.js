@@ -1,5 +1,6 @@
 export default {
   route: {
+    userCreate:'Create user',
     content:'Content',
     banner:'Banner',
     page:'Page',
@@ -294,6 +295,8 @@ export default {
     'confirmPassword': 'Confirm password',
     'name': 'Name',
     'email': 'Email',
+    'first_name':'First name',
+    'last_name':'Last name',
   },
   roles: {
     description: {

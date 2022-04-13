@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin\Role;
-use App\Http\Resources\RoleResource;
+use App\Http\Resources\RoleCollection;
 
 /**
  * Class RoleController
@@ -20,7 +20,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        return RoleResource::collection(Role::all());
+        return RoleCollection::collection(Role::all())->additional(['message' => 'Successfully']);;
     }
 
     /**

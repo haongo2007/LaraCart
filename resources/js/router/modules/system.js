@@ -19,6 +19,13 @@ const systemRoutes = {
       meta: { title: 'users',parent:'root',permissions: ['Users manager']},
     },
     {
+      path: '/users-permissions/users/create',
+      component: Layout,
+      component: () => import('@/views/system/users-permissions/users/Create'),
+      name: 'UserCreate',
+      meta: { title: 'userCreate',parent:'UsersList',permissions: ['Users manager']},
+    },
+    {
       path: '/users-permissions/roles',
       component: Layout,
       component: () => import('@/views/system/users-permissions/roles/List'),

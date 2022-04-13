@@ -10,7 +10,6 @@ const adminRoutes = {
   meta: {
     title: 'administrator',
     icon: 'admin',
-    permissions: ['view menu administrator'],
   },
   children: [
     /** User managements */
@@ -18,15 +17,15 @@ const adminRoutes = {
       path: 'users/edit/:id(\\d+)',
       component: () => import('@/views/users/UserProfile'),
       name: 'UserProfile',
-      meta: { title: 'userProfile', noCache: true, permissions: ['manage user'] },
+      meta: { title: 'userProfile', noCache: true},
       hidden: true,
     },
-    // {
-    //   path: 'users',
-    //   component: () => import('@/views/users/List'),
-    //   name: 'UserList',
-    //   meta: { title: 'users', icon: 'user', permissions: ['manage user'] },
-    // },
+    {
+      path: 'users',
+      component: () => import('@/views/users/List'),
+      name: 'UserList',
+      meta: { title: 'users', icon: 'user',},
+    },
     /** Role and permission */
     // {
     //   path: 'roles',

@@ -348,8 +348,8 @@ class User extends Model implements AuthenticatableContract
         }
 
         if (!empty($keyword)) {
-            $usersList->where('name', 'LIKE', '%' . $keyword . '%');
-            $usersList->where('email', 'LIKE', '%' . $keyword . '%');
+            $usersList->where($usersTable.'.name', 'LIKE', '%' . $keyword . '%');
+            $usersList->orwhere($usersTable.'.email', 'LIKE', '%' . $keyword . '%');
         }
 
         $usersList = $usersList->paginate($limit);
