@@ -36,11 +36,11 @@
 
 import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
-import RoleResource from '@/api/role';
+import PermissionsResource from '@/api/permissions';
 
-const roleResource = new RoleResource();
+const permissionsResource = new PermissionsResource();
 export default {
-  name: 'FilterSystemRoles',
+  name: 'FilterSystemPermissions',
   props: {
     dataLoading: {
       type: Boolean,
@@ -55,7 +55,7 @@ export default {
     return {
       list: null,
       total: 0,
-      multiSelectRow:[]
+      multiSelectRow: [],
     };
   },
   watch: {
@@ -78,7 +78,7 @@ export default {
   },
   methods: {
     async getList() {
-      const data = await roleResource.list(this.dataQuery);
+      const data = await permissionsResource.list(this.dataQuery);
       this.list = data.data;
       this.total = data.meta.total;
 
@@ -105,7 +105,7 @@ export default {
           var id = row.id;
         }
         var that = this;
-        roleResource.destroy(id).then((res) => {
+        permissionsResource.destroy(id).then((res) => {
           if (res) {
             if (multiple) {
               row.forEach(function(v) {

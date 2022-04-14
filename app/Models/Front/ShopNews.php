@@ -10,9 +10,9 @@ class ShopNews extends Model
 {
     use ModelTrait;
 
-    public $table = BC_DB_PREFIX.'shop_news';
+    public $table = LC_DB_PREFIX.'shop_news';
     protected $guarded = [];
-    protected $connection = BC_CONNECTION;
+    protected $connection = LC_CONNECTION;
 
     public function descriptions()
     {
@@ -21,7 +21,7 @@ class ShopNews extends Model
 
     //Function get text description 
     public function getText() {
-        return $this->descriptions()->where('lang', bc_get_locale())->first();
+        return $this->descriptions()->where('lang', lc_get_locale())->first();
     }
     public function getTitle() {
         return $this->getText()->title;
@@ -42,7 +42,7 @@ class ShopNews extends Model
     */
     public function getThumb()
     {
-        return bc_image_get_path_thumb($this->image);
+        return lc_image_get_path_thumb($this->image);
     }
 
     /*
@@ -50,7 +50,7 @@ class ShopNews extends Model
     */
     public function getImage()
     {
-        return bc_image_get_path($this->image);
+        return lc_image_get_path($this->image);
 
     }
     /**
@@ -59,7 +59,7 @@ class ShopNews extends Model
      */
     public function getUrl()
     {
-        return bc_route('news.detail', ['alias' => $this->alias]);
+        return lc_route('news.detail', ['alias' => $this->alias]);
     }
 
     //Scort
@@ -85,7 +85,7 @@ class ShopNews extends Model
         $tableDescription = (new ShopNewsDescription)->getTable();
         $news = $this
             ->leftJoin($tableDescription, $tableDescription . '.news_id', $this->getTable() . '.id')
-            ->where($tableDescription . '.lang', bc_get_locale());
+            ->where($tableDescription . '.lang', lc_get_locale());
 
         if ($type === null) {
             $news = $news->where('id', (int) $key);
@@ -126,33 +126,33 @@ class ShopNews extends Model
         //description
         $query = $this
             ->leftJoin($tableDescription, $tableDescription . '.news_id', $this->getTable() . '.id')
-            ->where($tableDescription . '.lang', bc_get_locale());
+            ->where($tableDescription . '.lang', lc_get_locale());
         //search keyword
-        if ($this->bc_keyword !='') {
+        if ($this->lc_keyword !='') {
             $query = $query->where(function ($sql) use($tableDescription){
-                $sql->where($tableDescription . '.title', 'like', '%' . $this->bc_keyword . '%')
-                ->orWhere($tableDescription . '.keyword', 'like', '%' . $this->bc_keyword . '%')
-                ->orWhere($tableDescription . '.description', 'like', '%' . $this->bc_keyword . '%');
+                $sql->where($tableDescription . '.title', 'like', '%' . $this->lc_keyword . '%')
+                ->orWhere($tableDescription . '.keyword', 'like', '%' . $this->lc_keyword . '%')
+                ->orWhere($tableDescription . '.description', 'like', '%' . $this->lc_keyword . '%');
             });
         }
 
         $query = $query->where('status', 1)
         ->where('store_id', config('app.storeId'));
 
-        if (count($this->bc_moreWhere)) {
-            foreach ($this->bc_moreWhere as $key => $where) {
+        if (count($this->lc_moreWhere)) {
+            foreach ($this->lc_moreWhere as $key => $where) {
                 if(count($where)) {
                     $query = $query->where($where[0], $where[1], $where[2]);
                 }
             }
         }
 
-        if ($this->bc_random) {
+        if ($this->lc_random) {
             $query = $query->inRandomOrder();
         } else {
             $ckeckSort = false;
-            if (is_array($this->bc_sort) && count($this->bc_sort)) {
-                foreach ($this->bc_sort as  $rowSort) {
+            if (is_array($this->lc_sort) && count($this->lc_sort)) {
+                foreach ($this->lc_sort as  $rowSort) {
                     if (is_array($rowSort) && count($rowSort) == 2) {
                         if ($rowSort[0] == 'sort') {
                             $ckeckSort = true;

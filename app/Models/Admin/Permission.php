@@ -6,9 +6,11 @@ use App\Helper\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class Permission extends Model
 {
+    const ITEM_PER_PAGE = 15;
     public $table = 'admin_permission';
     protected $fillable = ['name', 'slug', 'http_uri'];
 
@@ -88,4 +90,21 @@ class Permission extends Model
         return self::create($dataUpdate);
     }
 
+    public function getPermissionsListAdmin(array $dataSearch)
+    {
+        $limit = Arr::get($dataSearch, 'limit', self::ITEM_PER_PAGE);
+        $contain = Arr::get($dataSearch, 'contain', '');
+
+        $permissionsList     = (new self);
+        
+        if ($contain) {
+            $permissionsList = $permissionsList->where(function ($sql) use ($contain) {
+                $sql->where('name', 'like', '%' . $contain . '%');
+            });
+        }
+
+        $permissionsList = $permissionsList->paginate($limit);
+
+        return $permissionsList;
+    }
 }

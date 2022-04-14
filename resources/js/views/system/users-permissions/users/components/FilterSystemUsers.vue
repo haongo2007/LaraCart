@@ -11,6 +11,7 @@
           <el-col :span="24">
             <el-button-group>
               <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'UserCreate'}).catch(() => {})" />
+              <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
             </el-button-group>
           </el-col>
         </el-row>
@@ -62,6 +63,7 @@ export default {
       list: null,
       total: 0,
       roles: [],
+      multiSelectRow:[]
     };
   },
   watch: {
@@ -79,6 +81,9 @@ export default {
   created() {
     this.getList();
     this.getListRole();
+    EventBus.$on('listenMultiSelectRow', data => {
+      this.multiSelectRow = data;
+    });
   },
   methods: {
     async getList() {
@@ -95,6 +100,49 @@ export default {
     handleFilter(type, e) {
       this.dataQuery.page = 1;
       this.getList();
+    },
+    handerDeleteAll(){
+      this.handleDeleting(this.multiSelectRow, true);
+    },
+    handleDeleting(row, multiple = false) {
+      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      }).then(() => {
+        this.$emit('handleListenData', { loading: true });
+        if (multiple) {
+          var id = [];
+          row.map((item) => id.push(item.id));
+        } else {
+          var id = row.id;
+        }
+        var that = this;
+        userResource.destroy(id).then((res) => {
+          if (res) {
+            if (multiple) {
+              row.forEach(function(v) {
+                const index = that.list.indexOf(v);
+                that.list.splice(index, 1);
+              });
+            } else {
+              const index = that.list.indexOf(row);
+              that.list.splice(index, 1);
+            }
+            this.$message({
+              type: 'success',
+              message: 'Delete successfully',
+            });
+            const total = this.total - Array(row).length;
+            this.$emit('handleListenData', { list: this.list, loading: false, total: total });
+          }
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Delete canceled',
+        });
+      });
     },
   },
 };

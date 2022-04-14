@@ -9,4 +9,4 @@
 //     Route::post('/delete', 'Auth\PermissionController@deleteList')->name('admin_permission.delete');
 // });
 
-    // Route::apiResource('permissions', 'PermissionController')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
+    Route::apiResource('permissions', 'PermissionsController');

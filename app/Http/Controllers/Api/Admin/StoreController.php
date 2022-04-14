@@ -99,4 +99,14 @@ class StoreController extends Controller
         }
         return response()->json(new JsonResponse([]), Response::HTTP_OK);
     }
+    public function destroy($id)
+    {
+        $check = Store::find($id);
+        if (!$check) {
+            return response()->json(new JsonResponse([],trans('admin.permission_denied')) ,Response::HTTP_FORBIDDEN);
+        } else {
+            $check->delete();
+            return response()->json(new JsonResponse([]),Response::HTTP_OK);
+        }
+    }
 }

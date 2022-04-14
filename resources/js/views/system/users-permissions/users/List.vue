@@ -9,7 +9,12 @@
         />
       </right-panel>
     </div>
-    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
+    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionAllChange">
+      <el-table-column
+        type="selection"
+        align="center"
+        width="55"
+      />
       <el-table-column align="center" label="ID" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
@@ -56,6 +61,7 @@ import Pagination from '@/components/Pagination'; // Secondary package based on 
 import UserResource from '@/api/user';
 import RightPanel from '@/components/RightPanel';
 import FilterSystemUsers from './components/FilterSystemUsers';
+import EventBus from '@/components/FileManager/eventBus';
 
 export default {
   name: 'UsersList',
@@ -92,6 +98,9 @@ export default {
       this.loading = true;
       this.listQuery.page = data.page;
       this.listQuery.limit = data.limit;
+    },
+    handleSelectionAllChange(val){
+      EventBus.$emit('listenMultiSelectRow', val);
     },
   }
 };

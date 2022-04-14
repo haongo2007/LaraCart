@@ -61,8 +61,8 @@ class ShopStore extends Model
             $store->news()->delete();
             $store->banners()->delete();
             $store->pages()->delete();
-            AdminConfig::where('store_id', $store->id)->delete();
-            AdminUserStore::where('store_id', $store->id)->delete();
+            Config::where('store_id', $store->id)->delete();
+            UserStore::where('store_id', $store->id)->delete();
         });
     }
 

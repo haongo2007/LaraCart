@@ -17,6 +17,9 @@ class PermissionCollection extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'slug' => $this->slug,
+            'http_uri' => $this->http_uri,
+            'created_at' => $this->created_at,
         ];
     }
 }

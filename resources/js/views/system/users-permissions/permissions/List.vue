@@ -1,199 +1,151 @@
-
 <template>
   <div class="app-container">
-    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="ID" width="80">
+    <div class="filter-container">
+      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
+        <filter-system-permissions
+          :data-loading="loading"
+          :data-query="listQuery"
+          @handleListenData="handleListenData"
+        />
+      </right-panel>
+    </div>
+    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionAllChange">
+      <el-table-column
+        type="selection"
+        align="center"
+        width="55"
+      />
+      <el-table-column align="center" label="ID" width="50">
         <template slot-scope="scope">
-          <span>{{ scope.row.index }}</span>
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column width="150" align="center" :label="$t('table.name')">
+      <el-table-column label="Slug" max-width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.name | uppercaseFirst }}</span>
+          <span>{{ scope.row.slug }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="left" :label="$t('table.description')">
+      <el-table-column label="Name" max-width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.description }}</span>
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column v-if="checkPermission(['manage permission'])" align="center" label="Actions" width="200">
+      <el-table-column label="HTTP path" max-width="150">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.name !== 'admin'" v-permission="['manage permission']" type="primary" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
-            {{ $t('permission.editPermission') }}
-          </el-button>
+          <el-popover
+            placement="left-end"
+            width="400"
+            trigger="click">
+            <el-table :data="scope.row.http_uri | http_pathFilter">
+              <el-table-column label="Path" >
+                <template slot-scope="scope">
+                  <div v-html="scope.row.uri"></div>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-button slot="reference">Click to view</el-button>
+          </el-popover>
         </template>
       </el-table-column>
+
+      <el-table-column align="center" label="Created at" max-width="150">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+        </template>
+      </el-table-column>
+
     </el-table>
-
-    <el-dialog :visible.sync="dialogVisible" :title="'Edit Permissions - ' + currentRole.name">
-      <div v-loading="dialogLoading" class="form-container">
-        <div class="permissions-container">
-          <div class="block">
-            <el-form :model="currentRole" label-width="80px" label-position="top">
-              <el-form-item label="Menus">
-                <el-tree ref="menuPermissions" :data="menuPermissions" :default-checked-keys="permissionKeys(roleMenuPermissions)" :props="permissionProps" show-checkbox node-key="id" class="permission-tree" />
-              </el-form-item>
-            </el-form>
-          </div>
-          <div class="block">
-            <el-form :model="currentRole" label-width="80px" label-position="top">
-              <el-form-item label="Permissions">
-                <el-tree ref="otherPermissions" :data="otherPermissions" :default-checked-keys="permissionKeys(roleOtherPermissions)" :props="permissionProps" show-checkbox node-key="id" class="permission-tree" />
-              </el-form-item>
-            </el-form>
-          </div>
-          <div class="clear-left" />
-        </div>
-        <div style="text-align:right;">
-          <el-button type="danger" @click="dialogVisible=false">
-            {{ $t('permission.cancel') }}
-          </el-button>
-          <el-button type="primary" @click="confirmPermission">
-            {{ $t('permission.confirm') }}
-          </el-button>
-        </div>
-      </div>
-    </el-dialog>
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="paginationInit" />
   </div>
 </template>
 
 <script>
-import Resource from '@/api/resource';
-import RoleResource from '@/api/role';
-import waves from '@/directive/waves'; // Waves directive
-import permission from '@/directive/permission'; // Permission directive (v-permission)
-import checkPermission from '@/utils/permission'; // Permission checking
-
-const roleResource = new RoleResource();
-const permissionResource = new Resource('permissions');
+import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
+import RightPanel from '@/components/RightPanel';
+import FilterSystemPermissions from './components/FilterSystemPermissions';
+import EventBus from '@/components/FileManager/eventBus';
 
 export default {
-  name: 'PermissionsList',
-  directives: { waves, permission },
+  name: 'RolesList',
+  components: { Pagination, RightPanel, FilterSystemPermissions },
+  filters: {
+    http_pathFilter(data) {
+      let arr = data.split(',');
+      let res = [];
+      arr.forEach(function(v,i){
+        let cut = v.split('::');
+        let type = '';
+        if (cut[0].toLowerCase() == 'post') {
+          type = 'el-tag--success';
+        }else if(cut[0].toLowerCase() == 'put'){
+          type = 'el-tag--warning';
+        }else if(cut[0].toLowerCase() == 'delete'){
+          type = 'el-tag--danger';
+        }
+        v = '<span class="el-tag '+type+' el-tag--dark el-tag--mini" >'+cut[0]+'</span>&nbsp;'+cut[1];
+        res[i] = {uri:v};
+      });
+      return res;
+    },
+  },
   data() {
     return {
-      currentRoleId: 1,
       list: [],
+      total: 0,
       loading: true,
-      dialogLoading: false,
-      dialogVisible: false,
-      permissions: [],
-      menuPermissions: [],
-      otherPermissions: [],
-      permissionProps: {
-        children: 'children',
-        label: 'name',
-        disabled: 'disabled',
+      listQuery: {
+        page: 1,
+        limit: 15,
+        contain: '',
       },
     };
   },
-  computed: {
-    currentRole() {
-      const found = this.list.find(role => role.id === this.currentRoleId);
-      if (found === undefined) {
-        return { name: '', permissions: [] };
-      }
-
-      return found;
-    },
-    rolePermissions() {
-      return this.classifyPermissions(this.currentRole.permissions).all;
-    },
-    roleMenuPermissions() {
-      return this.classifyPermissions(this.currentRole.permissions).menu;
-    },
-    roleOtherPermissions() {
-      return this.classifyPermissions(this.currentRole.permissions).other;
-    },
-  },
-  created() {
-    this.getRoles();
-    this.getPermissions();
-  },
-
   methods: {
-    checkPermission,
-    async getRoles() {
+    handleListenData(data){
+      if (data.hasOwnProperty('list')) {
+        this.list = data.list;
+      }
+      if (data.hasOwnProperty('loading')) {
+        this.loading = data.loading;
+      }
+      if (data.hasOwnProperty('total')) {
+        this.total = data.total;
+      }
+      if (data.hasOwnProperty('listQuery')) {
+        this.listQuery = data.listQuery;
+      }
+    },
+    paginationInit(data){
       this.loading = true;
-      const { data } = await roleResource.list({});
-      this.list = data;
-      this.list.forEach((role, index) => {
-        role['index'] = index + 1;
-        role['description'] = this.$t('roles.description.' + role.name);
-      });
-      this.loading = false;
+      this.listQuery.page = data.page;
+      this.listQuery.limit = data.limit;
     },
-
-    async getPermissions() {
-      const { data } = await permissionResource.list({});
-      const { all, menu, other } = this.classifyPermissions(data);
-      this.permissions = all;
-      this.menuPermissions = menu;
-      this.otherPermissions = other;
-    },
-
-    classifyPermissions(permissions) {
-      const all = []; const menu = []; const other = [];
-      permissions.forEach(permission => {
-        const permissionName = permission.name;
-        all.push(permission);
-        if (permissionName.startsWith('view menu')) {
-          menu.push(this.normalizeMenuPermission(permission));
-        } else {
-          other.push(this.normalizePermission(permission));
-        }
-      });
-      return { all, menu, other };
-    },
-
-    normalizeMenuPermission(permission) {
-      return { id: permission.id, name: this.$options.filters.uppercaseFirst(permission.name.substring(10)) };
-    },
-
-    normalizePermission(permission) {
-      return { id: permission.id, name: this.$options.filters.uppercaseFirst(permission.name), disabled: permission.name === 'manage permission' };
-    },
-
-    permissionKeys(permissions) {
-      return permissions.map(permssion => permssion.id);
-    },
-
-    handleEditPermissions(id) {
-      this.dialogVisible = true;
-      this.currentRoleId = id;
-      this.$nextTick(() => {
-        this.$refs.menuPermissions.setCheckedKeys(this.permissionKeys(this.roleMenuPermissions));
-        this.$refs.otherPermissions.setCheckedKeys(this.permissionKeys(this.roleOtherPermissions));
-      });
-    },
-
-    confirmPermission() {
-      const checkedMenu = this.$refs.menuPermissions.getCheckedKeys();
-      const checkedOther = this.$refs.otherPermissions.getCheckedKeys();
-      const checkedPermissions = checkedMenu.concat(checkedOther);
-      this.dialogLoading = true;
-
-      roleResource.update(this.currentRole.id, { permissions: checkedPermissions }).then(response => {
-        this.$message({
-          message: 'Permissions has been updated successfully',
-          type: 'success',
-          duration: 5 * 1000,
-        });
-        this.dialogLoading = false;
-        this.dialogVisible = false;
-        this.getRoles();
-      });
+    handleSelectionAllChange(val){
+      EventBus.$emit('listenMultiSelectRow', val);
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.permissions-container {
+.edit-input {
+  padding-right: 100px;
+}
+.cancel-btn {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+.dialog-footer {
+  text-align: left;
+  padding-top: 0;
+  margin-left: 150px;
+}
+.app-container {
   flex: 1;
   justify-content: space-between;
   font-size: 14px;

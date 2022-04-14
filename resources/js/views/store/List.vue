@@ -83,7 +83,7 @@
           </el-switch>  
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" align="center" min-width="150px" class-name="small-padding fixed-width">
+      <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="250px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <router-link :to="{ name: 'StoreEdit',params:{id:row.id} }">
             <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
@@ -91,6 +91,7 @@
           <router-link :to="{ name: 'StoreConfig',params:{id:row.id} }">
             <el-button type="primary" size="mini" icon="el-icon-s-tools"></el-button>
           </router-link>
+          <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -185,6 +186,9 @@ export default {
       this.listQuery.page = data.page;
       this.listQuery.limit = data.limit;
     },
+    handleDeleting(row){
+      EventBus.$emit('handleDeleting', row);
+    }
   },
 };
 </script>

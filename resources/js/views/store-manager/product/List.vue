@@ -101,7 +101,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
+      <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
             <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="renderRouterEdit(row.kind,row.id)" />

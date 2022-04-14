@@ -115,6 +115,7 @@ export default {
   },
   created() {
     this.getList();
+    EventBus.$on('handleDeleting', this.handleDeleting);
   },
   methods: {
     async getList() {
@@ -153,6 +154,34 @@ export default {
       this.dataQuery.page = 1;
 
       this.getList();
+    },
+    handleDeleting(row, multiple = false) {
+      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      }).then(() => {
+        this.$emit('handleListenData', { loading: true });
+        var id = row.id;
+        var that = this;
+        storeResource.destroy(id).then((res) => {
+          if (res) {
+            const index = that.list.indexOf(row);
+            that.list.splice(index, 1);
+            this.$message({
+              type: 'success',
+              message: 'Delete successfully',
+            });
+            const total = this.total - Array(row).length;
+            this.$emit('handleListenData', { list: this.list, loading: false, total: total });
+          }
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Delete canceled',
+        });
+      });
     },
   },
 };

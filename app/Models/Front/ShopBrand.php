@@ -44,7 +44,7 @@ class ShopBrand extends Model
      */
     public function getUrl()
     {
-        return bc_route('brand.detail', ['alias' => $this->alias]);
+        return lc_route('brand.detail', ['alias' => $this->alias]);
     }
 
     /*
@@ -52,7 +52,7 @@ class ShopBrand extends Model
     */
     public function getThumb()
     {
-        return bc_image_get_path_thumb($this->image);
+        return lc_image_get_path_thumb($this->image);
     }
 
     /*
@@ -60,7 +60,7 @@ class ShopBrand extends Model
     */
     public function getImage()
     {
-        return bc_image_get_path($this->image);
+        return lc_image_get_path($this->image);
 
     }
 
@@ -109,19 +109,19 @@ class ShopBrand extends Model
     public function buildQuery() {
         $query = $this->where('status', 1);
         
-        if (count($this->bc_moreWhere)) {
-            foreach ($this->bc_moreWhere as $key => $where) {
+        if (count($this->lc_moreWhere)) {
+            foreach ($this->lc_moreWhere as $key => $where) {
                 if(count($where)) {
                     $query = $query->where($where[0], $where[1], $where[2]);
                 }
             }
         }
-        if ($this->bc_random) {
+        if ($this->lc_random) {
             $query = $query->inRandomOrder();
         } else {
             $ckeckSort = false;
-            if (is_array($this->bc_sort) && count($this->bc_sort)) {
-                foreach ($this->bc_sort as  $rowSort) {
+            if (is_array($this->lc_sort) && count($this->lc_sort)) {
+                foreach ($this->lc_sort as  $rowSort) {
                     if (is_array($rowSort) && count($rowSort) == 2) {
                         if ($rowSort[0] == 'sort') {
                             $ckeckSort = true;

@@ -9,22 +9,49 @@
         />
       </right-panel>
     </div>
-    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
+    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionAllChange">
+      <el-table-column
+        type="selection"
+        align="center"
+        width="55"
+      />
       <el-table-column align="center" label="ID" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Name">
+      <el-table-column  label="Slug" max-width="150">
+        <template slot-scope="scope">
+          <span>{{ scope.row.slug }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="Name" max-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Role" width="150">
+      <el-table-column align="center" label="Permissions" min-width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.permissions.join(', ') }}</span>
+          <el-popover
+            placement="left-end"
+            width="400"
+            trigger="click">
+            <el-table :data="scope.row.permissions">
+              <el-table-column width="50" property="id" label="id"></el-table-column>
+              <el-table-column property="name" label="name"></el-table-column>
+            </el-table>
+            <el-button slot="reference">Click to view permissions</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Created at" max-width="150">
+        <template slot-scope="scope">
+          <i class="el-icon-time" />
+          <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
@@ -37,6 +64,7 @@
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 import RightPanel from '@/components/RightPanel';
 import FilterSystemRoles from './components/FilterSystemRoles';
+import EventBus from '@/components/FileManager/eventBus';
 
 export default {
   name: 'RolesList',
@@ -49,7 +77,7 @@ export default {
       listQuery: {
         page: 1,
         limit: 15,
-        keyword: '',
+        contain: '',
       },
     };
   },
@@ -72,6 +100,9 @@ export default {
       this.loading = true;
       this.listQuery.page = data.page;
       this.listQuery.limit = data.limit;
+    },
+    handleSelectionAllChange(val){
+      EventBus.$emit('listenMultiSelectRow', val);
     },
   },
 };

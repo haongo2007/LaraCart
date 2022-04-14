@@ -4,9 +4,11 @@ namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Arr;
 
 class Role extends Model
 {
+    const ITEM_PER_PAGE = 15;
     protected $fillable = ['name', 'slug'];
     public $table       = 'admin_role';
 
@@ -99,4 +101,22 @@ class Role extends Model
         return self::create($dataUpdate);
     }
 
+    public function getRolesListAdmin(array $dataSearch)
+    {
+
+        $limit = Arr::get($dataSearch, 'limit', self::ITEM_PER_PAGE);
+        $contain = Arr::get($dataSearch, 'contain', '');
+
+        $rolesList     = (new self);
+        
+        if ($contain) {
+            $rolesList = $rolesList->where(function ($sql) use ($contain) {
+                $sql->where('name', 'like', '%' . $contain . '%');
+            });
+        }
+
+        $rolesList = $rolesList->paginate($limit);
+
+        return $rolesList;
+    }
 }

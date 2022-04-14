@@ -7,18 +7,18 @@ class ShopBanner extends Model
 {
     use ModelTrait;
 
-    public $table = BC_DB_PREFIX.'shop_banner';
+    public $table = LC_DB_PREFIX.'shop_banner';
     protected $guarded = [];
-    protected $connection = BC_CONNECTION;
+    protected $connection = LC_CONNECTION;
 
-    protected  $bc_type = 'all'; // all or interger
-    protected  $bc_store = 0; // 1: only produc promotion,
+    protected  $lc_type = 'all'; // all or interger
+    protected  $lc_store = 0; // 1: only produc promotion,
     /*
     Get thumb
     */
     public function getThumb()
     {
-        return bc_image_get_path_thumb($this->image);
+        return lc_image_get_path_thumb($this->image);
     }
 
     /*
@@ -26,7 +26,7 @@ class ShopBanner extends Model
     */
     public function getImage()
     {
-        return bc_image_get_path($this->image);
+        return lc_image_get_path($this->image);
 
     }
     //Scort
@@ -72,7 +72,7 @@ class ShopBanner extends Model
      * Set type
      */
     public function setType($type) {
-        $this->bc_type = $type;
+        $this->lc_type = $type;
         return $this;
     }
 
@@ -149,7 +149,7 @@ class ShopBanner extends Model
      *
      */
     public function setStore($id) {
-        $this->bc_store = (int)$id;
+        $this->lc_store = (int)$id;
         return $this;
     }
 
@@ -161,12 +161,12 @@ class ShopBanner extends Model
 
         $query = $query->where('status', 1);
 
-        if ($this->bc_type !== 'all') {
-            $query = $query->where('type', $this->bc_type);
+        if ($this->lc_type !== 'all') {
+            $query = $query->where('type', $this->lc_type);
         }
 
-        if (count($this->bc_moreWhere)) {
-            foreach ($this->bc_moreWhere as $key => $where) {
+        if (count($this->lc_moreWhere)) {
+            foreach ($this->lc_moreWhere as $key => $where) {
                 if(count($where)) {
                     $query = $query->where($where[0], $where[1], $where[2]);
                 }
@@ -174,21 +174,21 @@ class ShopBanner extends Model
         }
 
         //Get product active for store
-        if (!empty($this->bc_store)) {
+        if (!empty($this->lc_store)) {
             //If sepcify store id
-            $query = $query->where($this->getTable().'.store_id', $this->bc_store);
+            $query = $query->where($this->getTable().'.store_id', $this->lc_store);
         } else {
             // If stor ID is 1, will get product of all stores
             $query = $query->where($this->getTable().'.store_id', config('app.storeId'));
         }
         //End store
 
-        if ($this->bc_random) {
+        if ($this->lc_random) {
             $query = $query->inRandomOrder();
         } else {
             $ckeckSort = false;
-            if (is_array($this->bc_sort) && count($this->bc_sort)) {
-                foreach ($this->bc_sort as  $rowSort) {
+            if (is_array($this->lc_sort) && count($this->lc_sort)) {
+                foreach ($this->lc_sort as  $rowSort) {
                     if (is_array($rowSort) && count($rowSort) == 2) {
                         if ($rowSort[0] == 'sort') {
                             $ckeckSort = true;

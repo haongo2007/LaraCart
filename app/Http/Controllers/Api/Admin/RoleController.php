@@ -20,7 +20,9 @@ class RoleController extends Controller
      */
     public function index()
     {
-        return RoleCollection::collection(Role::all())->additional(['message' => 'Successfully']);;
+        $searchParams = request()->all();
+        $data = (new Role)->getRolesListAdmin($searchParams);
+        return RoleCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
     /**
