@@ -95,7 +95,7 @@ export default {
     },
   },
   created(){
-    this.currentStore = Cookies.get('store') ? JSON.parse(Cookies.get('store')) : '';
+    this.currentStore.push(Cookies.get('store') ? String(JSON.parse(Cookies.get('store'))) : '');
   },
   methods: {
     toggleSideBar() {

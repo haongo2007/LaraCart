@@ -28,7 +28,6 @@ class StoreController extends Controller
 
     public function index() {
         $searchParams = request()->all();
-        $searchParams['storeId_list'] = request()->header()['x-store'];
         $data = (new Store)->getStoreListAdmin($searchParams);
         return StoreCollection::collection($data)->additional(['message' => 'Successfully']);
     }

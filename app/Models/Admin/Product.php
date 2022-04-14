@@ -21,17 +21,11 @@ class Product extends ShopProduct
      *
      * @return  [type]       [return description]
      */
-    public static function gettableProduct($storeId)
+    public static function gettableProduct()
     {
         $tableProduct = (new ShopProduct())->getTable();
 
-        if (!is_array($storeId) && $storeId != '') {
-            $storeId = [$storeId];
-        }
-        if (empty($storeId) && Admin::user()->isAdministrator()) {
-            $storeId = Admin::user()->listStoreId();
-        }
-        return self::whereIn($tableProduct . '.store_id', $storeId);
+        return self::whereIn($tableProduct . '.store_id',  session('adminStoreId'));
     }
     /**
      * Get product detail in admin
@@ -40,16 +34,10 @@ class Product extends ShopProduct
      *
      * @return  [type]       [return description]
      */
-    public static function getProductAdmin($id,$storeId) {
+    public static function getProductAdmin($id) {
         $tableProduct = (new ShopProduct())->getTable();
-        if (!is_array($storeId) && $storeId != '') {
-            $storeId = [$storeId];
-        }
-        if (empty($storeId) && Admin::user()->isAdministrator()) {
-            $storeId = Admin::user()->listStoreId();
-        }
         return ShopProduct::with('descriptions','categories','promotionPrice','attributes','attributes.palette')
-        ->whereIn($tableProduct . '.store_id', $storeId)
+        ->whereIn($tableProduct . '.store_id',  session('adminStoreId'))
         ->where('id', $id)->first();
     }
 
@@ -85,8 +73,11 @@ class Product extends ShopProduct
         $to               = Arr::get($dataSearch,'to', '');
         $status           = Arr::get($dataSearch,'status', self::ACTIVE);
         $limit            = Arr::get($dataSearch,'limit', self::ITEM_PER_PAGE);
-        $storeId          = Arr::get($dataSearch,'storeId_list', []);
+        $storeId          = Arr::get($dataSearch,'storeId', session('adminStoreId'));
 
+        if ($storeId && !is_array($storeId)) {
+            $storeId = [$storeId];
+        }
         $tableDescription = (new ShopProductDescription)->getTable();
         $tablePTC         = (new ShopProductCategory)->getTable();
         $tableProduct     = (new ShopProduct)->getTable();
@@ -114,14 +105,7 @@ class Product extends ShopProduct
                 ->where($tableDescription . '.lang', lc_get_locale());
         }
 
-        if (!is_array($storeId) && $storeId != '') {
-            $storeId = [$storeId];
-        }
-        if (empty($storeId) && Admin::user()->isAdministrator()) {
-            $storeId = Admin::user()->listStoreId();
-        }
-
-        $productList = $productList->whereIn($tableProduct . '.store_id', $storeId);
+        $productList = $productList->whereIn($tableProduct . '.store_id',  $storeId);
 
         if ($keyword) {
             $productList = $productList->where(function ($sql) use($tableDescription, $tableProduct, $keyword){

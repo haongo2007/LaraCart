@@ -37,7 +37,6 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $searchParams = request()->all();
-        $searchParams['storeId_list'] = request()->header()['x-store'];
         $data = (new User)->getUsersListAdmin($searchParams);
         return UserCollection::collection($data)->additional(['message' => 'Successfully']);
     }

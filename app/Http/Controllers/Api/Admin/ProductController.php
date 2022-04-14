@@ -55,9 +55,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $storeList = $request->header()['x-store'];
         $searchParams = $request->all();
-        $searchParams['storeId_list'] = $storeList;
         $data = (new Product)->getProductListAdmin($searchParams);
         return ProductCollection::collection($data)->additional(['message' => 'Successfully']);
     }
@@ -68,9 +66,8 @@ class ProductController extends Controller
      */
     public function getMaxPriceProduct($type)
     {
-        $storeList = request()->header()['x-store'];
         $type = strtolower($type);
-        $max = Product::gettableProduct($storeList)->max($type);
+        $max = Product::gettableProduct()->max($type);
         $data = ['max' => $max];
         return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }   
@@ -80,7 +77,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = (new Product)->getProductAdmin($id,request()->header('x-store'));
+        $product = (new Product)->getProductAdmin($id);
         if (!$product) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }

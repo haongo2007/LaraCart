@@ -2,8 +2,17 @@
   <div class="el-main-form">
     <el-row :gutter="20" style="margin:0px;">
       <div style="padding: 24px;display: flex;justify-content: space-between;align-items: center;">
-        <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
-
+        <el-page-header @back="goBackList" :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' )"/>
+          <div slot="title"> 
+            <el-tag
+              size="medium"
+              type="success"
+              effect="dark">
+              <i class="el-icon-s-shop"></i>
+              {{ info_order.stores.descriptions_current_lang[0].title }}
+            </el-tag>
+          </div>
+        </el-page-header>
         <div>
           <el-button-group>
             <el-button type="success" @click="exportToExcel"><svg-icon icon-class="excel" /></el-button>

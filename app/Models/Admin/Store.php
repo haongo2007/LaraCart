@@ -72,7 +72,6 @@ class Store extends ShopStore
         $status= Arr::get($dataSearch, 'status', '');
         $active= Arr::get($dataSearch, 'active', '');
         $contain = Arr::get($dataSearch, 'contain', '');
-        $storeId = Arr::get($dataSearch, 'storeId_list', []);
         $arrSort = [
             'id__desc' => trans('category.admin.sort_order.id_desc'),
             'id__asc' => trans('category.admin.sort_order.id_asc'),
@@ -98,14 +97,7 @@ class Store extends ShopStore
             });
         }
 
-        if (!is_array($storeId) && $storeId != '') {
-            $storeId = [$storeId];
-        }
-        if (empty($storeId) && Admin::user()->isAdministrator()) {
-            $storeId = Admin::user()->listStoreId();
-        }
-
-        $storeList = $storeList->whereIn('id',$storeId);
+        $storeList = $storeList->whereIn('id',session('adminStoreId'));
 
         if (!is_null($status) && is_array($status)) {
             $storeList = $storeList->whereIn('status',$status);

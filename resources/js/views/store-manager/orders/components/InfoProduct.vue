@@ -171,7 +171,7 @@ export default {
       var results = queryString ? product.filter(this.createFilter(queryString)) : product;
 
       if (results.length == 0) {
-        productResource.list({ keyword: queryString }).then(response => {
+        productResource.list({ keyword: queryString,storeId:this.dataProducts.stores.id }).then(response => {
           this.products = [...this.products, ...response.data];
           results = response.data;
 		      cb(results);

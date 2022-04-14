@@ -31,6 +31,15 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="Store" min-width="150">
+        <template slot-scope="scope">
+          <el-tag type="success">
+            <i class="el-icon-s-shop"></i>
+            {{ scope.row.stores.descriptions_current_lang[0].title && scope.row.stores.descriptions_current_lang[0].title }}
+          </el-tag>
+        </template>
+      </el-table-column>
+
       <el-table-column label="Customer" min-width="150">
         <template slot-scope="scope">
           {{ scope.row && scope.row.first_name }} {{ scope.row && scope.row.last_name }}

@@ -322,26 +322,14 @@ class User extends Model implements AuthenticatableContract
         $limit = Arr::get($dataSearch, 'limit', self::ITEM_PER_PAGE);
         $role  = Arr::get($dataSearch, 'role', []);
         $keyword = Arr::get($dataSearch, 'keyword', '');
-        $storeId = Arr::get($dataSearch, 'storeId_list', []);
         
         $userstoreTable = (new UserStore)->getTable();
         $storeTable = (new Store)->getTable();
-
-        $usersList = (new self);
-        $usersTable = $usersList->getTable();
-
-        $usersList = $usersList->select($storeTable.'.*',$usersTable.'.*');
-
-        if (!is_array($storeId) && $storeId != '') {
-            $storeId = [$storeId];
-        }
-        if (empty($storeId) && Admin::user()->isAdministrator()) {
-            $storeId = Admin::user()->listStoreId();
-        }
-
-        $usersList = $usersList->join($userstoreTable, $userstoreTable . '.user_id', $usersTable . '.id')
-        ->join($storeTable, $storeTable . '.id', $userstoreTable . '.store_id')
-        ->whereIn($storeTable.'.id',$storeId);
+        $storeId = session('adminStoreId');
+        $usersList = (new self)->with(['stores' => function ($query) use ($storeId)
+        {
+            $query->whereIn('id',$storeId);
+        }]);
 
         if (!empty($role)) {
             $usersList->whereHas('roles', function($q) use ($role) { $q->whereIn('name', $role); });
@@ -351,7 +339,6 @@ class User extends Model implements AuthenticatableContract
             $usersList->where($usersTable.'.name', 'LIKE', '%' . $keyword . '%');
             $usersList->orwhere($usersTable.'.email', 'LIKE', '%' . $keyword . '%');
         }
-
         $usersList = $usersList->paginate($limit);
 
         return $usersList;

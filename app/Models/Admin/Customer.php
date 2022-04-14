@@ -4,6 +4,7 @@ namespace App\Models\Admin;
 
 use App\Models\Front\ShopCustomer;
 use App\Models\Front\ShopCustomerAddress;
+use Illuminate\Support\Arr;
 
 class Customer extends ShopCustomer
 {
@@ -44,7 +45,6 @@ class Customer extends ShopCustomer
      * @return  [type]               [return description]
      */
     public static function getCustomerListAdmin(array $dataSearch) {
-
         $arrSort = [
             'id__desc' => trans('customer.admin.sort_order.id_desc'),
             'id__asc' => trans('customer.admin.sort_order.id_asc'),
@@ -54,8 +54,8 @@ class Customer extends ShopCustomer
             'last_name__asc' => trans('customer.admin.sort_order.last_name_asc'),
         ];
 
-        $keyword          = $dataSearch['keyword'] ?? '';
-        $sort_order       = $dataSearch['sort_order'] ?? '';
+        $keyword    = Arr::get($dataSearch,'keyword','');
+        $sort_order = Arr::get($dataSearch,'sort_order','');
         $arrSort          = $arrSort;
 
         $customerList = (new ShopCustomer)

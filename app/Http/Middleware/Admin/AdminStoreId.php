@@ -30,16 +30,19 @@ class AdminStoreId
             }
         }
         $currentStore = array_filter($currentStore);
-        $request->headers->set('x-store', $currentStore);
         if ($currentStore) {
             $arrStoreId = Admin::user()->listStoreId();
-            if (array_intersect($currentStore, $arrStoreId)) {
+            $merge = array_intersect($currentStore, $arrStoreId);
+            if ($merge) {
+                session(['adminStoreId' => $merge]);
                 return $next($request);
             }else{
                 return Permission::error();
             }
         }else{
-            if (Admin::user()->isAdministrator()) {
+            $arrStoreId = Admin::user()->listStoreId();
+            if ($arrStoreId) {
+                session(['adminStoreId' => $arrStoreId]);
                 return $next($request);
             }
             return Permission::error();

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\StoreCollection;
 
 class OrderCollection extends JsonResource
 {
@@ -15,7 +16,7 @@ class OrderCollection extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
+            'id'            => $this->id,
             'first_name'    => $this->first_name,
             'last_name'     => $this->last_name,
             'address1'      => $this->address1,
@@ -33,6 +34,7 @@ class OrderCollection extends JsonResource
             'exchange_rate' => $this->exchange_rate,
             'status'        => $this->status,
             'created_at'    => $this->created_at,
+            'stores'        => $this->stores
         ];
     }
 }

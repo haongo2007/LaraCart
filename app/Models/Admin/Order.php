@@ -28,7 +28,7 @@ class Order extends ShopOrder
      * @return  [type]       [return description]
      */
     public static function getOrderAdmin($id) {
-        return self::with(['details', 'orderTotal','history' => function ($q)
+        return self::with(['stores','details', 'orderTotal','history' => function ($q)
         {
             $q->with('Staff:id,name')->orderBy('add_date','DESC');
         }])
@@ -53,8 +53,6 @@ class Order extends ShopOrder
         $sort_order   = $dataSearch['sort_order'] ?? 'id__desc';
         $status       = $dataSearch['status'] ?? [];
         $limit        = $dataSearch['limit'] ?? self::ITEM_PER_PAGE;
-        $storeId      = $dataSearch['storeId_list'];
-
         $arrSort = [
             'id__desc'         => trans('order.admin.sort_order.id_desc'),
             'id__asc'          => trans('order.admin.sort_order.id_asc'),
@@ -64,15 +62,8 @@ class Order extends ShopOrder
             'created_at__asc'  => trans('order.admin.sort_order.date_asc'),
         ];
         $orderList = (new ShopOrder);
-
-        if (!is_array($storeId) && $storeId != '') {
-            $storeId = [$storeId];
-        }
-        if (empty($storeId) && Admin::user()->isAdministrator()) {
-            $storeId = Admin::user()->listStoreId();
-        }
         
-        $orderList = $orderList->whereIn('store_id', $storeId);
+        $orderList = $orderList->whereIn('store_id', session('adminStoreId'));
 
         if($status && is_array($status)) {
             $orderList = $orderList->whereIn('status', $status);
@@ -280,7 +271,6 @@ class Order extends ShopOrder
             return $e->getMessage();
         }
     }
-
 
     /**
      * Get country order in year
