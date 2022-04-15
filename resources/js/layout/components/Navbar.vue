@@ -95,7 +95,13 @@ export default {
     },
   },
   created(){
-    this.currentStore.push(Cookies.get('store') ? String(JSON.parse(Cookies.get('store'))) : '');
+    if (Cookies.get('store')) {
+      if (JSON.parse(Cookies.get('store')).length < 1) {
+          Cookies.remove('store');
+      }else{
+        this.currentStore.push(String(JSON.parse(Cookies.get('store'))));
+      }
+    }
   },
   methods: {
     toggleSideBar() {

@@ -10,21 +10,27 @@ const systemRoutes = {
     icon: 'table',
   },
   children: [
-    // users permission
+    // users manager
     {
       path: '/users-permissions/users',
-      component: Layout,
       component: () => import('@/views/system/users-permissions/users/List'),
       name: 'UsersList',
       meta: { title: 'users', parent: 'root', permissions: ['Users manager'] },
     },
     {
       path: '/users-permissions/users/create',
-      component: Layout,
       component: () => import('@/views/system/users-permissions/users/Create'),
       name: 'UserCreate',
       meta: { title: 'userCreate', parent: 'UsersList', permissions: ['Users manager'] },
     },
+    {
+      path: 'users-permissions/users/edit/:id(\\d+)',
+      component: () => import('@/views/system/users-permissions/users/Edit'),
+      name: 'UserEdit',
+      meta: { title: 'userEdit',parent: 'UsersList',permissions: ['Users manager']},
+    },
+
+    // users manager
     {
       path: '/users-permissions/roles',
       component: Layout,

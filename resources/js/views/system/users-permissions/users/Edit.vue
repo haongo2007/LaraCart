@@ -1,13 +1,17 @@
 <template>
-  <user-detail :is-edit="false" :data-temp="temp"/>
+  <user-detail :is-edit="true" :data-temp="temp"/>
 </template>
 
 <script>
 
 import UserDetail from './components/UserDetail';
+import UserResource from '@/api/user';
+
+const userResource = new UserResource();
 
 const defaultForm = {
-  name: '',
+  id: '',
+  fullname: '',
   email: '',
   password: '',
   permissions: [],
@@ -17,7 +21,7 @@ const defaultForm = {
 };
 
 export default {
-  name: 'UserCreate',
+  name: 'UserEdit',
   components: { UserDetail },
   data() {
     return {
@@ -25,10 +29,25 @@ export default {
     };
   },
   created() {
-
+    const id = this.$route.params && this.$route.params.id;
+    this.fetchUser(id);
   },
   methods: {
-    
+    fetchUser(id){
+      userResource.get(id).then(({ data } = response) => {
+        var roles;
+        for(item in data.roles){
+          console.log(item);
+        }
+        this.temp.id = data.id;
+        this.temp.fullname = data.name;
+        this.temp.email = data.email;
+        this.temp.phone = data.phone;
+        this.temp.stores = data.store;
+        this.temp.roles = roles;
+        this.temp.permissions = data.permissions;
+      });
+    }
   },
 };
 </script>

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Str;
+use Illuminate\Http\Response;
 use Validator;
 
 /**
@@ -55,7 +56,6 @@ class UserController extends Controller
                 $this->getValidationRules(),
                 [
                     'password' => ['required', 'min:6'],
-                    'confirmPassword' => 'same:password',
                 ]
             )
         );
@@ -65,14 +65,27 @@ class UserController extends Controller
         } else {
             $params = $request->all();
             $user = User::create([
-                'name' => $params['name'],
+                'name' => $params['fullname'],
                 'email' => $params['email'],
+                'phone' => $params['phone'],
                 'password' => Hash::make($params['password']),
             ]);
-            $role = Role::findByName($params['role']);
-            $user->syncRoles($role);
+            $roles = $params['roles'] ?? [];
+            $permissions = $params['permissions'] ?? [];
+            $stores = $params['stores'] ?? [];
+            
+            if ($roles) {
+                $user->roles()->attach($roles);
+            }
+            if ($permissions) {
+                $user->permissions()->attach($permissions);
+            }
+            if ($stores) {
+                $user->stores()->attach($stores);
+            }
 
-            return new UserCollection($user);
+
+            return response()->json(new JsonResponse([]), Response::HTTP_OK);
         }
     }
 
@@ -82,9 +95,9 @@ class UserController extends Controller
      * @param  User $user
      * @return UserCollection|\Illuminate\Http\JsonResponse
      */
-    public function show(Request $request)
+    public function show(Request $request,User $user)
     {
-        return new UserCollection($request->user());
+        return new UserCollection($user);
     }
 
     /**
@@ -169,10 +182,9 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        if ($user->isAdmin()) {
-            response()->json(['error' => 'Ehhh! Can not delete admin user'], 403);
+        if ($user->isAdministrator()) {
+            return response()->json(new JsonResponse([],'Ehhh! Can not delete admin user'), Response::HTTP_BAD_REQUEST);
         }
-
         try {
             $user->delete();
         } catch (\Exception $ex) {
@@ -207,8 +219,10 @@ class UserController extends Controller
     private function getValidationRules($isNew = true)
     {
         return [
-            'name' => 'required',
-            'email' => $isNew ? 'required|email|unique:users' : 'required|email',
+            'fullname' => 'required',
+            'phone' => 'required',
+            'email' => $isNew ? 'required|email|unique:'.User::class : 'required|email',
+            'stores' => ['array','required'],
             'roles' => [
                 'required',
                 'array'

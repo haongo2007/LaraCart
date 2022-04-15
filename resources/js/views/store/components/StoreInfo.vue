@@ -766,7 +766,6 @@ export default {
             message: 'Update successfully',
           });
           if (i) {
-            console.log(i);
             if (typeof i == 'string') {
               i = i.split('.');
               this.temp.descriptions[i[0]][i[1]][i[2]] = false;
@@ -775,6 +774,8 @@ export default {
             }
             this.btnLoading = false;
           }
+          const view = this.$router.resolve({ name: 'StoreList' }).route;
+          this.$store.dispatch('tagsView/delCachedView', view);
         } else {
           this.$message({
             type: 'error',
@@ -809,6 +810,7 @@ export default {
           const view = this.$router.resolve({ name: 'StoreCreate' }).route;
           this.$store.dispatch('tagsView/delCachedView', view);
           this.reloadRedirectToList('StoreList');
+          this.$store.dispatch('user/getInfo');
         } else {
           this.$message({
             type: 'error',

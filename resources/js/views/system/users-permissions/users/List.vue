@@ -23,19 +23,37 @@
       
       <el-table-column align="center" label="Store" max-width="150">
         <template slot-scope="scope">
-            <el-tag v-for="item in scope.row.store" :key="item.id" size="medium">{{ item.descriptions[0].title }}</el-tag>
+            <el-popover
+              placement="right-end"
+              width="200"
+              trigger="click">
+              <el-table :data="scope.row.store">
+                <el-table-column label="Name" >
+                  <template slot-scope="scope">
+                    {{ scope.row.descriptions[0].title }}
+                  </template>
+                </el-table-column>
+              </el-table>
+              <el-button slot="reference">Click to view</el-button>
+            </el-popover>
         </template>
       </el-table-column>
 
       <el-table-column align="center" label="Avatar" min-width="80">
         <template slot-scope="scope">
-          <el-avatar :src="scope.row.avatar"></el-avatar>
+          <el-avatar icon="el-icon-user-solid" :src="scope.row.avatar"></el-avatar>
         </template>
       </el-table-column>
 
       <el-table-column align="center" label="Name">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Phone">
+        <template slot-scope="scope">
+          <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
 
@@ -47,7 +65,46 @@
 
       <el-table-column align="center" label="Role" width="150">
         <template slot-scope="scope">
-          <span>{{ scope.row.roles.join(', ') }}</span>
+          <el-popover
+            placement="left-end"
+            width="200"
+            trigger="click">
+            <el-table :data="scope.row.roles | filterRoles">
+              <el-table-column label="Name" >
+                <template slot-scope="scope">
+                  <div v-html="scope.row.name"></div>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-button slot="reference">Click to view</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="Permissions" width="150">
+        <template slot-scope="scope">
+          <el-popover
+            placement="left-end"
+            width="200"
+            trigger="click">
+            <el-table :data="scope.row.permissions | filterRoles">
+              <el-table-column label="Name" >
+                <template slot-scope="scope">
+                  <div v-html="scope.row.name"></div>
+                </template>
+              </el-table-column>
+            </el-table>
+            <el-button slot="reference">Click to view</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="$t('table.actions')" align="center" min-width="80" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-button-group>
+            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" />
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
+          </el-button-group>
         </template>
       </el-table-column>
 
@@ -66,6 +123,15 @@ import EventBus from '@/components/FileManager/eventBus';
 export default {
   name: 'UsersList',
   components: { Pagination,FilterSystemUsers,RightPanel },
+  filters: {
+    filterRoles(data) {
+      let res = [];
+      data.forEach(function(v,i){
+        res[i] = {name:v};
+      });
+      return res;
+    },
+  },
   data() {
     return {
       list: [],
@@ -102,6 +168,9 @@ export default {
     handleSelectionAllChange(val){
       EventBus.$emit('listenMultiSelectRow', val);
     },
+    handleDeleting(row){
+      EventBus.$emit('handleDeleting', row);
+    }
   }
 };
 </script>

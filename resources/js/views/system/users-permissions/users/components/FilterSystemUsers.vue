@@ -84,6 +84,7 @@ export default {
     EventBus.$on('listenMultiSelectRow', data => {
       this.multiSelectRow = data;
     });
+    EventBus.$on('handleDeleting', this.handleDeleting);
   },
   methods: {
     async getList() {

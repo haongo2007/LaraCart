@@ -4,6 +4,7 @@ export default {
     return: 'Trở về',
   },
   route: {
+    userEdit: 'Sửa người dùng',
     userCreate: 'Tạo người dùng',
     content: 'Bài viết',
     banner: 'Ảnh bìa',
@@ -287,6 +288,10 @@ export default {
     'email': 'Địa chỉ email',
     'first_name': 'Họ',
     'last_name': 'Tên',
+    'fullname': 'Họ & Tên',
+    'phone':'Số điện thoại',
+    'store':'Cửa hàng',
+    'permissions':'Quyền hạn'
   },
   roles: {
     description: {

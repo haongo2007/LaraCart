@@ -35,7 +35,7 @@
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
-            {{ scope.row.stores.descriptions_current_lang[0].title && scope.row.stores.descriptions_current_lang[0].title }}
+            {{ scope.row.store.descriptions_current_lang[0].title && scope.row.store.descriptions_current_lang[0].title }}
           </el-tag>
         </template>
       </el-table-column>

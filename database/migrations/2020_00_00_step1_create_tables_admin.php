@@ -23,6 +23,7 @@ class CreateTablesAdmin extends Migration
             $table->string('username', 100)->unique();
             $table->string('password', 60);
             $table->string('name', 100);
+            $table->string('phone', 50);
             $table->string('email', 150)->unique();
             $table->string('avatar', 255)->nullable();
             $table->string('remember_token', 100)->nullable();

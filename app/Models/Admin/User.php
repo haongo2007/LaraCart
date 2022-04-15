@@ -322,23 +322,27 @@ class User extends Model implements AuthenticatableContract
         $limit = Arr::get($dataSearch, 'limit', self::ITEM_PER_PAGE);
         $role  = Arr::get($dataSearch, 'role', []);
         $keyword = Arr::get($dataSearch, 'keyword', '');
-        
-        $userstoreTable = (new UserStore)->getTable();
-        $storeTable = (new Store)->getTable();
         $storeId = session('adminStoreId');
-        $usersList = (new self)->with(['stores' => function ($query) use ($storeId)
+        $userstoreTable = (new UserStore)->getTable();
+        $usersTable = (new User)->getTable();
+
+        $usersList = (new self)->leftJoin($userstoreTable,$userstoreTable.'.user_id',$usersTable.'.id')
+        ->where(function($query) use ($storeId,$userstoreTable)
         {
-            $query->whereIn('id',$storeId);
-        }]);
+            $query->whereIn($userstoreTable.'.store_id',$storeId)
+            ->orWhereNull($userstoreTable.'.store_id');
+        });
 
         if (!empty($role)) {
-            $usersList->whereHas('roles', function($q) use ($role) { $q->whereIn('name', $role); });
+            $usersList = $usersList->whereHas('roles', function($q) use ($role) { $q->whereIn('name', $role); });
         }
 
+        
         if (!empty($keyword)) {
-            $usersList->where($usersTable.'.name', 'LIKE', '%' . $keyword . '%');
-            $usersList->orwhere($usersTable.'.email', 'LIKE', '%' . $keyword . '%');
+            $usersList = $usersList->where($usersTable.'.name', 'LIKE', '%' . $keyword . '%');
+            $usersList = $usersList->orwhere($usersTable.'.email', 'LIKE', '%' . $keyword . '%');
         }
+        $usersList = $usersList->groupBy($usersTable.'.id');
         $usersList = $usersList->paginate($limit);
 
         return $usersList;

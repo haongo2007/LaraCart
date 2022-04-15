@@ -173,6 +173,7 @@ export default {
               message: 'Delete successfully',
             });
             const total = this.total - Array(row).length;
+            this.$store.dispatch('user/getInfo');
             this.$emit('handleListenData', { list: this.list, loading: false, total: total });
           }
         });

@@ -45,7 +45,7 @@ class ShopProduct extends Model
     }
     public function store()
     {
-        return $this->belongsTo(ShopStore::class, 'store_id', 'id');
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
     }
     public function groups()
     {

@@ -41,6 +41,11 @@ class ShopStore extends Model
         return $this->hasMany(ShopNews::class, 'store_id', 'id');
     }
 
+    public function orders()
+    {
+        return $this->hasMany(ShopOrder::class, 'store_id', 'id');
+    }
+
     public function pages()
     {
         return $this->hasMany(ShopPage::class, 'store_id', 'id');
@@ -61,6 +66,7 @@ class ShopStore extends Model
             $store->news()->delete();
             $store->banners()->delete();
             $store->pages()->delete();
+            $store->orders()->delete();
             Config::where('store_id', $store->id)->delete();
             UserStore::where('store_id', $store->id)->delete();
         });

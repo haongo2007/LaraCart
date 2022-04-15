@@ -1,5 +1,6 @@
 export default {
   route: {
+    userEdit: 'Edit user',
     userCreate: 'Create user',
     content: 'Content',
     banner: 'Banner',
@@ -297,6 +298,10 @@ export default {
     'email': 'Email',
     'first_name': 'First name',
     'last_name': 'Last name',
+    'fullname': 'Full name',
+    'phone':'Phone',
+    'store':'Store',
+    'permissions':'Permissions'
   },
   roles: {
     description: {

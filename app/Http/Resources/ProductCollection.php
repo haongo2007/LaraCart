@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\StoreCollection;
 
 class ProductCollection extends JsonResource
 {
@@ -41,7 +42,7 @@ class ProductCollection extends JsonResource
             'sort' => $this->sort ,
             'status' => $this->status ,
             'stock' => $this->stock ,
-            'store_id' => $this->store_id ,
+            'store' => $this->store,
             'supplier_id' => $this->supplier_id ,
             'attributes' => $this->attributes ,
             'tax' => $this->getTaxValue() ,
