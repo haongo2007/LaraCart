@@ -4,6 +4,10 @@ export default {
     return: 'Trở về',
   },
   route: {
+    roleCreate: 'Tạo nhóm quyền',
+    roleEdit: 'Sửa nhóm quyền',
+    permissionCreate: 'Tạo quyền',
+    permissionEdit: 'Sửa quyền',
     userEdit: 'Sửa người dùng',
     userCreate: 'Tạo người dùng',
     content: 'Bài viết',
@@ -165,6 +169,9 @@ export default {
     laravel: 'Laravel',
   },
   permission: {
+    name:"Tên Quyền",
+    slug:"Slug Quyền",
+    path:"Đường dẫn cho phép",
     roles: 'Nhóm của bạn',
     switchRoles: 'Đổi nhóm',
     tips: 'Trong vài trường hợp sẽ không thích hợp để dùng v-permission, như là thành phần Tab hay el-table-column và các trường hợp render DOM không đồng bộ, khi đó chỉ có thể xử lý bằng tay với v-if.',
@@ -301,5 +308,8 @@ export default {
       user: 'Normal user. Have access to some pages',
       visitor: 'Visitor. Have access to static pages, should not have any writable permission',
     },
+    'slug':'Slug',
+    'permissions':'Quyền hạn',
+    'name': 'Tên',
   },
 };

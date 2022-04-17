@@ -8,5 +8,5 @@
 //     Route::post('/edit/{id}', 'Auth\PermissionController@postEdit')->name('admin_permission.edit');
 //     Route::post('/delete', 'Auth\PermissionController@deleteList')->name('admin_permission.delete');
 // });
-
+	Route::get('/permissions/getAllPath','PermissionsController@getAllPath');
     Route::apiResource('permissions', 'PermissionsController');

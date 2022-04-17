@@ -18,21 +18,11 @@ class UserCollection extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'fullname' => $this->fullname,
             'email' => $this->email,
             'phone' => $this->phone,
-            'roles' => array_map(
-                function ($role) {
-                    return $role;
-                },
-                $this->roles->pluck('id','name')->toArray()
-            ),
-            'permissions' => array_map(
-                function ($permissions) {
-                    return $permissions;
-                },
-                $this->permissions->pluck('id','name')->toArray()
-            ),
+            'roles' => $this->roles,
+            'permissions' => $this->permissions,
             'avatar' => $this->avatar ? asset($this->avatar) : 'api/getFile?disk='.env('FILESYSTEM_DRIVER', 'local').'&path='.urlencode('avatar/default.jpg'),
             'store' => StoreCollection::collection($this->stores)
         ];

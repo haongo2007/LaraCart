@@ -1,10 +1,10 @@
 <template>
-  <user-detail :is-edit="false" :data-temp="temp"/>
+  <permission-detail :is-edit="true" :data-temp="temp"/>
 </template>
 
 <script>
 
-import UserDetail from './components/UserDetail';
+import PermissionDetail from './components/PermissionDetail';
 
 const defaultForm = {
   fullname: '',
@@ -17,8 +17,8 @@ const defaultForm = {
 };
 
 export default {
-  name: 'UserCreate',
-  components: { UserDetail },
+  name: 'PermissionEdit',
+  components: { PermissionDetail },
   data() {
     return {
       temp: Object.assign({}, defaultForm),

@@ -10,7 +10,7 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-button-group>
-              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'UserCreate'}).catch(() => {})" />
+              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'RoleCreate'}).catch(() => {})" />
               <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
             </el-button-group>
           </el-col>
@@ -75,6 +75,7 @@ export default {
     EventBus.$on('listenMultiSelectRow', data => {
       this.multiSelectRow = data;
     });
+    EventBus.$on('handleDeleting', this.handleDeleting);
   },
   methods: {
     async getList() {

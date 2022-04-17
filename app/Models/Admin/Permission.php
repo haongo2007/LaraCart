@@ -102,7 +102,9 @@ class Permission extends Model
                 $sql->where('name', 'like', '%' . $contain . '%');
             });
         }
-
+        if ($limit == 'all') {
+            $limit = '';
+        }
         $permissionsList = $permissionsList->paginate($limit);
 
         return $permissionsList;

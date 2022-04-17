@@ -79,6 +79,7 @@
 </template>
 
 <script>
+import reloadRedirectToList from '@/utils';
 import Tinymce from '@/components/Tinymce';
 import Sticky from '@/components/Sticky'; // Sticky header
 import InfoAttribute from './InfoAttribute';
@@ -198,7 +199,7 @@ export default {
           });
           const view = this.$router.resolve({ name: 'ProductCreateSingle' }).route;
           this.$store.dispatch('tagsView/delCachedView', view);
-          this.reloadRedirectToList('ProductList');
+          reloadRedirectToList('ProductList');
         } else {
           this.$message({
             type: 'error',
@@ -230,18 +231,9 @@ export default {
           message: 'Updated successfully',
         });
 
-        this.reloadRedirectToList('ProductList');
+        reloadRedirectToList('ProductList');
       }).catch(err => {
         loading.close();
-      });
-    },
-    reloadRedirectToList(cpn){
-      const view = this.$router.resolve({ name: cpn }).route;
-      this.$store.dispatch('tagsView/delCachedView', view).then(() => {
-        const { fullPath } = view;
-        this.$router.replace({
-          path: '/redirect' + fullPath,
-        });
       });
     },
     handleClose(tag, key) {

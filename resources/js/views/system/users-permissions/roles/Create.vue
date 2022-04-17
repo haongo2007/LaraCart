@@ -1,24 +1,20 @@
 <template>
-  <user-detail :is-edit="false" :data-temp="temp"/>
+  <role-detail :is-edit="false" :data-temp="temp"/>
 </template>
 
 <script>
 
-import UserDetail from './components/UserDetail';
+import RoleDetail from './components/RoleDetail';
 
 const defaultForm = {
-  fullname: '',
-  email: '',
-  password: '',
-  permissions: [],
-  roles: [],
-  stores:[],
-  phone:'',
+  name: '',
+  slug:'',
+  permissions:[],
 };
 
 export default {
-  name: 'UserCreate',
-  components: { UserDetail },
+  name: 'RoleCreate',
+  components: { RoleDetail },
   data() {
     return {
       temp: Object.assign({}, defaultForm),

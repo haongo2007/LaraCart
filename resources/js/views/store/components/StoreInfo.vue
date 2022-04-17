@@ -610,6 +610,7 @@
 <script>
 
 
+import reloadRedirectToList from '@/utils';
 import StoreResource from '@/api/store';
 import EventBus from '@/components/FileManager/eventBus';
 import FileManager from '@/components/FileManager';
@@ -749,15 +750,6 @@ export default {
         this.cancelAction = true;
       }
     },
-    reloadRedirectToList(cpn){
-      const view = this.$router.resolve({ name: cpn }).route;
-      this.$store.dispatch('tagsView/delCachedView', view).then(() => {
-        const { fullPath } = view;
-        this.$router.replace({
-          path: '/redirect' + fullPath,
-        });
-      });
-    },
     updateData(i,params){
       storeResource.update(this.id,params).then((res) => {
         if (res) {
@@ -809,7 +801,7 @@ export default {
           this.btnLoading = false;
           const view = this.$router.resolve({ name: 'StoreCreate' }).route;
           this.$store.dispatch('tagsView/delCachedView', view);
-          this.reloadRedirectToList('StoreList');
+          reloadRedirectToList('StoreList');
           this.$store.dispatch('user/getInfo');
         } else {
           this.$message({

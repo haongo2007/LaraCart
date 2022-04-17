@@ -1,4 +1,7 @@
 import { pluralize } from '@/filters';
+import router from '@/router';
+import store from '@/store';
+
 export function parseTime(time, cFormat) {
   if (arguments.length === 0) {
     return null;
@@ -41,6 +44,16 @@ export function parseTime(time, cFormat) {
   });
 
   return timeStr;
+}
+
+export default function reloadRedirectToList(cpn){
+  const view = router.resolve({ name: cpn }).route;
+  store.dispatch('tagsView/delCachedView', view).then(() => {
+    const { fullPath } = view;
+    router.replace({
+      path: '/redirect' + fullPath,
+    });
+  });
 }
 
 export function formatTime(time, option) {

@@ -1,34 +1,47 @@
 <template>
-  <user-detail :is-edit="false" :data-temp="temp"/>
+  <role-detail :is-edit="false" :data-temp="temp"/>
 </template>
 
 <script>
 
-import UserDetail from './components/UserDetail';
+import RoleDetail from './components/RoleDetail';
+import RoleResource from '@/api/role';
+
+const roleResource = new RoleResource();
 
 const defaultForm = {
-  fullname: '',
-  email: '',
-  password: '',
-  permissions: [],
-  roles: [],
-  stores:[],
-  phone:'',
+  name: '',
+  slug:'',
+  permissions:[],
 };
 
 export default {
-  name: 'UserCreate',
-  components: { UserDetail },
+  name: 'RoleEdit',
+  components: { RoleDetail },
   data() {
     return {
       temp: Object.assign({}, defaultForm),
     };
   },
   created() {
-
+    const id = this.$route.params && this.$route.params.id;
+    this.fetchRole(id);
   },
   methods: {
-    
+    fetchRole(id){
+      roleResource.get(id).then(({ data } = response) => {
+        this.temp.name = data.name;
+        this.temp.slug = data.slug;
+        this.temp.permissions = this.filterData(data.permissions);
+      });
+    },
+    filterData(data){
+      let res = [];
+      data.forEach(function (e,i) {
+        res.push(e.id);
+      });
+      return res;
+    },
   },
 };
 </script>

@@ -28,7 +28,7 @@ export default {
       state_cropper: this.cropper,
       imagecropperKey: 0,
       image: 'https://eclectickoifish.files.wordpress.com/2015/01/7826_one_piece.jpg',
-      urlUpdateAvatar: 'update/avatar',
+      urlUpdateAvatar: 'uploads/avatar',
     };
   },
   methods: {

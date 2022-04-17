@@ -55,6 +55,15 @@
         </template>
       </el-table-column>
 
+      <el-table-column :label="$t('table.actions')" align="center" min-width="80" class-name="small-padding fixed-width">
+        <template slot-scope="{row}">
+          <el-button-group>
+            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="$router.push({ name: 'RoleEdit',params:{id:row.id} })" />
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
+          </el-button-group>
+        </template>
+      </el-table-column>
+
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="paginationInit" />
   </div>
@@ -104,6 +113,9 @@ export default {
     handleSelectionAllChange(val){
       EventBus.$emit('listenMultiSelectRow', val);
     },
+    handleDeleting(row){
+      EventBus.$emit('handleDeleting', row);
+    }
   },
 };
 </script>

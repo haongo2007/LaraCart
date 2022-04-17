@@ -155,6 +155,7 @@
 <script>
 import CustomerResource from '@/api/customer';
 import OrdersResource from '@/api/orders';
+import reloadRedirectToList from '@/utils';
 
 const customerResource = new CustomerResource();
 const ordersResource = new OrdersResource();
@@ -390,16 +391,8 @@ export default {
               });
 
               this.temp = Object.assign({}, defaultForm);
-
-              const view = this.$router.resolve({ name: 'OrdersList' }).route;
-              this.$store.dispatch('tagsView/delCachedView', view).then(() => {
-                const { fullPath } = view;
-                this.$nextTick(() => {
-                  this.$router.replace({
-                    path: '/redirect' + fullPath,
-                  });
-                });
-              });
+              
+              reloadRedirectToList('OrdersList');
             } else {
               this.$message({
                 type: 'error',

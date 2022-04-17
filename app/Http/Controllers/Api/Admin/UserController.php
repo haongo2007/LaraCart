@@ -65,7 +65,7 @@ class UserController extends Controller
         } else {
             $params = $request->all();
             $user = User::create([
-                'name' => $params['fullname'],
+                'fullname' => $params['fullname'],
                 'email' => $params['email'],
                 'phone' => $params['phone'],
                 'password' => Hash::make($params['password']),
@@ -113,15 +113,12 @@ class UserController extends Controller
         if ($user === null) {
             return response()->json(['error' => 'User not found'], 404);
         }
-        if ($user->isAdmin()) {
+        if ($user->isAdministrator()) {
             if ($currentUser->id != $user->id) {
                 return response()->json(['error' => 'Admin can not be modified'], 403);
             }
         }
-        if (!$currentUser->isAdmin()
-            && $currentUser->id !== $user->id
-            && !$currentUser->hasPermission(\App\Larviu\Acl::PERMISSION_USER_MANAGE)
-        ) {
+        if (!$currentUser->isAdministrator() && $currentUser->id !== $user->id) {
             return response()->json(['error' => 'Permission denied'], 403);
         }
 
@@ -129,16 +126,24 @@ class UserController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 403);
         } else {
-            $email = $request->get('email');
+            $email = $request->email;
             $found = User::where('email', $email)->first();
             if ($found && $found->id !== $user->id) {
                 return response()->json(['error' => 'Email has been taken'], 403);
             }
 
-            $user->name = $request->get('name');
+            $user->fullname = $request->fullname;
             $user->email = $email;
             $user->save();
-            return new UserCollection($user);
+            $user->roles()->detach();
+            $user->permissions()->detach();
+            $user->stores()->detach();
+
+            $user->roles()->attach($request->roles);
+            $user->permissions()->attach($request->permissions);
+            $user->stores()->attach($request->stores);
+
+            return response()->json(new JsonResponse([]), Response::HTTP_OK);
         }
     }
 
@@ -188,10 +193,10 @@ class UserController extends Controller
         try {
             $user->delete();
         } catch (\Exception $ex) {
-            response()->json(['error' => $ex->getMessage()], 403);
+            return response()->json(new JsonResponse([],$ex->getMessage()), Response::HTTP_BAD_REQUEST);
         }
 
-        return response()->json(null, 204);
+        return response()->json(new JsonResponse([]), Response::HTTP_OK);
     }
 
     /**
@@ -224,6 +229,10 @@ class UserController extends Controller
             'email' => $isNew ? 'required|email|unique:'.User::class : 'required|email',
             'stores' => ['array','required'],
             'roles' => [
+                'required',
+                'array'
+            ],
+            'permissions' => [
                 'required',
                 'array'
             ],

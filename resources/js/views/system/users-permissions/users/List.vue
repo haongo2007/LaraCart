@@ -47,7 +47,7 @@
 
       <el-table-column align="center" label="Name">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.fullname }}</span>
         </template>
       </el-table-column>
 
@@ -69,7 +69,7 @@
             placement="left-end"
             width="200"
             trigger="click">
-            <el-table :data="scope.row.roles | filterRoles">
+            <el-table :data="scope.row.roles">
               <el-table-column label="Name" >
                 <template slot-scope="scope">
                   <div v-html="scope.row.name"></div>
@@ -87,7 +87,7 @@
             placement="left-end"
             width="200"
             trigger="click">
-            <el-table :data="scope.row.permissions | filterRoles">
+            <el-table :data="scope.row.permissions">
               <el-table-column label="Name" >
                 <template slot-scope="scope">
                   <div v-html="scope.row.name"></div>
@@ -123,15 +123,6 @@ import EventBus from '@/components/FileManager/eventBus';
 export default {
   name: 'UsersList',
   components: { Pagination,FilterSystemUsers,RightPanel },
-  filters: {
-    filterRoles(data) {
-      let res = [];
-      data.forEach(function(v,i){
-        res[i] = {name:v};
-      });
-      return res;
-    },
-  },
   data() {
     return {
       list: [],

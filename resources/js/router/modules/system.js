@@ -15,35 +15,59 @@ const systemRoutes = {
       path: '/users-permissions/users',
       component: () => import('@/views/system/users-permissions/users/List'),
       name: 'UsersList',
-      meta: { title: 'users', parent: 'root', permissions: ['Users manager'] },
+      meta: { title: 'users', parent: 'root', permissions: ['User manager'] },
     },
     {
       path: '/users-permissions/users/create',
       component: () => import('@/views/system/users-permissions/users/Create'),
       name: 'UserCreate',
-      meta: { title: 'userCreate', parent: 'UsersList', permissions: ['Users manager'] },
+      meta: { title: 'userCreate', parent: 'UsersList', permissions: ['User manager'] },
     },
     {
       path: 'users-permissions/users/edit/:id(\\d+)',
       component: () => import('@/views/system/users-permissions/users/Edit'),
       name: 'UserEdit',
-      meta: { title: 'userEdit',parent: 'UsersList',permissions: ['Users manager']},
+      meta: { title: 'userEdit',parent: 'UsersList',permissions: ['User manager']},
     },
-
-    // users manager
+    // roles manager
     {
       path: '/users-permissions/roles',
       component: Layout,
       component: () => import('@/views/system/users-permissions/roles/List'),
       name: 'RolesList',
-      meta: { title: 'roles', parent: 'root' },
+      meta: { title: 'roles', parent: 'root' , permissions: ['Role manager']},
     },
+    {
+      path: '/users-permissions/roles/create',
+      component: () => import('@/views/system/users-permissions/roles/Create'),
+      name: 'RoleCreate',
+      meta: { title: 'roleCreate', parent: 'RolesList', permissions: ['Role manager'] },
+    },
+    {
+      path: 'users-permissions/roles/edit/:id(\\d+)',
+      component: () => import('@/views/system/users-permissions/roles/Edit'),
+      name: 'RoleEdit',
+      meta: { title: 'roleEdit',parent: 'RolesList',permissions: ['Role manager']},
+    },
+    // permissions manager
     {
       path: '/users-permissions/permissions',
       component: Layout,
       component: () => import('@/views/system/users-permissions/permissions/List'),
       name: 'PermissionsList',
-      meta: { title: 'permissions', parent: 'root' },
+      meta: { title: 'permissions', parent: 'root', permissions: ['Permission manager'] },
+    },
+    {
+      path: '/users-permissions/permissions/create',
+      component: () => import('@/views/system/users-permissions/permissions/Create'),
+      name: 'PermissionCreate',
+      meta: { title: 'permissionCreate', parent: 'PermissionsList', permissions: ['Permission manager'] },
+    },
+    {
+      path: 'users-permissions/permissions/edit/:id(\\d+)',
+      component: () => import('@/views/system/users-permissions/permissions/Edit'),
+      name: 'PermissionEdit',
+      meta: { title: 'permissionEdit',parent: 'PermissionsList',permissions: ['Permission manager']},
     },
     // setting
     {

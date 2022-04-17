@@ -5,43 +5,19 @@ use App\Models\Admin\Permission;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 use App\Http\Resources\PermissionCollection;
+use App\Helper\JsonResponse;
 use Validator;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Route;
+
 
 class PermissionsController extends Controller
 {
 
-    public $routeAdmin;
 
     public function __construct()
     {
         
-        // $routes = app()->routes->getRoutes();
-
-        // foreach ($routes as $route) {
-        //     if (Str::startsWith($route->uri(), LC_ADMIN_PREFIX)) {
-        //         $prefix = LC_ADMIN_PREFIX?$route->getPrefix():ltrim($route->getPrefix(),'/');
-        //         $routeAdmin[$prefix] = [
-        //             'uri'    => 'ANY::' . $prefix . '/*',
-        //             'name'   => $prefix . '/*',
-        //             'method' => 'ANY',
-        //         ];
-        //         foreach ($route->methods as $key => $method) {
-        //             if ($method != 'HEAD' && !collect($this->without())->first(function ($exp) use ($route) {
-        //                 return Str::startsWith($route->uri, $exp);
-        //             })) {
-        //                 $routeAdmin[] = [
-        //                     'uri'    => $method . '::' . $route->uri,
-        //                     'name'   => $route->uri,
-        //                     'method' => $method,
-        //                 ];
-        //             }
-
-        //         }
-        //     }
-
-        // }
-
-        // $this->routeAdmin = $routeAdmin;
     }
 
     public function index()
@@ -49,27 +25,6 @@ class PermissionsController extends Controller
         $searchParams = request()->all();
         $data = (new Permission)->getPermissionsListAdmin($searchParams);
         return PermissionCollection::collection($data)->additional(['message' => 'Successfully']);
-    }
-
-/**
- * Form create new item in admin
- * @return [type] [description]
- */
-    public function create()
-    {
-        $data = [
-            'title' => trans('permission.admin.add_new_title'),
-            'subTitle' => '',
-            'title_description' => trans('permission.admin.add_new_des'),
-            'icon' => 'fa fa-plus',
-            'permission' => [],
-            'routeAdmin' => $this->routeAdmin,
-            'url_action' => lc_route_admin('admin_permission.create'),
-
-        ];
-
-        return view($this->templatePathAdmin.'Auth.permission')
-            ->with($data);
     }
 
 /**
@@ -103,28 +58,6 @@ class PermissionsController extends Controller
 
         return redirect()->route('admin_permission.index')->with('success', trans('permission.admin.create_success'));
 
-    }
-
-/**
- * Form edit
- */
-    public function edit($id)
-    {
-        $permission = Permission::find($id);
-        if ($permission === null) {
-            return 'no data';
-        }
-        $data = [
-            'title' => trans('permission.admin.edit'),
-            'subTitle' => '',
-            'title_description' => '',
-            'icon' => 'fa fa-edit',
-            'permission' => $permission,
-            'routeAdmin' => $this->routeAdmin,
-            'url_action' => lc_route_admin('admin_permission.edit', ['id' => $permission['id']]),
-        ];
-        return view($this->templatePathAdmin.'Auth.permission')
-            ->with($data);
     }
 
 /**
@@ -178,15 +111,54 @@ Need mothod destroy to boot deleting in model
 
     public function without()
     {
-        $prefix = LC_ADMIN_PREFIX?LC_ADMIN_PREFIX.'/':'';
+        $prefix = LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX;
         return [
-            $prefix . 'login',
-            $prefix . 'logout',
-            $prefix . 'forgot',
-            $prefix . 'deny',
-            $prefix . 'locale',
-            $prefix . 'uploads',
+            $prefix . '/auth/login',
+            $prefix . '/auth/logout',
+            $prefix . '/auth/info',
+            $prefix . '/forgot',
+            $prefix . '/deny',
+            $prefix . '/locale',
+            $prefix . '/sanctum',
         ];
     }
 
+    public function getAllPath()
+    {
+        $routes = Route::getRoutes();
+        $routeAdmin = [];
+        foreach ($routes as $route) {
+            if (Str::startsWith($route->uri(), LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX)) {
+                $prefix = LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX;
+
+                $routeAdmin[$prefix] = [
+                    'uri'    => 'ANY::' . $prefix . '/*',
+                    'name'   => $prefix . '/*',
+                    'method' => 'ANY',
+                ];
+                foreach ($route->methods as $key => $method) {
+                    if ($method != 'HEAD' && $method != 'PATCH' && !collect($this->without())->first(function ($exp) use ($route) {
+                        return Str::startsWith($route->uri, $exp);
+                    })) {
+                        $prf = explode('/', $route->uri)[2];
+                        $routeAdmin[$prf][] = [
+                            'uri'    => $method . '::' . $route->uri,
+                            'name'   => $route->uri,
+                            'method' => $method,
+                        ];
+                    }
+
+                }
+            }elseif (Str::startsWith($route->uri(), 'file-manager')) {
+                $routeAdmin['file-manager'] = [
+                    'uri'    => 'ANY::file-manager/*',
+                    'name'   => 'file-manager/*',
+                    'method' => 'ANY',
+                ];
+            }
+
+        }
+        return response()->json(new JsonResponse($routeAdmin), Response::HTTP_OK);
+
+    }
 }

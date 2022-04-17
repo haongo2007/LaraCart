@@ -1,5 +1,9 @@
 export default {
   route: {
+    roleCreate: 'Create role',
+    roleEdit: 'Edit role',
+    permissionCreate: 'Create permission',
+    permissionEdit: 'Edit permission',
     userEdit: 'Edit user',
     userCreate: 'Create user',
     content: 'Content',
@@ -162,6 +166,9 @@ export default {
     github: 'Github Repository',
   },
   permission: {
+    name:"Permission Name",
+    slug:"Permission Slug",
+    path:"Permission Path",
     addRole: 'New Role',
     editPermission: 'Edit Permission',
     roles: 'Your roles',
@@ -301,7 +308,7 @@ export default {
     'fullname': 'Full name',
     'phone':'Phone',
     'store':'Store',
-    'permissions':'Permissions'
+    'permissions':'Permissions',
   },
   roles: {
     description: {
@@ -311,5 +318,8 @@ export default {
       user: 'Normal user. Have access to some pages',
       visitor: 'Visitor. Have access to static pages, should not have any writable permission',
     },
+    'slug':'Slug',
+    'permissions':'Permissions',
+    'name': 'Name',
   },
 };

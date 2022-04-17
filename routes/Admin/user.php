@@ -1,5 +1,4 @@
 <?php
-	use \App\Helper\Acl;
 // Route::group(['prefix' => 'user'], function () {
 //     Route::get('/', 'Auth\UsersController@index')->name('admin_user.index');
 //     Route::get('create', 'Auth\UsersController@create')->name('admin_user.create');
@@ -10,8 +9,4 @@
 // });
 
     Route::apiResource('users', 'UserController');
-    Route::put('users/{user}', 'UserController@update');
-    Route::get('users/{user}/permissions', 'UserController@permissions');
-    Route::put('users/{user}/permissions', 'UserController@updatePermissions');
-    Route::get('user','UserController@show');
-    Route::post('update/avatar', 'UserController@updateAvatar');
+    Route::post('uploads/avatar', 'UserController@updateAvatar');

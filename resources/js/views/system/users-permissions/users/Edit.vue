@@ -35,19 +35,22 @@ export default {
   methods: {
     fetchUser(id){
       userResource.get(id).then(({ data } = response) => {
-        var roles;
-        for(item in data.roles){
-          console.log(item);
-        }
         this.temp.id = data.id;
-        this.temp.fullname = data.name;
+        this.temp.fullname = data.fullname;
         this.temp.email = data.email;
         this.temp.phone = data.phone;
-        this.temp.stores = data.store;
-        this.temp.roles = roles;
-        this.temp.permissions = data.permissions;
+        this.temp.stores = this.filterData(data.store);
+        this.temp.roles = this.filterData(data.roles);
+        this.temp.permissions = this.filterData(data.permissions);
       });
-    }
+    },
+    filterData(data){
+      let res = [];
+      data.forEach(function (e,i) {
+        res.push(e.id);
+      });
+      return res;
+    },
   },
 };
 </script>

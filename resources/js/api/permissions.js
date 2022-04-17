@@ -5,6 +5,12 @@ class PermissionsResource extends Resource {
   constructor() {
     super('permissions');
   }
+  getAllPath() {
+    return request({
+      url: '/' + this.uri + '/getAllPath',
+      method: 'get',
+    });
+  }
 }
 
 export { PermissionsResource as default };

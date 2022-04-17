@@ -124,6 +124,7 @@
 </template>
 
 <script>
+import reloadRedirectToList from '@/utils';
 import Sticky from '@/components/Sticky'; // Sticky header
 import FileManager from '@/components/FileManager';
 import EventBus from '@/components/FileManager/eventBus';
@@ -242,7 +243,7 @@ export default {
               });
               const view = this.$router.resolve({ name: 'CategoryCreate' }).route;
               this.$store.dispatch('tagsView/delCachedView', view);
-              this.reloadRedirectToList('CategoryList');
+              reloadRedirectToList('CategoryList');
             } else {
               this.$message({
                 type: 'error',
@@ -274,7 +275,7 @@ export default {
           form_data.append('_method', 'PUT');
 
           categoryResource.update(this.dataTemp.id, form_data).then((res) => {
-            this.reloadRedirectToList('CategoryList');
+            reloadRedirectToList('CategoryList');
 
             this.$message({
               type: 'success',
@@ -287,15 +288,6 @@ export default {
             loading.close();
           });
         }
-      });
-    },
-    reloadRedirectToList(cpn){
-      const view = this.$router.resolve({ name: cpn }).route;
-      this.$store.dispatch('tagsView/delCachedView', view).then(() => {
-        const { fullPath } = view;
-        this.$router.replace({
-          path: '/redirect' + fullPath,
-        });
       });
     },
     handleVisibleStorage(){

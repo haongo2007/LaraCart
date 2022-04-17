@@ -44,7 +44,7 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        //
+        return new RoleCollection($role);
     }
 
     /**

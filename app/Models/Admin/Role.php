@@ -114,7 +114,10 @@ class Role extends Model
                 $sql->where('name', 'like', '%' . $contain . '%');
             });
         }
-
+        
+        if ($limit == 'all') {
+            $limit = '';
+        }
         $rolesList = $rolesList->paginate($limit);
 
         return $rolesList;
