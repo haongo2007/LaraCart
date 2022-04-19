@@ -25,11 +25,15 @@
 
         <el-form-item :label="$t('permission.path')" prop="path">
           <div class="parent-options">
-            <div class="child-options"  v-for="(info,index) in path" :key="index">
-              <el-checkbox v-model="checkList[index]['value']" :indeterminate="isIndeterminatePath" @change="handleCheckAllChange">{{index}}</el-checkbox>
+            <div class="child-options" v-for="(info,index) in path" :key="index">
+              <el-checkbox v-model="checkList[index]['value']" @change="handleCheckAllChange(index)" 
+              :label="index">{{index | uppercaseFirst}}</el-checkbox>
               <div class="child-child-options" v-if="info.length">
-                <el-checkbox-group v-model="checkList[index]['children'][key]" v-for="(route,key) in info" :key="key">
-                  <el-checkbox :label="route.uri">{{ route.uri }}</el-checkbox>
+                <el-checkbox-group v-for="(route,key) in info" :key="key" v-model="checkList[index]['children'][key]" @change="handleCheckChange(index,key)" 
+                style="overflow: hidden;">
+                  <el-tooltip :open-delay="500" class="item" effect="dark" :content="route.uri" placement="left">
+                    <el-checkbox :key="route.uri" :label="route.uri" >{{ route.uri }}</el-checkbox>
+                  </el-tooltip>
                 </el-checkbox-group>
               </div>
             </div>
@@ -63,7 +67,6 @@ export default {
   },
   data() {
     return {
-      isIndeterminatePath:false,
       checkList:{},
       loading:true,
       path: [],
@@ -89,22 +92,25 @@ export default {
     this.getAllPath();
   },
   methods: {
-    handleCheckAllChange(){
-
+    handleCheckAllChange(key){
+      let that = this;
+      this.checkList[key].children.forEach(function(v,i){
+        that.checkList[key].children[i] = that.checkList[key].value === true ? true : false;
+      });
     },
-    handleCheckedChangePath(){
-
+    handleCheckChange(props,prop){
+      console.log(this.path[props][prop]);
     },
     getAllPath(){
       permissionsResource.getAllPath().then(data => {
         this.path = data.data;
-        for(const prop in this.path){
-          this.$set(this.checkList,prop,{});
-          this.$set(this.checkList[prop],'value',false);
-          this.$set(this.checkList[prop],'children',[]);
+        for(const props in this.path){
+          this.$set(this.checkList,props,{});
+          this.$set(this.checkList[props],'value',false);
+          this.$set(this.checkList[props],'children',[]);
 
-          for(const child in this.path[prop]){
-            this.$set(this.checkList[prop]['children'],child,false);
+          for(const prop in this.path[props]){
+            this.$set(this.checkList[props]['children'],prop,false);
           }
         }
         this.loading = false;
@@ -224,7 +230,7 @@ export default {
       padding: 0 10px;
       margin: 5px;
       .child-child-options{
-        margin-left: 25px;
+        margin: 0px 25px;
       }
     }
   }
