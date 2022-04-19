@@ -7,13 +7,10 @@
 import PermissionDetail from './components/PermissionDetail';
 
 const defaultForm = {
-  fullname: '',
-  email: '',
-  password: '',
-  permissions: [],
-  roles: [],
-  stores:[],
-  phone:'',
+  id: null,
+  name: '',
+  slug: '',
+  uri:[],
 };
 
 export default {

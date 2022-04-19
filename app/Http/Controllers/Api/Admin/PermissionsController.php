@@ -8,6 +8,7 @@ use App\Http\Resources\PermissionCollection;
 use App\Helper\JsonResponse;
 use Validator;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -27,10 +28,20 @@ class PermissionsController extends Controller
         return PermissionCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
+    /**
+     * Display the specified resource.
+     *
+     * @param  Permission $permission
+     * @return PermissionCollection|\Illuminate\Http\JsonResponse
+     */
+    public function show(Request $request,Permission $permission)
+    {
+        return new PermissionCollection($permission);
+    }
+    /**
+    * Post create new item in admin
+    * @return [type] [description]
+    */
     public function postCreate()
     {
         $data = request()->all();

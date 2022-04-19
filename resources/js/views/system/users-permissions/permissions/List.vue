@@ -79,7 +79,7 @@ import FilterSystemPermissions from './components/FilterSystemPermissions';
 import EventBus from '@/components/FileManager/eventBus';
 
 export default {
-  name: 'RolesList',
+  name: 'PermissionsList',
   components: { Pagination, RightPanel, FilterSystemPermissions },
   filters: {
     http_pathFilter(data) {

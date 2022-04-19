@@ -99,18 +99,44 @@ export default {
       });
     },
     handleCheckChange(props,prop){
-      console.log(this.path[props][prop]);
+      let check = this.checkList[props].children.filter(item => item === false);
+      if (check.length == 0) {
+        this.checkList[props].value = true;
+      }else{
+        this.checkList[props].value = false;
+      }
     },
-    getAllPath(){
-      permissionsResource.getAllPath().then(data => {
+    async getAllPath(){
+      let uri = [];
+      let that = this;
+      if (this.isEdit) {
+        uri = this.dataTemp.uri;
+      }
+      await permissionsResource.getAllPath().then(data => {
         this.path = data.data;
         for(const props in this.path){
+          let checked = false;
+          if (uri.length) {
+            for(let i in uri){
+              if (uri[i] == this.path[props].uri) {
+                checked = true;
+              }
+            }
+          }
           this.$set(this.checkList,props,{});
-          this.$set(this.checkList[props],'value',false);
+          this.$set(this.checkList[props],'value',checked);
           this.$set(this.checkList[props],'children',[]);
 
           for(const prop in this.path[props]){
-            this.$set(this.checkList[props]['children'],prop,false);
+            let checked = false;
+            if (uri.length) {
+              for(let i in uri){
+                if (uri[i] == this.path[props][prop].uri) {
+                  checked = true;
+                }
+              }
+            }
+            this.$set(this.checkList[props]['children'],prop,checked);
           }
         }
         this.loading = false;

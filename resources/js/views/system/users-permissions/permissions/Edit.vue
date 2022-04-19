@@ -1,19 +1,19 @@
 <template>
-  <permission-detail :is-edit="true" :data-temp="temp"/>
+  <components :is="component" :is-edit="true" :data-temp="temp"/>
 </template>
 
 <script>
 
 import PermissionDetail from './components/PermissionDetail';
+import PermissionsResource from '@/api/permissions';
+
+const permissionsResource = new PermissionsResource();
 
 const defaultForm = {
-  fullname: '',
-  email: '',
-  password: '',
-  permissions: [],
-  roles: [],
-  stores:[],
-  phone:'',
+  id: null,
+  name: '',
+  slug: '',
+  uri:[],
 };
 
 export default {
@@ -22,13 +22,22 @@ export default {
   data() {
     return {
       temp: Object.assign({}, defaultForm),
+      component:'',
     };
   },
   created() {
-
+    const id = this.$route.params && this.$route.params.id;
+    this.fetchPermission(id);
   },
   methods: {
-    
+    fetchPermission(id){
+      permissionsResource.get(id).then(({ data } = response) => {
+        this.temp.name = data.name;
+        this.temp.slug = data.slug;
+        this.temp.uri = data.http_uri.split(',');
+        this.component = 'PermissionDetail';
+      });
+    }
   },
 };
 </script>
