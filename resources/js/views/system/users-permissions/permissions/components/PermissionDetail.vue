@@ -115,6 +115,8 @@ export default {
       await permissionsResource.getAllPath().then(data => {
         this.path = data.data;
         for(const props in this.path){
+          let leng = this.path[props].length;
+          let deepLeng = 0;
           let checked = false;
           if (uri.length) {
             for(let i in uri){
@@ -126,17 +128,20 @@ export default {
           this.$set(this.checkList,props,{});
           this.$set(this.checkList[props],'value',checked);
           this.$set(this.checkList[props],'children',[]);
-
           for(const prop in this.path[props]){
             let checked = false;
             if (uri.length) {
               for(let i in uri){
                 if (uri[i] == this.path[props][prop].uri) {
                   checked = true;
+                  deepLeng++;
                 }
               }
             }
             this.$set(this.checkList[props]['children'],prop,checked);
+          }
+          if (length != deepLeng) {
+            this.checkList[props].value = true;
           }
         }
         this.loading = false;
