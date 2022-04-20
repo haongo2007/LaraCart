@@ -111,7 +111,7 @@ export const asyncRoutes = [
   {
     path: '/storage',
     component: Layout,
-    redirect: 'noredirect',
+    redirect: 'storage/index',
     children: [
       {
         path: 'index',

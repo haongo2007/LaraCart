@@ -13,7 +13,7 @@ const defaultForm = {
   id: null,
   name: '',
   slug: '',
-  uri:[],
+  http_uri:[],
 };
 
 export default {
@@ -32,9 +32,10 @@ export default {
   methods: {
     fetchPermission(id){
       permissionsResource.get(id).then(({ data } = response) => {
+        this.temp.id  = data.id;
         this.temp.name = data.name;
         this.temp.slug = data.slug;
-        this.temp.uri = data.http_uri.split(',');
+        this.temp.http_uri = data.http_uri.split(',');
         this.component = 'PermissionDetail';
       });
     }

@@ -10,7 +10,7 @@ const defaultForm = {
   id: null,
   name: '',
   slug: '',
-  uri:[],
+  http_uri:[],
 };
 
 export default {

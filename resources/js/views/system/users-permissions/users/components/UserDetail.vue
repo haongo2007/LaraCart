@@ -213,11 +213,17 @@ export default {
     async getListRole(contain = 'all'){
       const data = await roleResource.list({limit:'all'});
       this.roles = data.data;
+      if (this.dataTemp.roles.length == this.roles.length) {
+        this.checkAllRoles = true;
+      }
     },
     async getListPermissions(){
       const data = await permissionsResource.list({limit:'all'});
       this.permissions = data.data;
       this.loading = false;
+      if (this.dataTemp.permissions.length == this.permissions.length) {
+        this.checkAllPermissions = true;
+      }
     },
     goBackList(){
       this.$router.push({ name: 'UsersList' });

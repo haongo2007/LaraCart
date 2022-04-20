@@ -42,11 +42,10 @@ class PermissionsController extends Controller
     * Post create new item in admin
     * @return [type] [description]
     */
-    public function postCreate()
+    public function store(Request $request)
     {
-        $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $data = $request->all();
+        $validator = Validator::make($data, [
             'name' => 'required|string|max:50|unique:"'.Permission::class.'",name',
             'slug' => 'required|regex:/(^([0-9A-Za-z\._\-]+)$)/|unique:"'.Permission::class.'",slug|string|max:50|min:3',
         ], [
@@ -54,9 +53,7 @@ class PermissionsController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
 
         $dataInsert = [
@@ -67,19 +64,18 @@ class PermissionsController extends Controller
 
         $permission = Permission::createPermission($dataInsert);
 
-        return redirect()->route('admin_permission.index')->with('success', trans('permission.admin.create_success'));
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
 
     }
 
 /**
  * update status
  */
-    public function postEdit($id)
+    public function update(Request $request,$id)
     {
         $permission = Permission::find($id);
-        $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $data = $request->all();
+        $validator = Validator::make($data, [
             'name' => 'required|string|max:50|unique:"'.Permission::class.'",name,' . $permission->id . '',
             'slug' => 'required|regex:/(^([0-9A-Za-z\._\-]+)$)/|unique:"'.Permission::class.'",slug,' . $permission->id . '|string|max:50|min:3',
         ], [
@@ -87,11 +83,8 @@ class PermissionsController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Edit
 
         $dataUpdate = [
             'name' => $data['name'],
@@ -99,9 +92,7 @@ class PermissionsController extends Controller
             'http_uri' => implode(',', ($data['http_uri'] ?? [])),
         ];
         $permission->update($dataUpdate);
-//
-        return redirect()->route('admin_permission.index')->with('success', trans('permission.admin.edit_success'));
-
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 /*

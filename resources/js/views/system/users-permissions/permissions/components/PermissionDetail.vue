@@ -92,11 +92,22 @@ export default {
     this.getAllPath();
   },
   methods: {
-    handleCheckAllChange(key){
+    handleCheckAllChange(props){
       let that = this;
-      this.checkList[key].children.forEach(function(v,i){
-        that.checkList[key].children[i] = that.checkList[key].value === true ? true : false;
+      this.checkList[props].children.forEach(function(v,i){
+        that.checkList[props].children[i] = that.checkList[props].value === true ? true : false;
       });
+      for(let i in this.dataTemp.http_uri){
+        for(let j in this.path[props]){
+          if (this.path[props][j].uri == this.dataTemp.http_uri[i]) {
+              this.dataTemp.http_uri.splice(i, 1); 
+          }
+        }
+      }
+      if (this.checkList[props].value) {
+        this.path[props].map((item) => this.dataTemp.http_uri.push(item.uri));
+      }
+      console.log(this.dataTemp.http_uri);
     },
     handleCheckChange(props,prop){
       let check = this.checkList[props].children.filter(item => item === false);
@@ -105,12 +116,20 @@ export default {
       }else{
         this.checkList[props].value = false;
       }
+      if (this.checkList[props].children[prop]) {
+        this.dataTemp.http_uri.push(this.path[props][prop].uri);
+      }else {        
+        let index = this.dataTemp.http_uri.indexOf(this.path[props][prop].uri);
+        if (index > -1) {
+          this.dataTemp.http_uri.splice(index, 1); // 2nd parameter means remove one item only
+        }
+      }
     },
     async getAllPath(){
       let uri = [];
       let that = this;
       if (this.isEdit) {
-        uri = this.dataTemp.uri;
+        uri = this.dataTemp.http_uri;
       }
       await permissionsResource.getAllPath().then(data => {
         this.path = data.data;
@@ -156,7 +175,7 @@ export default {
           const loading = this.$loading({
             target: '.el-form',
           });
-          userResource.store(this.dataTemp).then((res) => {
+          permissionsResource.store(this.dataTemp).then((res) => {
             if (res) {
               loading.close();
               this.$message({
@@ -164,10 +183,10 @@ export default {
                 message: 'Create successfully',
               });
 
-              const view = this.$router.resolve({ name: 'UserCreate' }).route;
+              const view = this.$router.resolve({ name: 'PermissionCreate' }).route;
               this.$store.dispatch('tagsView/delCachedView', view);
 
-              reloadRedirectToList('UsersList')
+              reloadRedirectToList('PermissionsList')
             } else {
               this.$message({
                 type: 'error',
@@ -188,8 +207,8 @@ export default {
           const loading = this.$loading({
             target: '.el-form',
           });
-          userResource.update(this.dataTemp.id,this.dataTemp).then((res) => {
-            reloadRedirectToList('UsersList');
+          permissionsResource.update(this.dataTemp.id,this.dataTemp).then((res) => {
+            reloadRedirectToList('PermissionsList');
 
             this.$message({
               type: 'success',

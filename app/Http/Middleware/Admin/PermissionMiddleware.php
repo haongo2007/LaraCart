@@ -28,9 +28,6 @@ class PermissionMiddleware
      */
     public function handle(Request $request, \Closure $next, ...$args)
     {
-        if (!Admin::user()) {
-            return $next($request);   
-        }
         if (!empty($args) || $this->shouldPassThrough($request) || Admin::user()->isAdministrator()) {
             return $next($request);
         }
