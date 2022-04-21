@@ -6,19 +6,17 @@
 
 import PermissionDetail from './components/PermissionDetail';
 
-const defaultForm = {
-  id: null,
-  name: '',
-  slug: '',
-  http_uri:[],
-};
-
 export default {
   name: 'PermissionCreate',
   components: { PermissionDetail },
   data() {
     return {
-      temp: Object.assign({}, defaultForm),
+      temp: {
+        id: null,
+        name: '',
+        slug: '',
+        http_uri:[],
+      },
     };
   },
   created() {

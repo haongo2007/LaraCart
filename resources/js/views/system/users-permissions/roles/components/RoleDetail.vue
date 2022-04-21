@@ -111,53 +111,49 @@ export default {
     createData(){
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          const loading = this.$loading({
-            target: '.el-form',
-          });
+          this.loading = true;
           roleResource.store(this.dataTemp).then((res) => {
             if (res) {
-              loading.close();
+              this.loading = false;
               this.$message({
                 type: 'success',
                 message: 'Create successfully',
               });
 
-              const view = this.$router.resolve({ name: 'UserCreate' }).route;
+              const view = this.$router.resolve({ name: 'RoleCreate' }).route;
               this.$store.dispatch('tagsView/delCachedView', view);
 
-              reloadRedirectToList('UsersList')
+              reloadRedirectToList('RolesList')
             } else {
               this.$message({
                 type: 'error',
                 message: 'Create failed',
               });
-              loading.close();
+              this.loading = false;
             }
           }).catch(err => {
             console.log(err);
-            loading.close();
+            this.loading = false;
           });
         }
       });
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          const loading = this.$loading({
-            target: '.el-form',
-          });
+        if (valid) {          
+          this.loading = true;
           roleResource.update(this.dataTemp.id,this.dataTemp).then((res) => {
-            reloadRedirectToList('UsersList');
+            reloadRedirectToList('RolesList');
 
             this.$message({
               type: 'success',
               message: 'Updated successfully',
             });
 
-            loading.close();
+            this.loading = false;
           }).catch(err => {
             console.log(err);
-            loading.close();
+            this.loading = false;
           });
         }
       });

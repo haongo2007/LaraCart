@@ -6,18 +6,16 @@
 
 import RoleDetail from './components/RoleDetail';
 
-const defaultForm = {
-  name: '',
-  slug:'',
-  permissions:[],
-};
-
 export default {
   name: 'RoleCreate',
   components: { RoleDetail },
   data() {
     return {
-      temp: Object.assign({}, defaultForm),
+      temp:{
+        name: '',
+        slug:'',
+        permissions:[],
+      },
     };
   },
   created() {

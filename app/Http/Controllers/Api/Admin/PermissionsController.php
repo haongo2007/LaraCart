@@ -99,16 +99,11 @@ class PermissionsController extends Controller
 Delete list Item
 Need mothod destroy to boot deleting in model
  */
-    public function deleteList()
+    public function destroy($permissions)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            Permission::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $permissions);
+        Permission::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
     public function without()

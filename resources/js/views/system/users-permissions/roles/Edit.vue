@@ -9,18 +9,16 @@ import RoleResource from '@/api/role';
 
 const roleResource = new RoleResource();
 
-const defaultForm = {
-  name: '',
-  slug:'',
-  permissions:[],
-};
-
 export default {
   name: 'RoleEdit',
   components: { RoleDetail },
   data() {
     return {
-      temp: Object.assign({}, defaultForm),
+      temp: {
+        name: '',
+        slug:'',
+        permissions:[],
+      }
     };
   },
   created() {

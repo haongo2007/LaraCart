@@ -1,5 +1,5 @@
 <template>
-  <components :is="component" :is-edit="true" :data-temp="temp"/>
+  <components v-if="!loading" :is="component" :is-edit="true" :data-temp="temp"/>
 </template>
 
 <script>
@@ -9,19 +9,18 @@ import PermissionsResource from '@/api/permissions';
 
 const permissionsResource = new PermissionsResource();
 
-const defaultForm = {
-  id: null,
-  name: '',
-  slug: '',
-  http_uri:[],
-};
-
 export default {
   name: 'PermissionEdit',
   components: { PermissionDetail },
   data() {
     return {
-      temp: Object.assign({}, defaultForm),
+      temp: {
+        id: null,
+        name: '',
+        slug: '',
+        http_uri:[],
+      },
+      loading: true,
       component:'',
     };
   },
@@ -31,12 +30,17 @@ export default {
   },
   methods: {
     fetchPermission(id){
+      const loading = this.$loading({
+        target: '.app-main',
+      });
       permissionsResource.get(id).then(({ data } = response) => {
         this.temp.id  = data.id;
         this.temp.name = data.name;
         this.temp.slug = data.slug;
         this.temp.http_uri = data.http_uri.split(',');
         this.component = 'PermissionDetail';
+        loading.close();
+        this.loading = false;
       });
     }
   },

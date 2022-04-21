@@ -39,7 +39,7 @@
             placement="left-end"
             width="400"
             trigger="click">
-            <el-table :data="scope.row.http_uri | http_pathFilter">
+            <el-table max-height="600" :data="scope.row.http_uri | http_pathFilter">
               <el-table-column label="Path" >
                 <template slot-scope="scope">
                   <div v-html="scope.row.uri"></div>

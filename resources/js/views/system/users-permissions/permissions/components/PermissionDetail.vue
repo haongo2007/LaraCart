@@ -90,24 +90,30 @@ export default {
   },
   created() {
     this.getAllPath();
+      console.log(this.dataTemp.http_uri);
   },
   methods: {
     handleCheckAllChange(props){
       let that = this;
-      this.checkList[props].children.forEach(function(v,i){
-        that.checkList[props].children[i] = that.checkList[props].value === true ? true : false;
-      });
+      if (this.checkList[props].children.length) {
+        this.checkList[props].children.forEach(function(v,i){
+          that.checkList[props].children[i] = that.checkList[props].value === true ? true : false;
+        });
+      }
       for(let i in this.dataTemp.http_uri){
         for(let j in this.path[props]){
-          if (this.path[props][j].uri == this.dataTemp.http_uri[i]) {
+          if (this.path[props].uri == this.dataTemp.http_uri[i]) {
               this.dataTemp.http_uri.splice(i, 1); 
           }
         }
       }
       if (this.checkList[props].value) {
-        this.path[props].map((item) => this.dataTemp.http_uri.push(item.uri));
+        if (this.path[props].length) {
+          this.path[props].map((item) => this.dataTemp.http_uri.push(item.uri));
+        }else{
+          this.dataTemp.http_uri.push(this.path[props].uri);
+        }
       }
-      console.log(this.dataTemp.http_uri);
     },
     handleCheckChange(props,prop){
       let check = this.checkList[props].children.filter(item => item === false);
@@ -125,13 +131,13 @@ export default {
         }
       }
     },
-    async getAllPath(){
+    getAllPath(){
       let uri = [];
       let that = this;
       if (this.isEdit) {
         uri = this.dataTemp.http_uri;
       }
-      await permissionsResource.getAllPath().then(data => {
+      permissionsResource.getAllPath().then(data => {
         this.path = data.data;
         for(const props in this.path){
           let leng = this.path[props].length;
@@ -159,7 +165,7 @@ export default {
             }
             this.$set(this.checkList[props]['children'],prop,checked);
           }
-          if (length != deepLeng) {
+          if (leng === deepLeng && uri.length) {
             this.checkList[props].value = true;
           }
         }
@@ -173,7 +179,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const loading = this.$loading({
-            target: '.el-form',
+            target: '.el-row',
           });
           permissionsResource.store(this.dataTemp).then((res) => {
             if (res) {
@@ -182,11 +188,9 @@ export default {
                 type: 'success',
                 message: 'Create successfully',
               });
-
               const view = this.$router.resolve({ name: 'PermissionCreate' }).route;
               this.$store.dispatch('tagsView/delCachedView', view);
-
-              reloadRedirectToList('PermissionsList')
+              reloadRedirectToList('PermissionsList');
             } else {
               this.$message({
                 type: 'error',
@@ -205,7 +209,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const loading = this.$loading({
-            target: '.el-form',
+            target: '.el-row',
           });
           permissionsResource.update(this.dataTemp.id,this.dataTemp).then((res) => {
             reloadRedirectToList('PermissionsList');
