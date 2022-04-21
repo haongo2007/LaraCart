@@ -147,20 +147,6 @@ export default {
             trigger: 'blur',
           },
         ],
-        roles: [
-          {
-            required: true,
-            message: 'Please choose role',
-            trigger: 'change',
-          },
-        ],
-        permissions: [
-          {
-            required: true,
-            message: 'Please choose permission',
-            trigger: 'change',
-          },
-        ],
         password: [
           {
             required: true,

@@ -55,7 +55,7 @@ const actions = {
       login({ email: email.trim(), password: password, token_name: state.token_name })
         .then(response => {
           setLogged(response.data.token);
-          resolve();
+          resolve(response);
         })
         .catch(error => {
           console.log(error);

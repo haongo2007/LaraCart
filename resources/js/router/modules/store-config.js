@@ -16,7 +16,7 @@ const configStoreRoutes = {
       component: () => import('@/views/store/List'),
       name: 'StoreList',
       meta: {
-        title: 'Store',
+        title: 'store',
         icon: 'book-shop',
         permissions: ['Store manager'],
         parent: 'root',

@@ -111,10 +111,13 @@ export default {
     createData(){
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.loading = true;
+          const loading = this.$loading({
+            target: '.el-row',
+          });
+
           roleResource.store(this.dataTemp).then((res) => {
             if (res) {
-              this.loading = false;
+              loading.close();
               this.$message({
                 type: 'success',
                 message: 'Create successfully',
@@ -129,11 +132,11 @@ export default {
                 type: 'error',
                 message: 'Create failed',
               });
-              this.loading = false;
+              loading.close();
             }
           }).catch(err => {
             console.log(err);
-            this.loading = false;
+            loading.close();
           });
         }
       });
@@ -141,7 +144,10 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {          
-          this.loading = true;
+          const loading = this.$loading({
+            target: '.el-row',
+          });
+          
           roleResource.update(this.dataTemp.id,this.dataTemp).then((res) => {
             reloadRedirectToList('RolesList');
 
@@ -150,10 +156,10 @@ export default {
               message: 'Updated successfully',
             });
 
-            this.loading = false;
+            loading.close();
           }).catch(err => {
             console.log(err);
-            this.loading = false;
+            loading.close();
           });
         }
       });

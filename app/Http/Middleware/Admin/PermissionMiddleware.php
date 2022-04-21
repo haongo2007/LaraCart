@@ -113,6 +113,7 @@ class PermissionMiddleware
         $exceptsPAth = [
             LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX . '/auth/login',
             LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX . '/auth/logout',
+            LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX . '/auth/info',
         ];
         return in_array($routePath, $exceptsPAth);
     }

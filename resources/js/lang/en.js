@@ -1,5 +1,7 @@
 export default {
   route: {
+    index: 'Index',
+    library: 'Library',
     roleCreate: 'Create role',
     roleEdit: 'Edit role',
     permissionCreate: 'Create permission',

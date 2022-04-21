@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
-    public $table = BC_DB_PREFIX . 'admin_menu';
+    public $table = LC_DB_PREFIX . 'admin_menu';
     protected $guarded = [];
     private static $getList = null;
 

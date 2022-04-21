@@ -224,18 +224,10 @@ class UserController extends Controller
     private function getValidationRules($isNew = true)
     {
         return [
-            'fullname' => 'required',
+            'fullname' => 'required|string|max:100',
             'phone' => 'required',
-            'email' => $isNew ? 'required|email|unique:'.User::class : 'required|email',
+            'email' => $isNew ? 'required|string|email|max:255|unique:'.User::class : 'required|email',
             'stores' => ['array','required'],
-            'roles' => [
-                'required',
-                'array'
-            ],
-            'permissions' => [
-                'required',
-                'array'
-            ],
         ];
     }
     /**

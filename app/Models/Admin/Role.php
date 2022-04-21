@@ -15,7 +15,7 @@ class Role extends Model
     public function administrators()
     {
 
-        return $this->belongsToMany(AdminUser::class, 'admin_role_user', 'role_id', 'user_id');
+        return $this->belongsToMany(User::class, 'admin_role_user', 'role_id', 'user_id');
     }
 
     /**
@@ -36,7 +36,7 @@ class Role extends Model
     public function menus()
     {
 
-        return $this->belongsToMany(AdminMenu::class, 'admin_role_menu', 'role_id', 'menu_id');
+        return $this->belongsToMany(Menu::class, 'admin_role_menu', 'role_id', 'menu_id');
     }
 
     /**
@@ -74,7 +74,7 @@ class Role extends Model
 
         static::deleting(function ($model) {
             $model->administrators()->detach();
-            $model->menus()->detach();
+            // $model->menus()->detach();
             $model->permissions()->detach();
         });
     }
@@ -97,7 +97,7 @@ class Role extends Model
      */
     public static function createRole($dataInsert)
     {
-        $dataUpdate = bc_clean($dataInsert, 'password');
+        $dataUpdate = lc_clean($dataInsert, 'password');
         return self::create($dataUpdate);
     }
 

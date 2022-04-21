@@ -3,9 +3,11 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\Admin\Role;
 use App\Http\Resources\RoleCollection;
-
+use App\Helper\JsonResponse;
+use Validator;
 /**
  * Class RoleController
  *
@@ -33,7 +35,29 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        $data = request()->all();
+        $validator = Validator::make($data, [
+            'name' => 'required|string|max:50|unique:"'.Role::class.'",name',
+            'slug' => 'required|regex:/(^([0-9A-Za-z\._\-]+)$)/|unique:"'.Role::class.'",slug|string|max:50|min:3',
+        ], [
+            'slug.regex' => trans('admin.role.slug_validate'),
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
+        }
+
+        $dataInsert = [
+            'name' => $data['name'],
+            'slug' => $data['slug'],
+        ];
+        $role = Role::createRole($dataInsert);
+        $permissions = $data['permissions'] ?? [];
+        //Insert permission
+        if ($permissions) {
+            $role->permissions()->attach($permissions);
+        }
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
     /**
@@ -56,15 +80,33 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        if ($role === null || $role->isAdmin()) {
-            return response()->json(['error' => 'Role not found'], 404);
+        $data = request()->all();
+        $validator = Validator::make($data, [
+            'name' => 'required|string|max:50|unique:"'.Role::class.'",name,' . $role->id . '',
+            'slug' => 'required|regex:/(^([0-9A-Za-z\._\-]+)$)/|unique:"'.Role::class.'",slug,' . $role->id . '|string|max:50|min:3',
+        ], [
+            'slug.regex' => trans('role.slug_validate'),
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
 
-        $permissionIds = $request->get('permissions', []);
-        $permissions = Permission::allowed()->whereIn('id', $permissionIds)->get();
-        $role->syncPermissions($permissions);
-        $role->save();
-        return new RoleResource($role);
+        $dataUpdate = [
+            'name' => $data['name'],
+            'slug' => $data['slug'],
+        ];
+        $role->update($dataUpdate);
+
+        $permissions = $data['permissions'] ?? [];
+
+        $role->permissions()->detach();
+        //Insert permission
+        if ($permissions) {
+            $role->permissions()->attach($permissions);
+        }
+
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
     /**
@@ -75,17 +117,10 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $arrID = explode(',', $id);
+        $arrID = array_diff($arrID, LC_GUARD_ROLES);
+        Role::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
-    /**
-     * Get permissions from role
-     *
-     * @param  Role $role
-     * @return \Illuminate\Http\Response
-     */
-    public function permissions(Role $role)
-    {
-        return PermissionResource::collection($role->permissions);
-    }
 }

@@ -16,7 +16,7 @@ const storeManagerRoutes = {
       component: () => import('@/views/store-manager/orders/List'),
       name: 'OrdersList',
       meta: {
-        title: 'Orders',
+        title: 'orders',
         icon: 'form',
         permissions: ['Orders manager'],
         parent: 'root',

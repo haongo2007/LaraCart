@@ -109,15 +109,16 @@ export const asyncRoutes = [
     ],
   },
   {
-    path: '/storage',
+    path: '/library',
     component: Layout,
-    redirect: 'storage/index',
+    redirect: 'noredirect',
+    meta: { title: 'library', icon: 'storage', permissions: ['File Manager'], },
     children: [
       {
         path: 'index',
-        component: () => import('@/views/storage/index'),
+        component: () => import('@/views/library/index'),
+        meta: { title: 'library', icon: 'storage',parent:'root' },
         name: 'Storage',
-        meta: { title: 'Storage', icon: 'storage', parent: 'root' },
       },
     ],
   },

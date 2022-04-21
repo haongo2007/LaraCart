@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import '../../views/storage/assets/all.css';
+import '../../views/library/assets/all.css';
 /* eslint-disable import/no-duplicates, no-param-reassign */
 import { mapState } from 'vuex';
 // Axios

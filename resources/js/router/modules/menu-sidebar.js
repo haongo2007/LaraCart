@@ -189,6 +189,24 @@ export const menuSidebar = [
     ],
   },
   {
+    path: '/library',
+    redirect : '/library/index',
+    meta: {
+      title: 'library',
+      icon: 'storage',
+      permissions: ['File Manager'],
+    },
+    children: [
+      {
+        path: 'index',
+        meta: {
+          title: 'library',
+          icon: 'storage',
+        },
+      },
+    ],
+  },
+  {
     path: '/system-config',
     alwaysShow: true,
     meta: {

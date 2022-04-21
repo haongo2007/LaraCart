@@ -4,6 +4,8 @@ export default {
     return: 'Trở về',
   },
   route: {
+    index: 'Index',
+    library: 'Thư Viện',
     roleCreate: 'Tạo nhóm quyền',
     roleEdit: 'Sửa nhóm quyền',
     permissionCreate: 'Tạo quyền',

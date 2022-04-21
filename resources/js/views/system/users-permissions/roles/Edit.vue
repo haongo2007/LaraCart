@@ -1,5 +1,5 @@
 <template>
-  <role-detail :is-edit="false" :data-temp="temp"/>
+  <role-detail :is-edit="true" :data-temp="temp"/>
 </template>
 
 <script>
@@ -15,6 +15,7 @@ export default {
   data() {
     return {
       temp: {
+        id: '',
         name: '',
         slug:'',
         permissions:[],
@@ -28,6 +29,7 @@ export default {
   methods: {
     fetchRole(id){
       roleResource.get(id).then(({ data } = response) => {
+        this.temp.id = data.id;
         this.temp.name = data.name;
         this.temp.slug = data.slug;
         this.temp.permissions = this.filterData(data.permissions);

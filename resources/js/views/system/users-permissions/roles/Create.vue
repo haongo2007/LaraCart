@@ -12,6 +12,7 @@ export default {
   data() {
     return {
       temp:{
+        id: null,
         name: '',
         slug:'',
         permissions:[],
