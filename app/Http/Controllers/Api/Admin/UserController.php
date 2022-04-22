@@ -185,13 +185,12 @@ class UserController extends Controller
      * @param  User $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy($ids)
     {
-        if ($user->isAdministrator()) {
-            return response()->json(new JsonResponse([],'Ehhh! Can not delete admin user'), Response::HTTP_BAD_REQUEST);
-        }
         try {
-            $user->delete();
+            $arrID = explode(',', $ids);
+            $arrID = array_diff($arrID, LC_GUARD_ADMIN);
+            User::destroy($arrID);
         } catch (\Exception $ex) {
             return response()->json(new JsonResponse([],$ex->getMessage()), Response::HTTP_BAD_REQUEST);
         }

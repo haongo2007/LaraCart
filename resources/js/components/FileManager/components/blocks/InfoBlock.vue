@@ -1,6 +1,6 @@
 <template>
     <div style="margin-top:10px;">
-        <el-tag>
+        <el-tag v-on:click="showModal('Status')">
             <span v-show="selectedCount">
                 {{ `${lang.info.selected} ${selectedCount}` }}
                 {{ `${lang.info.selectedSize} ${selectedFilesSize}` }}
@@ -27,13 +27,6 @@
                   v-on:click="showModal('Clipboard')"
                   v-bind:title="[ lang.clipboard.title + ' - ' + lang.clipboard[clipboardType] ]">
                 <i class="far fa-clipboard"></i>
-            </span>
-        </el-tag>
-        <el-tag>
-            <span v-on:click="showModal('Status')"
-                  v-bind:class="[hasErrors ? 'text-danger' : 'text-success']"
-                  v-bind:title="lang.modal.status.title">
-                <i class="fas fa-info-circle"></i>
             </span>
         </el-tag>
     </div>

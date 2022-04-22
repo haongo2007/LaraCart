@@ -1,20 +1,17 @@
 <template>
-  <div class="fm" :class="{ 'fm-full-screen': fullScreen }">
-    <el-row :gutter="20">
-      <el-col :xs="24" :sm="8" :md="6" :lg="4" style="margin-bottom: 20px;">
-        <folder-tree />
-      </el-col>
-      <el-col :xs="24" :sm="16" :md="18" :lg="20">
-        <template>
-          <left-manager
-            manager="left"
-            @click.native="selectManager('left')"
-            @contextmenu.native="selectManager('left')"
-          />
-        </template>
-      </el-col>
-    </el-row>
-
+  <div class="fm content-area-wrapper" :class="{ 'fm-full-screen': fullScreen }">
+    <div class="sidebar-left">
+      <folder-tree />
+      <div class="info-status">
+        <info-block></info-block>
+      </div>
+    </div>
+    <div class="content-right">
+        <right-content
+          manager="left"
+          @click.native="selectManager('left')"
+          @contextmenu.native="selectManager('left')"/>
+    </div>
     <notification />
     <context-menu />
     <modal v-if="showModal" />
@@ -22,6 +19,7 @@
 </template>
 
 <script>
+import InfoBlock from './components/blocks/InfoBlock.vue';
 import '../../views/library/assets/all.css';
 /* eslint-disable import/no-duplicates, no-param-reassign */
 import { mapState } from 'vuex';
@@ -30,7 +28,7 @@ import HTTP from './http/axios';
 import EventBus from './eventBus';
 // Components
 import FolderTree from './components/tree/FolderTree.vue';
-import LeftManager from './components/manager/Manager.vue';
+import RightContent from './components/manager/Manager.vue';
 // import RightManager from './components/manager/Manager.vue';
 import Modal from './components/modals/Modal.vue';
 import ContextMenu from './components/blocks/ContextMenu.vue';
@@ -42,10 +40,11 @@ export default {
   name: 'FileManager',
   components: {
     FolderTree,
-    LeftManager,
+    RightContent,
     Modal,
     ContextMenu,
     Notification,
+    InfoBlock,
   },
   mixins: [translate],
   props: {
@@ -235,6 +234,30 @@ export default {
   tr.table-info{
     background:#e7faf0;
     color:#13ce66;
+  }
+  .content-area-wrapper{
+    border: 1px solid #ebe9f1;
+    border-radius: 0.25rem;
+    color: #6e6b7b;
+    font-size: 1rem;
+    height: calc(100vh - 125px);
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    .sidebar-left{
+      width: 20%;
+      background-color: #fff;
+      border-bottom-left-radius: 0.25rem;
+      border-top-left-radius: 0.25rem;
+      .info-status{
+        cursor: pointer;
+        text-align: center;
+      }
+    }
+    .content-right{
+      width: 80%;
+      border-left: 1px solid #ebe9f1;
+    }
   }
 </style>
 

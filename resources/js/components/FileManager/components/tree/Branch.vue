@@ -1,26 +1,24 @@
 <template>
-  <div>
-      <div class="el-tree filter-tree">
-       <div class="el-tree-node is-expanded is-focusable" v-for="(directory, index) in subDirectories" v-bind:key="index">
+  <div class="list-group">
+      <div class="my-drive">
+       <div class="tree-node" v-for="(directory, index) in subDirectories" v-bind:key="index">
           <div 
             v-bind:class="{'selected': isDirectorySelected(directory.path)}"
             v-on:click="selectDirectory(directory.path)"
-            class="el-tree-node__content" 
-            style="padding-left: 0px;">
-             <span 
-             v-if="directory.props.hasSubdirectories"
-             v-on:click.stop="showSubdirectories(directory.path,directory.props.showSubdirectories)"
-             v-bind:class="[arrowState(index) ? 'el-icon-folder-remove' : 'el-icon-folder-add']"
-             style="padding:6px;font-size: 20px;">
-             </span>
-             <span class="el-icon-folder-remove" style="padding:6px;font-size: 20px;" v-else></span>
-             <span class="el-tree-node__label" style="font-size: 17px;"> {{ directory.basename }}</span>
+            class="tree-node__content">
+             <div class="tree-item" v-if="directory.props.hasSubdirectories" v-on:click.stop="showSubdirectories(directory.path,directory.props.showSubdirectories)">
+                <i :class="'el-icon-arrow-'+caret"></i>
+                <span class="tree-node__label"><i class="el-icon-folder"></i> {{ directory.basename }}</span>
+             </div>
+             <div class="tree-item" v-else>
+                <span class="tree-node__label"><i class="el-icon-folder"></i> {{ directory.basename }}</span>
+             </div>
           </div>
 
           <transition name="fade-tree">
             <branch v-show="arrowState(index)"
                     v-if="directory.props.hasSubdirectories"
-                    v-bind:parent-id="directory.id" style="padding-left:1em">
+                    v-bind:parent-id="directory.id" style="margin-left:20px">
             </branch>
           </transition>
        </div>
@@ -33,6 +31,11 @@ export default {
   name: 'Branch',
   props: {
     parentId: { type: Number, required: true },
+  },
+  data() {
+    return {
+      caret: 'right',
+    };
   },
   computed: {
     /**
@@ -70,9 +73,11 @@ export default {
     showSubdirectories(path, showState) {
       if (showState) {
         // hide
+        this.caret = 'right';
         this.$store.dispatch('fm/tree/hideSubdirectories', path);
       } else {
         // show
+        this.caret = 'down';
         this.$store.dispatch('fm/tree/showSubdirectories', path);
       }
     },
@@ -90,3 +95,15 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" >
+  .tree-node{
+    cursor: pointer;
+    padding: 5px 0px;
+    .tree-node__content{
+      .tree-item{
+        padding: 5px 20px;
+      }
+    }
+  }
+</style>

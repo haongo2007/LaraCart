@@ -1,16 +1,13 @@
 <template>
     <div>
-      <el-breadcrumb separator="/">
-        <el-breadcrumb-item v-for="(disk, index) in disks" v-bind:key="index">
-            <el-tag type="primary"
-              v-on:click="selectDisk(disk)"
-              v-bind:class="[disk === selectedDisk ? 'badge-secondary' : 'badge-light']"
-              effect="dark">
-              {{ disk }}
-              <i class="fa-fw far fa-hdd"></i> 
-            </el-tag>
-        </el-breadcrumb-item>
-      </el-breadcrumb>
+      <el-row :gutter="12" style="padding:20px;">
+        <el-col :span="4" v-for="(disk, index) in disks" v-bind:key="index">
+          <el-card shadow="hover" v-on:click="selectDisk(disk)" v-bind:class="[disk === selectedDisk ? 'drive-active' : '']">
+            <i class="far fa-hdd"></i>
+            {{ disk }}
+          </el-card>
+        </el-col>
+      </el-row>
     </div>
 </template>
 
@@ -56,14 +53,10 @@ export default {
 </script>
 
 <style lang="scss">
-    .fm-disk-list {
-
-        ul.list-inline {
-            margin-bottom: 0.5rem;
-        }
-
-        .badge.badge-light {
-            cursor: pointer;
-        }
+    .drive-active{
+      background-color: #409EFF;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 0 10px 1px #409EFF;
     }
 </style>

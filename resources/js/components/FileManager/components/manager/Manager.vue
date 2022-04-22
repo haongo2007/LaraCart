@@ -1,16 +1,17 @@
 <template>
-    <div>
-      <el-card class="box-card">
-        <div slot="header" class="clearfix">
-          <disk-list v-bind:manager="manager"></disk-list>
-          <breadcrumb v-bind:manager="manager"></breadcrumb>
-          <navbar></navbar>
-        </div>
+  <div class="content-wrapper">
+    <div class="file-manager-main-content">
+      <div class="file-manager-content-header">
+        <breadcrumb v-bind:manager="manager"></breadcrumb>
+        <!-- <navbar></navbar> -->
+      </div>
+      <div class="file-manager-content-body">
+        <disk-list v-bind:manager="manager"></disk-list>
         <table-view v-if="viewType === 'table'" v-bind:manager="manager"></table-view>
-        <grid-view v-else v-bind:manager="manager"></grid-view>
-        <info-block></info-block>
-      </el-card>
+        <grid-view v-else v-bind:manager="manager"></grid-view>        
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -20,7 +21,6 @@ import Navbar from '../blocks/Navbar.vue';
 import Breadcrumb from './Breadcrumb.vue';
 import TableView from './TableView.vue';
 import GridView from './GridView.vue';
-import InfoBlock from '../blocks/InfoBlock.vue';
 
 export default {
   name: 'Manager',
@@ -29,7 +29,6 @@ export default {
     Breadcrumb,
     Navbar,
     TableView,
-    InfoBlock,
     GridView,
   },
   props: {

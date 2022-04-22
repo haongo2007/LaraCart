@@ -1,4 +1,7 @@
 <template>
+    <!-- <div class="view-container">
+        
+    </div> -->
     <div class="el-table el-table--fit el-table--enable-row-hover el-table--enable-row-transition">
         <div class="el-table__header-wrapper">
             <table class="el-table__header" style="width:100%;">
