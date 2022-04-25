@@ -222,7 +222,7 @@ class User extends Model implements AuthenticatableContract
      */
     public function isViewAll(): bool
     {
-        return $this->isRole('view.all');
+        return $this->isRole('manager');
     }
 
     /**
@@ -309,7 +309,7 @@ class User extends Model implements AuthenticatableContract
     public static function listStore()
     {
         if (self::$listStore === null) {
-            self::$listStore = ShopStore::with('descriptionsCurrentLang')
+            self::$listStore = ShopStore::with('descriptionsCurrentLang','admin_custom_config')
                 ->whereIn('id', self::listStoreId())
                 ->get()
                 ->keyBy('id');

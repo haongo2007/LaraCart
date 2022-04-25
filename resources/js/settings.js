@@ -4,7 +4,6 @@ export default {
   /**
    * @type {String}
    */
-  title: 'LaraCart Admin',
   theme: variables.theme,
 
   /**

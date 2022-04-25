@@ -3,19 +3,24 @@ import { isLogged, setLogged, removeToken } from '@/utils/auth';
 import router, { resetRouter } from '@/router';
 import Cookies from 'js-cookie';
 
-const state = {
-  token_name: 'server:full',
-  id: null,
-  user: null,
-  token: isLogged(),
-  name: '',
-  avatar: '',
-  introduction: '',
-  roles: [],
-  permissions: [],
-  online: false,
-  storeList:[],
-};
+const defaultState = () => {
+  return {
+    token_name: 'server:full',
+    id: null,
+    user: null,
+    token: isLogged(),
+    name: '',
+    avatar: '',
+    introduction: '',
+    roles: [],
+    permissions: [],
+    online: false,
+    storeList:[],
+    currentStore:null,
+  }
+}
+
+const state = defaultState();
 
 const mutations = {
   SET_ID: (state, id) => {
@@ -43,11 +48,20 @@ const mutations = {
     state.storeList = store;
   },
   SET_STORE_CURRENT: (state, store) => {
+    state.currentStore = typeof store == 'object' ? store[0] : store;
     Cookies.set('store', store);
   },
+  RESET_STORE (state) {
+    Object.assign(state, defaultState())
+  }
 };
 
 const actions = {
+  // acction change store
+  ChangeStore({ commit, state }, store){
+    commit('SET_STORE_CURRENT', store);
+  },
+
   // user login
   login({ commit, state }, userInfo) {
     const { email, password } = userInfo;
@@ -103,8 +117,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       logout()
         .then(() => {
-          commit('SET_TOKEN', '');
-          commit('SET_ROLES', []);
+          commit('RESET_STORE', []);
           removeToken();
           resetRouter();
           resolve();

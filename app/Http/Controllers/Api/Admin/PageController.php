@@ -1,53 +1,26 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use App\Models\Front\ShopLanguage;
-use BlackCart\Core\Admin\Models\AdminPage;
+use App\Models\Admin\Page;
+use App\Http\Resources\PageCollection;
 use Validator;
 
-class PageController extends RootAdminController
+class PageController extends Controller
 {
     public $languages;
 
     public function __construct()
     {
-        parent::__construct();
         $this->languages = ShopLanguage::getListActive();
     }
 
     public function index()
     {
-        $sort_order = bc_clean(request('sort_order') ?? 'id_desc');
-        $keyword    = bc_clean(request('keyword') ?? '');
-        $arrSort = [
-            'id__desc'    => trans('page.admin.sort_order.id_desc'),
-            'id__asc'     => trans('page.admin.sort_order.id_asc'),
-            'title__desc' => trans('page.admin.sort_order.title_desc'),
-            'title__asc'  => trans('page.admin.sort_order.title_asc'),
-        ];
-        $dataSearch = [
-            'keyword'    => $keyword,
-            'sort_order' => $sort_order,
-            'arrSort'    => $arrSort,
-        ];
-        $dataPage = AdminPage::getPageListAdmin($dataSearch);
-
-        $data = [
-            'title'         => trans('page.admin.list'),
-            'urlDeleteItem' => bc_route_admin('admin_page.delete'),
-            'removeList'    => 1, // 1 - Enable function delete list item
-            'buttonRefresh' => 1, // 1 - Enable button refresh
-            'buttonSort'    => 1, // 1 - Enable button sort
-            'dataPage'      => $dataPage,
-            'pagination'    => $dataPage->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination'),
-            'resultItems'   => trans('page.admin.result_item', ['item_from' => $dataPage->firstItem(), 'item_to' => $dataPage->lastItem(), 'item_total' => $dataPage->total()]),
-            'arrSort'       => $arrSort,
-            'sort_order'    => $sort_order,
-            'keyword'       => $keyword
-        ];
-        return view($this->templatePathAdmin.'Page.list')
-            ->with($data);
+        $dataSearch = request()->all();
+        $data = Page::getPageListAdmin($dataSearch);
+        return PageCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
     /*

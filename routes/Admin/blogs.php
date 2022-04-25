@@ -7,3 +7,5 @@
 //     Route::post('/edit/{id}', 'AdminNewsController@postEdit')->name('admin_news.edit');
 //     Route::post('/delete', 'AdminNewsController@deleteList')->name('admin_news.delete');
 // });
+
+Route::apiResource('blogs', 'BlogsController');

@@ -1,16 +1,7 @@
 <template>
   <div>
-    <transition name="fade" mode="out-in">
-      <div class="block">
-        <i v-if="!src" class="far fa-file-image fa-5x pb-2"></i>
-        <el-avatar 
-                shape="square" 
-                :size="100" 
-                v-else
-                v-bind:src="src">
-        </el-avatar>
-      </div>
-    </transition>
+    <i v-if="!src" class="far fa-file-image fa-5x pb-2"></i>
+    <img style="object-fit: cover;width:100%;height: 150px;border-radius:0.428rem 0.428rem  0rem 0rem ;" v-else v-bind:src="src"/>
   </div>
 </template>
 

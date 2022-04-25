@@ -8,3 +8,5 @@
 //     Route::post('/delete', 'AdminPageController@deleteList')->name('admin_page.delete');
 // });
 //=Page
+
+Route::apiResource('page', 'PageController');

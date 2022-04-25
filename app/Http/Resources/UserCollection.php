@@ -15,7 +15,7 @@ class UserCollection extends JsonResource
      * @return array
      */
     public function toArray($request)
-    {
+    {   
         return [
             'id' => $this->id,
             'fullname' => $this->fullname,
@@ -24,7 +24,7 @@ class UserCollection extends JsonResource
             'roles' => $this->roles,
             'permissions' => $this->permissions,
             'avatar' => $this->avatar ? asset($this->avatar) : 'api/getFile?disk='.env('FILESYSTEM_DRIVER', 'local').'&path='.urlencode('avatar/default.jpg'),
-            'store' => StoreCollection::collection($this->stores)
+            'store' => StoreCollection::collection($this->stores),
         ];
     }
 }

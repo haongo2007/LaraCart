@@ -8,6 +8,7 @@ use App\Models\Front\ShopPageDescription;
 
 class Page extends ShopPage
 {
+    const ITEM_PER_PAGE = 15;
     protected static $getListTitleAdmin = null;
     protected static $getListPageGroupByParentAdmin = null;
     /**
@@ -31,16 +32,25 @@ class Page extends ShopPage
      * @return  [type]               [return description]
      */
     public static function getPageListAdmin(array $dataSearch) {
-        $keyword          = $dataSearch['keyword'] ?? '';
-        $sort_order       = $dataSearch['sort_order'] ?? '';
-        $arrSort          = $dataSearch['arrSort'] ?? '';
+
+        $arrSort = [
+            'id__desc'    => trans('page.admin.sort_order.id_desc'),
+            'id__asc'     => trans('page.admin.sort_order.id_asc'),
+            'title__desc' => trans('page.admin.sort_order.title_desc'),
+            'title__asc'  => trans('page.admin.sort_order.title_asc'),
+        ];
+
+        $keyword          = lc_clean($dataSearch['keyword'] ?? '');
+        $sort_order       = lc_clean($dataSearch['sort_order'] ?? 'id_desc');
+        $limit            = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
+
         $tableDescription = (new ShopPageDescription)->getTable();
-        $tablePage     = (new AdminPage)->getTable();
+        $tablePage     = (new Page)->getTable();
 
         $pageList = (new ShopPage)
             ->leftJoin($tableDescription, $tableDescription . '.page_id', $tablePage . '.id')
             ->where('store_id', session('adminStoreId'))
-            ->where($tableDescription . '.lang', bc_get_locale());
+            ->where($tableDescription . '.lang', lc_get_locale());
 
         if ($keyword) {
             $pageList = $pageList->where(function ($sql) use($tableDescription, $keyword){
@@ -55,7 +65,7 @@ class Page extends ShopPage
         } else {
             $pageList = $pageList->orderBy('id', 'desc');
         }
-        $pageList = $pageList->paginate(20);
+        $pageList = $pageList->paginate($limit);
 
         return $pageList;
     }

@@ -63,7 +63,10 @@ class LaraCartController extends Controller
     {
         event(new BeforeInitialization());
         $init = $this->fm->initialize();
-        $init['config']['disks'] = [request()->disk => ["driver" => "local"] ];
+        $disk_size = disk_total_space(substr(public_path(), 0, 2)) / pow(1024, 3);
+        $free_space = disk_free_space(substr(public_path(), 0, 2))  / pow(1024, 3);
+
+        $init['config']['disks'] = [request()->disk => ["driver" => "local" , "capacity" => (int) $disk_size , "free_space" => (int) $free_space] ];
         return response()->json(
             $init
         );

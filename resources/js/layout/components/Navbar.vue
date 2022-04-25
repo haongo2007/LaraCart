@@ -78,7 +78,7 @@ export default {
   },
   data() {
     return {
-      currentStore:[],
+      currentStore: [],
     };
   },
   computed: {
@@ -95,11 +95,13 @@ export default {
     },
   },
   created(){
-    if (Cookies.get('store')) {
-      if (JSON.parse(Cookies.get('store')).length < 1) {
+    let store_ck = Cookies.get('store');
+    if (store_ck) {
+      store_ck = JSON.parse(store_ck);
+      if (store_ck.length < 1) {
           Cookies.remove('store');
       }else{
-        this.currentStore.push(String(JSON.parse(Cookies.get('store'))));
+        this.currentStore.push(String(store_ck));
       }
     }
   },
@@ -113,7 +115,7 @@ export default {
       Cookies.remove('store');
     },
     handleChangeStore(){
-      Cookies.set('store', JSON.stringify(this.currentStore));
+      this.$store.dispatch('user/ChangeStore',JSON.stringify(this.currentStore));
       this.$store.dispatch('tagsView/delAllCachedViews');
       const fullPath = this.$router.currentRoute.fullPath;
       this.$router.replace({

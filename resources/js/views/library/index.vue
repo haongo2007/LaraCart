@@ -34,7 +34,7 @@ export default {
   },
   created() {
     // console.log(this.$store.state);
-    this.$store.commit('fm/setDisks', 'public');
+    this.$store.commit('fm/setDisks', 'local');
   },
 };
 </script>

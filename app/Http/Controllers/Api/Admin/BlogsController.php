@@ -1,55 +1,26 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use App\Models\Front\ShopLanguage;
-use BlackCart\Core\Admin\Models\AdminNews;
+use App\Models\Admin\News;
+use App\Http\Resources\BlogsCollection;
 use Validator;
 
-class NewsController extends RootAdminController
+class BlogsController extends Controller
 {
     public $languages;
 
     public function __construct()
     {
-        parent::__construct();
         $this->languages = ShopLanguage::getListActive();
     }
 
     public function index()
     {
-        $sort_order = bc_clean(request('sort_order') ?? 'id_desc');
-        $keyword    = bc_clean(request('keyword') ?? '');
-        $arrSort = [
-            'id__desc' => trans('news.admin.sort_order.id_desc'),
-            'id__asc' => trans('news.admin.sort_order.id_asc'),
-            'title__desc' => trans('news.admin.sort_order.title_desc'),
-            'title__asc' => trans('news.admin.sort_order.title_asc'),
-        ];
-        $dataSearch = [
-            'keyword'    => $keyword,
-            'sort_order' => $sort_order,
-            'arrSort'    => $arrSort,
-        ];
-        $dataNews = AdminNews::getNewsListAdmin($dataSearch);
-
-        $data = [
-            'title'         => trans('news.admin.list'),
-            'urlDeleteItem' => bc_route_admin('admin_news.delete'),
-            'removeList'    => 1, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort'    => 1, // 1 - Enable button sort
-            'sort_order'    => $sort_order,
-            'arrSort'       => $arrSort,
-            'dataNews'      => $dataNews,
-            'urlSort'       => bc_route_admin('admin_news.index', request()->except(['_token', '_pjax', 'sort_order'])),
-            'keyword'       => $keyword,
-            'pagination'    => $dataNews->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination'),
-            'resultItems'   => trans('news.admin.result_item', ['item_from' => $dataNews->firstItem(), 'item_to' => $dataNews->lastItem(), 'item_total' => $dataNews->total()])
-        ];
-
-        return view($this->templatePathAdmin.'News.list')
-            ->with($data);
+        $dataSearch = request()->all();
+        $data = News::getNewsListAdmin($dataSearch);
+        return BlogsCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
     /**

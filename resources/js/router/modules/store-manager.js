@@ -18,7 +18,8 @@ const storeManagerRoutes = {
       meta: {
         title: 'orders',
         icon: 'form',
-        permissions: ['Orders manager'],
+        roles: ['Manager'],
+        permissions: ['Orders Manager','View All'],
         parent: 'root',
       },
     },
@@ -28,7 +29,7 @@ const storeManagerRoutes = {
       name: 'OrderCreate',
       meta: {
         title: 'orderCreate',
-        permissions: ['Orders manager'],
+        permissions: ['Orders Manager'],
         parent: 'OrdersList',
       },
       hidden: true,
@@ -39,7 +40,7 @@ const storeManagerRoutes = {
       name: 'OrderEdit',
       meta: {
         title: 'orderEdit',
-        permissions: ['Orders manager'],
+        permissions: ['Orders Manager'],
         parent: 'OrdersList',
       },
       hidden: true,
@@ -52,7 +53,8 @@ const storeManagerRoutes = {
       meta: {
         title: 'Product',
         icon: 'shopping',
-        permissions: ['Product manager'],
+        roles: ['Manager'],
+        permissions: ['Product Manager','View All'],
         parent: 'root',
       },
     },
@@ -62,7 +64,7 @@ const storeManagerRoutes = {
       name: 'ProductCreateSingle',
       meta: {
         title: 'productCreateSingle',
-        permissions: ['Product manager'],
+        permissions: ['Product Manager'],
         parent: 'ProductList',
       },
       hidden: true,
@@ -73,7 +75,7 @@ const storeManagerRoutes = {
       name: 'ProductCreateGroup',
       meta: {
         title: 'productCreateGroup',
-        permissions: ['Product manager'],
+        permissions: ['Product Manager'],
         parent: 'ProductList',
       },
       hidden: true,
@@ -84,7 +86,7 @@ const storeManagerRoutes = {
       name: 'ProductCreateBundle',
       meta: {
         title: 'productCreateBundle',
-        permissions: ['Product manager'],
+        permissions: ['Product Manager'],
         parent: 'ProductList',
       },
       hidden: true,
@@ -95,7 +97,7 @@ const storeManagerRoutes = {
       name: 'ProductEditSingle',
       meta: {
         title: 'productEditSingle',
-        permissions: ['Product manager'],
+        permissions: ['Product Manager'],
         parent: 'ProductList',
       },
       hidden: true,
@@ -106,7 +108,7 @@ const storeManagerRoutes = {
       name: 'ProductEditGroup',
       meta: {
         title: 'productEditGroup',
-        permissions: ['Product manager'],
+        permissions: ['Product Manager'],
         parent: 'ProductList',
       },
       hidden: true,
@@ -117,7 +119,7 @@ const storeManagerRoutes = {
       name: 'ProductEditBundle',
       meta: {
         title: 'productEditBundle',
-        permissions: ['Product manager'],
+        permissions: ['Product Manager'],
         parent: 'ProductList',
       },
       hidden: true,
@@ -130,7 +132,8 @@ const storeManagerRoutes = {
       meta: {
         title: 'Category',
         icon: 'list',
-        permissions: ['Category manager'],
+        roles: ['Manager'],
+        permissions: ['Category Manager','View All'],
         parent: 'root',
       },
     },
@@ -140,7 +143,7 @@ const storeManagerRoutes = {
       name: 'CategoryCreate',
       meta: {
         title: 'categoryCreate',
-        permissions: ['Category manager'],
+        permissions: ['Category Manager'],
         parent: 'CategoryList',
       },
       hidden: true,
@@ -151,7 +154,7 @@ const storeManagerRoutes = {
       name: 'CategoryEdit',
       meta: {
         title: 'categoryEdit',
-        permissions: ['Category manager'],
+        permissions: ['Category Manager'],
         parent: 'CategoryList',
       },
       hidden: true,

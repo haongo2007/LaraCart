@@ -1,5 +1,5 @@
 <template>
-    <div style="margin-top:10px;">
+    <div style="margin:10px 0px;">
         <el-tag v-on:click="showModal('Status')">
             <span v-show="selectedCount">
                 {{ `${lang.info.selected} ${selectedCount}` }}

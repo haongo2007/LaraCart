@@ -18,6 +18,8 @@ export const menuSidebar = [
     meta: {
       title: 'storeManager',
       icon: 'theme',
+      roles: ['Manager'],
+      permissions: ['Store Manager'],
     },
     children: [
       {
@@ -25,7 +27,8 @@ export const menuSidebar = [
         meta: {
           title: 'orders',
           icon: 'form',
-          permissions: ['Orders manager'],
+          roles: ['Manager'],
+          permissions: ['Orders Manager','View All'],
         },
       },
       // //////////////end orders
@@ -34,7 +37,8 @@ export const menuSidebar = [
         meta: {
           title: 'Product',
           icon: 'shopping',
-          permissions: ['Product manager'],
+          roles: ['Manager'],
+          permissions: ['Product Manager','View All'],
         },
       },
       // //////////////end product
@@ -44,7 +48,8 @@ export const menuSidebar = [
         meta: {
           title: 'Category',
           icon: 'list',
-          permissions: ['Category manager'],
+          roles: ['Manager'],
+          permissions: ['Category Manager','View All'],
         },
       },
       // //////////////end category

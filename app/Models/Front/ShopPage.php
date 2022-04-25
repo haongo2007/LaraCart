@@ -10,7 +10,7 @@ class ShopPage extends Model
     use ModelTrait;
 
     public $timestamps     = false;
-    public $table          = LC_DB_PREFIX.'shop_page';
+    public $table          = 'shop_page';
     protected $connection  = LC_CONNECTION;
     protected $guarded     = [];
 
@@ -19,6 +19,14 @@ class ShopPage extends Model
         return $this->hasMany(ShopPageDescription::class, 'page_id', 'id');
     }
 
+    /*
+    Get store
+    */
+    public function store()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
+    
     //Function get text description 
     public function getText() {
         return $this->descriptions()->where('lang', lc_get_locale())->first();

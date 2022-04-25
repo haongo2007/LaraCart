@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\Admin\Config;
 
 class InfoCollection extends JsonResource
 {
@@ -31,7 +32,7 @@ class InfoCollection extends JsonResource
                 },
                 $this->allPermissions()->toArray()
             ),
-            'store' => $this->listStore()
+            'store' => $this->listStore(),
         ];
     }
 }

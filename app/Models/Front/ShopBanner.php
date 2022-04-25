@@ -7,7 +7,7 @@ class ShopBanner extends Model
 {
     use ModelTrait;
 
-    public $table = LC_DB_PREFIX.'shop_banner';
+    public $table = 'shop_banner';
     protected $guarded = [];
     protected $connection = LC_CONNECTION;
 
@@ -20,7 +20,13 @@ class ShopBanner extends Model
     {
         return lc_image_get_path_thumb($this->image);
     }
-
+    /*
+    Get store
+    */
+    public function store()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
     /*
     Get image
     */

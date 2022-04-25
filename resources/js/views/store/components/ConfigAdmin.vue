@@ -98,4 +98,7 @@ export default {
       color: #1890ff;
       cursor: pointer;
   }
+  .el-dialog{
+    margin-top: 2vh!important;
+  }
 </style>

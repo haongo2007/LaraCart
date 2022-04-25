@@ -7,7 +7,7 @@
             v-on:click="selectDirectory(directory.path)"
             class="tree-node__content">
              <div class="tree-item" v-if="directory.props.hasSubdirectories" v-on:click.stop="showSubdirectories(directory.path,directory.props.showSubdirectories)">
-                <i :class="'el-icon-arrow-'+caret"></i>
+                <i v-bind:class="[arrowState(index) ? 'el-icon-arrow-down' : 'el-icon-arrow-right']"></i>
                 <span class="tree-node__label"><i class="el-icon-folder"></i> {{ directory.basename }}</span>
              </div>
              <div class="tree-item" v-else>
@@ -31,11 +31,6 @@ export default {
   name: 'Branch',
   props: {
     parentId: { type: Number, required: true },
-  },
-  data() {
-    return {
-      caret: 'right',
-    };
   },
   computed: {
     /**
@@ -73,11 +68,9 @@ export default {
     showSubdirectories(path, showState) {
       if (showState) {
         // hide
-        this.caret = 'right';
         this.$store.dispatch('fm/tree/hideSubdirectories', path);
       } else {
         // show
-        this.caret = 'down';
         this.$store.dispatch('fm/tree/showSubdirectories', path);
       }
     },

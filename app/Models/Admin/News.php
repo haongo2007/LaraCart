@@ -10,6 +10,7 @@ class News extends ShopNews
 {
     protected static $getListTitleAdmin = null;
     protected static $getListNewsGroupByParentAdmin = null;
+    const ITEM_PER_PAGE = 15;
     /**
      * Get news detail in admin
      *
@@ -31,16 +32,24 @@ class News extends ShopNews
      * @return  [type]               [return description]
      */
     public static function getNewsListAdmin(array $dataSearch) {
-        $keyword          = $dataSearch['keyword'] ?? '';
-        $sort_order       = $dataSearch['sort_order'] ?? '';
-        $arrSort          = $dataSearch['arrSort'] ?? '';
+        $arrSort = [
+            'id__desc' => trans('news.admin.sort_order.id_desc'),
+            'id__asc' => trans('news.admin.sort_order.id_asc'),
+            'title__desc' => trans('news.admin.sort_order.title_desc'),
+            'title__asc' => trans('news.admin.sort_order.title_asc'),
+        ];
+
+        $keyword          = lc_clean($dataSearch['keyword'] ?? '');
+        $sort_order       = lc_clean($dataSearch['sort_order'] ?? 'id_desc');
+        $limit      = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
+
         $tableDescription = (new ShopNewsDescription)->getTable();
         $tableNews     = (new ShopNews)->getTable();
 
         $newsList = (new ShopNews)
             ->leftJoin($tableDescription, $tableDescription . '.news_id', $tableNews . '.id')
             ->where('store_id', session('adminStoreId'))
-            ->where($tableDescription . '.lang', bc_get_locale());
+            ->where($tableDescription . '.lang', lc_get_locale());
 
         if ($keyword) {
             $newsList = $newsList->where(function ($sql) use($tableDescription, $keyword){
@@ -55,7 +64,7 @@ class News extends ShopNews
         } else {
             $newsList = $newsList->orderBy('id', 'desc');
         }
-        $newsList = $newsList->paginate(20);
+        $newsList = $newsList->paginate($limit);
 
         return $newsList;
     }

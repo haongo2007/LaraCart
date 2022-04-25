@@ -6,6 +6,7 @@ use App\Models\Front\ShopBanner;
 
 class Banner extends ShopBanner
 {
+    const ITEM_PER_PAGE = 15;
     /**
      * Get banner detail in admin
      *
@@ -27,13 +28,18 @@ class Banner extends ShopBanner
      * @return  [type]               [return description]
      */
     public static function getBannerListAdmin(array $dataSearch) {
-        $sort_order       = $dataSearch['sort_order'] ?? '';
-        $arrSort          = $dataSearch['arrSort'] ?? '';
-        $keyword          = $dataSearch['keyword'] ?? '';
-        $bannerList = (new AdminBanner)
-            ->where('store_id', session('adminStoreId'));
+
+        $sort_order = lc_clean($dataSearch['sort_order'] ?? 'id_desc');
+        $arrSort = [
+            'id__desc' => trans('banner.admin.sort_order.id_desc'),
+            'id__asc' => trans('banner.admin.sort_order.id_asc'),
+        ];
+        $keyword    = lc_clean($dataSearch['keyword'] ?? '');
+        $limit      = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
+
+        $bannerList = (new ShopBanner)->where('store_id', session('adminStoreId'));
         if ($keyword) {
-            $bannerList->where('title', 'like', '%'.$keyword.'%');
+            $bannerList = $bannerList->where('title', 'like', '%'.$keyword.'%');
         }
         if ($sort_order && array_key_exists($sort_order, $arrSort)) {
             $field = explode('__', $sort_order)[0];
@@ -42,7 +48,7 @@ class Banner extends ShopBanner
         } else {
             $bannerList = $bannerList->sort('id', 'desc');
         }
-        $bannerList = $bannerList->paginate(20);
+        $bannerList = $bannerList->paginate($limit);
 
         return $bannerList;
     }

@@ -243,15 +243,18 @@ export default {
     height: calc(100vh - 125px);
     display: flex;
     overflow: hidden;
-    position: relative;
     .sidebar-left{
       width: 20%;
       background-color: #fff;
       border-bottom-left-radius: 0.25rem;
       border-top-left-radius: 0.25rem;
+      position: relative;
       .info-status{
         cursor: pointer;
         text-align: center;
+        bottom:0px;
+        width: 100%;
+        position: absolute;
       }
     }
     .content-right{

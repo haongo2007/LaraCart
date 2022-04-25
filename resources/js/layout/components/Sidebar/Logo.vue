@@ -3,17 +3,19 @@
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 v-else class="sidebar-title">{{ title }} </h1>
+        <h1 v-else class="sidebar-title">{{ names }} </h1>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 class="sidebar-title">{{ title }} </h1>
+        <h1 class="sidebar-title">{{ names }} </h1>
       </router-link>
     </transition>
   </div>
 </template>
 
 <script>
+import Cookies from 'js-cookie';
+
 export default {
   name: 'SidebarLogo',
   props: {
@@ -24,10 +26,47 @@ export default {
   },
   data() {
     return {
-      title: 'LaraCart Admin',
-      logo: '/svg/logo.svg',
+      logo: '',
+      names:''
     };
   },
+  watch: {
+    '$store.state.user.currentStore'(value, oldValue) {
+      this.logo_admin();
+      this.name_admin();
+    },
+  },
+  created(){
+    this.name_admin();
+    this.logo_admin();
+  },
+  methods:{
+    renderAdminSignature(type){
+      let store_ck = Cookies.get('store');
+      let data,data_config = '';
+      if (store_ck) {
+        store_ck = JSON.parse(store_ck);
+      }
+      if (store_ck && store_ck.length == 0) {
+        let index = Object.keys(this.$store.state.user.storeList);
+        data_config = this.$store.state.user.storeList[index[0]] ? this.$store.state.user.storeList[index[0]].admin_custom_config.filter((item) => item.key == type) : '';
+        data = data_config ? data_config[0].value : '';
+      }else{
+        store_ck = typeof store_ck === 'object' ? store_ck[0] : store_ck;
+        data_config = this.$store.state.user.storeList[store_ck] ? this.$store.state.user.storeList[store_ck].admin_custom_config.filter((item) => item.key == type) : '';
+        data = data_config ? data_config[0].value : '';
+      }
+      return data;
+    },
+    logo_admin(){
+      let logo_config = this.renderAdminSignature('ADMIN_LOGO');
+      this.logo = logo_config ? logo_config : '/svg/logo.svg'
+    },
+    name_admin(){
+      let name_config = this.renderAdminSignature('ADMIN_NAME');
+      this.names = name_config ? name_config : 'LaraCart Admin';
+    } 
+  }
 };
 </script>
 

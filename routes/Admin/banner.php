@@ -7,3 +7,4 @@
 //     Route::post('/edit/{id}', 'AdminBannerController@postEdit')->name('admin_banner.edit');
 //     Route::post('/delete', 'AdminBannerController@deleteList')->name('admin_banner.delete');
 // });
+Route::apiResource('banner', 'BannerController');

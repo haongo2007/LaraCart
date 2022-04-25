@@ -10,6 +10,6 @@ class ShopPageDescription extends Model
     public $incrementing  = false;
     protected $guarded    = [];
     public $timestamps    = false;
-    public $table = BC_DB_PREFIX.'shop_page_description';
-    protected $connection = BC_CONNECTION;
+    public $table = 'shop_page_description';
+    protected $connection = LC_CONNECTION;
 }

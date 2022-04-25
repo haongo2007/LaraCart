@@ -64,6 +64,7 @@ const en = {
       name: 'Name',
       size: 'Size',
       type: 'Type',
+      lastModified: 'Last modified',
     },
   },
   modal: {

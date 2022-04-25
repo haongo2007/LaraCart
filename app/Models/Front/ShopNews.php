@@ -10,7 +10,7 @@ class ShopNews extends Model
 {
     use ModelTrait;
 
-    public $table = LC_DB_PREFIX.'shop_news';
+    public $table = 'shop_news';
     protected $guarded = [];
     protected $connection = LC_CONNECTION;
 
@@ -19,6 +19,14 @@ class ShopNews extends Model
         return $this->hasMany(ShopNewsDescription::class, 'news_id', 'id');
     }
 
+    /*
+    Get store
+    */
+    public function store()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
+    
     //Function get text description 
     public function getText() {
         return $this->descriptions()->where('lang', lc_get_locale())->first();

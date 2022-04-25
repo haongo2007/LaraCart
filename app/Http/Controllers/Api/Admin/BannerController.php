@@ -1,59 +1,32 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use Validator;
-use BlackCart\Core\Admin\Models\AdminBanner;
+use App\Models\Admin\Banner;
 use App\Models\Front\ShopBannerType;
-class BannerController extends RootAdminController
+use App\Http\Resources\BannerCollection;
+
+class BannerController extends Controller
 {
     protected $arrTarget;
     protected $dataType;
     public function __construct()
     {
-        parent::__construct();
-        $this->arrTarget = ['_blank' => '_blank', '_self' => '_self'];
-        $this->dataType  = (new ShopBannerType)->pluck('name', 'code')->all();
-        if(bc_config_global('MultiVendorPro')) {
-            $this->dataType['background-store'] = 'Background store';
-            $this->dataType['breadcrumb-store'] = 'Breadcrumb store';
-        }
-        ksort($this->dataType);
+        // $this->arrTarget = ['_blank' => '_blank', '_self' => '_self'];
+        // $this->dataType  = (new ShopBannerType)->pluck('name', 'code')->all();
+        // if(lc_config_global('MultiVendorPro')) {
+        //     $this->dataType['background-store'] = 'Background store';
+        //     $this->dataType['breadcrumb-store'] = 'Breadcrumb store';
+        // }
+        // ksort($this->dataType);
     }
 
     public function index()
     {
-        $sort_order = bc_clean(request('sort_order') ?? 'id_desc');
-        $keyword    = bc_clean(request('keyword') ?? '');
-        $arrSort = [
-            'id__desc' => trans('banner.admin.sort_order.id_desc'),
-            'id__asc' => trans('banner.admin.sort_order.id_asc'),
-        ];
-        
-        $dataSearch = [
-            'keyword'    => $keyword,
-            'sort_order' => $sort_order,
-            'arrSort'    => $arrSort,
-        ];
-        $dataBann = AdminBanner::getBannerListAdmin($dataSearch);
-
-        $data = [
-            'title'         => trans('banner.admin.list'),
-            'urlDeleteItem' => bc_route_admin('admin_banner.delete'),
-            'removeList'    => 1, // 1 - Enable function delete list item
-            'buttonRefresh' => 1, // 1 - Enable button refresh
-            'buttonSort'    => 1, // 1 - Enable button sort
-            'keyword'       => $keyword,
-            'urlSort'       => bc_route_admin('admin_banner.index', request()->except(['_token', '_pjax', 'sort_order'])),
-            'arrSort'       => $arrSort,
-            'sort_order'    => $sort_order,
-            'dataType'      => $this->dataType,
-            'dataBann'      => $dataBann,
-            'pagination'    => $dataBann->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination'),
-            'resultItems'   => trans('banner.admin.result_item', ['item_from' => $dataBann->firstItem(), 'item_to' => $dataBann->lastItem(), 'item_total' => $dataBann->total()]),
-        ];
-        return view($this->templatePathAdmin.'Banner.list')
-            ->with($data);
+        $dataSearch = request()->all();
+        $data = Banner::getBannerListAdmin($dataSearch);
+        return BannerCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
 /**

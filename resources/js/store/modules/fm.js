@@ -137,6 +137,14 @@ const mutations = {
 };
 const getters = {
   /**
+  * Get a list of disks
+  * @param state
+  * @returns {string[]}
+  */
+  diskListFull(state) {
+    return state.disks;
+  },
+  /**
 	* Get a list of disks
 	* @param state
 	* @returns {string[]}
