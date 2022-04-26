@@ -10,6 +10,7 @@
           <el-autocomplete
             v-model="temp.customer"
             style="width: 100%;"
+            value-key="email"
             :fetch-suggestions="querySearchAsync"
             placeholder="Please input"
             @select="handleSelect"
@@ -162,6 +163,7 @@ const ordersResource = new OrdersResource();
 
 const defaultForm = {
   customer_id: undefined,
+  storeId: '',
   first_name: '',
   last_name: '',
   phone: '',
@@ -359,7 +361,7 @@ export default {
     },
     createFilter(queryString) {
       return (customer) => {
-        return (customer.value.toLowerCase().includes(queryString.toLowerCase()) === true);
+        return (customer.email.toLowerCase().includes(queryString.toLowerCase()) === true);
       };
     },
     handleSelect(item) {
@@ -372,6 +374,7 @@ export default {
       this.temp.address1 = item.address1;
       this.temp.address2 = item.address2;
       this.temp.address3 = item.address3;
+      this.temp.storeId = item.store.id;
     },
     handleSelectCurrency(index){
       this.temp.exchange_rate = this.ExchangeRateOption[index];

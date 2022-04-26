@@ -59,7 +59,7 @@ class Customer extends ShopCustomer
         $arrSort          = $arrSort;
 
         $customerList = (new ShopCustomer)
-            ->where('store_id', session('adminStoreId'));
+            ->whereIn('store_id', session('adminStoreId'));
 
         if ($keyword) {
             $customerList->where('email', 'like', '%' . $keyword . '%')

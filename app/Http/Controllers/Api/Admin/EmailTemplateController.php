@@ -1,40 +1,22 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use App\Models\Front\ShopEmailTemplate;
-use BlackCart\Core\Admin\Models\AdminEmailTemplate;
+use App\Models\Admin\EmailTemplate;
+use App\Http\Resources\EmailTemplateCollection;
 use Validator;
 
-class EmailTemplateController extends RootAdminController
+class EmailTemplateController extends Controller
 {
     public function __construct()
     {
-        parent::__construct();
     }
     public function index()
     {
-        //Process add content
-        $dataSearch = [];
-        $dataET = AdminEmailTemplate::getEmailTemplateListAdmin($dataSearch);
-
-        $data = [
-            'title'         => trans('email_template.admin.list'),
-            'subTitle'      => '',
-            'icon'          => 'fa fa-indent',
-            'urlDeleteItem' => bc_route_admin('admin_email_template.delete'),
-            'removeList'    => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort'    => 0, // 1 - Enable button sort
-            'css'           => '', 
-            'js'            => '',
-            'urlSort'       => bc_route_admin('admin_email_template.index', request()->except(['_token', '_pjax', 'sort_order'])),
-            'dataET'        => $dataET,
-            'pagination'    => $dataET->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination'),
-            'resultItems'   =>trans('email_template.admin.result_item', ['item_from' => $dataET->firstItem(), 'item_to' => $dataET->lastItem(), 'item_total' => $dataET->total()])
-        ];
-        return view($this->templatePathAdmin.'EmailTemplate.list')
-            ->with($data);
+        $dataSearch = request()->all();
+        $data = EmailTemplate::getEmailTemplateListAdmin($dataSearch);
+        return EmailTemplateCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
     /**

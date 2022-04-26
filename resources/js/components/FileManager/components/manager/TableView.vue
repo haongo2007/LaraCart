@@ -75,7 +75,8 @@
           v-on:dblclick="selectAction(file.path, file.extension)"
           v-on:contextmenu.prevent="contextMenu(file, $event)">
           <div class="file-file" v-on:dblclick="selectDirectory(directory.path)">
-            <div class="file-file-name" v-bind:class="(acl && file.acl === 0) ? 'text-hidden' : ''" ><i class="fas" v-bind:class="extensionToIcon(file.extension)" ></i> &nbsp;{{ file.filename ? file.filename : file.basename }}</div>
+            <div class="file-file-name" v-bind:class="(acl && file.acl === 0) ? 'text-hidden' : ''" ><i class="fas" v-bind:class="extensionToIcon(file.extension)" ></i> 
+              <div>{{ file.filename ? file.filename : file.basename }}</div></div>
             <div class="file-file-left">
               <span class="file-file-size">{{ bytesToHuman(file.size) }}</span>
               <span class="file-file-type">{{ file.extension }}</span>
@@ -199,9 +200,17 @@ export default {
             align-items:center;
             padding: 10px 10px 10px 5px;
             .file-file-name{
+              display: flex;
+              align-items: center;
               i{
                 font-size: 22px;
                 padding-right:25px;
+              }
+              div{
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                max-width: 400px;
               }
             }
             .file-file-left{

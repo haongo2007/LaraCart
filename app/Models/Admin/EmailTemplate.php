@@ -17,7 +17,7 @@ class EmailTemplate extends ShopEmailTemplate
      */
     public static function getEmailTemplateAdmin($id) {
         return self::where('id', $id)
-        ->where('store_id', session('adminStoreId'))
+        ->whereIn('store_id', session('adminStoreId'))
         ->first();
     }
 
@@ -34,7 +34,7 @@ class EmailTemplate extends ShopEmailTemplate
         $arrSort          = $dataSearch['arrSort'] ?? '';
 
         $newsList = (new ShopEmailTemplate)
-            ->where('store_id', session('adminStoreId'));
+            ->whereIn('store_id', session('adminStoreId'));
 
         if ($keyword) {
             $newsList = $newsList->where(function ($sql){

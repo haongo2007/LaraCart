@@ -30,7 +30,7 @@ class Order extends ShopOrder
     public static function getOrderAdmin($id) {
         return self::with(['stores','details', 'orderTotal','history' => function ($q)
         {
-            $q->with('Staff:id,name')->orderBy('add_date','DESC');
+            $q->with('Staff:id,fullname')->orderBy('add_date','DESC');
         }])
         ->where('id', $id)
         ->first();

@@ -4,7 +4,7 @@
       <div class="el-descriptions__title">History Order #{{ this.$route.params.id }}</div>
     </div>
     <el-table
-      :data="dataHistory.filter(data => !search || data.content.toLowerCase().includes(search.toLowerCase()) || data.staff.name.toLowerCase().includes(search.toLowerCase()) )"
+      :data="dataHistory.filter(data => !search || data.content.toLowerCase().includes(search.toLowerCase()) || data.staff.fullname.toLowerCase().includes(search.toLowerCase()) )"
       height="295"
       style="width: 100%"
     >
@@ -13,7 +13,7 @@
         min-width="180"
       >
         <template slot-scope="scope">
-          <span v-html="scope.row.staff.name" />
+          <span v-html="scope.row.staff.fullname" />
         </template>
       </el-table-column>
       <el-table-column

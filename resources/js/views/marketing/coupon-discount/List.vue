@@ -2,33 +2,25 @@
   <div class="app-container">
     <div class="filter-container">
       <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
-        <filter-system-product
+        <filter-system-coupon
           :data-loading="loading"
           :data-query="listQuery"
           @handleListenData="handleListenData"
         />
       </right-panel>
     </div>
-
-    <el-table
-      v-loading="loading"
-      :data="list"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%"
-      @selection-change="handleSelectionAllChange">
+    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionAllChange">
       <el-table-column
         type="selection"
         align="center"
         width="55"
       />
-      <el-table-column fixed label="#ID" min-width="50" align="center">
+      <el-table-column align="center" label="ID" width="50">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.id }}
+          <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-
+      
       <el-table-column label="Store" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
@@ -38,62 +30,48 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Image" min-width="150" align="center">
+      <el-table-column label="Code">
         <template slot-scope="scope">
-          <el-image :src="scope.row.image+'&w=100'">
-            <div slot="error" class="image-slot">
-              <i class="el-icon-picture-outline" />
-            </div>
-          </el-image>
+          <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Sku" min-width="100" align="center">
+      <el-table-column label="Value">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.sku }}
+          <span>{{ scope.row.reward }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Name" min-width="250">
+      <el-table-column label="Type">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.name }}
+          <span>{{ scope.row.type }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Category" min-width="200">
-        <template slot-scope="{row}">
-          <el-tag v-for="item in row.categories" :key="item.id" style="margin: 2px;">
-            {{ item.descriptions_with_lang_default.title }}
-          </el-tag>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Cost" min-width="200">
+      <el-table-column label="Data" min-width="150">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.cost | toThousandFilter }}
+          <span>{{ scope.row.data }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Price" min-width="150" align="center">
+      <el-table-column label="Limit">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.price | toThousandFilter }}
+          <span>{{ scope.row.limit }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Type" min-width="100" align="center">
+      <el-table-column label="Used">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.property }}
+          <span>{{ scope.row.used }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Kind" min-min-width="150" align="center">
-        <template slot-scope="{row}">
-          <el-tag :type="row.kind | kindFilter">
-            {{ row.kind | kindFilter(true) }}
-          </el-tag>
+      <el-table-column label="Require Login"  min-width="150">
+        <template slot-scope="scope">
+          <span>{{ scope.row.login }}</span>
         </template>
       </el-table-column>
-
+      
       <el-table-column :label="$t('table.status')" class-name="status-col" width="100" prop="status">
         <template slot-scope="{row}">
           <el-tag :type="row.status | statusFilter">
@@ -102,17 +80,17 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Created at" min-width="195" align="center">
-        <template slot-scope="scope">
+      <el-table-column label="Exprise at" min-width="195" align="center">
+        <template slot-scope="scope" v-if="scope.row.expires_at">
           <i class="el-icon-time" />
-          <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ scope.row.expires_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
+      <el-table-column :label="$t('table.actions')" align="center" min-width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="renderRouterEdit(row.kind,row.id)" />
+            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" />
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
         </template>
@@ -124,37 +102,29 @@
 </template>
 
 <script>
+import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
+import UserResource from '@/api/user';
 import RightPanel from '@/components/RightPanel';
-import Pagination from '@/components/Pagination';
-import FilterSystemProduct from './components/FilterSystemProduct';
+import FilterSystemCoupon from './components/FilterSystemCoupon';
 import EventBus from '@/components/FileManager/eventBus';
 
 export default {
-  name: 'ProductList',
-  components: { Pagination, RightPanel, FilterSystemProduct },
+  name: 'CouponList',
+  components: { Pagination,FilterSystemCoupon,RightPanel },
   data() {
     return {
-      list: null,
+      list: [],
       total: 0,
       loading: true,
       listQuery: {
         page: 1,
-        limit: 10,
-        from: '',
-        to: '',
-        price: null,
-        filter_price_by: 'Cost',
-        sort_order: 'id__desc',
-        status: ['1'],
-        category: null,
+        limit: 15,
         keyword: '',
+        role: '',
       },
-    };
+    }
   },
-  created() {
-
-  },
-  methods: {
+  methods:{
     handleListenData(data){
       if (data.hasOwnProperty('list')) {
         this.list = data.list;
@@ -169,31 +139,46 @@ export default {
         this.listQuery = data.listQuery;
       }
     },
-    handleSelectionAllChange(val){
-      EventBus.$emit('listenMultiSelectRow', val);
-    },
     paginationInit(data){
       this.loading = true;
       this.listQuery.page = data.page;
       this.listQuery.limit = data.limit;
     },
+    handleSelectionAllChange(val){
+      EventBus.$emit('listenMultiSelectRow', val);
+    },
     handleDeleting(row){
       EventBus.$emit('handleDeleting', row);
-    },
-    renderRouterEdit(kind, prid){
-      var rou = 'ProductEditSingle';
-      if (kind == 1) {
-        rou = 'ProductEditBundle';
-      } else if (kind == 2) {
-        rou = 'ProductEditGroup';
-      }
-      this.$router.push({ name: rou, params: { id: prid }});
-    },
-  },
+    }
+  }
 };
 </script>
-<style>
-.el-slider__runway{
-  margin:11px 0px !important;
+
+<style lang="scss" scoped>
+.edit-input {
+  padding-right: 100px;
+}
+.cancel-btn {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+.dialog-footer {
+  text-align: left;
+  padding-top: 0;
+  margin-left: 150px;
+}
+.app-container {
+  flex: 1;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+  .block {
+    float: left;
+    min-width: 250px;
+  }
+  .clear-left {
+    clear: left;
+  }
 }
 </style>

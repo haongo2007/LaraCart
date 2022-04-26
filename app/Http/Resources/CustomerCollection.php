@@ -15,16 +15,19 @@ class CustomerCollection extends JsonResource
     public function toArray($request)
     {
         return [
-            'value'      => $this->first_name.' '.$this->last_name.($this->email ? ' <'.$this->email.'>' : ''),
             'id'         => $this->id,
             'first_name' => $this->first_name,
+            'email'      => $this->email,
             'last_name'  => $this->last_name,
             'address1'   => $this->address1,
             'address2'   => $this->address2,
             'address3'   => $this->address3,
             'phone'      => $this->phone,
             'email'      => $this->email,
-            'country'    => $this->country
+            'country'    => $this->country,
+            'store'      => $this->store,
+            'created_at' => $this->created_at,
+            'status' => $this->status
         ];
     }
 }

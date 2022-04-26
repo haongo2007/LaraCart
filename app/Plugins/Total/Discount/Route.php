@@ -2,7 +2,7 @@
 /**
  * Route front
  */
-if(bc_config('Discount')) {
+if(lc_config('Discount')) {
 Route::group(
     [
         'prefix'    => 'plugin/discount',
@@ -21,22 +21,23 @@ Route::group(
  */
 Route::group(
     [
-        'prefix' => BC_ADMIN_PREFIX.'/shop_discount',
-        'middleware' => BC_ADMIN_MIDDLEWARE,
+        'prefix' => LC_ADMIN_PREFIX.'/coupon-discount',
+        'middleware' => LC_ADMIN_MIDDLEWARE,
         'namespace' => 'App\Plugins\Total\Discount\Admin',
     ], 
     function () {
-        Route::get('/', 'AdminController@index')
-        ->name('admin_discount.index');
-        Route::get('create', 'AdminController@create')
-            ->name('admin_discount.create');
-        Route::post('/create', 'AdminController@postCreate')
-            ->name('admin_discount.create');
-        Route::get('/edit/{id}', 'AdminController@edit')
-            ->name('admin_discount.edit');
-        Route::post('/edit/{id}', 'AdminController@postEdit')
-            ->name('admin_discount.edit');
-        Route::post('/delete', 'AdminController@deleteList')
-            ->name('admin_discount.delete');
+        Route::apiResource('/', 'AdminController');
+        // Route::get('/', 'AdminController@index')
+        // ->name('admin_discount.index');
+        // Route::get('create', 'AdminController@create')
+        //     ->name('admin_discount.create');
+        // Route::post('/create', 'AdminController@postCreate')
+        //     ->name('admin_discount.create');
+        // Route::get('/edit/{id}', 'AdminController@edit')
+        //     ->name('admin_discount.edit');
+        // Route::post('/edit/{id}', 'AdminController@postEdit')
+        //     ->name('admin_discount.edit');
+        // Route::post('/delete', 'AdminController@deleteList')
+        //     ->name('admin_discount.delete');
     }
 );

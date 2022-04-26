@@ -16,7 +16,7 @@ class Banner extends ShopBanner
      */
     public static function getBannerAdmin($id) {
         return self::where('id', $id)
-        ->where('store_id', session('adminStoreId'))
+        ->whereIn('store_id', session('adminStoreId'))
         ->first();
     }
 
@@ -37,7 +37,7 @@ class Banner extends ShopBanner
         $keyword    = lc_clean($dataSearch['keyword'] ?? '');
         $limit      = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
 
-        $bannerList = (new ShopBanner)->where('store_id', session('adminStoreId'));
+        $bannerList = (new ShopBanner)->whereIn('store_id', session('adminStoreId'));
         if ($keyword) {
             $bannerList = $bannerList->where('title', 'like', '%'.$keyword.'%');
         }

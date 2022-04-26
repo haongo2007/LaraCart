@@ -20,7 +20,7 @@ class Page extends ShopPage
      */
     public static function getPageAdmin($id) {
         return self::where('id', $id)
-        ->where('store_id', session('adminStoreId'))
+        ->whereIn('store_id', session('adminStoreId'))
         ->first();
     }
 
@@ -49,7 +49,7 @@ class Page extends ShopPage
 
         $pageList = (new ShopPage)
             ->leftJoin($tableDescription, $tableDescription . '.page_id', $tablePage . '.id')
-            ->where('store_id', session('adminStoreId'))
+            ->whereIn('store_id', session('adminStoreId'))
             ->where($tableDescription . '.lang', lc_get_locale());
 
         if ($keyword) {

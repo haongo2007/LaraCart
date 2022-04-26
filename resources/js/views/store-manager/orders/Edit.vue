@@ -9,7 +9,7 @@
               type="success"
               effect="dark">
               <i class="el-icon-s-shop"></i>
-              {{ info_order.stores.descriptions_current_lang[0].title }}
+              {{ Object.keys(info_order).length ? info_order.stores.descriptions_current_lang[0].title : '' }}
             </el-tag>
           </div>
         </el-page-header>

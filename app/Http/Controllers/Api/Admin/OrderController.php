@@ -102,25 +102,25 @@ class OrderController extends Controller
             'shipping_method' => 'required',
             'email' => 'required',
         ];
-        if(lc_config_admin('customer_lastname')) {
+        if(lc_config('customer_lastname',$data['storeId'])) {
             $validate['last_name'] = 'required|max:100';
         }
-        if(lc_config_admin('customer_address2')) {
+        if(lc_config('customer_address2',$data['storeId'])) {
             $validate['address2'] = 'required|max:100';
         }
-        if(lc_config_admin('customer_address3')) {
+        if(lc_config('customer_address3',$data['storeId'])) {
             $validate['address3'] = 'required|max:100';
         }
-        if(lc_config_admin('customer_phone')) {
+        if(lc_config('customer_phone',$data['storeId'])) {
             $validate['phone'] = 'required|regex:/^0[^0][0-9\-]{7,13}$/';
         }
-        if(lc_config_admin('customer_country')) {
+        if(lc_config('customer_country',$data['storeId'])) {
             $validate['country'] = 'required|min:2';
         }
-        if(lc_config_admin('customer_postcode')) {
+        if(lc_config('customer_postcode',$data['storeId'])) {
             $validate['postcode'] = 'required|min:5';
         }
-        if(lc_config_admin('customer_company')) {
+        if(lc_config('customer_company',$data['storeId'])) {
             $validate['company'] = 'required|min:3';
         }
         $messages = [
@@ -191,6 +191,7 @@ class OrderController extends Controller
             'exchange_rate'   => $data['exchange_rate'],
             'email'           => $data['email'],
             'comment'         => $data['comment'],
+            'store_id'         => $data['storeId'],
         ];
         $order = Order::create($dataInsert);
         Order::insertOrderTotal([
@@ -359,7 +360,7 @@ class OrderController extends Controller
         (new Order)->addOrderHistory($dataHistory);
 
         //data to render
-        $dataHistory['staff']['name'] = Admin::user()->name;
+        $dataHistory['staff']['fullname'] = Admin::user()->fullname;
         $dataHistory['add_date'] = date('Y-m-d H:i:s');
         return response()->json(new JsonResponse(['history' => $dataHistory, 'invoice' => $dataInvoice],trans('order.admin.update_success')), Response::HTTP_OK); 
     }
@@ -429,7 +430,7 @@ class OrderController extends Controller
                     'received'  => $orderUpdated->received,
                     'balance'   => $orderUpdated->balance,
                 ];
-                $dataHistory['staff']['name'] = Admin::user()->name;
+                $dataHistory['staff']['fullname'] = Admin::user()->fullname;
                 $dataHistory['add_date'] = date('Y-m-d H:i:s');
                 //end update total price
                 return response()->json(new JsonResponse(['history' => $dataHistory,'invoice' => $dataInvoice,'order_detail_id' => $order_detail_id],trans('order.admin.update_success')), Response::HTTP_OK); 
@@ -560,7 +561,7 @@ class OrderController extends Controller
                 'balance'   => $orderUpdated->balance,
             ];
 
-            $dataHistory['staff']['name'] = Admin::user()->name;
+            $dataHistory['staff']['fullname'] = Admin::user()->fullname;
             $dataHistory['add_date'] = date('Y-m-d H:i:s');
             return response()->json(new JsonResponse(['history' => $dataHistory,'invoice' => $dataInvoice],trans('order.admin.update_success')), Response::HTTP_OK); 
         } catch (\Throwable $e) {

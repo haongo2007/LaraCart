@@ -40,6 +40,14 @@ class ShopCustomer extends Authenticatable
         return $this->hasMany(ShopOrder::class, 'customer_id', 'id');
     }
 
+    /*
+    Get store
+    */
+    public function store()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
+    
     public function addresses()
     {
         return $this->hasMany(ShopCustomerAddress::class, 'customer_id', 'id');

@@ -139,7 +139,7 @@
 
 import RightPanel from '@/components/RightPanel';
 import FilterSystemOrder from './components/FilterSystemOrder';
-import OrderStatusResource from '@/api/order_status';
+import OrderStatusResource from '@/api/order-status';
 import Pagination from '@/components/Pagination';
 import EventBus from '@/components/FileManager/eventBus';
 

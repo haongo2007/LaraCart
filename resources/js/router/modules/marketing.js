@@ -15,16 +15,16 @@ const marketingRoutes = {
     {
       path: '/email-template',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/marketing/email-template/List'),
+      name: 'EmailTemplateList',
       meta: { title: 'emailTemplate',parent:'root',},
     },
     //coupon & discount
     {
       path: '/coupon-discount',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/marketing/coupon-discount/List'),
+      name: 'CouponList',
       meta: { title: 'couponDiscount',parent:'root',},
     },
     //product flashsale
@@ -39,8 +39,8 @@ const marketingRoutes = {
     {
       path: '/customer-manager/list',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/marketing/customer-manager/List'),
+      name: 'CustomerList',
       meta: { title: 'customerManager',parent:'root',},
     },
     //customer subcribe
@@ -63,8 +63,8 @@ const marketingRoutes = {
     {
       path: '/report-analytics/product-report',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/marketing/report-analytics/product-report/List'),
+      name: 'ProductReportList',
       meta: { title: 'productReport',parent:'root',},
     },
   ],

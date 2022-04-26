@@ -34,8 +34,6 @@ class ProductCollection extends JsonResource
             'minimum' => $this->minimum ,
             'name' => $this->name ,
             'price' => $this->price ,
-            'price_final' => $this->price_final ,
-            'product_id' => $this->product_id ,
             'property' => $this->property ,
             'sku' => $this->sku ,
             'sold' => $this->sold ,

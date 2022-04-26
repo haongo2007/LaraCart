@@ -30,14 +30,13 @@ if (!function_exists('lc_config')) {
         if (is_array($key)) {
             if (count($key) == 1) {
                 foreach ($key as $k => $v) {
-                    return Config::where('store_id', $storeId)->where('key', $k)->update(['value' => $v]);
+                    return Config::whereIn('store_id', $storeId)->where('key', $k)->update(['value' => $v]);
                 }
             } else {
                 return false;
             }
         }
         //End update
-
         $allConfig = Config::getAllConfigOfStore($storeId);
         if ($key === null) {
             return $allConfig;
@@ -58,7 +57,7 @@ if (!function_exists('lc_config_admin')) {
  */
     function lc_config_admin($key = null)
     {
-        return lc_config($key, session('adminStoreId'));
+        return lc_config($key,session('adminStoreId'));
     }
 }
 

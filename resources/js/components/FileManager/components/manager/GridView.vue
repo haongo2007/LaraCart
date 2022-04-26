@@ -46,7 +46,7 @@
                       v-bind:file="file">
             </thumbnail>
             <div class="icon" v-else>
-              <svg-icon v-bind:icon-class="'file-extension'"/>
+              <i class="fas" v-bind:class="extensionToIcon(file.extension)" ></i>
             </div>
           </div>
           <div class="card-body">

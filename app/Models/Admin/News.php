@@ -48,7 +48,7 @@ class News extends ShopNews
 
         $newsList = (new ShopNews)
             ->leftJoin($tableDescription, $tableDescription . '.news_id', $tableNews . '.id')
-            ->where('store_id', session('adminStoreId'))
+            ->whereIn('store_id', session('adminStoreId'))
             ->where($tableDescription . '.lang', lc_get_locale());
 
         if ($keyword) {

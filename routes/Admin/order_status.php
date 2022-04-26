@@ -10,4 +10,4 @@
 //     Route::post('/delete', 'AdminOrderStatusController@deleteList')->name('admin_order_status.delete');
 // });
 
-Route::apiResource('order_status', 'OrderStatusController');
+Route::apiResource('order-status', 'OrderStatusController');

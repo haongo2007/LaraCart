@@ -8,3 +8,5 @@
 //     Route::post('/delete', 'AdminEmailTemplateController@deleteList')->name('admin_email_template.delete');
 //     Route::get('/list_variable', 'AdminEmailTemplateController@listVariable')->name('admin_email_template.list_variable');
 // });
+
+Route::apiResource('email-template', 'EmailTemplateController');

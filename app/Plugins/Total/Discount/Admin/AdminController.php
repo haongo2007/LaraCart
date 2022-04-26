@@ -4,23 +4,23 @@
 namespace App\Plugins\Total\Discount\Admin;
 
 use App\Plugins\Total\Discount\Admin\Models\AdminDiscount;
-use App\Http\Controllers\RootAdminController;
-use BlackCart\Core\Front\Models\ShopLanguage;
+use App\Http\Controllers\Controller;
+use App\Models\Front\ShopLanguage;
 use App\Plugins\Total\Discount\AppConfig;
 use Validator;
-class AdminController extends RootAdminController
+class AdminController extends Controller
 {
     public $plugin;
 
     public function __construct()
     {
-        parent::__construct();
         $this->languages = ShopLanguage::getListActive();
         $this->plugin = new AppConfig;
     }
 
     public function index()
     {
+        dd(request()->all());
         $data = [
             'title' => trans($this->plugin->pathPlugin.'::lang.admin.list'),
             'subTitle' => '',
