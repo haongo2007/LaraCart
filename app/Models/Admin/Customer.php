@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 
 class Customer extends ShopCustomer
 {
+    const ITEM_PER_PAGE = 15;
     protected static $getListTitleAdmin = null;
     protected static $getListCustomerGroupByParentAdmin = null;
     private static $getList = null;
@@ -57,6 +58,7 @@ class Customer extends ShopCustomer
         $keyword    = Arr::get($dataSearch,'keyword','');
         $sort_order = Arr::get($dataSearch,'sort_order','');
         $arrSort          = $arrSort;
+        $limit            = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
 
         $customerList = (new ShopCustomer)
             ->whereIn('store_id', session('adminStoreId'));
@@ -74,7 +76,7 @@ class Customer extends ShopCustomer
         } else {
             $customerList = $customerList->orderBy('id', 'desc');
         }
-        $customerList = $customerList->paginate(20);
+        $customerList = $customerList->paginate($limit);
 
         return $customerList;
     }

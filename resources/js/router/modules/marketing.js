@@ -31,8 +31,8 @@ const marketingRoutes = {
     {
       path: '/product-flashsale',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/marketing/product-flashsale/List'),
+      name: 'ProductFlashSale',
       meta: { title: 'productFlashsale',parent:'root',},
     },
     //customer manager

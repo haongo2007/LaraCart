@@ -5,6 +5,7 @@ use App\Models\Front\ShopDiscount;
 
 class Discount extends ShopDiscount
 {
+    const ITEM_PER_PAGE = 15;
     /**
      * Get discount detail in admin
      *
@@ -29,6 +30,7 @@ class Discount extends ShopDiscount
 
         $sort_order = $dataSearch['sort_order'] ?? 'id_desc';
         $keyword = $dataSearch['keyword'] ?? '';
+        $limit            = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
 
         $arrSort = [
             'id__desc' => trans('discount.admin.sort_order.id_desc'),
@@ -50,7 +52,7 @@ class Discount extends ShopDiscount
         } else {
             $discountList = $discountList->orderBy('id', 'desc');
         }
-        $discountList = $discountList->paginate(20);
+        $discountList = $discountList->paginate($limit);
 
         return $discountList;
     }

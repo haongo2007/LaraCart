@@ -6,6 +6,7 @@ use App\Models\Front\ShopEmailTemplate;
 
 class EmailTemplate extends ShopEmailTemplate
 {
+    const ITEM_PER_PAGE = 15;
     protected static $getListTitleAdmin = null;
     protected static $getListEmailTemplateGroupByParentAdmin = null;
     /**
@@ -32,6 +33,7 @@ class EmailTemplate extends ShopEmailTemplate
         $keyword          = $dataSearch['keyword'] ?? '';
         $sort_order       = $dataSearch['sort_order'] ?? '';
         $arrSort          = $dataSearch['arrSort'] ?? '';
+        $limit            = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
 
         $newsList = (new ShopEmailTemplate)
             ->whereIn('store_id', session('adminStoreId'));
@@ -49,7 +51,7 @@ class EmailTemplate extends ShopEmailTemplate
         } else {
             $newsList = $newsList->orderBy('id', 'desc');
         }
-        $newsList = $newsList->paginate(20);
+        $newsList = $newsList->paginate($limit);
 
         return $newsList;
     }
