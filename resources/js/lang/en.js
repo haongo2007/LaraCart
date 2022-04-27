@@ -1,5 +1,6 @@
 export default {
   route: {
+    seoConfig:'SEO Config',
     index: 'Index',
     library: 'Library',
     roleCreate: 'Create role',

@@ -1,15 +1,15 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
-use BlackCart\Core\Admin\Models\AdminSubscribe;
+use App\Http\Controllers\Controller;
+use App\Models\Admin\Subscribe;
 use Validator;
+use App\Http\Resources\SubscribeCollection;
 
-class SubscribeController extends RootAdminController
+class SubscribeController extends Controller
 {
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**
@@ -19,41 +19,9 @@ class SubscribeController extends RootAdminController
      */
     public function index()
     {
-        $sort_order = bc_clean(request('sort_order') ?? 'id_desc');
-        $keyword    = bc_clean(request('keyword') ?? '');
-        $arrSort = [
-            'id__desc' => trans('subscribe.admin.sort_order.id_desc'),
-            'id__asc' => trans('subscribe.admin.sort_order.id_asc'),
-            'email__desc' => trans('subscribe.admin.sort_order.email_desc'),
-            'email__asc' => trans('subscribe.admin.sort_order.email_asc'),
-        ];
-        $dataSearch = [
-            'keyword'    => $keyword,
-            'sort_order' => $sort_order,
-            'arrSort'    => $arrSort,
-        ];
-        $dataSub = AdminSubscribe::getSubscribeListAdmin($dataSearch);
-
-        $data = [
-            'title'         => trans('subscribe.admin.list'),
-            'subTitle'      => '',
-            'icon'          => 'fa fa-indent',
-            'urlDeleteItem' => bc_route_admin('admin_subscribe.delete'),
-            'removeList'    => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort'    => 1, // 1 - Enable button sort
-            'css'           => '', 
-            'js'            => '',
-            'sort_order'    => $sort_order,
-            'keyword'       => $keyword,
-            'arrSort'       => $arrSort,
-            'urlSort'       => bc_route_admin('admin_subscribe.index', request()->except(['_token', '_pjax', 'sort_order'])),
-            'dataSub'       => $dataSub,
-            'pagination'    => $dataSub->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination'),
-            'resultItems'   => trans('subscribe.admin.result_item', ['item_from' => $dataSub->firstItem(), 'item_to' => $dataSub->lastItem(), 'item_total' => $dataSub->total()])
-        ];
-        return view($this->templatePathAdmin.'Subcribe.list')
-            ->with($data);
+        $dataSearch = request()->all();
+        $data = Subscribe::getSubscribeListAdmin($dataSearch);
+        return SubscribeCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
 /**

@@ -17,7 +17,7 @@ class ProductFlashSaleController extends Controller
     }
     public function index()
     {
-        // (new ProductFlashSale)->install();
+        // (new AppConfig)->install();
         $dataSearch = request()->all();
         $data = (new ProductFlashSale)->getAllProductFlashSale($dataSearch);
         return ProductFlashSaleCollection::collection($data)->additional(['message' => 'Successfully']);

@@ -2,82 +2,66 @@
   <div class="app-container">
     <div class="filter-container">
       <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
-        <filter-system-product-flashsale
+        <filter-system-subcribe
           :data-loading="loading"
           :data-query="listQuery"
           @handleListenData="handleListenData"
         />
       </right-panel>
     </div>
-    <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%" @selection-change="handleSelectionAllChange">
+    <el-table
+      v-loading="loading"
+      :data="list"
+      border
+      fit
+      highlight-current-row
+      style="width: 100%"
+      @selection-change="handleSelectionAllChange">
       <el-table-column
         type="selection"
         align="center"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="50">
+      <el-table-column fixed label="#ID" min-width="50" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.id }}</span>
+          {{ scope.row && scope.row.id }}
         </template>
       </el-table-column>
-      
+
       <el-table-column label="Store" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
-            {{ scope.row.product.store.descriptions_current_lang[0].title && scope.row.product.store.descriptions_current_lang[0].title }}
+            {{ scope.row.store.descriptions_current_lang[0].title && scope.row.store.descriptions_current_lang[0].title }}
           </el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column label="Product">
+      <el-table-column label="Email" min-width="150" align="center">
         <template slot-scope="scope">
-          <span>{{ scope.row.product.description.name }}</span>
+          {{ scope.row && scope.row.email }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Stock">
-        <template slot-scope="scope">
-          <span>{{ scope.row.stock }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Sold">
-        <template slot-scope="scope">
-          <span>{{ scope.row.sold }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Start Date" min-width="150">
-        <template slot-scope="scope" v-if="scope.row.promotion.date_start">
-          <span>{{ scope.row.promotion.date_start }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="End Date" min-width="150">
-        <template slot-scope="scope" v-if="scope.row.promotion.date_end">
-          <span>{{ scope.row.promotion.date_end | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column label="Price">
-        <template slot-scope="scope" >
-          <span>{{ scope.row.promotion.price_promotion }}</span>
+      <el-table-column label="Created at" min-width="195" align="center">
+        <template slot-scope="scope" v-if="scope.row.created_at">
+          <i class="el-icon-time" />
+          <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
       <el-table-column :label="$t('table.status')" class-name="status-col" width="100" prop="status">
         <template slot-scope="{row}">
-          <el-tag :type="row.promotion.status_promotion | statusFilter">
-            {{ row.promotion.status_promotion | statusFilter(true) }}
+          <el-tag :type="row.status | statusFilter">
+            {{ row.status | statusFilter(true) }}
           </el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.actions')" align="center" min-width="200" class-name="small-padding fixed-width">
+      <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" />
+            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="renderRouterEdit(row.kind,row.id)" />
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
         </template>
@@ -92,12 +76,12 @@
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 import UserResource from '@/api/user';
 import RightPanel from '@/components/RightPanel';
-import FilterSystemProductFlashsale from './components/FilterSystemProductFlashsale';
+import FilterSystemSubcribe from './components/FilterSystemSubcribe';
 import EventBus from '@/components/FileManager/eventBus';
 
 export default {
-  name: 'ProductFlashSale',
-  components: { Pagination,FilterSystemProductFlashsale,RightPanel },
+  name: 'SubscribeList',
+  components: { Pagination,FilterSystemSubcribe,RightPanel },
   data() {
     return {
       list: [],

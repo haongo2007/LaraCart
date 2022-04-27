@@ -1,16 +1,17 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
-use BlackCart\Core\Admin\Models\AdminConfig;
+use App\Http\Controllers\Controller;
+use App\Models\Admin\Config;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 
-class ConfigGlobalController extends RootAdminController
+class ConfigGlobalController extends Controller
 {
     public $templates, $currencies, $languages, $timezones;
 
     public function __construct()
     {
-        parent::__construct();
     }
 
     public function webhook()
@@ -34,22 +35,15 @@ class ConfigGlobalController extends RootAdminController
         $name = $data['name'];
         $value = $data['value'];
         try {
-            AdminConfig::where('key', $name)
+            Config::where('key', $name)
                 ->where('store_id', 0)
                 ->update(['value' => $value]);
-            $error = 0;
-            $msg = trans('admin.update_success');
         } catch (\Throwable $e) {
-            $error = 1;
             $msg = $e->getMessage();
+            return response()->json(new JsonResponse([], $msg), Response::HTTP_FORBIDDEN);
         }
-        return response()->json([
-            'error' => $error,
-            'field' => $name,
-            'value' => $value,
-            'msg'   => $msg,
-            ]
-        );
+        
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 }

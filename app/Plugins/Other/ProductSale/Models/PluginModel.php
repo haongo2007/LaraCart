@@ -1,19 +1,18 @@
 <?php
-#App\Plugins\Other\ProductSale\Models\PluginModel.php
 namespace App\Plugins\Other\ProductSale\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use BlackCart\Core\Front\Models\ShopProduct;
-use BlackCart\Core\Front\Models\ShopProductPromotion;
+use App\Models\Front\ShopProduct;
+use App\Models\Front\ShopProductPromotion;
 
 class PluginModel extends Model
 {
     public $timestamps    = false;
-    public $table = BC_DB_PREFIX.'shop_product_flash';
-    protected $connection = BC_CONNECTION;
+    public $table = 'shop_product_flash';
+    protected $connection = LC_CONNECTION;
     protected $guarded    = [];
 
     public function product()
@@ -40,7 +39,6 @@ class PluginModel extends Model
             $table->integer('sold');
             $table->integer('sort');
         });
-
         return ['error' => 0, 'msg' => 'install success'];
     }
 

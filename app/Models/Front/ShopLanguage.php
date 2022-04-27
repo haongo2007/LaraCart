@@ -28,7 +28,7 @@ class ShopLanguage extends Model
         if ($title) {
             $languageList = $languageList->where('name', 'like', '%' . $title . '%');
         }
-        if(is_array($code)) {
+        if(is_array($code) && count($code) > 1) {
             $languageList = $languageList->whereIn('code', $code);
         }
 
@@ -37,7 +37,6 @@ class ShopLanguage extends Model
         }
 
         $languageList = $languageList->paginate($limit);
-
         return $languageList;
     }
 

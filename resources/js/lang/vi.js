@@ -4,6 +4,7 @@ export default {
     return: 'Trở về',
   },
   route: {
+    seoConfig:'Cấu hình SEO',
     index: 'Index',
     library: 'Thư Viện',
     roleCreate: 'Tạo nhóm quyền',

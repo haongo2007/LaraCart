@@ -150,7 +150,7 @@ export const menuSidebar = [
           {
             path: '/seo-manager/config',
             meta: { 
-              title: 'config',
+              title: 'seoConfig',
               icon:'admin'
             },
           },

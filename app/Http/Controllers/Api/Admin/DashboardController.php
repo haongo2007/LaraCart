@@ -7,6 +7,7 @@ use App\Models\Admin\News;
 use App\Models\Admin\Product;
 use App\Models\Admin\Customer;
 use App\Models\Admin\Order;
+use App\Models\Admin\Store;
 use Illuminate\Http\Request;
 use App\Helper\JsonResponse;
 use Illuminate\Http\Response;
@@ -25,11 +26,15 @@ class DashboardController extends Controller
             $from = Carbon::parse($req['range_picker'][0])->format('Y-m-d H:i:s');
             $to = Carbon::parse($req['range_picker'][1])->format('Y-m-d H:i:s');   
         }
-        
+        if (session('adminStoreId')) {
+            $storeId = session('adminStoreId');
+        }else{
+            $storeId = array_keys(Store::getStoreActive());
+        }
         $newVisitis = Customer::getSumCustomerTotalCustomTime($from,$to)->keyBy('d')->toArray();
-        $newOrder = Order::getSumOrderTotalCustomTime($from,$to)->keyBy('d')->toArray();
+        $newOrder = Order::getSumOrderTotalCustomTime($from,$to,$storeId)->toArray();
+        dd($newOrder);
         $newProduct = Product::getSumProductTotalCustomTime($from,$to)->keyBy('d')->toArray();
-        
         $data = [];
 
         $rangDays = CarbonPeriod::create($from, $to);

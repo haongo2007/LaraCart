@@ -82,7 +82,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Discount" min-min-width="150" align="center">
+      <el-table-column label="Discount" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.discount | toThousandFilter }} {{ scope.row && scope.row.currency }}
         </template>

@@ -7,3 +7,5 @@
 //     Route::post('/edit/{id}', 'AdminSubscribeController@postEdit')->name('admin_subscribe.edit');
 //     Route::post('/delete', 'AdminSubscribeController@deleteList')->name('admin_subscribe.delete');
 // });
+
+Route::apiResource('subscribe', 'SubscribeController');

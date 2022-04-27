@@ -47,17 +47,17 @@ const marketingRoutes = {
     {
       path: '/customer-manager/subcribe',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/marketing/customer-manager/subcribe/List'),
+      name: 'SubscribeList',
       meta: { title: 'subcribe',parent:'root',},
     },
     //seo manager
     {
       path: '/seo-manager/config',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
-      meta: { title: 'config',parent:'root',},
+      component: () => import('@/views/marketing/seo-manager/Config'),
+      name: 'SeoConfig',
+      meta: { title: 'seoConfig',parent:'root',},
     },
     //report analytics
     {

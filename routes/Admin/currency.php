@@ -7,3 +7,6 @@
 //     Route::post('/edit/{id}', 'AdminCurrencyController@postEdit')->name('admin_currency.edit');
 //     Route::post('/delete', 'AdminCurrencyController@deleteList')->name('admin_currency.delete');
 // });
+
+
+    Route::apiResource('currency', 'CurrencyController')->only('index');

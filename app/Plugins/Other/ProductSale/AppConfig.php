@@ -1,10 +1,9 @@
 <?php
-#App\Plugins\Other\ProductSale\AppConfig.php
 namespace App\Plugins\Other\ProductSale;
 
 use App\Plugins\Other\ProductSale\Models\PluginModel;
-use BlackCart\Core\Admin\Models\AdminConfig;
-use BlackCart\Core\Admin\Models\AdminMenu;
+use App\Models\Admin\Config;
+use App\Models\Admin\Menu;
 use App\Plugins\ConfigDefault;
 class AppConfig extends ConfigDefault
 {
@@ -31,10 +30,10 @@ class AppConfig extends ConfigDefault
     public function install()
     {
         $return = ['error' => 0, 'msg' => ''];
-        $check = AdminConfig::where('key', $this->configKey)->first();
+        $check = Config::where('key', $this->configKey)->first();
         if ($check) {
             //Check Plugin key exist
-            $return = ['error' => 1, 'msg' =>  sc_language_render('admin.plugin.plugin_exist')];
+            $return = ['error' => 1, 'msg' =>  lc_language_render('admin.plugin.plugin_exist')];
         } else {
             //Insert plugin to config
             $dataInsert = [
@@ -47,13 +46,13 @@ class AppConfig extends ConfigDefault
                     'detail' => $this->pathPlugin.'::lang.title',
                 ],
             ];
-            $process = AdminConfig::insert(
+            $process = Config::insert(
                 $dataInsert
             );
 
-            $blockMarketing = AdminMenu::where('key','MARKETING')->first();
+            $blockMarketing = Menu::where('key','MARKETING')->first();
             if($blockMarketing) {
-                AdminMenu::insert([
+                Menu::insert([
                     'sort' => 100,
                     'parent_id' => $blockMarketing->id,
                     'title' => ''.$this->pathPlugin.'::lang.title',
@@ -65,7 +64,7 @@ class AppConfig extends ConfigDefault
 
 
             if (!$process) {
-                $return = ['error' => 1, 'msg' => sc_language_render('admin.plugin.install_faild')];
+                $return = ['error' => 1, 'msg' => lc_language_render('admin.plugin.install_faild')];
             } else {
                 $return = (new PluginModel)->installExtension();
             }

@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class LanguageCollection extends JsonResource
+class SubscribeCollection extends JsonResource
 {
     /**
      * Transform the resource collection into an array.
@@ -14,15 +14,14 @@ class LanguageCollection extends JsonResource
      */
     public function toArray($request)
     {
-        $res = [
+        return [
             'id' => $this->id,
-            'name' => $this->name,
-            'code' => $this->code,
-            'icon' => $this->icon,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'content' => $this->content,
             'status' => $this->status,
-            'rtl' => $this->rtl,
-            'sort' => $this->sort,
+            'store' => $this->store,
+            'created_at' => $this->created_at,
         ];
-        return $res;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models\Admin;
 
 use App\Models\Front\ShopOrder;
 use App\Models\Front\ShopOrderTotal;
+use App\Models\Front\ShopStore;
 use Cache;
 use Carbon\Carbon;
 
@@ -302,11 +303,16 @@ class Order extends ShopOrder
      *
      * @return  [type]  [return description]
      */
-    public static function getSumOrderTotalCustomTime($from = '',$to = '') {
+    public static function getSumOrderTotalCustomTime($from = '',$to = '',$storeId = null) {
+        $store_table = (new ShopStore)->getTable();
+        $order_table = (new Order)->getTable();
         return self::selectRaw('DATE_FORMAT(created_at, "%m-%d") AS d,
-        SUM(total/exchange_rate) AS total_amount, count(id) AS total_order')
-            ->whereBetween('created_at',[$from,$to])
-            ->groupBy('d')->get();
+        SUM(total/exchange_rate) AS total_amount, 
+        count(id) AS total_order,'.$store_table.'.*')
+        ->leftJoin($store_table, $order_table.'.store_id', '=', $store_table.'.id')
+        ->whereIn('store_id',$storeId)
+        ->whereBetween('created_at',[$from,$to])
+        ->groupBy('d','store_id')->get();
     }
 
     /**

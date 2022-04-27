@@ -24,6 +24,38 @@ class ShopCurrency extends Model
     protected static $getCodeActive     = null;
     protected static $checkListCurrency = [];
     protected $guarded                  = [];
+    const ITEM_PER_PAGE = 15;
+
+
+    public function getCurrencyListAdmin($searchParams='')
+    {
+        $sort_order = $searchParams['sort_order'] ?? 'id_desc';
+        $keyword = $searchParams['keyword'] ?? '';
+        $limit = $searchParams['limit'] ?? self::ITEM_PER_PAGE;
+        $arrSort = [
+            'id__desc' => trans('currency.admin.sort_order.id_desc'),
+            'id__asc' => trans('currency.admin.sort_order.id_asc'),
+            'name__desc' => trans('currency.admin.sort_order.name_desc'),
+            'name__asc' => trans('currency.admin.sort_order.name_asc'),
+        ];
+
+        $currencyList = new ShopCurrency;
+        if ($keyword) {
+            $currencyList = $currencyList->where(function ($sql) use($keyword){
+                $sql->where('code', 'like', '%' . $keyword . '%')->orWhere('name', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        if ($sort_order && array_key_exists($sort_order, $arrSort)) {
+            $field = explode('__', $sort_order)[0];
+            $sort_field = explode('__', $sort_order)[1];
+            $currencyList = $currencyList->orderBy($field, $sort_field);
+
+        } else {
+            $currencyList = $currencyList->orderBy('id', 'desc');
+        }
+        return $currencyList->paginate($limit);
+    }
 
     public static function getListAll()
     {

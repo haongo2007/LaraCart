@@ -6,6 +6,7 @@ use App\Models\Front\ShopSubscribe;
 
 class Subscribe extends ShopSubscribe
 {
+    const ITEM_PER_PAGE = 15;
     /**
      * Get subcribe detail in admin
      *
@@ -27,10 +28,19 @@ class Subscribe extends ShopSubscribe
      * @return  [type]               [return description]
      */
     public static function getSubscribeListAdmin(array $dataSearch) {
-        $sort_order       = $dataSearch['sort_order'] ?? '';
-        $arrSort          = $dataSearch['arrSort'] ?? '';
-        $subcribeList = (new AdminSubscribe)
-            ->where('store_id', session('adminStoreId'));
+
+        $sort_order = lc_clean($dataSearch['sort_order'] ?? 'id_desc');
+        $keyword    = lc_clean($dataSearch['keyword'] ?? '');
+        $limit      = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
+        $arrSort = [
+            'id__desc' => trans('subscribe.admin.sort_order.id_desc'),
+            'id__asc' => trans('subscribe.admin.sort_order.id_asc'),
+            'email__desc' => trans('subscribe.admin.sort_order.email_desc'),
+            'email__asc' => trans('subscribe.admin.sort_order.email_asc'),
+        ];
+
+        $subcribeList = (new Subscribe)
+            ->whereIn('store_id', session('adminStoreId'));
 
         if ($sort_order && array_key_exists($sort_order, $arrSort)) {
             $field = explode('__', $sort_order)[0];
@@ -39,7 +49,7 @@ class Subscribe extends ShopSubscribe
         } else {
             $subcribeList = $subcribeList->orderBy('id', 'desc');
         }
-        $subcribeList = $subcribeList->paginate(20);
+        $subcribeList = $subcribeList->paginate($limit);
 
         return $subcribeList;
     }

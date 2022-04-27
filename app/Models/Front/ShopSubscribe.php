@@ -1,12 +1,18 @@
 <?php
-#black-cart/Core/Front/Models/ShopSubscribe.php
 namespace App\Models\Front;
 
 use Illuminate\Database\Eloquent\Model;
 
 class ShopSubscribe extends Model
 {
-    public $table = BC_DB_PREFIX.'shop_subscribe';
+    public $table = 'shop_subscribe';
     protected $guarded      = [];
-    protected $connection = BC_CONNECTION;
+    protected $connection = LC_CONNECTION;
+    /*
+    Get store
+    */
+    public function store()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
 }

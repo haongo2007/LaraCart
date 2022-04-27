@@ -1,129 +1,21 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use App\Models\Front\ShopCurrency;
 use Validator;
+use App\Http\Resources\CurrencyCollection;
 
-class CurrencyController extends RootAdminController
+class CurrencyController extends Controller
 {
     public function __construct()
     {
-        parent::__construct();
     }
     public function index()
     {
-
-        $data = [
-            'title' => trans('currency.admin.list'),
-            'subTitle' => '',
-            'icon' => 'fa fa-indent',
-            'urlDeleteItem' => bc_route_admin('admin_currency.delete'),
-            'removeList' => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort' => 0, // 1 - Enable button sort
-            'css' => '', 
-            'js' => '',
-        ];
-        //Process add content
-        $data['menuRight'] = bc_config_group('menuRight', \Request::route()->getName());
-        $data['menuLeft'] = bc_config_group('menuLeft', \Request::route()->getName());
-        $data['topMenuRight'] = bc_config_group('topMenuRight', \Request::route()->getName());
-        $data['topMenuLeft'] = bc_config_group('topMenuLeft', \Request::route()->getName());
-        $data['blockBottom'] = bc_config_group('blockBottom', \Request::route()->getName());
-
-        $listTh = [
-            'name' => trans('currency.name'),
-            'code' => trans('currency.code'),
-            'symbol' => trans('currency.symbol'),
-            'exchange_rate' => trans('currency.exchange_rate'),
-            'precision' => trans('currency.precision'),
-            'symbol_first' => trans('currency.symbol_first'),
-            'thousands' => trans('currency.thousands'),
-            'sort' => trans('currency.sort'),
-            'status' => trans('currency.status'),
-            'action' => trans('currency.admin.action'),
-        ];
-
-        $sort_order = request('sort_order') ?? 'id_desc';
-        $keyword = request('keyword') ?? '';
-        $arrSort = [
-            'id__desc' => trans('currency.admin.sort_order.id_desc'),
-            'id__asc' => trans('currency.admin.sort_order.id_asc'),
-            'name__desc' => trans('currency.admin.sort_order.name_desc'),
-            'name__asc' => trans('currency.admin.sort_order.name_asc'),
-        ];
-        $obj = new ShopCurrency;
-        if ($keyword) {
-            $obj = $obj->whereRaw('(code = "' . $keyword . '" OR name like "%' . $keyword . '%" )');
-        }
-
-        if ($sort_order && array_key_exists($sort_order, $arrSort)) {
-            $field = explode('__', $sort_order)[0];
-            $sort_field = explode('__', $sort_order)[1];
-            $obj = $obj->orderBy($field, $sort_field);
-
-        } else {
-            $obj = $obj->orderBy('id', 'desc');
-        }
-        $dataTmp = $obj->paginate(20);
-
-        $dataTr = [];
-        foreach ($dataTmp as $key => $row) {
-            $dataTr[] = [
-                'name' => $row['name'],
-                'code' => $row['code'],
-                'symbol' => $row['symbol'],
-                'exchange_rate' => $row['exchange_rate'],
-                'precision' => $row['precision'],
-                'symbol_first' => $row['symbol_first'],
-                'thousands' => $row['thousands'],
-                'sort' => $row['sort'],
-                'status' => $row['status'] ? '<span class="badge badge-success">ON</span>' : '<span class="badge badge-danger">OFF</span>',
-                'action' => '
-                    <a href="' . bc_route_admin('admin_currency.edit', ['id' => $row['id']]) . '"><span title="' . trans('currency.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-                  <span ' . (in_array($row['id'], BC_GUARD_CURRENCY) ? "style='display:none'" : "") . ' onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('currency.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-                  ',
-            ];
-        }
-
-        $data['listTh'] = $listTh;
-        $data['dataTr'] = $dataTr;
-        $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-        $data['resultItems'] = trans('currency.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-//menuRight
-        $data['menuRight'][] = '<a href="' . bc_route_admin('admin_currency.create') . '" class="btn  btn-success  btn-flat" title="New" id="button_create_new">
-        <i class="fa fa-plus" title="'.trans('admin.add_new').'"></i>
-                           </a>';
-//=menuRight
-
-//menuSort        
-        $optionSort = '';
-        foreach ($arrSort as $key => $status) {
-            $optionSort .= '<option  ' . (($sort_order == $key) ? "selected" : "") . ' value="' . $key . '">' . $status . '</option>';
-        }
-
-        $data['urlSort'] = bc_route_admin('admin_currency.index', request()->except(['_token', '_pjax', 'sort_order']));
-
-        $data['optionSort'] = $optionSort;
-//=menuSort
-
-//menuSearch
-        $data['topMenuRight'][] = '
-                <form action="' . bc_route_admin('admin_currency.index') . '" id="button_search">
-                <div class="input-group input-group" style="width: 250px;">
-                    <input type="text" name="keyword" class="form-control rounded-0 float-right" placeholder="' . trans('currency.admin.search_place') . '" value="' . $keyword . '">
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
-                    </div>
-                </div>
-                </form>';
-//=menuSearch
-
-        return view($this->templatePathAdmin.'screen.list')
-            ->with($data);
+        $searchParams = request()->all();
+        $data = (new ShopCurrency)->getCurrencyListAdmin($searchParams);
+        return CurrencyCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
 /**
