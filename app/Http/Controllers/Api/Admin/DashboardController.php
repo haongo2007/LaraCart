@@ -33,7 +33,6 @@ class DashboardController extends Controller
         }
         $newVisitis = Customer::getSumCustomerTotalCustomTime($from,$to)->keyBy('d')->toArray();
         $newOrder = Order::getSumOrderTotalCustomTime($from,$to,$storeId)->toArray();
-        dd($newOrder);
         $newProduct = Product::getSumProductTotalCustomTime($from,$to)->keyBy('d')->toArray();
         $data = [];
 
