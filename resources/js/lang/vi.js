@@ -4,6 +4,7 @@ export default {
     return: 'Trở về',
   },
   route: {
+    webHook:'Webhook',
     seoConfig:'Cấu hình SEO',
     index: 'Index',
     library: 'Thư Viện',
@@ -193,6 +194,13 @@ export default {
     imageUploadTips: 'Since I was using only the vue@1 version, and it is not compatible with mockjs at the moment, I modified it myself, and if you are going to use it, it is better to use official version.',
   },
   table: {
+    user: 'Người dùng',
+    method: 'Method',
+    path: 'Đường dẫn',
+    ip: 'IP',
+    agent: 'Thiết bị',
+    input: 'Đầu vào',
+    created_at: 'Thời gian tạo',
     value: 'Giá trị',
     required: 'Bắt buộc',
     fieldConfig: 'Cầu hình trường',
@@ -261,6 +269,13 @@ export default {
     logo: 'Logo',
     active: 'Kích hoạt',
     config: 'Cấu hình',
+  },
+  settings: {
+    title: 'Cài đặt kiểu trang',
+    theme: 'Màu giao diện',
+    tagsView: 'chế độ xem thẻ',
+    fixedHeader: 'Cố định Header',
+    sidebarLogo: 'Logo thanh bên',
   },
   errorLog: {
     tips: 'Please click the bug icon in the upper right corner',

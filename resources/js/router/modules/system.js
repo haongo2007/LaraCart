@@ -6,7 +6,7 @@ const systemRoutes = {
   redirect: 'noredirect',
   name: 'System',
   meta: {
-    title: 'System',
+    title: 'system',
     icon: 'table',
   },
   children: [
@@ -28,6 +28,12 @@ const systemRoutes = {
       component: () => import('@/views/system/users-permissions/users/Edit'),
       name: 'UserEdit',
       meta: { title: 'userEdit',parent: 'UsersList',permissions: ['User manager']},
+    },
+    {
+      path: '/profile',
+      component: () => import('@/views/users/SelfProfile'),
+      name: 'SelfProfile',
+      meta: { title: 'selfProfile', icon: 'user', parent: 'root' },
     },
     // roles manager
     {
@@ -141,20 +147,20 @@ const systemRoutes = {
       meta: { title: 'taxManager', parent: 'root' },
     },
     // admin global
-    {
-      path: '/admin-global/menu',
-      component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
-      meta: { title: 'menu', parent: 'root' },
-    },
-    {
-      path: '/admin-global/env-config',
-      component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
-      meta: { title: 'enviromentConfig', parent: 'root' },
-    },
+    // {
+    //   path: '/admin-global/menu',
+    //   component: Layout,
+    //   component: () => import('@/views/store-manager/orders/List'),
+    //   name: 'OrdersList',
+    //   meta: { title: 'menu', parent: 'root' },
+    // },
+    // {
+    //   path: '/admin-global/env-config',
+    //   component: Layout,
+    //   component: () => import('@/views/store-manager/orders/List'),
+    //   name: 'OrdersList',
+    //   meta: { title: 'enviromentConfig', parent: 'root' },
+    // },
     {
       path: '/admin-global/backup-db',
       component: Layout,
@@ -173,8 +179,8 @@ const systemRoutes = {
     {
       path: '/errors-logs/operationLogs',
       component: Layout,
-      component: () => import('@/views/store-manager/orders/List'),
-      name: 'OrdersList',
+      component: () => import('@/views/system/errors-logs/operation-logs/List'),
+      name: 'OperationLogsList',
       meta: { title: 'operationLogs', parent: 'root' },
     },
     {

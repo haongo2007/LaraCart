@@ -1,5 +1,7 @@
 export default {
   route: {
+    webHook:'Webhook',
+    System:'System',
     seoConfig:'SEO Config',
     index: 'Index',
     library: 'Library',
@@ -195,6 +197,13 @@ export default {
     imageUploadTips: 'Since I was using only the vue@1 version, and it is not compatible with mockjs at the moment, I modified it myself, and if you are going to use it, it is better to use official version.',
   },
   table: {
+    user: 'User',
+    method: 'Method',
+    path: 'Path',
+    ip: 'IP',
+    agent: 'Agent',
+    input: 'Input',
+    created_at: 'Created at',
     value: 'Value',
     required: 'Required',
     fieldConfig: 'Field Config',

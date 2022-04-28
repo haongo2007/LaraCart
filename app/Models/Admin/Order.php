@@ -4,7 +4,6 @@ namespace App\Models\Admin;
 
 use App\Models\Front\ShopOrder;
 use App\Models\Front\ShopOrderTotal;
-use App\Models\Front\ShopStoreDescription;
 use Cache;
 use Carbon\Carbon;
 
@@ -304,16 +303,12 @@ class Order extends ShopOrder
      * @return  [type]  [return description]
      */
     public static function getSumOrderTotalCustomTime($from = '',$to = '',$storeId = null) {
-        $store_table = (new ShopStoreDescription)->getTable();
-        $order_table = (new Order)->getTable();
-        return self::selectRaw('DATE_FORMAT(created_at, "%m-%d") AS d,
-        SUM(total/exchange_rate) AS total_amount,'.LC_DB_PREFIX.$order_table.'.store_id ,'.LC_DB_PREFIX.$store_table.'.title AS store_name,
-        count('.LC_DB_PREFIX.$order_table.'.id) AS total_order')
-        ->leftJoin($store_table, $order_table.'.store_id', '=', $store_table.'.store_id')
-        ->whereIn($order_table.'.store_id',$storeId)
-        ->where($store_table.'.lang',lc_get_locale())
+        return self::selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") AS d,
+        SUM(total/exchange_rate) AS total_amount,store_id,
+        count(id) AS total_order')
+        ->whereIn('store_id',$storeId)
         ->whereBetween('created_at',[$from,$to])
-        ->groupBy('d',$order_table.'.store_id')->get();
+        ->groupBy('d','store_id')->get();
     }
 
     /**
@@ -340,8 +335,9 @@ class Order extends ShopOrder
      *
      * @return  [type]  [return description]
      */
-    public static function getListOrderNew($numRow) {
+    public static function getListOrderNew($numRow,$storeId = null) {
         return self::where('status', 1)
+        ->whereIn('store_id',$storeId)
         ->take($numRow)->orderBy('status', 'asc')->orderBy('id', 'desc')->get();
     }
 

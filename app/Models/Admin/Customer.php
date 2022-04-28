@@ -152,9 +152,11 @@ class Customer extends ShopCustomer
      *
      * @return  [type]  [return description]
      */
-    public static function getSumCustomerTotalCustomTime($from = '',$to = '') {
-        return self::selectRaw('DATE_FORMAT(created_at, "%m-%d") AS d, count(id) AS total_customer')
+    public static function getSumCustomerTotalCustomTime($from = '',$to = '',$storeId = null) {
+        return self::selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") AS d,store_id,
+            count(id) AS total_customer')
             ->whereBetween('created_at',[$from,$to])
-            ->groupBy('d')->get();
+            ->whereIn('store_id',$storeId)
+            ->groupBy('store_id','d')->get();
     }
 }

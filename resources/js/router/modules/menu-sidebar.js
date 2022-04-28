@@ -330,19 +330,19 @@ export const menuSidebar = [
         alwaysShow: true,
         meta: { title: 'adminGlobal',icon:'el-icon-s-claim'},
         children:[
-          {
-            path: '/admin-global/menu',
-            meta: { 
-              title: 'menu',
-              icon:'el-icon-menu'
-            },
-          },
-          {
-            path: '/admin-global/env-config',
-            meta: { 
-              title: 'enviromentConfig',
-              icon:'el-icon-s-tools'},
-          },
+          // {
+          //   path: '/admin-global/menu',
+          //   meta: { 
+          //     title: 'menu',
+          //     icon:'el-icon-menu'
+          //   },
+          // },
+          // {
+          //   path: '/admin-global/env-config',
+          //   meta: { 
+          //     title: 'enviromentConfig',
+          //     icon:'el-icon-s-tools'},
+          // },
           {
             path: '/admin-global/backup-db',
             meta: { 
@@ -374,13 +374,13 @@ export const menuSidebar = [
               icon:'el-icon-document'
             },
           },
-          {
-            path: '/errors-logs/webhook',
-            meta: { 
-              title: 'webHook',
-              icon:'el-icon-connection'
-            },
-          },
+          // {
+          //   path: '/errors-logs/webhook',
+          //   meta: { 
+          //     title: 'webHook',
+          //     icon:'el-icon-connection'
+          //   },
+          // },
         ]
       },
       {

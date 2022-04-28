@@ -6,7 +6,6 @@
 import * as echarts from 'echarts';
 require('echarts/theme/macarons'); // echarts theme
 import { debounce } from '@/utils';
-import _rawData from '../life-expectancy-table.json'
 
 export default {
   props: {
@@ -35,7 +34,6 @@ export default {
     return {
       chart: null,
       sidebarElm: null,
-      rawData:_rawData
     };
   },
   watch: {
@@ -80,22 +78,11 @@ export default {
         this.__resizeHandler();
       }
     },
-    setOptions({ data, name, label } = data) {
-      let _rawData = this.rawData;
-      const countries = [
-        'Finland',
-        'France',
-        'Germany',
-        'Iceland',
-        'Norway',
-        'Poland',
-        'Russia',
-        'United Kingdom'
-      ];
+    setOptions({ data, name, label, companies } = data) {
       const datasetWithFilters = [];
       const seriesList = [];
-      echarts.util.each(countries, function (country) {
-        var datasetId = 'dataset_' + country;
+      echarts.util.each(companies, function (id,company) {
+        var datasetId = 'dataset_' + company;
         datasetWithFilters.push({
           id: datasetId,
           fromDatasetId: 'dataset_raw',
@@ -103,8 +90,13 @@ export default {
             type: 'filter',
             config: {
               and: [
-                { dimension: 'Year', gte: 1990 },
-                { dimension: 'Country', '=': country }
+                { 
+                  dimension: 'Date' ,
+                  '>=': '2000-01',
+                  '<': '2100-01',
+                  parser: 'time'
+                },
+                { dimension: 'Company', '=': id }
               ]
             }
           }
@@ -113,11 +105,13 @@ export default {
           type: 'line',
           datasetId: datasetId,
           showSymbol: false,
-          name: country,
+          name: company,
+          smooth: true,
+          animationEasing: 'cubicInOut',
           endLabel: {
             show: true,
             formatter: function (params) {
-              return params.value[3] + ': ' + params.value[0];
+              return company + ': ' + params.value[0];
             }
           },
           labelLayout: {
@@ -127,89 +121,62 @@ export default {
             focus: 'series'
           },
           encode: {
-            x: 'Year',
-            y: 'Income',
-            label: ['Country', 'Income'],
-            itemName: 'Year',
-            tooltip: ['Income']
+            x: 'Date',
+            y: 'value',
+            label: ['Company', 'value'],
+            itemName: 'Date',
+            tooltip: ['value']
           }
         });
       });
       let option = {
-            animationDuration: 10000,
+            animationDuration: 2800,
             dataset: [
               {
                 id: 'dataset_raw',
-                source: _rawData
+                source: data
               },
               ...datasetWithFilters
             ],
+            title: {
+              text: name
+            },
             tooltip: {
-              order: 'valueDesc',
-              trigger: 'axis'
+              trigger: 'axis',
+              axisPointer: {
+                type: 'cross'
+              },
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            },
+            toolbox: {
+              show: true,
+              feature: {
+                dataZoom: {
+                  yAxisIndex: 'none'
+                },
+                dataView: { readOnly: false },
+                magicType: { type: ['line', 'bar'] },
+                restore: {},
+                saveAsImage: {}
+              }
             },
             xAxis: {
               type: 'category',
               nameLocation: 'middle'
             },
             yAxis: {
-              name: 'Income'
             },
             grid: {
-              right: 140
+              left: 10,
+              right: 10,
+              bottom: 20,
+              top: 30,
+              containLabel: true,
             },
             series: seriesList
           };
 
       this.chart.setOption(option);
-      // this.chart.setOption({
-      //   xAxis: {
-      //     data: label,
-      //     boundaryGap: false,
-      //     axisTick: {
-      //       show: false,
-      //     },
-      //   },
-      //   grid: {
-      //     left: 10,
-      //     right: 10,
-      //     bottom: 20,
-      //     top: 30,
-      //     containLabel: true,
-      //   },
-      //   tooltip: {
-      //     trigger: 'axis',
-      //     axisPointer: {
-      //       type: 'cross',
-      //     },
-      //     padding: [5, 10],
-      //   },
-      //   yAxis: {
-      //     axisTick: {
-      //       show: false,
-      //     },
-      //   },
-      //   legend: {
-      //     data: name,
-      //   },
-      //   series: {
-      //     name: name,
-      //     itemStyle: {
-      //       normal: {
-      //         color: '#FF005A',
-      //         lineStyle: {
-      //           color: '#FF005A',
-      //           width: 2,
-      //         },
-      //       },
-      //     },
-      //     smooth: true,
-      //     type: 'line',
-      //     data: data,
-      //     animationDuration: 2800,
-      //     animationEasing: 'cubicInOut',
-      //   },
-      // });
     },
     initChart() {
       this.chart = echarts.init(this.$el,'macarons')

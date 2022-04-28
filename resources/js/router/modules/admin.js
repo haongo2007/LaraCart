@@ -12,6 +12,19 @@ const adminRoutes = {
     icon: 'admin',
   },
   children: [
+    {
+      path: '/profile',
+      component: Layout,
+      redirect: 'noredirect',
+      children: [
+        {
+          path: 'index',
+          component: () => import('@/views/users/SelfProfile'),
+          name: 'SelfProfile',
+          meta: { title: 'selfProfile', icon: 'user', parent: 'root' },
+        },
+      ],
+    },
     /** User managements */
     {
       path: 'users/edit/:id(\\d+)',

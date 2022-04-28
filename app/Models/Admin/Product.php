@@ -288,9 +288,11 @@ class Product extends ShopProduct
      *
      * @return  [type]  [return description]
      */
-    public static function getSumProductTotalCustomTime($from = '',$to = '') {
-        return self::selectRaw('DATE_FORMAT(created_at, "%m-%d") AS d, count(id) AS total_product')
+    public static function getSumProductTotalCustomTime($from = '',$to = '',$storeId = null) {
+        return self::selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d") AS d,store_id ,
+            count(id) AS total_product')
             ->whereBetween('created_at',[$from,$to])
-            ->groupBy('d')->get();
+            ->whereIn('store_id',$storeId)
+            ->groupBy('d','store_id')->get();
     }
 }

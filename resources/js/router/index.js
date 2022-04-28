@@ -12,16 +12,7 @@ Vue.use(Router);
 /* Layout */
 import Layout from '@/layout';
 
-/* Router for modules */
-import elementUiRoutes from './modules/element-ui';
-import componentRoutes from './modules/components';
-import chartsRoutes from './modules/charts';
-import tableRoutes from './modules/table';
-import adminRoutes from './modules/admin';
-import nestedRoutes from './modules/nested';
-import errorRoutes from './modules/error';
-import excelRoutes from './modules/excel';
-import permissionRoutes from './modules/permission';
+import libraryRoutes from './modules/library';
 import storeManagerRoutes from './modules/store-manager';
 import configStoreRoutes from './modules/store-config';
 import systemRoutes from './modules/system';
@@ -91,143 +82,11 @@ export const constantRoutes = [
 export const asyncRoutes = [
   dashboardRoutes,
   storeManagerRoutes,
+  libraryRoutes,
   configStoreRoutes,
   systemRoutes,
   marketingRoutes,
   contentRoutes,
-  {
-    path: '/profile',
-    component: Layout,
-    redirect: 'noredirect',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/users/SelfProfile'),
-        name: 'SelfProfile',
-        meta: { title: 'selfProfile', icon: 'user', parent: 'root' },
-      },
-    ],
-  },
-  {
-    path: '/library',
-    component: Layout,
-    redirect: 'noredirect',
-    meta: { title: 'library', icon: 'storage', permissions: ['File Manager'], },
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/library/index'),
-        meta: { title: 'library', icon: 'storage',parent:'root' },
-        name: 'Storage',
-      },
-    ],
-  },
-  {
-    path: '/guide',
-    component: Layout,
-    redirect: '/guide/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/guide/index'),
-        name: 'Guide',
-        meta: { title: 'guide', icon: 'guide', noCache: true, parent: 'root' },
-      },
-    ],
-  },
-  {
-    path: '/documentation',
-    component: Layout,
-    redirect: '/documentation/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/documentation/index'),
-        name: 'Documentation',
-        meta: { title: 'documentation', icon: 'documentation', noCache: true, parent: 'root' },
-      },
-    ],
-  },
-  elementUiRoutes,
-  permissionRoutes,
-  componentRoutes,
-  chartsRoutes,
-  nestedRoutes,
-  tableRoutes,
-  adminRoutes,
-  {
-    path: '/clipboard',
-    component: Layout,
-    redirect: 'noredirect',
-    meta: { permissions: ['view menu clipboard'], parent: 'root' },
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/clipboard/index'),
-        name: 'ClipboardDemo',
-        meta: { title: 'clipboardDemo', icon: 'clipboard', roles: ['admin', 'manager', 'editor', 'user'] },
-      },
-    ],
-  },
-  errorRoutes,
-  excelRoutes,
-  {
-    path: '/zip',
-    component: Layout,
-    redirect: '/zip/download',
-    alwaysShow: true,
-    meta: { title: 'zip', icon: 'zip', permissions: ['view menu zip'], parent: 'root' },
-    children: [
-      {
-        path: 'download',
-        component: () => import('@/views/zip'),
-        name: 'ExportZip',
-        meta: { title: 'exportZip' },
-      },
-    ],
-  },
-  {
-    path: '/pdf',
-    component: Layout,
-    redirect: '/pdf/index',
-    meta: { title: 'pdf', icon: 'pdf', permissions: ['view menu pdf'], parent: 'root' },
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/pdf'),
-        name: 'Pdf',
-        meta: { title: 'pdf' },
-      },
-    ],
-  },
-  {
-    path: '/pdf/download',
-    component: () => import('@/views/pdf/Download'),
-    hidden: true,
-  },
-  {
-    path: '/i18n',
-    component: Layout,
-    meta: { permissions: ['view menu i18n'], parent: 'root' },
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/i18n'),
-        name: 'I18n',
-        meta: { title: 'i18n', icon: 'international' },
-      },
-    ],
-  },
-  {
-    path: '/external-link',
-    component: Layout,
-    children: [
-      {
-        path: 'https://github.com/haongo2007/larviu',
-        meta: { title: 'externalLink', icon: 'link', parent: 'root' },
-      },
-    ],
-  },
   { path: '*', redirect: '/404', hidden: true },
 ];
 

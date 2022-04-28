@@ -173,7 +173,7 @@ class ShopStore extends Model
 
     //Function get text description 
     public function getText() {
-        return $this->descriptions()->where('lang', bc_get_locale())->first();
+        return $this->descriptions()->where('lang', lc_get_locale())->first();
     }
     public function getTitle() {
         return $this->getText()->title;

@@ -8,6 +8,7 @@ use App\Models\Admin\Product;
 use App\Models\Admin\Customer;
 use App\Models\Admin\Order;
 use App\Models\Admin\Store;
+use App\Models\Front\ShopStoreDescription;
 use Illuminate\Http\Request;
 use App\Helper\JsonResponse;
 use Illuminate\Http\Response;
@@ -31,51 +32,64 @@ class DashboardController extends Controller
         }else{
             $storeId = array_keys(Store::getStoreActive());
         }
-        $newVisitis = Customer::getSumCustomerTotalCustomTime($from,$to)->keyBy('d')->toArray();
+        $newVisitis = Customer::getSumCustomerTotalCustomTime($from,$to,$storeId)->toArray();
         $newOrder = Order::getSumOrderTotalCustomTime($from,$to,$storeId)->toArray();
-        $newProduct = Product::getSumProductTotalCustomTime($from,$to)->keyBy('d')->toArray();
+        $newProduct = Product::getSumProductTotalCustomTime($from,$to,$storeId)->toArray();
+        $Companies = ShopStoreDescription::select('store_id','title')->where('lang',lc_get_locale())->whereIn('store_id',$storeId)->get()
+        ->pluck('store_id','title')->toArray();
         $data = [];
+        // $rangDays = CarbonPeriod::create($from, $to);
 
-        $rangDays = CarbonPeriod::create($from, $to);
-
+        $Header = ["value","Company","Date"];
         $Customer  = [];
         $Orders  = [];
         $Amount  = [];
         $Product  = [];
-        $label = [];
-        $from = $rangDays->getStartDate()->format('Y-m-d');
-        $to = $rangDays->getEndDate()->format('Y-m-d');
-        foreach ($rangDays as $i => $day) {
-            $date = $day->format('m-d');
-            // customer
-            $Customer[] = $newVisitis[$date]['total_customer'] ?? 0;
-            // order 
-            $Orders[] = ($newOrder[$date]['total_order'] ?? 0);
-            // revenue
-            $Amount[] = ($newOrder[$date]['total_amount'] ?? 0);
-            // product
-            $Product[] = ($newProduct[$date]['total_product'] ?? 0);
-            // label chart
-            $label[] = $day->format('d-m');
+        // $from = $rangDays->getStartDate()->format('Y-m-d');
+        // $to = $rangDays->getEndDate()->format('Y-m-d');
+
+        foreach($newVisitis as $k => $visited){
+            $Customer[] = [$visited['total_customer'],$visited['store_id'],$visited['d']];
+            $Customer_total[] = $visited['total_customer'];
         }
+
+        foreach($newOrder as $k => $order){
+            $Orders[] = [$order['total_order'],$order['store_id'],$order['d']];
+            $Orders_total[] = $order['total_order'];
+            
+            $Amount[] = [$order['total_amount'],$order['store_id'],$order['d']];
+            $Amount_total[] = $order['total_amount'];
+        }
+
+        foreach($newProduct as $k => $product){
+            $Product[] = [$product['total_product'],$product['store_id'],$product['d']];
+            $Product_total[] = $product['total_product'];
+        }
+
+        $Customer = array_merge([$Header],$Customer);
+        $Orders = array_merge([$Header],$Orders);
+        $Product = array_merge([$Header],$Product);
+        $Amount = array_merge([$Header],$Amount);
+
+
         $data['newCustomers']['data'] = $Customer;
-        $data['newCustomers']['total'] = array_sum($Customer);
+        $data['newCustomers']['total'] = array_sum($Customer_total);
         $data['newCustomers']['name'] = 'Customers '; 
 
         $data['newOrder']['data'] = $Orders;
-        $data['newOrder']['total'] = array_sum($Orders);
+        $data['newOrder']['total'] = array_sum($Orders_total);
         $data['newOrder']['name'] = 'Order ';
 
         $data['newRevenue']['data'] = $Amount;
-        $data['newRevenue']['total'] = array_sum($Amount);
+        $data['newRevenue']['total'] = array_sum($Amount_total);
         $data['newRevenue']['name'] = 'Revenue ';
 
         $data['newProduct']['data'] = $Product;
-        $data['newProduct']['total'] = array_sum($Product);
+        $data['newProduct']['total'] = array_sum($Product_total);
         $data['newProduct']['name'] = 'Product ';
 
         $data['rangeDate'] = ['from' => $from, 'to' => $to];
-        $data['label'] = $label;
+        $data['companies'] = $Companies;
 
         return response()->json(new JsonResponse($data),Response::HTTP_OK);
     }
@@ -88,7 +102,7 @@ class DashboardController extends Controller
     public function orders()
     {
         $rowsNumber = 8;
-        $data = Order::getListOrderNew($rowsNumber);
+        $data = Order::getListOrderNew($rowsNumber,session('adminStoreId'));
         return response()->json(new JsonResponse(['items' => $data]));
     }
 
