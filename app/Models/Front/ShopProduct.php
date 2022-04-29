@@ -10,6 +10,7 @@ use App\Models\Front\ShopProductPromotion;
 use App\Models\Front\ShopTax;
 use App\Models\Front\ShopStore;
 use App\Models\Front\ShopCustomFieldDetail;
+use App\Models\Admin\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Front\ModelTrait;
 class ShopProduct extends Model
@@ -32,6 +33,11 @@ class ShopProduct extends Model
     public function brand()
     {
         return $this->belongsTo(ShopBrand::class, 'brand_id', 'id');
+    }
+
+    public function creator()
+    {
+        return $this->hasOne(User::class, 'id', 'created_by');
     }
 
     public function supplier()
@@ -352,7 +358,6 @@ class ShopProduct extends Model
     public function start() {
         return new ShopProduct;
     }
-    
     /**
      * Set product kind
      */
@@ -587,7 +592,6 @@ class ShopProduct extends Model
      * build Query
      */
     public function buildQuery() {
-
         $tableDescription = (new ShopProductDescription)->getTable();
         $tableStore = (new ShopStore)->getTable();
 
@@ -643,7 +647,6 @@ class ShopProduct extends Model
             $query = $query->whereIn($tablePTC . '.category_id', $this->lc_category);
         }
         $storeId = $this->lc_store_id ? $this->lc_store_id : config('app.storeId');
-
         //Process store
         if (!empty($this->lc_store_id) || config('app.storeId') != 1) {
             //If the store is specified or the default is not the primary store
@@ -679,7 +682,7 @@ class ShopProduct extends Model
             $query = $query->whereIn($this->getTable().'.supplier_id', $this->lc_supplier);
         }
 
-        if (count($this->lc_moreWhere)) {
+        if (is_countable($this->lc_moreWhere) && count($this->lc_moreWhere)) {
             foreach ($this->lc_moreWhere as $key => $where) {
                 if (count($where)) {
                     $query = $query->where($where[0], $where[1], $where[2]);

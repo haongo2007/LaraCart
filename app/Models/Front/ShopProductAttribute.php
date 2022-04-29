@@ -18,4 +18,14 @@ class ShopProductAttribute extends Model
     {
         return $this->hasMany(ShopAttributePalette::class, 'attribute_id','id');
     }
+
+    public function first_palette()
+    {
+        return $this->hasOne(ShopAttributePalette::class, 'attribute_id','id');
+    }
+
+    public function size()
+    {
+        return $this->hasMany(self::class, 'parent','id');
+    }
 }

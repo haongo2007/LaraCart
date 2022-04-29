@@ -8,24 +8,23 @@ namespace App\Models\Front;
 trait ModelTrait
 {
 
-    protected  $bc_limit = 'all'; // all or interger
-    protected  $bc_paginate = 0; // 0: dont paginate,
-    protected  $bc_sort = [];
-    protected  $bc_moreWhere = []; // more wehere
-    protected  $bc_random = 0; // 0: no random, 1: random
-    protected  $bc_keyword = ''; // search search product
-    protected  $bc_min_price = ''; // search min price
-    protected  $bc_max_price = ''; // search max price
-    protected  $bc_attribute = ''; // search attribute product
+    protected  $lc_limit = 'all'; // all or interger
+    protected  $lc_paginate = 0; // 0: dont paginate,
+    protected  $lc_sort = [];
+    protected  $lc_moreWhere = []; // more wehere
+    protected  $lc_random = 0; // 0: no random, 1: random
+    protected  $lc_keyword = ''; // search search product
+    protected  $lc_min_price = ''; // search min price
+    protected  $lc_max_price = ''; // search max price
+    protected  $lc_attribute = ''; // search attribute product
 
-    
     /**
      * Set price beetween
      *
      */
     public function setPriceBetween($min,$max) {
-        $this->bc_max_price = $max;
-        $this->bc_min_price = $min;
+        $this->lc_max_price = $max;
+        $this->lc_min_price = $min;
         return $this;
     }
     /**
@@ -34,9 +33,9 @@ trait ModelTrait
      */
     public function setLimit($limit) {
         if ($limit === 'all') {
-            $this->bc_limit = $limit;
+            $this->lc_limit = $limit;
         } else {
-            $this->bc_limit = (int)$limit;
+            $this->lc_limit = (int)$limit;
         }
         return $this;
     }
@@ -47,7 +46,7 @@ trait ModelTrait
      */
     public function setSort(array $sort) {
         if (is_array($sort)) {
-            $this->bc_sort[] = $sort;
+            $this->lc_sort[] = $sort;
         }
         return $this;
     }
@@ -66,7 +65,7 @@ trait ModelTrait
                 $where = $moreWhere;
             }
             if (count($where) == 3) {
-                $this->bc_moreWhere[] = $where;
+                $this->lc_moreWhere[] = $where;
             }
         }
         return $this;
@@ -77,7 +76,7 @@ trait ModelTrait
      *  0 - no paginate
      */
     public function setPaginate() {
-        $this->bc_paginate = 1;
+        $this->lc_paginate = 1;
         return $this;
     }
 
@@ -85,7 +84,7 @@ trait ModelTrait
      * Set random mode
      */
     public function setRandom() {
-        $this->bc_random = 1;
+        $this->lc_random = 1;
         return $this;
     }
     
@@ -95,7 +94,7 @@ trait ModelTrait
      */
     public function setKeyword($keyword) {
         if (trim($keyword)) {
-            $this->bc_keyword = trim($keyword);
+            $this->lc_keyword = trim($keyword);
         }
         return $this;
     }
@@ -106,7 +105,7 @@ trait ModelTrait
      */
     public function setAttributes($code) {
         if (trim($code)) {
-            $this->bc_attribute = trim($code);
+            $this->lc_attribute = trim($code);
         }
         return $this;
     }
@@ -115,9 +114,9 @@ trait ModelTrait
      */
     public function getSql() {
         $query = $this->buildQuery();
-        if (!$this->bc_paginate) {
-            if ($this->bc_limit !== 'all') {
-                $query = $query->limit($this->bc_limit);
+        if (!$this->lc_paginate) {
+            if ($this->lc_limit !== 'all') {
+                $query = $query->limit($this->lc_limit);
             }
         }
 		return $query = $query->toSql();
@@ -132,11 +131,11 @@ trait ModelTrait
         if (!empty($action['query'])) {
             return $query;
         }
-        if ($this->bc_paginate) {
-            $data =  $query->paginate(($this->bc_limit === 'all') ? 20 : $this->bc_limit);
+        if ($this->lc_paginate) {
+            $data =  $query->paginate(($this->lc_limit === 'all') ? 20 : $this->lc_limit);
         } else {
-            if ($this->bc_limit !== 'all') {
-                $query = $query->limit($this->bc_limit);
+            if ($this->lc_limit !== 'all') {
+                $query = $query->limit($this->lc_limit);
             }
             $data = $query->get();
                 

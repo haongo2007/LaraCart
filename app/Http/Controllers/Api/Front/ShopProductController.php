@@ -8,6 +8,8 @@ use App\Models\Front\ShopAttributeGroup;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Helper\JsonResponse;
+use App\Http\Resources\Front\ProductCollection;
+use App\Http\Resources\Front\ProductRelatedCollection;
 use Cache;
 
 class ShopProductController extends Controller
@@ -145,19 +147,18 @@ class ShopProductController extends Controller
      * @param [type] ...$params
      * @return void
      */
-    public function show($req) 
+    public function show(Request $request,$alias) 
     {
-        // if (config('app.seoLang')) {
-        //     $lang = $req[0] ?? '';
-        //     $alias = $req[1] ?? '';
-        //     $storeId = $req[2] ?? '';
-        //     bc_lang_switch($lang);
-        // } else {
-        //     $alias = $req[0] ?? '';
-        //     $storeId = $req[1] ?? '';
-        // }
-        $alias = $req;
-        return $this->_productDetail($alias,'alias',1);
+        if (config('app.seoLang')) {
+            $lang = $request->header('x-localization');
+            $store = $request->header('x-store') ?? 7;
+            $alias = $alias ?? '';
+            lc_lang_switch($lang);
+        } else {
+            $store = $request->header('x-store') ?? 7;
+            $alias = $alias ?? '';
+        }
+        return $this->_productDetail($alias,'alias',$store);
     }
 
     /**
@@ -180,35 +181,39 @@ class ShopProductController extends Controller
             $product->save();
             //End last viewed
 
+            //Product relation by categories
+            $categories = $product->categories->keyBy('id')->toArray();
+            $arrCategoriId = array_keys($categories);
+            $productRelation = (new ShopProduct)
+                ->setStore($storeId)
+                ->getProductToCategory($arrCategoriId)
+                ->setLimit(lc_config('product_relation', $storeId))
+                ->setRandom()
+                ->getData()
+                ->where('id','<>',$product->id);
+            //End Product relation by categories
+
             //Product last view
                 // $arrlastView = empty(\Cookie::get('productsLastView')) ? array() : json_decode(\Cookie::get('productsLastView'), true);
                 // $arrlastView[$product->id] = date('Y-m-d H:i:s');
                 // arsort($arrlastView);
                 // \Cookie::queue('productsLastView', json_encode($arrlastView), (86400 * 30));
             //End product last view
+            $prev_product = (new ShopProduct)->setStore($storeId)->getData()->where('id', '<', $product->id)->first();
+            if ($prev_product) {
+                $prev_product = new ProductCollection($prev_product);
+            }
 
-            // $categories = $product->categories->keyBy('id')->toArray();
-            // $arrCategoriId = array_keys($categories);
-
-            // $productRelation = (new ShopProduct)
-            //     ->getProductToCategory($arrCategoriId)
-            //     ->setLimit(bc_config('product_relation', $storeId))
-            //     ->setRandom()
-            //     ->getData();
-            return response()->json(new JsonResponse($product), Response::HTTP_OK);
-            // bc_check_view($this->templatePath . $view);
-            // return view($this->templatePath . $view,
-            //     array(
-            //         'title' => $product->name,
-            //         'description' => $product->description,
-            //         'keyword' => $product->keyword,
-            //         'product' => $product,
-            //         'productRelation' => $productRelation,
-            //         'goToStore' => $product->goToStore(),
-            //         'og_image' => asset($product->getImage()),
-            //         'layout_page' => 'product_detail',
-            //     )
-            // );
+            $next_product = (new ShopProduct)->setStore($storeId)->getData()->where('id', '>', $product->id)->first();
+            if ($next_product) {
+                $next_product = new ProductCollection($next_product);
+            }
+            
+            $data['prevProduct'] = $prev_product;
+            $data['nextProduct'] = $next_product;
+            $data['product'] = new ProductCollection($product);
+            $data['relatedProducts'] = new ProductRelatedCollection($productRelation);
+            return response()->json(new JsonResponse($data), Response::HTTP_OK);
         } else {
             return response()->json(new JsonResponse([]), Response::HTTP_OK);
         }
