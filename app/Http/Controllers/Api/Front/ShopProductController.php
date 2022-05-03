@@ -151,11 +151,11 @@ class ShopProductController extends Controller
     {
         if (config('app.seoLang')) {
             $lang = $request->header('x-localization');
-            $store = $request->header('x-store') ?? 7;
+            $store = $request->header('x-store') ?? 10;
             $alias = $alias ?? '';
             lc_lang_switch($lang);
         } else {
-            $store = $request->header('x-store') ?? 7;
+            $store = $request->header('x-store') ?? 10;
             $alias = $alias ?? '';
         }
         return $this->_productDetail($alias,'alias',$store);

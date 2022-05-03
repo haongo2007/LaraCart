@@ -121,7 +121,7 @@ class Config extends Model
             self::$getAllConfigOfStore = self::get()
                 ->groupBy('store_id');
         }
-        $data =  self::$getAllConfigOfStore[$storeId] ?? '';
+        $data = self::$getAllConfigOfStore->contains($storeId,self::$getAllConfigOfStore) ? self::$getAllConfigOfStore[$storeId] : '' ;
         if($data) {
             return $data->pluck('value', 'key');
         } else {

@@ -37,6 +37,7 @@ class ProductController extends Controller
     public $listWeight;
     public $listLength;
     public $categories;
+    public $storeId;
 
     public function __construct(Request $request)
     {
@@ -51,6 +52,7 @@ class ProductController extends Controller
         ];
         $this->properties = (new ShopProductProperty)->pluck('name', 'code')->toArray();
         $this->categories =  (new Category)->getTreeCategoriesAdmin();
+        $this->storeId  = session('adminStoreId');
     }
 
     public function index(Request $request)
@@ -485,6 +487,7 @@ public function createProductGroup()
         if ($product === null) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
+        $storeId = session('adminStoreId');
         $data = $request->all();
         $data['descriptions'] = json_decode($data['descriptions']);
         $data['brand'] = json_decode($data['brand']);
@@ -531,7 +534,7 @@ public function createProductGroup()
                     }
                 }
 
-                $arrValidation = $this->validateAttribute($arrValidation);
+                $arrValidation = $this->validateAttribute($arrValidation,$storeId);
 
                 $arrMsg = [
                     'descriptions.*.name.required'    => trans('validation.required', ['attribute' => trans('product.name')]),
@@ -556,7 +559,7 @@ public function createProductGroup()
                     'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|product_alias_unique:'.$id,
                 ];
 
-                $arrValidation = $this->validateAttribute($arrValidation);
+                $arrValidation = $this->validateAttribute($arrValidation,$storeId);
                 
                 $arrMsg = [
                     'descriptions.*.name.required' => trans('validation.required', ['attribute' => trans('product.name')]),
@@ -639,7 +642,7 @@ public function createProductGroup()
             'status'       => (!empty($data['status']) ? 1 : 0),
             'sort'         => (int) $data['sort'],
             'minimum'      => (int) ($data['minimum'] ?? 0),
-            'store_id'     => session('adminStoreId'),
+            'store_id'     => $product->store_id,
         ];
 
 
@@ -830,73 +833,73 @@ public function createProductGroup()
     /**
      * Validate attribute product
      */
-    public function validateAttribute(array $arrValidation) {
-        if (lc_config_admin('product_brand')) {
-            if (lc_config_admin('product_brand_required')) {
+    public function validateAttribute(array $arrValidation,$storeId) {
+        if (lc_config('product_brand',$storeId)) {
+            if (lc_config('product_brand_required',$storeId)) {
                 $arrValidation['brand_id'] = 'required|numeric';
             } else {
                 $arrValidation['brand_id'] = 'nullable|numeric';
             }
         }
 
-        if (lc_config_admin('product_supplier')) {
-            if (lc_config_admin('product_supplier_required')) {
+        if (lc_config('product_supplier',$storeId)) {
+            if (lc_config('product_supplier_required',$storeId)) {
                 $arrValidation['supplier_id'] = 'required';
             } else {
                 $arrValidation['supplier_id'] = 'nullable';
             }
         }
 
-        if (lc_config_admin('product_price')) {
-            if (lc_config_admin('product_price_required')) {
+        if (lc_config('product_price',$storeId)) {
+            if (lc_config('product_price_required',$storeId)) {
                 $arrValidation['price'] = 'required|numeric|min:0';
             } else {
                 $arrValidation['price'] = 'nullable|numeric|min:0';
             }
         }
 
-        if (lc_config_admin('product_cost')) {
-            if (lc_config_admin('product_cost_required')) {
+        if (lc_config('product_cost',$storeId)) {
+            if (lc_config('product_cost_required',$storeId)) {
                 $arrValidation['cost'] = 'required|numeric|min:0';
             } else {
                 $arrValidation['cost'] = 'nullable|numeric|min:0';
             }
         }
 
-        if (lc_config_admin('product_promotion')) {
-            if (lc_config_admin('product_promotion_required')) {
+        if (lc_config('product_promotion',$storeId)) {
+            if (lc_config('product_promotion_required',$storeId)) {
                 $arrValidation['price_promotion'] = 'required|numeric|min:0';
             } else {
                 $arrValidation['price_promotion'] = 'nullable|numeric|min:0';
             }
         }
 
-        if (lc_config_admin('product_stock')) {
-            if (lc_config_admin('product_stock_required')) {
+        if (lc_config('product_stock',$storeId)) {
+            if (lc_config('product_stock_required',$storeId)) {
                 $arrValidation['stock'] = 'required|numeric';
             } else {
                 $arrValidation['stock'] = 'nullable|numeric';
             }
         }
 
-        if (lc_config_admin('product_property')) {
-            if (lc_config_admin('product_property_required')) {
+        if (lc_config('product_property',$storeId)) {
+            if (lc_config('product_property_required',$storeId)) {
                 $arrValidation['property'] = 'required|string';
             } else {
                 $arrValidation['property'] = 'nullable|string';
             }
         }
 
-        if (lc_config_admin('product_available')) {
-            if (lc_config_admin('product_available_required')) {
+        if (lc_config('product_available',$storeId)) {
+            if (lc_config('product_available_required',$storeId)) {
                 $arrValidation['date_available'] = 'required|date';
             } else {
                 $arrValidation['date_available'] = 'nullable|date';
             }
         }
 
-        if (lc_config_admin('product_weight')) {
-            if (lc_config_admin('product_weight_required')) {
+        if (lc_config('product_weight',$storeId)) {
+            if (lc_config('product_weight_required',$storeId)) {
                 $arrValidation['weight'] = 'required|numeric';
                 $arrValidation['weight_class'] = 'required|string';
             } else {
@@ -905,8 +908,8 @@ public function createProductGroup()
             }
         }
 
-        if (lc_config_admin('product_length')) {
-            if (lc_config_admin('product_length_required')) {
+        if (lc_config('product_length',$storeId)) {
+            if (lc_config('product_length_required',$storeId)) {
                 $arrValidation['length_class'] = 'required|string';
                 $arrValidation['length'] = 'required|numeric|min:0';
                 $arrValidation['width'] = 'required|numeric|min:0';

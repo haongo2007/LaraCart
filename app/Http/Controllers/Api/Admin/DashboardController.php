@@ -70,6 +70,11 @@ class DashboardController extends Controller
         $Orders = array_merge([$Header],$Orders);
         $Product = array_merge([$Header],$Product);
         $Amount = array_merge([$Header],$Amount);
+        
+        $Customer_total = [];
+        $Orders_total = [];
+        $Amount_total = [];
+        $Product_total = [];
 
 
         $data['newCustomers']['data'] = $Customer;
