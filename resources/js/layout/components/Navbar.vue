@@ -5,15 +5,15 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
-      <el-select style="width: 250px;" v-model="currentStore" @change="handleChangeStore" collapse-tags multiple v-if="Object.keys(storeList).length > 1" placeholder="Choose Store" class="avatar-container right-menu-item hover-effect">
+      <el-select v-if="Object.keys(storeList).length > 1" v-model="currentStore" style="width: 250px;" collapse-tags multiple placeholder="Choose Store" class="avatar-container right-menu-item hover-effect" @change="handleChangeStore">
         <el-option
+          v-for="(item,index) in storeList"
+          :key="index"
           size="mini"
-          v-for="(item,index) in storeList" :key="index"
           :label="item.descriptions_current_lang[0].title"
-          :value="index">
-        </el-option>
+          :value="index"
+        />
       </el-select>
-
 
       <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
@@ -90,7 +90,7 @@ export default {
       'userId',
     ]),
     storeList(){
-      let storeList = this.$store.state.user.storeList;
+      const storeList = this.$store.state.user.storeList;
       return storeList;
     },
   },
@@ -99,8 +99,8 @@ export default {
     if (store_ck) {
       store_ck = JSON.parse(store_ck);
       if (store_ck.length < 1) {
-          Cookies.remove('store');
-      }else{
+        Cookies.remove('store');
+      } else {
         this.currentStore.push(String(store_ck));
       }
     }
@@ -115,13 +115,13 @@ export default {
       Cookies.remove('store');
     },
     handleChangeStore(){
-      this.$store.dispatch('user/ChangeStore',JSON.stringify(this.currentStore));
+      this.$store.dispatch('user/ChangeStore', JSON.stringify(this.currentStore));
       this.$store.dispatch('tagsView/delAllCachedViews');
       const fullPath = this.$router.currentRoute.fullPath;
       this.$router.replace({
         path: '/redirect' + fullPath,
       });
-    }
+    },
   },
 };
 </script>

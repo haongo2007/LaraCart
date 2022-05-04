@@ -38,7 +38,7 @@
       <el-table-column label="Store" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
-            <i class="el-icon-s-shop"></i>
+            <i class="el-icon-s-shop" />
             {{ scope.row.store.descriptions_current_lang[0].title && scope.row.store.descriptions_current_lang[0].title }}
           </el-tag>
         </template>

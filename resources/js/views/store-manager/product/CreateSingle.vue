@@ -14,14 +14,15 @@
       title="Please Choose store you want add product"
       :visible.sync="confirmStoreDialog"
       :before-close="handleConfirm"
-      width="30%">
+      width="30%"
+    >
       <div>
-        <el-radio :key="index" v-for="(item,index) in storeList" v-model="temp.store_id" :label="index" >
+        <el-radio v-for="(item,index) in storeList" :key="index" v-model="temp.store_id" :label="index">
           {{ item.descriptions_current_lang[0].title }}
         </el-radio>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="confirmChooseStore" :disabled="temp.store_id == 0">Confirm</el-button>
+        <el-button type="primary" :disabled="temp.store_id == 0" @click="confirmChooseStore">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -56,7 +57,7 @@ export default {
   },
   computed: {
     storeList(){
-      let storeList = this.$store.state.user.storeList;
+      const storeList = this.$store.state.user.storeList;
       return storeList;
     },
   },
@@ -68,7 +69,7 @@ export default {
     if (!store_ck || store_ck.length !== 1 || this.temp.store_id != 0) {
       this.confirmStoreDialog = true;
       return false;
-    }else{
+    } else {
       this.temp.store_id = store_ck[0];
     }
     this.fetchLanguages();

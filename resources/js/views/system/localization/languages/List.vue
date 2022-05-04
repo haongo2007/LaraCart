@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container">
       <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
-        <filter-system-languages  
+        <filter-system-languages
           :data-loading="loading"
           :data-query="listQuery"
           @handleListenData="handleListenData"
@@ -13,18 +13,19 @@
       v-loading="loading"
       :data="list"
       style="width: 100%"
-      border>
+      border
+    >
 
       <el-table-column :label="$t('table.id')" prop="id" sortable align="center" width="80">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      
+
       <el-table-column label="Store" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
-            <i class="el-icon-s-shop"></i>
+            <i class="el-icon-s-shop" />
             {{ scope.row.store.descriptions_current_lang[0].title && scope.row.store.descriptions_current_lang[0].title }}
           </el-tag>
         </template>
@@ -76,9 +77,9 @@
       <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="250px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <router-link :to="{ name: 'StoreEdit',params:{id:row.id} }">
-            <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
+            <el-button type="primary" size="mini" icon="el-icon-edit" />
           </router-link>
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)"></el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
         </template>
       </el-table-column>
     </el-table>
@@ -100,7 +101,7 @@ const storeResource = new StoreResource();
 
 export default {
   name: 'LanguagesList',
-  components: { Pagination, RightPanel,FilterSystemLanguages },
+  components: { Pagination, RightPanel, FilterSystemLanguages },
   data() {
     return {
       list: [],
@@ -118,8 +119,8 @@ export default {
   created() {
   },
   methods: {
-    handleChange(id,val,key){
-      let params = {};
+    handleChange(id, val, key){
+      const params = {};
       params[key] = val;
       if (val == 0) {
         this.$confirm('this action will put your app into maintenance mode, are you sure ?', 'Warning', {
@@ -127,16 +128,16 @@ export default {
           cancelButtonText: 'Cancel',
           type: 'warning',
         }).then(() => {
-          this.updateData(id,params);
+          this.updateData(id, params);
         }).catch(err => {
-          let row = this.list.findIndex((item) => item.id == id);
+          const row = this.list.findIndex((item) => item.id == id);
           this.list[row].active = 1;
         });
-      }else{        
-        this.updateData(id,params);
+      } else {
+        this.updateData(id, params);
       }
     },
-    updateData(id,params){
+    updateData(id, params){
       storeResource.update(id, params).then((res) => {
         if (res) {
           this.$message({
@@ -150,7 +151,7 @@ export default {
           });
         }
       }).catch(err => {
-         console.log(err);
+        console.log(err);
       });
     },
     handleListenData(data){
@@ -174,7 +175,7 @@ export default {
     },
     handleDeleting(row){
       EventBus.$emit('handleDeleting', row);
-    }
+    },
   },
 };
 </script>
