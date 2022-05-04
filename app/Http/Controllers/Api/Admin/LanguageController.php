@@ -22,9 +22,9 @@ class LanguageController extends Controller
      * Get active languages
      * @return [type] [description]
      */
-    public function getActiveLanguages()
+    public function getActiveLanguages($storeId)
     {
-        $languages = (new ShopLanguage)->getCodeActive();
+        $languages = (new ShopLanguage)->getCodeActive($storeId);
         return response()->json(new JsonResponse($languages), Response::HTTP_OK);
     }
     

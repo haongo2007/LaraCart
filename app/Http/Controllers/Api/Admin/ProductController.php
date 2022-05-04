@@ -212,6 +212,7 @@ public function createProductGroup()
                     'descriptions.*.content'     => 'required|string',
                     'category'                   => 'required|not_in:0',
                     'image'                      => 'required',
+                    'store_id'                   => 'required',
                     // 'sub_image'                  => 'required',
                     // 'type_show_image_desc'       => 'required',
                     'sku'                        => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|unique:shop_product,sku',
@@ -228,7 +229,7 @@ public function createProductGroup()
                     }
                 }
 
-                $arrValidation = $this->validateAttribute($arrValidation);
+                $arrValidation = $this->validateAttribute($arrValidation,$data['store_id']);
                 
                 $arrMsg = [
                     'descriptions.*.title.required'    => trans('validation.required', ['attribute' => trans('product.name')]),
@@ -255,7 +256,7 @@ public function createProductGroup()
                     'alias'                      => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|product_alias_unique',
                 ];
 
-                $arrValidation = $this->validateAttribute($arrValidation);
+                $arrValidation = $this->validateAttribute($arrValidation,$data['store_id']);
 
                 $arrMsg = [
                     'descriptions.*.name.required' => trans('validation.required', ['attribute' => trans('product.name')]),
@@ -341,7 +342,7 @@ public function createProductGroup()
             'status'         => (!empty($data['status']) ? 1 : 0),
             'sort'           => (int) $data['sort'],
             'minimum'        => (int) ($data['minimum'] ?? 0),
-            'store_id'       => session('adminStoreId'),
+            'store_id'       => $data['store_id'],
         ];
 
         if(!empty($data['date_available'])) {

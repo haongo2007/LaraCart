@@ -69,6 +69,8 @@ class Category extends ShopCategory
         if (!is_null($status) && is_array($status)) {
             $categoryList = $categoryList->whereIn('status',$status);
         }
+        
+        $categoryList = $categoryList->whereIn('store_id', session('adminStoreId'));
 
         if ($sort && array_key_exists($sort, $arrSort)) {
             $field = explode('__', $sort)[0];

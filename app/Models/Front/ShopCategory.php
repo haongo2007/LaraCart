@@ -68,6 +68,15 @@ class ShopCategory extends Model
         });
     }
 
+    /**
+     * A order has and belongs to many stores.
+     *
+     * @return BelongsToMany
+     */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
     /*
     *Get thumb
     */

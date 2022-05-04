@@ -21,7 +21,7 @@
         "php": "^8.0.8",
         "alexusmai/laravel-file-manager": "^2.4",
         "fideloper/proxy": "^4.0",
-        "fruitcake/laravel-cors": "^1.0",
+        "fruitcake/laravel-cors": "^3.0",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "^8.0",
         "laravel/sanctum": "^2.4",

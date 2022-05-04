@@ -1,18 +1,36 @@
 <template>
-  <product-detail
-    v-show="!loading"
-    :is-edit="false"
-    :data-temp="temp"
-    :data-languages="languages"
-    :data-step-content="stepContent"
-    :data-component-info="componentInfo"
-    :data-rules="rules"
-  />
+  <div>
+    <product-detail
+      v-show="!loading"
+      :is-edit="false"
+      :data-temp="temp"
+      :data-languages="languages"
+      :data-step-content="stepContent"
+      :data-component-info="componentInfo"
+      :data-rules="rules"
+    />
+    <el-dialog
+      :show-close="false"
+      title="Please Choose store you want add product"
+      :visible.sync="confirmStoreDialog"
+      :before-close="handleConfirm"
+      width="30%">
+      <div>
+        <el-radio :key="index" v-for="(item,index) in storeList" v-model="temp.store_id" :label="index" >
+          {{ item.descriptions_current_lang[0].title }}
+        </el-radio>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="confirmChooseStore" :disabled="temp.store_id == 0">Confirm</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
 import ProductDetail from './components/ProductDetail';
 import LanguageResource from '@/api/languages';
+import Cookies from 'js-cookie';
 
 const languageResource = new LanguageResource();
 export default {
@@ -20,11 +38,13 @@ export default {
   components: { ProductDetail },
   data(){
     return {
+      confirmStoreDialog: false,
       loading: true,
     	languages: {},
       componentInfo: {},
       stepContent: {},
   		temp: {
+        store_id: 0,
 			  id: 0,
 			  kind: 0,
 			  descriptions: {},
@@ -34,15 +54,40 @@ export default {
       },
   	};
   },
+  computed: {
+    storeList(){
+      let storeList = this.$store.state.user.storeList;
+      return storeList;
+    },
+  },
   created(){
+    let store_ck = Cookies.get('store');
+    if (store_ck) {
+      store_ck = JSON.parse(store_ck);
+    }
+    if (!store_ck || store_ck.length !== 1 || this.temp.store_id != 0) {
+      this.confirmStoreDialog = true;
+      return false;
+    }else{
+      this.temp.store_id = store_ck[0];
+    }
     this.fetchLanguages();
   },
   methods: {
-    fetchLanguages() {
+    confirmChooseStore(){
+      this.fetchLanguages(this.temp.store_id);
+      this.confirmStoreDialog = false;
+    },
+    handleConfirm(done){
+      if (this.temp.store_id != 0) {
+        done();
+      }
+    },
+    fetchLanguages(store_id) {
       const loading = this.$loading({
         target: '.app-main',
       });
-      languageResource.fetchLanguagesActive()
+      languageResource.fetchLanguagesActive(store_id)
         .then(data => {
           this.languages = Object.assign({}, data.data);
           this.setTemp();

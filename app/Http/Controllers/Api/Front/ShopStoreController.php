@@ -5,6 +5,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Front\ShopStore;
 use Illuminate\Http\Response;
 use App\Helper\JsonResponse;
+use App\Models\Front\ShopLanguage;
+use App\Models\Front\ShopCurrency;
+use App\Models\Front\ShopCategory;
 
 class ShopStoreController extends Controller
 {
@@ -16,7 +19,11 @@ class ShopStoreController extends Controller
             return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
         }else{
         	$key = array_search($domain, $arrDomain);
-        	$data = ShopStore::with('descriptionsCurrentLang')->find($key);
+        	$data = [];
+            $data['store'] = ShopStore::with('descriptionsCurrentLang')->find($key);
+            $data['languages'] = ShopLanguage::where('store_id',$key)->get();
+            $data['currencies'] = ShopCurrency::where('store_id',$key)->get();
+            $data['categories'] = ShopCategory::with('descriptionsWithLangDefault')->where([['store_id',$key],['parent',0]])->get();
             return response()->json(new JsonResponse($data, ''), Response::HTTP_OK);
         }
     }

@@ -5,7 +5,7 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
-      <el-select style="width: 250px;" v-model="currentStore" @change="handleChangeStore" collapse-tags multiple v-if="Object.keys(storeList).length > 1" multiple placeholder="Choose Store" class="avatar-container right-menu-item hover-effect">
+      <el-select style="width: 250px;" v-model="currentStore" @change="handleChangeStore" collapse-tags multiple v-if="Object.keys(storeList).length > 1" placeholder="Choose Store" class="avatar-container right-menu-item hover-effect">
         <el-option
           size="mini"
           v-for="(item,index) in storeList" :key="index"

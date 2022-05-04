@@ -60,6 +60,7 @@ class CreateTablesShop extends Migration
             $table->tinyInteger('status')->default(0);
             $table->tinyInteger('rtl')->nullable()->default(0)->comment('Layout RTL');
             $table->integer('sort')->default(0);
+            $table->integer('store_id')->default(1);
             }
         );
 
@@ -162,6 +163,7 @@ class CreateTablesShop extends Migration
             $table->string('thousands')->default(',');
             $table->tinyInteger('status')->default(0);
             $table->integer('sort')->default(0);
+            $table->integer('store_id')->default(1);
             }
         );
 
@@ -385,6 +387,7 @@ class CreateTablesShop extends Migration
             $table->integer('product_id');
             $table->integer('add_price')->default(0);
             $table->text('images')->nullable();
+            $table->integer('parent')->default(0);
             $table->index(['product_id', 'attribute_group_id']);
             }
         );

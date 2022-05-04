@@ -1,7 +1,7 @@
 <?php
 
     Route::get('/languages/changeLanguage/{lang}', 'LanguageController@changeLanguages');
-    Route::get('/languages/getActiveLanguage', 'LanguageController@getActiveLanguages');
+    Route::get('/languages/getActiveLanguage/{storeId?}', 'LanguageController@getActiveLanguages');
 	Route::apiResource('/languages', 'LanguageController');
     // Route::get('create', function () {
     //     return redirect()->route('admin_language.index');

@@ -25,6 +25,7 @@ class CurrencyCollection extends JsonResource
             'thousands' => $this->thousands,
             'status' => $this->status,
             'sort' => $this->sort,
+            'store' => $this->stores
         ];
     }
 }

@@ -19,7 +19,7 @@
       :load="load"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
     >
-      <el-table-column :label="labelChildOrParent" align="center" min-width="50">
+      <el-table-column :label="labelChildOrParent" align="center" min-width="100">
         <template v-if="row.hasChildren" slot-scope="{row}" />
         <template v-if="!row.hasChildren" slot-scope="{row}">
           <el-tag v-if="row.parent === 0" type="danger">ROOT</el-tag>
@@ -34,6 +34,16 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
+
+      <el-table-column label="Store" min-width="150">
+        <template slot-scope="scope">
+          <el-tag type="success">
+            <i class="el-icon-s-shop"></i>
+            {{ scope.row.store.descriptions_current_lang[0].title && scope.row.store.descriptions_current_lang[0].title }}
+          </el-tag>
+        </template>
+      </el-table-column>
+
       <el-table-column :label="$t('table.name')" min-width="150px">
         <template slot-scope="scope">
           <el-tag>{{ scope.row.name }}</el-tag>
@@ -58,7 +68,7 @@
           <span style="color:red;">{{ scope.row.sort }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.top')" width="110px" align="center" prop="top">
+      <el-table-column :label="$t('table.active')" width="110px" align="center" prop="top">
         <template slot-scope="{row}">
           <el-tag :type="row.top | statusFilter">
             {{ row.top | statusFilter('name') }}
@@ -72,7 +82,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.actions')" align="center" width="350" class-name="small-padding fixed-width">
+      <el-table-column :label="$t('table.actions')" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <router-link :to="{ name: 'CategoryEdit',params:{id:row.id} }">
             <el-button type="primary" size="mini" icon="el-icon-edit">

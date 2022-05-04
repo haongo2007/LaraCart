@@ -35,11 +35,22 @@ class ShopLanguage extends Model
         if (!is_null($status) && is_array($status)) {
             $languageList = $languageList->whereIn('status',$status);
         }
+        
+        $languageList = $languageList->whereIn('store_id', session('adminStoreId'));
 
         $languageList = $languageList->paginate($limit);
         return $languageList;
     }
 
+    /**
+     * A order has and belongs to many stores.
+     *
+     * @return BelongsToMany
+     */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
     public static function getListAll()
     {
         if (self::$getListAll === null) {
@@ -59,12 +70,16 @@ class ShopLanguage extends Model
         return self::$getListActive;
     }
 
-    public static function getCodeActive()
+    public static function getCodeActive($storeId)
     {
         if (self::$getCodeActive === null) {
-            self::$getCodeActive = self::where('status', 1)
-                ->pluck('name', 'code')
-                ->all();
+            self::$getCodeActive = self::where('status', 1);
+            if (!$storeId || $storeId == 'undefined') {
+                self::$getCodeActive = self::$getCodeActive->whereIn('store_id',session('adminStoreId'));
+            }else{
+                self::$getCodeActive = self::$getCodeActive->where('store_id',$storeId);
+            }
+            self::$getCodeActive = self::$getCodeActive->pluck('name', 'code')->all();
         }
         return self::$getCodeActive;
     }

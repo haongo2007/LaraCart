@@ -22,6 +22,7 @@ class LanguageCollection extends JsonResource
             'status' => $this->status,
             'rtl' => $this->rtl,
             'sort' => $this->sort,
+            'store' => $this->stores
         ];
         return $res;
     }

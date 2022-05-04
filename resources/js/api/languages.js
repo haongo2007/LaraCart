@@ -7,7 +7,7 @@ class LanguageResource extends Resource {
   }
   fetchLanguagesActive(id) {
     return request({
-      url: '/languages/getActiveLanguage',
+      url: '/languages/getActiveLanguage/'+id,
       method: 'get',
     });
   }

@@ -1,15 +1,17 @@
 <?php
-namespace BlackCart\Core\Front\Controllers;
+namespace App\Http\Controllers\Api\Front;
 
-use App\Http\Controllers\RootFrontController;
-use BlackCart\Core\Front\Models\ShopCategory;
-use BlackCart\Core\Front\Models\ShopProduct;
+use App\Http\Controllers\Controller;
+use App\Models\Front\ShopCategory;
+use App\Models\Front\ShopProduct;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 
-class ShopCategoryController extends RootFrontController
+class ShopCategoryController extends Controller
 {
     public function __construct()
     {
-        parent::__construct();
+
     }
 
     /**
@@ -18,12 +20,18 @@ class ShopCategoryController extends RootFrontController
      * @param [type] ...$params
      * @return void
      */
-    public function allCategoriesProcessFront(...$params) {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
+    public function getListChild($id_parent) {
+        // if (config('app.seoLang')) {
+        //     $lang = $params[0] ?? '';
+        //     lc_lang_switch($lang);
+        // }
+        $store = request()->header('x-store');
+        if (!$store) {
+            return response()->json(new JsonResponse([],'Error'), Response::HTTP_FORBIDDEN);
         }
-        return $this->_allCategories();
+        $categoriesList = (new ShopCategory)->with('descriptionsWithLangDefault')->where([['parent',$id_parent],['store_id',$store]])->get();
+
+        return response()->json(new JsonResponse($categoriesList), Response::HTTP_OK);
     }
 
     /**
@@ -50,10 +58,10 @@ class ShopCategoryController extends RootFrontController
             ->getCategoryRoot()
             ->setSort([$sortBy, $sortOrder])
             ->setPaginate()
-            ->setLimit(bc_config('item_list'))
+            ->setLimit(lc_config('item_list'))
             ->getData();
 
-        bc_check_view($this->templatePath . '.screen.shop_item_list');
+        lc_check_view($this->templatePath . '.screen.shop_item_list');
         return view(
             $this->templatePath . '.screen.shop_item_list',
             array(
@@ -77,7 +85,7 @@ class ShopCategoryController extends RootFrontController
         if (config('app.seoLang')) {
             $lang = $params[0] ?? '';
             $alias = $params[1] ?? '';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         } else {
             $alias = $params[0] ?? '';
         }
@@ -113,18 +121,18 @@ class ShopCategoryController extends RootFrontController
         if ($category) {
             $products = (new ShopProduct)
                 ->getProductToCategory([$category->id])
-                ->setLimit(bc_config('product_list'))
+                ->setLimit(lc_config('product_list'))
                 ->setPaginate()
                 ->setSort([$sortBy, $sortOrder])
                 ->getData();
 
             $subCategory = (new ShopCategory)
                 ->setParent($category->id)
-                ->setLimit(bc_config('item_list'))
+                ->setLimit(lc_config('item_list'))
                 ->setPaginate()
                 ->getData();
 
-            bc_check_view($this->templatePath . '.screen.shop_product_list');
+            lc_check_view($this->templatePath . '.screen.shop_product_list');
             return view($this->templatePath . '.screen.shop_product_list',
                 array(
                     'title' => $category->title,

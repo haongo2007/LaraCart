@@ -45,6 +45,8 @@ class ShopCurrency extends Model
                 $sql->where('code', 'like', '%' . $keyword . '%')->orWhere('name', 'like', '%' . $keyword . '%');
             });
         }
+        
+        $currencyList = $currencyList->whereIn('store_id', session('adminStoreId'));
 
         if ($sort_order && array_key_exists($sort_order, $arrSort)) {
             $field = explode('__', $sort_order)[0];
@@ -107,6 +109,15 @@ class ShopCurrency extends Model
         }
     }
 
+    /**
+     * A order has and belongs to many stores.
+     *
+     * @return BelongsToMany
+     */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
     /**
      * [getCurrency description]
      * @return [type] [description]

@@ -92,7 +92,6 @@ class Order extends ShopOrder
                 ->orwhere('last_name','like','%'.$customer_name.'$');
             });
         }
-        
 
         if ($from && $to) {
             $orderList = $orderList->where(function ($sql) use($from,$to){

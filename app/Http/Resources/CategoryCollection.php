@@ -22,7 +22,8 @@ class CategoryCollection extends JsonResource
             'top' => $this->top,
             'alias' => $this->alias,
             'parent' => $this->parent,
-            'image' => $this->image
+            'image' => $this->image,
+            'store' => $this->stores
         ];
 
         if (!$parent = $request->parent === '0' ? true : false) {
