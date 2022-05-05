@@ -101,6 +101,12 @@ return [
             'root' => storage_path('app/public/banner'),
             'url' => env('APP_URL').'/storage',
         ],
+
+        'brands' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/brands'),
+            'url' => env('APP_URL').'/storage',
+        ],
     ],
 
     /*
