@@ -14,6 +14,7 @@ class ProductAttributeColorCollection extends JsonResource
      */
     public function toArray($request)
     {
+        $res = [];
         foreach ($this->resource as $key => $value) {
             $res[] = [
                 'id' => $value->id,

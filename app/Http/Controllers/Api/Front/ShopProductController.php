@@ -38,7 +38,7 @@ class ShopProductController extends Controller
      * All products
      * @return [view]
      */
-    private function index()
+    public function index()
     {
         $sortBy = 'sort';
         $sortOrder = 'asc';
@@ -66,8 +66,8 @@ class ShopProductController extends Controller
         }  
         if ($filter_price) {
             $filter_price = explode('-', request('filter_price'));
-            $price_min = bc_convert_price_to_origin($filter_price[0]);
-            $price_max = bc_convert_price_to_origin($filter_price[1]);
+            $price_min = lc_convert_price_to_origin($filter_price[0]);
+            $price_max = lc_convert_price_to_origin($filter_price[1]);
             $products = $products->setPriceBetween($price_min,$price_max);
         }  
         if ($filter_keyword) {
@@ -80,65 +80,12 @@ class ShopProductController extends Controller
             $products = $products->setAttributes($filter_attribute);
         }        
         $products = $products
-            ->setLimit(bc_config('product_list'))
+            ->setLimit(lc_config('product_list'))
             ->setPaginate()
             ->setSort([$sortBy, $sortOrder])
             ->getData();
     
-        $filterArrKeyword = [];
-        if (Cache::has(session('adminStoreId').'_cache_keyword_products_'.bc_get_locale())){
-            $filterArrKeyword = Cache::get(session('adminStoreId').'_cache_keyword_products_'.bc_get_locale());
-        }else{
-            $ArrKeyword = ShopProductDescription::select('keyword')->where('lang', bc_get_locale())->get()->pluck('keyword')->toArray();
-            $ArrKeyword = array_unique($ArrKeyword);
-            foreach ($ArrKeyword as $value) {
-                $keys = explode(',', $value);
-                foreach ($keys as $key) {
-                    if (!in_array($key,$filterArrKeyword)) {
-                        array_push($filterArrKeyword, $key);
-                    }
-                }
-            }
-            bc_set_cache(session('adminStoreId').'_cache_keyword_products_'.bc_get_locale(), $filterArrKeyword);
-        }
-
-        $filterArrAttribute = [];
-        if (Cache::has(session('adminStoreId').'_cache_attributes_products_'.bc_get_locale())){
-            $filterArrAttribute = Cache::get(session('adminStoreId').'_cache_attributes_products_'.bc_get_locale());
-        }else{
-            $allAttributes = ShopAttributeGroup::with('attributeDetails')->where('picker',1)->get()->pluck('attributeDetails')[0]->pluck('code')->toArray();
-            foreach (array_filter($allAttributes) as $key => $att) {
-                foreach (explode(',', $att) as $key => $vatt) {
-                    $filterArrAttribute[] = $vatt;
-                }
-            }
-            $filterArrAttribute = array_unique($filterArrAttribute);
-        }
-        
-        if(request()->ajax()){
-            bc_check_view($this->templatePath . '.Common.isotope_grid');
-            return view($this->templatePath . '.Common.isotope_grid',['products'=> $products])->render();   
-        }
-
-        bc_check_view($this->templatePath . '.Shop.index');
-        return view(
-            $this->templatePath . '.Shop.index',
-            array(
-                'title'            => trans('front.all_product'),
-                'keyword'          => '',
-                'description'      => '',
-                'products'         => $products,
-                'layout_page'      => 'shop_product_list',
-                'filterArrSort'    => $filterArrSort,
-                'filter_sort'      => $filter_sort,
-                'filterArrPrice'   => $filterArrPrice,
-                'filter_price'     => $filter_price ? implode('-', $filter_price) : '',
-                'filterArrKeyword' => $filterArrKeyword,
-                'filter_keyword'   => $filter_keyword,
-                'filterArrAttribute' => $filterArrAttribute,
-                'filter_attribute'   => $filter_attribute,
-            )
-        );
+        return ProductCollection::collection($products);
     }
 
     /**

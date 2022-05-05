@@ -6,6 +6,7 @@ use App\Models\Front\ShopCategory;
 use App\Models\Front\ShopProduct;
 use Illuminate\Http\Response;
 use App\Helper\JsonResponse;
+use App\Http\Resources\Front\CategoryCollection;
 
 class ShopCategoryController extends Controller
 {
@@ -29,7 +30,7 @@ class ShopCategoryController extends Controller
         if (!$store) {
             return response()->json(new JsonResponse([],'Error'), Response::HTTP_FORBIDDEN);
         }
-        $categoriesList = (new ShopCategory)->with('descriptionsWithLangDefault')->where([['parent',$id_parent],['store_id',$store]])->get();
+        $categoriesList = new CategoryCollection((new ShopCategory)->where([['parent',$id_parent],['store_id',$store]])->get());
 
         return response()->json(new JsonResponse($categoriesList), Response::HTTP_OK);
     }

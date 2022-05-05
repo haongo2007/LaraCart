@@ -8,6 +8,9 @@ use App\Helper\JsonResponse;
 use App\Models\Front\ShopLanguage;
 use App\Models\Front\ShopCurrency;
 use App\Models\Front\ShopCategory;
+use App\Models\Front\ShopBanner;
+use App\Models\Front\ShopBrand;
+use App\Http\Resources\Front\CategoryCollection;
 
 class ShopStoreController extends Controller
 {
@@ -23,7 +26,10 @@ class ShopStoreController extends Controller
             $data['store'] = ShopStore::with('descriptionsCurrentLang')->find($key);
             $data['languages'] = ShopLanguage::where('store_id',$key)->get();
             $data['currencies'] = ShopCurrency::where('store_id',$key)->get();
-            $data['categories'] = ShopCategory::with('descriptionsWithLangDefault')->where([['store_id',$key],['parent',0]])->get();
+            $data['slider'] = ShopBanner::where([['store_id',$key],['type','slider_home'],['status',1]])->get();
+            $data['brands'] = ShopBrand::where([['store_id',$key],['status',1]])->get();
+            $data['banner'] = ShopBanner::where([['store_id',$key],['type','banner_home'],['status',1]])->get();
+            $data['categories'] = new CategoryCollection(ShopCategory::where([['store_id',$key],['parent',0]])->get());
             return response()->json(new JsonResponse($data, ''), Response::HTTP_OK);
         }
     }

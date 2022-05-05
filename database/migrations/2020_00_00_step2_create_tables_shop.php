@@ -127,6 +127,7 @@ class CreateTablesShop extends Migration
             $table->string('url', 100)->nullable();
             $table->tinyInteger('status')->default(0);
             $table->integer('sort')->default(0);
+            $table->integer('store_id')->default(1);
             }
         );
 

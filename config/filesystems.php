@@ -95,6 +95,12 @@ return [
             'root' => storage_path('app/public/store'),
             'url' => env('APP_URL').'/storage',
         ],
+
+        'banner' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/banner'),
+            'url' => env('APP_URL').'/storage',
+        ],
     ],
 
     /*
