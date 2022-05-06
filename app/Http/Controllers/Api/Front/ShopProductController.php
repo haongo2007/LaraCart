@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopProduct;
+use App\Models\Front\ShopCategory;
 use App\Models\Front\ShopProductDescription;
 use App\Models\Front\ShopAttributeGroup;
 use Illuminate\Http\Request;
@@ -40,13 +41,14 @@ class ShopProductController extends Controller
      */
     public function index()
     {
+        $store = request()->header('x-store');
         $sortBy = 'sort';
         $sortOrder = 'asc';
         $filter_sort = request('filter_sort') ?? 'id_desc';
         $filter_price = request('filter_price') ?? '';
         $filter_keyword = request('filter_keyword') ?? '';
         $filter_attribute = request('filter_attribute') ?? '';
-        $filter_category = request('categoryId') ?? '';
+        $filter_category = request('category') ?? '';
         
         $filterArrSort = [
             'price_desc' => ['price', 'desc'],
@@ -78,7 +80,11 @@ class ShopProductController extends Controller
         }
         if ($filter_attribute) {
             $products = $products->setAttributes($filter_attribute);
-        }        
+        }   
+        if ($filter_category) {
+            $categoriId = ShopCategory::select('id')->where('alias',$filter_category)->pluck('id')->first();
+            $products = $products->getProductToCategory($categoriId);
+        }     
         $products = $products
             ->setLimit(lc_config('product_list'))
             ->setPaginate()
