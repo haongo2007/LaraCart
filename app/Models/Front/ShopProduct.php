@@ -82,6 +82,14 @@ class ShopProduct extends Model
     {
         return $this->hasMany(ShopProductAttribute::class, 'product_id', 'id');
     }
+    public function attributesParent()
+    {
+        return $this->hasMany(ShopProductAttribute::class, 'product_id', 'id')->where('parent',0)->with('palette');
+    }
+    public function palette()
+    {
+        return $this->hasMany(ShopAttributePalette::class, 'product_id', 'id');
+    }
     public function downloadPath()
     {
         return $this->hasOne(ShopProductDownload::class, 'product_id', 'id');
@@ -213,6 +221,7 @@ class ShopProduct extends Model
             $product->promotionPrice()->delete();
             $product->groups()->delete();
             $product->attributes()->delete();
+            $product->palette()->delete();
             $product->downloadPath()->delete();
             $product->builds()->delete();
             $product->categories()->detach();

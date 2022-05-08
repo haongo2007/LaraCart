@@ -24,8 +24,8 @@ class ShopProductAttribute extends Model
         return $this->hasOne(ShopAttributePalette::class, 'attribute_id','id');
     }
 
-    public function size()
+    public function Children()
     {
-        return $this->hasMany(self::class, 'parent','id');
+        return $this->hasMany(self::class, 'parent','id')->with('palette');
     }
 }

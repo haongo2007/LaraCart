@@ -89,6 +89,7 @@ class ShopProductController extends Controller
             ->setLimit(lc_config('product_list'))
             ->setPaginate()
             ->setSort([$sortBy, $sortOrder])
+            ->setStore($store)
             ->getData();
     
         return ProductCollection::collection($products);

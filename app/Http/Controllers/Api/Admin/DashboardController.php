@@ -45,6 +45,10 @@ class DashboardController extends Controller
         $Orders  = [];
         $Amount  = [];
         $Product  = [];
+        $Customer_total = [];
+        $Orders_total = [];
+        $Amount_total = [];
+        $Product_total = [];
         // $from = $rangDays->getStartDate()->format('Y-m-d');
         // $to = $rangDays->getEndDate()->format('Y-m-d');
 
@@ -65,17 +69,10 @@ class DashboardController extends Controller
             $Product[] = [$product['total_product'],$product['store_id'],$product['d']];
             $Product_total[] = $product['total_product'];
         }
-
         $Customer = array_merge([$Header],$Customer);
         $Orders = array_merge([$Header],$Orders);
         $Product = array_merge([$Header],$Product);
         $Amount = array_merge([$Header],$Amount);
-        
-        $Customer_total = [];
-        $Orders_total = [];
-        $Amount_total = [];
-        $Product_total = [];
-
 
         $data['newCustomers']['data'] = $Customer;
         $data['newCustomers']['total'] = array_sum($Customer_total);

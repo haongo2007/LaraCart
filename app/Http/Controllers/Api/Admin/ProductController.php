@@ -83,25 +83,6 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
-
-        // $data = [
-        //     'title'                => trans('product.admin.add_new_title'),
-        //     'kind'                     => lc_PRODUCT_SINGLE,
-        //     'title_description'    => trans('product.admin.add_new_des'),
-        //     'icon'                 => 'fa fa-plus',
-        //     'languages'            => $this->languages,
-        //     'categories'           => $this->categories,
-        //     'brands'               => (new ShopBrand)->getListAll(),
-        //     'suppliers'            => (new ShopSupplier)->getListAll(),
-        //     'taxs'                 => (new ShopTax)->getListAll(),
-        //     'properties'           => $this->properties,
-        //     'kinds'                => $this->kinds,
-        //     'attributeGroup'       => $this->attributeGroup,
-        //     'listWeight'           => $this->listWeight,
-        //     'listLength'           => $this->listLength,
-        //     'customFields'         => (new ShopCustomField)->getCustomField($type = 'product'),
-        // ];
-
         return response()->json(new JsonResponse($product), Response::HTTP_OK);
     }
 
@@ -299,7 +280,6 @@ public function createProductGroup()
         }
 
         $validator = Validator::make($data, $arrValidation, $arrMsg ?? []);
-
         if ($validator->fails()) {
             return response()->json(new JsonResponse([],$validator->messages()), Response::HTTP_BAD_REQUEST);
         }
@@ -310,7 +290,7 @@ public function createProductGroup()
         $productBuild    = $data['hotSpots'] ?? [];
         /* UPLOAD IMAGE */
         if($request->hasFile('image')){
-            $path = 'product/';
+            $path = 'public/product/';
             $fileName = $request->file('image')->hashName();
             $request->file('image')->storeAs(
                 $path,$fileName
@@ -390,23 +370,60 @@ public function createProductGroup()
             $arrDataAtt = [];
             foreach ($data['attribute'] as $group => $rowGroup) {
                 if ($rowGroup) {
-                    foreach ($rowGroup->values as $key => $nameAtt) {
-                        if ($nameAtt) {
+                    foreach ($rowGroup->values as $key => $value) {
+                        if ($value) {
                             $arrDataPalette = [];
                             $images = '';
-                            if (isset($rowGroup->values[$key]->files)) {
-                                $images = implode(',', $rowGroup->values[$key]->files);
+                            if (isset($value->files)) {
+                                $images = implode(',', $value->files);
                             }
                             $arrDataAtt =  [
-                                                'name' => $nameAtt->name, 
-                                                'add_price' => $rowGroup->values[$key]->add_price,
+                                                'name' => $value->name, 
+                                                'add_price' => $value->add_price,
                                                 'attribute_group_id' => $rowGroup->id,
                                                 'images' => $images,
-                                                'product_id' => $product->id
+                                                'product_id' => $product->id,
+                                                'parent'  => 0,
                                             ];
                             $justProdAttribute = ShopProductAttribute::create($arrDataAtt);
-                            if (isset($rowGroup->values[$key]->palette)) {
-                                $palette = $rowGroup->values[$key]->palette;
+
+                            if (isset($value->children)) {
+                                $children = $value->children;
+                                foreach ($children as $keychildren => $valuechildren) {
+                                    $images = '';
+                                    if (isset($valuechildren->files)) {
+                                        $images = implode(',', $valuechildren->files);
+                                    }
+                                    $arrDataChildren =  [
+                                                'name' => $valuechildren->name, 
+                                                'add_price' => $valuechildren->add_price,
+                                                'attribute_group_id' => $rowGroup->child_id,
+                                                'images' => $images,
+                                                'product_id' => $product->id,
+                                                'parent'  => $justProdAttribute->id,
+                                            ];
+
+                                    $justProdAttributeChild = ShopProductAttribute::create($arrDataChildren);
+
+                                    if (isset($valuechildren->palette)) {
+                                        $childPalette = $valuechildren->palette;
+
+                                        foreach ($childPalette as $childkeypalette => $childvaluepalette) {
+                                            $arrDataChildPalette[] = [
+                                                'name' => $childvaluepalette->name,
+                                                'type' => $childvaluepalette->type,
+                                                'hex' => $childvaluepalette->hex,
+                                                'attribute_id' => $justProdAttributeChild->id,
+                                                'product_id' => $product->id
+                                            ];
+                                        }
+                                        ShopAttributePalette::insert($arrDataChildPalette);
+                                    };
+                                }
+                            }
+
+                            if (isset($value->palette)) {
+                                $palette = $value->palette;
 
                                 foreach ($palette as $keypalette => $valuepalette) {
                                     $arrDataPalette[] = [
@@ -747,26 +764,64 @@ public function createProductGroup()
         //Update attribute
         if ($attribute && $data['kind'] == LC_PRODUCT_SINGLE) {
             $product->attributes()->delete();
+            $product->palette()->delete();
             $arrDataAtt = [];
-            foreach ($attribute as $group => $rowGroup) {
+            foreach ($data['attribute'] as $group => $rowGroup) {
                 if ($rowGroup) {
-                    foreach ($rowGroup->values as $key => $nameAtt) {
-                        if ($nameAtt) {
+                    foreach ($rowGroup->values as $key => $value) {
+                        if ($value) {
                             $arrDataPalette = [];
                             $images = '';
-                            if (isset($rowGroup->values[$key]->files)) {
-                                $images = implode(',', $rowGroup->values[$key]->files);
+                            if (isset($value->files)) {
+                                $images = implode(',', $value->files);
                             }
                             $arrDataAtt =  [
-                                                'name' => $nameAtt->name, 
-                                                'add_price' => $rowGroup->values[$key]->add_price,
+                                                'name' => $value->name, 
+                                                'add_price' => $value->add_price,
                                                 'attribute_group_id' => $rowGroup->id,
                                                 'images' => $images,
-                                                'product_id' => $product->id
+                                                'product_id' => $product->id,
+                                                'parent'  => 0,
                                             ];
                             $justProdAttribute = ShopProductAttribute::create($arrDataAtt);
-                            if (isset($rowGroup->values[$key]->palette)) {
-                                $palette = $rowGroup->values[$key]->palette;
+
+                            if (isset($value->children)) {
+                                $children = $value->children;
+                                foreach ($children as $keychildren => $valuechildren) {
+                                    $images = '';
+                                    if (isset($valuechildren->files)) {
+                                        $images = implode(',', $valuechildren->files);
+                                    }
+                                    $arrDataChildren =  [
+                                                'name' => $valuechildren->name, 
+                                                'add_price' => $valuechildren->add_price,
+                                                'attribute_group_id' => $rowGroup->child_id,
+                                                'images' => $images,
+                                                'product_id' => $product->id,
+                                                'parent'  => $justProdAttribute->id,
+                                            ];
+
+                                    $justProdAttributeChild = ShopProductAttribute::create($arrDataChildren);
+
+                                    if (isset($valuechildren->palette)) {
+                                        $childPalette = $valuechildren->palette;
+
+                                        foreach ($childPalette as $childkeypalette => $childvaluepalette) {
+                                            $arrDataChildPalette[] = [
+                                                'name' => $childvaluepalette->name,
+                                                'type' => $childvaluepalette->type,
+                                                'hex' => $childvaluepalette->hex,
+                                                'attribute_id' => $justProdAttributeChild->id,
+                                                'product_id' => $product->id
+                                            ];
+                                        }
+                                        ShopAttributePalette::insert($arrDataChildPalette);
+                                    };
+                                }
+                            }
+
+                            if (isset($value->palette)) {
+                                $palette = $value->palette;
 
                                 foreach ($palette as $keypalette => $valuepalette) {
                                     $arrDataPalette[] = [

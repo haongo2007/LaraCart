@@ -74,7 +74,7 @@
           v-on:click="selectItem('files', file.path, $event)"   
           v-on:dblclick="selectAction(file.path, file.extension)"
           v-on:contextmenu.prevent="contextMenu(file, $event)">
-          <div class="file-file" v-on:dblclick="selectDirectory(directory.path)">
+          <div class="file-file" >
             <div class="file-file-name" v-bind:class="(acl && file.acl === 0) ? 'text-hidden' : ''" ><i class="fas" v-bind:class="extensionToIcon(file.extension)" ></i> 
               <div>{{ file.filename ? file.filename : file.basename }}</div></div>
             <div class="file-file-left">

@@ -16,13 +16,21 @@ class ProductAttributeColorCollection extends JsonResource
     {
         $res = [];
         foreach ($this->resource as $key => $value) {
-            $res[] = [
+            
+            $group = strtolower($value->attGroup->name);
+
+            if (!isset($res[$group])) {
+                $res[$group] = [];
+            }
+            
+            array_push($res[$group], 
+            [
                 'id' => $value->id,
                 'color' => new ProductAttributePaletteCollection($value->first_palette),
-                'color_name' => $value->name,
+                'name' => $value->name,
                 'price' => $value->add_price,
-                'size' => new ProductAttributeSizeCollection($value->size),
-            ];
+                'children' => new ProductAttributeSizeCollection($value->Children),
+            ]);
         }
         
         return $res;
@@ -42,11 +50,18 @@ class ProductAttributeSizeCollection extends JsonResource
     {
         $res = [];
         foreach ($this->resource as $key => $value) {
-            $res[] = [
+            $group = strtolower($value->attGroup->name);
+            
+            if (!isset($res[$group])) {
+                $res[$group] = [];
+            }
+            
+            array_push($res[$group], 
+            [
                 'id' => $value->id,
                 'name' => $value->name,
                 'price' => $value->add_price,
-            ];
+            ]);
         }
         
         return $res;

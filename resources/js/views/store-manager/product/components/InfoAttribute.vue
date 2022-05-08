@@ -4,49 +4,103 @@
       <el-row v-show="!loadAttributes" class="el-main-form">
         <el-col :span="2">
           <div v-loading="loadAttributes" width="200px">
-            <div v-for="(attribute,index) in temp" :key="attribute.id" style="margin: 5px;">
-              <el-button type="warning" icon="el-icon-plus" @click="handleAddAttribute(index)">{{ attribute.name }}</el-button>
-            </div>
-            <div style="margin: 5px;">
-              <el-button :disabled="disabled_clear" type="danger" icon="el-icon-close" @click="handleClearAllAttribute()">Clear</el-button>
-            </div>
+            <draggable-tree @drop="dropAttribute" :data="temp" draggable="draggable" cross-tree="cross-tree">
+              <div slot-scope="{data, store}">
+                <template v-if="!data.isDragPlaceHolder">
+                  <b v-if="data.children && data.children.length" @click="store.toggleOpen(data)">
+                    {{ data.open ? '-' : '+' }} 
+                  </b>
+                  <span>{{ data.name }}</span>
+                  <el-button :disabled="data.children.length == 0 && temp.length <= 1 && disabledChild" type="success" size="mini" @click="handleAddAttribute(data.id)"><i class="el-icon-plus"></i></el-button>
+                </template>
+              </div>
+            </draggable-tree>
+            <!-- <div v-for="(attribute,index) in temp" :key="attribute.id" style="margin: 5px;">
+              <el-button type="warning" icon="el-icon-plus" ">{{ attribute.name }}</el-button>
+            </div> -->
           </div>
         </el-col>
-        <el-col :span="22">
-          <el-col v-for="(attribute,index) in temp" :key="attribute.id" v-loading="loadAttributes" :span="12" style="padding: 0 20px">
-            <el-header align="center">{{ attribute.name }} ({{ attribute.values.length }})</el-header>
-            <div v-for="(value,key) in attribute.values" v-if="attribute.values" :key="key">
-              <div style="display: flex;justify-content: space-between;">
-                <el-form-item label-width="80px" label="Name">
+        <el-col :span="20" style="display: flex;justify-content: space-around;">
+          <div v-for="(attribute,index) in temp" :key="attribute.id" v-loading="loadAttributes" style="padding: 0 20px;" :style="[temp.length > 1 ? {'width': '50%'} : {'width': '70%'}]" >
+            <el-header align="center">{{ attribute.name }} {{ attribute.values ? '( '+ attribute.values.length + ' )': '' }}</el-header>
+            <div v-for="(value,key) in attribute.values" v-if="attribute.values" :key="key" class="box-attributes" >
+              <div style="display: flex;justify-content: space-between;align-items: center;" >
+                <el-form-item label-width="80px" label="Name" style="width: 100%;margin: 15px 0px;">
                   <el-input v-model="temp[index]['values'][key].name" />
                 </el-form-item>
-                <el-form-item label-width="80px" label="Price">
+                <el-form-item label-width="80px" label="Price" style="width: 100%;margin: 15px 0px;">
                   <el-input-number v-model="temp[index]['values'][key].add_price" style="width: 100%" :controls="false" />
                 </el-form-item>
-                <el-form-item label-width="30px">
-                  <el-button v-if="attribute.picker" type="success" @click="handleVisibleStorage(index,key)">Pick Image</el-button>
-                </el-form-item>
-                <el-form-item label-width="30px">
-                  <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
+                <el-form-item label-width="30px" style="width: 100%;margin: 15px 0px;">
+                  <el-button-group>
+                    <el-button v-if="attribute.picker" type="success" @click="handleVisibleStorage(index,key)">Pick Image</el-button>
+                    <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
+                  </el-button-group>
                 </el-form-item>
               </div>
               <div v-if="temp[index]['values'][key].images != ''" v-loading="loadFiles">
                 <lightbox :cells="3" :items="temp[index]['values'][key].files" />
                 <div v-if="temp[index]['values'][key].palette" class="color-Palette">
-                  <h1>COLORS</h1>
+                  <h4 style="margin: 10px 0px">Choose Code</h4>
                   <ul class="swatch__container">
                     <li v-for="color in temp[index]['values'][key].palette" class="swatch__wrapper">
-                      <div :style="{ backgroundColor: color.hex }" class="swatch">
-                        <div :style="{ color: color.typeTextColor }" class="swatch__type">№ {{ color.number }}. {{ color.type }}</div>
-                        <div :style="{ color: color.hexTextColor }" class="swatch__hex">{{ color.hex }}</div>
-                        <div :style="{ color: color.nameTextColor }" class="swatch__name">{{ color.name }}</div>
-                      </div>
+                      <el-tooltip content="Top center" placement="top">
+                        <div slot="content">
+                          <div class="swatch__type">№ {{ color.number }}. {{ color.type }}</div>
+                          <div class="swatch__name">{{ color.name }}</div>
+                        </div>
+                        <div :style="{ backgroundColor: color.hex }" class="swatch"></div>
+                      </el-tooltip>
                     </li>
                   </ul>
                 </div>
               </div>
+
+
+              <div v-if="value.children.length > 0" v-for="(child,childKey) in value.children" :key="childKey" v-loading="loadAttributes">
+                <div style="display: flex;justify-content: space-between;">
+                  <el-form-item label-width="80px" label="Name" style="width: 100%;margin: 15px 0px;">
+                    <el-input v-model="temp[index]['values'][key]['children'][childKey].name" />
+                  </el-form-item>
+                  <el-form-item label-width="80px" label="Price" style="width: 100%;margin: 15px 0px;">
+                    <el-input-number v-model="temp[index]['values'][key]['children'][childKey].add_price" style="width: 100%" :controls="false" />
+                  </el-form-item>
+                  <el-form-item label-width="30px" style="width: 100%;margin: 15px 0px;">
+                    <el-button-group>
+                      <el-button v-if="attribute.children[index] && attribute.children[index].picker" type="success" @click="handleVisibleStorage(index,key,childKey)">Pick Image</el-button>
+                      <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key,childKey)" />
+                    </el-button-group>
+                  </el-form-item>
+                </div>
+                <div v-if="temp[index]['values'][key]['children'][childKey].images != ''" v-loading="loadFiles">
+                  <lightbox :cells="3" :items="temp[index]['values'][key]['children'][childKey].files" />
+                  <div v-if="temp[index]['values'][key]['children'][childKey].palette" class="color-Palette">
+                    <h4 style="margin: 10px 0px">Choose Code</h4>
+                    <ul class="swatch__container">
+                      <li v-for="color in temp[index]['values'][key]['children'][childKey].palette" class="swatch__wrapper">
+                        <div :style="{ backgroundColor: color.hex }" class="swatch">
+                          <el-tooltip content="Top center" placement="top">
+                            <div slot="content">
+                              <div class="swatch__type">№ {{ color.number }}. {{ color.type }}</div>
+                              <div class="swatch__name">{{ color.name }}</div>
+                            </div>
+                            <div :style="{ backgroundColor: color.hex }" class="swatch"></div>
+                          </el-tooltip>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+
             </div>
-          </el-col>
+          </div>
+        </el-col>
+        <el-col :span="2">
+          <div style="margin: 5px;">
+            <el-button :disabled="disabled_clear" type="danger" icon="el-icon-close" @click="handleClearAllAttribute()">Clear</el-button>
+          </div>
         </el-col>
       </el-row>
     </el-form>
@@ -67,6 +121,7 @@
 </template>
 
 <script>
+import {DraggableTree} from 'vue-draggable-nested-tree'
 import AttributeGroupResource from '@/api/attribute_group';
 import FileManager from '@/components/FileManager';
 import EventBus from '@/components/FileManager/eventBus';
@@ -88,10 +143,12 @@ export default {
   components: {
     Lightbox,
     FileManager,
+    DraggableTree
   },
   props: ['dataActive', 'dataProduct'],
   data() {
     return {
+      disabledChild:true,
       loadAttributes: true,
       loadFiles: false,
       disabled_clear: true,
@@ -111,6 +168,7 @@ export default {
       handler(newValue, oldValue) {
         if (newValue == 0) {
           this.disabled_clear = true;
+          this.disabledChild = true;
         }else{
           this.disabled_clear = false;
         }
@@ -125,41 +183,114 @@ export default {
     nextStep() {
       const active = this.dataActive + 1;
       this.$emit('handleProcessActive', active);
-      this.$emit('handleProcessTemp', { attribute: this.temp });
+      let lastTemp = [];
+      this.temp.forEach(function (v,i) {
+        let cur = {
+          values : v.values,
+          picker : v.picker,
+          id : v.id,
+          name : v.name
+        }
+        if (v.children.length > 0) {
+          v.children.forEach(function (r,j) {
+            cur['child_name'] = r.name;
+            cur['child_id'] = r.id;
+          })
+        }
+        lastTemp.push(cur)
+      })
+      this.$emit('handleProcessTemp', { attribute: lastTemp });
     },
     async fetchAttributeGroup(){
       const { data } = await attributeGroupResource.list();
       const that = this;
       const values = [];
-      if (Object.keys(this.dataProduct).length > 0) {
-        if (this.dataProduct.attributes) {
-          this.dataProduct.attributes.forEach(function(v, i) {
-            if (values[v['attribute_group_id']] == undefined) {
-              values[v['attribute_group_id']] = [];
+      
+      if (Object.keys(this.dataProduct).length == 0) { // add
+        data.forEach(function(v, i) {
+          that.$set(that.temp, i, v);
+          that.$set(that.temp[i], 'values', []);
+        });
+      }else{// edit
+        if (this.dataProduct.attributes_parent) {
+          let attributes_parent = {};
+
+          data.forEach(function(v, i) {
+            if (!attributes_parent.hasOwnProperty(v.id)) {
+              attributes_parent[v.id] = [];
             }
-            values[v['attribute_group_id']].push(v);
+            let foundGroup = that.dataProduct.attributes_parent.filter((item) => item.attribute_group_id == v.id);
+            if (foundGroup.length > 0) {
+              attributes_parent[v.id].values = foundGroup;
+              attributes_parent[v.id].picker = v.picker;
+              attributes_parent[v.id].name = v.name;
+              attributes_parent[v.id].id = v.id;
+            }
+            if (Object.keys(attributes_parent[v.id]).length == 0) {
+              delete attributes_parent[v.id];
+            }
           });
+          let y = 0;
+          for(let attribute in attributes_parent){
+            let id = attributes_parent[attribute].id;
+            let name = attributes_parent[attribute].name;
+            let picker = attributes_parent[attribute].picker;
+            let value = attributes_parent[attribute].values;
+
+            let index_group = data.findIndex((item) => item.id == id);
+            this.$set(this.temp,y,data[index_group]);
+            this.$set(this.temp[y], 'values', []);
+            // filter value
+
+            value.forEach(function (v,i) {
+
+              if (v.images != '') {
+                  let files = v.images.split(',');
+                  v['files'] = files;
+              }
+
+              if (v.children.length > 0) {
+                v.children.forEach(function(vchild, ichild) {
+
+                  let index_group_child = data.findIndex((item) => item.id == vchild.attribute_group_id);
+                  if (index_group_child >= 0) {
+                    that.$set(that.temp[y],'children', []);
+                    that.temp[y]['children'].push(data[index_group_child]);
+                    that.disabledChild = false;
+                  }
+
+                  if (vchild.images != '') {
+                    let files = vchild.images.split(',');
+                    v['children'][ichild]['files'] = files;
+                  }
+                })
+
+              }
+              that.attNum++;
+            });
+            this.temp[y]['values'] = value;
+            y++;
+          }
         }
       }
-      data.forEach(function(v, i) {
-        that.$set(that.temp, i, v);
-        that.$set(that.temp[i], 'values', values.length > 0 ? values[v.id] : []);
-        if (values.length) {
-          values[v.id].forEach(function(val,ind){
-            if (val.hasOwnProperty('images') && val.images != '') {
-              let files = val.images.split(',');
-              that.$set(that.temp[i]['values'][ind], 'files', files);
-              that.$set(that.temp[i]['values'][ind], 'palette', val.palette);
-            }
-            that.attNum++;
-          });
-        }
-      });
       this.loadAttributes = false;
     },
     handleAddAttribute(key){
-      this.attNum++;
-      this.$set(this.temp[key]['values'], this.temp[key]['values'].length, { name: '', add_price: '' });
+      let find = this.temp.findIndex((item) => item.id == key);
+      if (find < 0) {
+        key = this.temp.length - 1;
+        if (!this.temp[key]['values'][this.temp[key]['values'].length - 1]['children']) {
+          this.$set(this.temp[key]['values'][this.temp[key]['values'].length - 1], 'children', []);
+        }
+        this.temp[key]['values'][this.temp[key]['values'].length - 1]['children'].push({name: '', add_price: ''});
+      } else {
+        this.attNum++;
+        if (!this.temp[find].hasOwnProperty('values')) {
+          this.$set(this.temp[find], 'values' , []);
+        }
+        this.$set(this.temp[find]['values'], this.temp[find]['values'].length, { name: '', add_price: '' });
+      }
+      this.disabledChild = false;
     },
     handleClearAllAttribute(){
       this.attNum = 0;
@@ -168,9 +299,12 @@ export default {
         that.temp[v].values.length = 0;
       });
     },
-    handleClearAttribute(index, key){
-      this.temp[index].values.splice(key, 1);
-      if (this.attNum-- == 0) {
+    handleClearAttribute(index, key, childKey){
+      if (childKey || childKey == 0) {
+        this.temp[index].values[key].children.splice(childKey, 1);
+      }else{
+        this.temp[index].values.splice(key, 1);
+        this.attNum--;
       }
     },
     dialogStorageClose(){
@@ -178,21 +312,33 @@ export default {
       this.componentStorage = '';
       this.dialogStorageVisible = false;
     },
-    handleVisibleStorage(index, key){
+    handleVisibleStorage(index, key, childKey){
+      if (childKey || childKey == 0) {
+        this.currentSelectFile = [index, key, childKey];
+      } else {
+        this.currentSelectFile = [index, key];
+      }
       EventBus.$on('getFileResponse', this.handlerGeturl);
       this.$store.commit('fm/setDisks', 'product');
       this.componentStorage = 'FileManager';
       this.dialogStorageVisible = true;
-      this.currentSelectFile = [index, key];
     },
     handlerGeturl(data) {
       this.loadFiles = true;
-      this.$set(this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]], 'files', []);
-      this.$set(this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]], 'palette', []);
       const that = this;
-      data.forEach(function(v, i) {
-        that.temp[that.currentSelectFile[0]]['values'][that.currentSelectFile[1]].files.push(v);
-      });
+      if (this.currentSelectFile.length > 2) {
+        this.$set(this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]]['children'][this.currentSelectFile[2]], 'files', []);
+        this.$set(this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]]['children'][this.currentSelectFile[2]], 'palette', []);
+        data.forEach(function(v, i) {
+          that.temp[that.currentSelectFile[0]]['values'][that.currentSelectFile[1]]['children'][that.currentSelectFile[2]].files.push(v);
+        });
+      } else {
+        this.$set(this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]], 'files', []);
+        this.$set(this.temp[this.currentSelectFile[0]]['values'][this.currentSelectFile[1]], 'palette', []);
+        data.forEach(function(v, i) {
+          that.temp[that.currentSelectFile[0]]['values'][that.currentSelectFile[1]].files.push(v);
+        });
+      }
       this.getPalette(data[0]);
       this.dialogStorageClose();
     },
@@ -210,8 +356,19 @@ export default {
           const nameTextColor = palette[color].getBodyTextColor();
           colors.push({ number, type, typeTextColor, hex, hexTextColor, name, nameTextColor });
         }
-        this.temp[currentSelectFile.length>0 ? currentSelectFile[0] : this.currentSelectFile[0]]['values'][currentSelectFile.length>0 ? currentSelectFile[1] :this.currentSelectFile[1]].palette = colors;
+        if (this.currentSelectFile.length > 2) {
+          this.temp[currentSelectFile.length>0 ? currentSelectFile[0] : this.currentSelectFile[0]]['values'][currentSelectFile.length>0 ? currentSelectFile[1] :this.currentSelectFile[1]]['children'][currentSelectFile.length>0 ? currentSelectFile[2] :this.currentSelectFile[2]].palette = colors;
+        } else {
+          this.temp[currentSelectFile.length>0 ? currentSelectFile[0] : this.currentSelectFile[0]]['values'][currentSelectFile.length>0 ? currentSelectFile[1] :this.currentSelectFile[1]].palette = colors;
+        }
         this.loadFiles = false;
+      });
+    },
+    dropAttribute(node, targetTree, oldTree){
+      this.temp.forEach(function (v,i) {
+        if (v['id'] != node.id) {
+          if (v['values']) {v['values'].forEach((val) => delete val.children)}
+        }
       });
     },
   },
@@ -223,21 +380,19 @@ export default {
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
 }
 .swatch {
   display: inline-block;
   width: 100%;
-  height: 100px;
   border-radius: 4px;
-  margin-bottom: 1em;
+  height: 25px;
   transition: background .3s ease;
 }
 .swatch__wrapper {
   display: inline-block;
-  width: 30%;
+  width: 5%;
   list-style: none;
-  margin-bottom: 1.4em;
+  margin-right: 10px;
 }
 .swatch__hex {
   text-transform: uppercase;
@@ -248,11 +403,44 @@ export default {
 .swatch__name {
   font-size: 11px;
   color: #aaa;
-  padding-left: .5em;
 }
 .swatch__type {
   font-size: 13px;
   color: #aaa;
-  padding: 1.0em 0 .5em .5em;
+}
+.box-attributes{
+    background: #f5f7fa;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+}
+.tree-node{
+  background: #f5f7fa;
+  padding: 5px;
+  border-radius: 5px;
+  color: white;  
+  border: 1px solid #eee;
+}
+.tree-node-inner-back{
+    background: #e6a23c;
+    padding: 5px;
+    margin-bottom: 0px!important;
+    border-radius: 3px;
+}
+.tree-node-inner{
+  width: 100%;
+}
+.tree-node-inner div{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tree-node-children{
+  margin-left: 10px;
+}
+.tree-node-children .tree-node{
+  padding: 0px;
+  margin: 5px 0px;
 }
 </style>

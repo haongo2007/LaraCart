@@ -36,7 +36,7 @@ class Product extends ShopProduct
      */
     public static function getProductAdmin($id) {
         $tableProduct = (new ShopProduct())->getTable();
-        return ShopProduct::with('descriptions','categories','promotionPrice','attributes','attributes.palette')
+        return ShopProduct::with('descriptions','categories','promotionPrice','attributesParent.Children')
         ->whereIn($tableProduct . '.store_id',  session('adminStoreId'))
         ->where('id', $id)->first();
     }
