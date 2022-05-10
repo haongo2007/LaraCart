@@ -61,6 +61,7 @@ class ProductAttributeSizeCollection extends JsonResource
                 'id' => $value->id,
                 'name' => $value->name,
                 'price' => $value->add_price,
+                'color' => new ProductAttributePaletteCollection($value->first_palette),
             ]);
         }
         
