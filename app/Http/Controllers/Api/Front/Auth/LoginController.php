@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\Front\Auth;
 
 use App\Http\Controllers\Controller;
-use BlackCart\Core\Front\Models\ShopCountry;
-use Auth;
-// use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Models\Front\ShopCustomer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -20,94 +20,42 @@ class LoginController extends Controller
     | to conveniently provide its functionality to your applications.
     |
      */
-
-    // use AuthenticatesUsers;
-
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    // protected $redirectTo = '/';
-    protected function redirectTo()
+    public function login(Request $request)
     {
-        return bc_route('customer.index');
-    }
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        // parent::__construct();
-        $this->middleware('guest')->except('logout');
-    }
+        try {
+            $request->validate([
+                'email' => 'email|required',
+                'password' => 'required'
+            ]);
 
-    protected function validateLogin(Request $request)
-    {
-        $messages = [
-            'email.email'       => trans('validation.email',['attribute'=> trans('customer.email')]),
-            'email.required'    => trans('validation.required',['attribute'=> trans('customer.email')]),
-            'password.required' => trans('validation.required',['attribute'=> trans('customer.password')]),
-            ];
-        $this->validate($request, [
-            'email'    => 'required|string|email',
-            'password' => 'required|string',
-        ], $messages);
-    }
+            $credentials = request(['email', 'password']);
 
-    /**
-     * Process front form login
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function showLoginFormProcessFront(...$params) {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
-        }
-        return $this->_showLoginForm();
-    }
+            if (!Auth::attempt($credentials)) {
+                return response()->json([
+                    'status_code' => 500,
+                    'message' => 'Unauthorized'
+                ]);
+            }
 
+            $user = ShopCustomer::where('email', $request->email)->first();
 
-    /**
-     * Form login
-     *
-     * @return  [type]  [return description]
-     */
-    private function _showLoginForm()
-    {
-        if (Auth::user()) {
-            return redirect()->route('home');
-        }
-        bc_check_view($this->templatePath . '.auth.login');
-        return view($this->templatePath . '.auth.login',
-            array(
-                'title'       => trans('front.login'),
-                'countries'   => ShopCountry::getCodeAll(),
-                'layout_page' => 'shop_auth',
-            )
-        );
-    }
+            if (!Hash::check($request->password, $user->password, [])) {
+                throw new \Exception('Error in Login');
+            }
 
+            $tokenResult = $user->createToken('authToken')->plainTextToken;
 
-    public function logout(Request $request)
-    {
-        $this->guard()->logout();
-
-        $request->session()->invalidate();
-
-        return $this->loggedOut($request) ?: redirect(bc_route('home'))->with('login_form', 'true');
-    }
-
-    protected function authenticated(Request $request, $user)
-    {
-        if (auth()->user()) {
-            session(['customer' => auth()->user()->toJson()]);
-        } else {
-            session(['customer' => []]);
+            return response()->json([
+                'status_code' => 200,
+                'access_token' => $tokenResult,
+                'token_type' => 'Bearer',
+            ]);
+        } catch (\Exception $error) {
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Error in Login',
+                'error' => $error,
+            ]);
         }
     }
 

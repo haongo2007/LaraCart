@@ -36,7 +36,7 @@ class ShopCartController extends RootFrontController
     {
         if (config('app.seoLang')) {
             $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         }
         return $this->_getCart();
     }
@@ -52,19 +52,19 @@ class ShopCartController extends RootFrontController
         session()->forget('orderID'); //destroy orderID
         
         //Shipping
-        $moduleShipping = bc_get_plugin_installed('shipping');
-        $sourcesShipping = bc_get_all_plugin('shipping');
+        $moduleShipping = lc_get_plugin_installed('shipping');
+        $sourcesShipping = lc_get_all_plugin('shipping');
         $shippingMethod = array();
         foreach ($moduleShipping as $module) {
             if (array_key_exists($module['key'], $sourcesShipping)) {
-                $moduleClass = bc_get_class_plugin_config('shipping', $module['key']);
+                $moduleClass = lc_get_class_plugin_config('shipping', $module['key']);
                 $shippingMethod[$module['key']] = (new $moduleClass)->getData();
             }
         }
 
         //Payment
-        $modulePayment = bc_get_plugin_installed('payment');
-        $sourcesPayment = bc_get_all_plugin('payment');
+        $modulePayment = lc_get_plugin_installed('payment');
+        $sourcesPayment = lc_get_all_plugin('payment');
         $paymentMethod = array();
         foreach ($modulePayment as $module) {
             if (array_key_exists($module['key'], $sourcesPayment)) {
@@ -74,8 +74,8 @@ class ShopCartController extends RootFrontController
         }        
 
         //Total
-        $moduleTotal = bc_get_plugin_installed('total');
-        $sourcesTotal = bc_get_all_plugin('total');
+        $moduleTotal = lc_get_plugin_installed('total');
+        $sourcesTotal = lc_get_all_plugin('total');
         $totalMethod = array();
         foreach ($moduleTotal as $module) {
             if (array_key_exists($module['key'], $sourcesTotal)) {
@@ -142,18 +142,18 @@ class ShopCartController extends RootFrontController
         $shippingAddress = session('shippingAddress') ?? $addressDefaul;
         $objects = ShopOrderTotal::getObjectOrderTotal();
         $viewCaptcha = '';
-        if(bc_captcha_method() && in_array('checkout', bc_captcha_page())) {
-            if (view()->exists(bc_captcha_method()->pathPlugin.'::render')){
+        if(lc_captcha_method() && in_array('checkout', lc_captcha_page())) {
+            if (view()->exists(lc_captcha_method()->pathPlugin.'::render')){
                 $dataView = [
                     'titleButton' => trans('cart.checkout'),
                     'idForm' => 'form-process',
                     'idButtonForm' => 'button-form-process',
                 ];
-                $viewCaptcha = view(bc_captcha_method()->pathPlugin.'::render', $dataView)->render();
+                $viewCaptcha = view(lc_captcha_method()->pathPlugin.'::render', $dataView)->render();
             }
         }
 
-        bc_check_view($this->templatePath . '.Cart.index');
+        lc_check_view($this->templatePath . '.Cart.index');
         return view(
             $this->templatePath . '.Cart.index',
             [
@@ -185,7 +185,7 @@ class ShopCartController extends RootFrontController
     {
         if (config('app.seoLang')) {
             $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         }
         return $this->_checkoutPrepare();
     }
@@ -197,12 +197,12 @@ class ShopCartController extends RootFrontController
     {
         $customer = auth()->user();
         if (Cart::instance('default')->count() == 0) {
-            return redirect(bc_route('cart'));
+            return redirect(lc_route('cart'));
         }
 
         //Not allow for guest
-        if (!bc_config('shop_allow_guest') && !$customer) {
-            return redirect(bc_route('login'));
+        if (!lc_config('shop_allow_guest') && !$customer) {
+            return redirect(lc_route('login'));
         }
 
         $data = request()->all();
@@ -212,78 +212,78 @@ class ShopCartController extends RootFrontController
             'email'          => config('validation.customer.email', 'required|string|email|max:255'),
         ];
         //check shipping
-        if (!bc_config('shipping_off')) {
+        if (!lc_config('shipping_off')) {
             $validate['shippingMethod'] = 'required';
         }
         //check payment
-        if (!bc_config('payment_off')) {
+        if (!lc_config('payment_off')) {
             $validate['paymentMethod'] = 'required';
         }
 
-        if (bc_config('customer_lastname')) {
-            if (bc_config('customer_lastname_required')) {
+        if (lc_config('customer_lastname')) {
+            if (lc_config('customer_lastname_required')) {
                 $validate['last_name'] = config('validation.customer.last_name_required', 'required|string|max:100');
             } else {
                 $validate['last_name'] = config('validation.customer.last_name_null', 'nullable|string|max:100');
             }
         }
-        if (bc_config('customer_address1')) {
-            if (bc_config('customer_address1_required')) {
+        if (lc_config('customer_address1')) {
+            if (lc_config('customer_address1_required')) {
                 $validate['address1'] = config('validation.customer.address1_required', 'required|string|max:100');
             } else {
                 $validate['address1'] = config('validation.customer.address1_null', 'nullable|string|max:100');
             }
         }
 
-        if (bc_config('customer_address2')) {
-            if (bc_config('customer_address2_required')) {
+        if (lc_config('customer_address2')) {
+            if (lc_config('customer_address2_required')) {
                 $validate['address2'] = config('validation.customer.address2_required', 'required|string|max:100');
             } else {
                 $validate['address2'] = config('validation.customer.address2_null', 'nullable|string|max:100');
             }
         }
 
-        if (bc_config('customer_address3')) {
-            if (bc_config('customer_address3_required')) {
+        if (lc_config('customer_address3')) {
+            if (lc_config('customer_address3_required')) {
                 $validate['address3'] = config('validation.customer.address3_required', 'required|string|max:100');
             } else {
                 $validate['address3'] = config('validation.customer.address3_null', 'nullable|string|max:100');
             }
         }
 
-        if (bc_config('customer_phone')) {
-            if (bc_config('customer_phone_required')) {
+        if (lc_config('customer_phone')) {
+            if (lc_config('customer_phone_required')) {
                 $validate['phone'] = config('validation.customer.phone_required', 'required|regex:/^0[^0][0-9\-]{7,13}$/');
             } else {
                 $validate['phone'] = config('validation.customer.phone_null', 'nullable|regex:/^0[^0][0-9\-]{7,13}$/');
             }
         }
-        if (bc_config('customer_country')) {
+        if (lc_config('customer_country')) {
             $arraycountry = (new ShopCountry)->pluck('code')->toArray();
-            if (bc_config('customer_country_required')) {
+            if (lc_config('customer_country_required')) {
                 $validate['country'] = config('validation.customer.country_required', 'required|string|min:2').'|in:'. implode(',', $arraycountry);
             } else {
                 $validate['country'] = config('validation.customer.country_null', 'nullable|string|min:2').'|in:'. implode(',', $arraycountry);
             }
         }
 
-        if (bc_config('customer_postcode')) {
-            if (bc_config('customer_postcode_required')) {
+        if (lc_config('customer_postcode')) {
+            if (lc_config('customer_postcode_required')) {
                 $validate['postcode'] = config('validation.customer.postcode_required', 'required|min:5');
             } else {
                 $validate['postcode'] = config('validation.customer.postcode_null', 'nullable|min:5');
             }
         }
-        if (bc_config('customer_company')) {
-            if (bc_config('customer_company_required')) {
+        if (lc_config('customer_company')) {
+            if (lc_config('customer_company_required')) {
                 $validate['company'] = config('validation.customer.company_required', 'required|string|max:100');
             } else {
                 $validate['company'] = config('validation.customer.company_null', 'nullable|string|max:100');
             }
         } 
 
-        if (bc_config('customer_name_kana')) {
-            if (bc_config('customer_name_kana_required')) {
+        if (lc_config('customer_name_kana')) {
+            if (lc_config('customer_name_kana_required')) {
                 $validate['first_name_kana'] = config('validation.customer.name_kana_required', 'required|string|max:100');
                 $validate['last_name_kana'] = config('validation.customer.name_kana_required', 'required|string|max:100');
             } else {
@@ -321,8 +321,8 @@ class ShopCartController extends RootFrontController
             'paymentMethod.required'  => trans('cart.validation.paymentMethod_required'),
         ];
 
-        if(bc_captcha_method() && in_array('checkout', bc_captcha_page())) {
-            $data['captcha_field'] = $data[bc_captcha_method()->getField()] ?? '';
+        if(lc_captcha_method() && in_array('checkout', lc_captcha_page())) {
+            $data['captcha_field'] = $data[lc_captcha_method()->getField()] ?? '';
             $validate['captcha_field'] = ['required', 'string', new \BlackCart\Core\Rules\CaptchaRule];
         }
 
@@ -339,12 +339,12 @@ class ShopCartController extends RootFrontController
         }
 
         //Set session shippingMethod
-        if (!bc_config('shipping_off')) {
+        if (!lc_config('shipping_off')) {
             session(['shippingMethod' => request('shippingMethod')]);
         }
 
         //Set session paymentMethod
-        if (!bc_config('payment_off')) {
+        if (!lc_config('payment_off')) {
             session(['paymentMethod' => request('paymentMethod')]);
         }
 
@@ -385,11 +385,11 @@ class ShopCartController extends RootFrontController
             }
         }
         if (count($arrErrorQty)) {
-            return redirect(bc_route('cart'))->with('arrErrorQty', $arrErrorQty);
+            return redirect(lc_route('cart'))->with('arrErrorQty', $arrErrorQty);
         }
         //End check minimum
 
-        return redirect(bc_route('checkout'));
+        return redirect(lc_route('checkout'));
     }
 
     /**
@@ -402,7 +402,7 @@ class ShopCartController extends RootFrontController
     {
         if (config('app.seoLang')) {
             $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         }
         return $this->_getCheckout();
     }
@@ -417,32 +417,32 @@ class ShopCartController extends RootFrontController
         if (
             !session('shippingAddress')
         ) {
-            return redirect(bc_route('cart'));
+            return redirect(lc_route('cart'));
         }
         $shippingAddress = session('shippingAddress');
 
 
         //Shipping method
-        if (bc_config('shipping_off')) {
+        if (lc_config('shipping_off')) {
             $shippingMethodData = null;
         } else {
             if (!session('shippingMethod')) {
-                return redirect(bc_route('cart'));
+                return redirect(lc_route('cart'));
             }
             $shippingMethod = session('shippingMethod');
-            $classShippingMethod = bc_get_class_plugin_config('Shipping', $shippingMethod);
+            $classShippingMethod = lc_get_class_plugin_config('Shipping', $shippingMethod);
             $shippingMethodData = (new $classShippingMethod)->getData();
         }
 
         //Payment method
-        if (bc_config('payment_off')) {
+        if (lc_config('payment_off')) {
             $paymentMethodData = null;
         } else {
             if (!session('paymentMethod')) {
-                return redirect(bc_route('cart'));
+                return redirect(lc_route('cart'));
             }
             $paymentMethod = session('paymentMethod');
-            $classPaymentMethod = bc_get_class_plugin_config('Payment', $paymentMethod);
+            $classPaymentMethod = lc_get_class_plugin_config('Payment', $paymentMethod);
             $paymentMethodData = (new $classPaymentMethod)->getData();
         }
         $objects = ShopOrderTotal::getObjectOrderTotal();
@@ -451,7 +451,7 @@ class ShopCartController extends RootFrontController
         //Set session dataTotal
         session(['dataTotal' => $dataTotal]);
 
-        bc_check_view($this->templatePath . '.Cart.checkout');
+        lc_check_view($this->templatePath . '.Cart.checkout');
         return view(
             $this->templatePath . '.Cart.checkout',
             [
@@ -477,7 +477,7 @@ class ShopCartController extends RootFrontController
         $data      = request()->all();
 
         //Process escape
-        $data      = bc_clean($data);
+        $data      = lc_clean($data);
 
         $productId = $data['product_id'];
         $qty       = $data['qty'] ?? 0;
@@ -519,12 +519,12 @@ class ShopCartController extends RootFrontController
             }
             Cart::instance('default')->add($dataCart);
         } else {
-            return redirect(bc_route('cart'))
+            return redirect(lc_route('cart'))
                 ->with(
                     ['error' => trans('cart.dont_allow_sale')]
                 );
         }
-        return redirect(bc_route('cart'))->with(['success' => trans('cart.success', ['instance' => 'cart'])]);
+        return redirect(lc_route('cart'))->with(['success' => trans('cart.success', ['instance' => 'cart'])]);
 
     }
 
@@ -541,13 +541,13 @@ class ShopCartController extends RootFrontController
             return redirect()->route('home');
         }
         //Not allow for guest
-        if (!bc_config('shop_allow_guest') && !$customer) {
-            return redirect(bc_route('login'));
+        if (!lc_config('shop_allow_guest') && !$customer) {
+            return redirect(lc_route('login'));
         } //
 
         $data = request()->all();
         if (!$data) {
-            return redirect(bc_route('cart'));
+            return redirect(lc_route('cart'));
         } else {
             $dataTotal       = session('dataTotal') ?? [];
             $shippingAddress = session('shippingAddress') ?? [];
@@ -574,8 +574,8 @@ class ShopCartController extends RootFrontController
         $dataOrder['payment_status']  = self::PAYMENT_UNPAID;
         $dataOrder['shipping_status'] = self::SHIPPING_NOTSEND;
         $dataOrder['status']          = self::ORDER_STATUS_NEW;
-        $dataOrder['currency']        = bc_currency_code();
-        $dataOrder['exchange_rate']   = bc_currency_rate();
+        $dataOrder['currency']        = lc_currency_code();
+        $dataOrder['exchange_rate']   = lc_currency_rate();
         $dataOrder['total']           = $total;
         $dataOrder['balance']         = $total + $received;
         $dataOrder['email']           = $shippingAddress['email'];
@@ -624,11 +624,11 @@ class ShopCartController extends RootFrontController
         foreach (Cart::instance('default')->content() as $cartItem) {
             $arrDetail['product_id']  = $cartItem->id;
             $arrDetail['name']        = $cartItem->name;
-            $arrDetail['price']       = bc_currency_value($cartItem->price);
+            $arrDetail['price']       = lc_currency_value($cartItem->price);
             $arrDetail['qty']         = $cartItem->qty;
             $arrDetail['store_id']    = $cartItem->storeId;
             $arrDetail['attribute']   = ($cartItem->options) ? json_encode($cartItem->options) : null;
-            $arrDetail['total_price'] = bc_currency_value($cartItem->price) * $cartItem->qty;
+            $arrDetail['total_price'] = lc_currency_value($cartItem->price) * $cartItem->qty;
             $arrCartDetail[]          = $arrDetail;
         }
 
@@ -639,7 +639,7 @@ class ShopCartController extends RootFrontController
         $newOrder = (new ShopOrder)->createOrder($dataOrder, $dataTotal, $arrCartDetail);
 
         if ($newOrder['error'] == 1) {
-            return redirect(bc_route('cart'))->with(['error' => $newOrder['msg']]);
+            return redirect(lc_route('cart'))->with(['error' => $newOrder['msg']]);
         }
         //Set session orderID
         session(['orderID' => $newOrder['orderID']]);
@@ -660,13 +660,13 @@ class ShopCartController extends RootFrontController
             ];
 
             //Process escape
-            $addressNew = bc_clean($addressNew);
+            $addressNew = lc_clean($addressNew);
 
             ShopCustomer::find($uID)->addresses()->save(new ShopCustomerAddress($addressNew));
             session()->forget('address_process'); //destroy address_process
         }
 
-        $paymentMethod = bc_get_class_plugin_controller('Payment', session('paymentMethod'));
+        $paymentMethod = lc_get_class_plugin_controller('Payment', session('paymentMethod'));
 
         if ($paymentMethod) {
             // Check payment method
@@ -684,7 +684,7 @@ class ShopCartController extends RootFrontController
     public function addToCartAjax(Request $request)
     {
         if (!$request->ajax()) {
-            return redirect(bc_route('cart'));
+            return redirect(lc_route('cart'));
         }
         $data     = request()->all();
         $instance = $data['instance'] ?? 'default';
@@ -705,7 +705,7 @@ class ShopCartController extends RootFrontController
         }
         switch ($instance) {
             case 'default':
-                if ($product->attributes->count() || $product->kind == BC_PRODUCT_GROUP) {
+                if ($product->attributes->count() || $product->kind == LC_PRODUCT_GROUP) {
                     //Products have attributes or kind is group,
                     //need to select properties before adding to the cart
                     return response()->json(
@@ -812,7 +812,7 @@ class ShopCartController extends RootFrontController
     public function updateToCart(Request $request)
     {
         if (!$request->ajax()) {
-            return redirect(bc_route('cart'));
+            return redirect(lc_route('cart'));
         }
         $data    = request()->all();
         $id      = $data['id'] ?? '';
@@ -830,7 +830,7 @@ class ShopCartController extends RootFrontController
             );
         }
         
-        if ($product->stock < $new_qty && !bc_config('product_buy_out_of_stock', $product->store_id)) {
+        if ($product->stock < $new_qty && !lc_config('product_buy_out_of_stock', $product->store_id)) {
             return response()->json(
                 [
                     'error' => 1,
@@ -858,7 +858,7 @@ class ShopCartController extends RootFrontController
     {
         if (config('app.seoLang')) {
             $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         }
         return $this->_favorite();
     }
@@ -871,7 +871,7 @@ class ShopCartController extends RootFrontController
     {
 
         $favorites = Cart::instance('favorite')->content();
-        bc_check_view($this->templatePath . '.Shop.shop_favorite');
+        lc_check_view($this->templatePath . '.Shop.shop_favorite');
         return view(
             $this->templatePath . '.Shop.shop_favorite',
             array(
@@ -894,7 +894,7 @@ class ShopCartController extends RootFrontController
     {
         if (config('app.seoLang')) {
             $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         }
         return $this->_compare();
     }
@@ -907,7 +907,7 @@ class ShopCartController extends RootFrontController
     {
         $compare = Cart::instance('compare')->content();
 
-        bc_check_view($this->templatePath . '.Product.compare');
+        lc_check_view($this->templatePath . '.Product.compare');
         return view(
             $this->templatePath . '.Product.compare',
             array(
@@ -932,7 +932,7 @@ class ShopCartController extends RootFrontController
         if (config('app.seoLang')) {
             $lang = $params[0] ?? '';
             $instance = $params[1] ?? 'cart';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         } else {
             $instance = $params[0] ?? 'cart';
         }
@@ -947,7 +947,7 @@ class ShopCartController extends RootFrontController
     private function _clearCart($instance = 'cart')
     {
         Cart::instance($instance)->destroy();
-        return redirect(bc_route($instance));
+        return redirect(lc_route($instance));
     }
 
     /**
@@ -962,7 +962,7 @@ class ShopCartController extends RootFrontController
             $lang = $params[0] ?? '';
             $instance = $params[1] ?? 'cart';
             $id = $params[2] ?? '';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         } else {
             $instance = $params[0] ?? 'cart';
             $id = $params[1] ?? '';
@@ -978,12 +978,12 @@ class ShopCartController extends RootFrontController
     private function _removeItem($instance = 'cart', $id = null)
     {
         if ($id === null) {
-            return redirect(bc_route($instance));
+            return redirect(lc_route($instance));
         }
         if (array_key_exists($id, Cart::instance($instance)->content()->toArray())) {
             Cart::instance($instance)->remove($id);
         }
-        return redirect(bc_route($instance));
+        return redirect(lc_route($instance));
     }
 
     
@@ -1004,19 +1004,19 @@ class ShopCartController extends RootFrontController
         $shippingMethod = session('shippingMethod');
         $totalMethod = session('totalMethod', []);
 
-        $classPaymentConfig = bc_get_class_plugin_config('Payment', $paymentMethod);
+        $classPaymentConfig = lc_get_class_plugin_config('Payment', $paymentMethod);
         if (method_exists($classPaymentConfig, 'endApp')) {
             (new $classPaymentConfig)->endApp();
         }
 
-        $classShippingConfig = bc_get_class_plugin_config('Shipping', $shippingMethod);
+        $classShippingConfig = lc_get_class_plugin_config('Shipping', $shippingMethod);
         if (method_exists($classShippingConfig, 'endApp')) {
             (new $classShippingConfig)->endApp();
         }
 
         if ($totalMethod && is_array($totalMethod)) {
             foreach ($totalMethod as $keyMethod => $valueMethod) {
-                $classTotalConfig = bc_get_class_plugin_config('Total', $keyMethod);
+                $classTotalConfig = lc_get_class_plugin_config('Total', $keyMethod);
                 if (method_exists($classTotalConfig, 'endApp')) {
                     (new $classTotalConfig)->endApp(['orderID' => $orderID, 'code' => $valueMethod]);
                 }
@@ -1032,7 +1032,7 @@ class ShopCartController extends RootFrontController
         session()->forget('arrCartDetail'); //destroy arrCartDetail
         session()->forget('orderID'); //destroy orderID
 
-        if (bc_config('order_success_to_admin') || bc_config('order_success_to_customer')) {
+        if (lc_config('order_success_to_admin') || lc_config('order_success_to_customer')) {
             $data = ShopOrder::with('details')->find($orderID)->toArray();
             $checkContent = (new ShopEmailTemplate)->where('group', 'order_success_to_admin')->where('status', 1)->first();
             $checkContentCustomer = (new ShopEmailTemplate)->where('group', 'order_success_to_customer')->where('status', 1)->first();
@@ -1051,17 +1051,17 @@ class ShopCartController extends RootFrontController
                     $product = (new ShopProduct)->getDetail($detail['product_id']);
                     $pathDownload = $product->downloadPath->path ?? '';
                     $nameProduct = $detail['name'];
-                    if ($product && $pathDownload && $product->property == BC_PROPERTY_DOWNLOAD) {
-                        $nameProduct .="<br><a href='".bc_path_download_render($pathDownload)."'>Download</a>";
+                    if ($product && $pathDownload && $product->property == LC_PROPERTY_DOWNLOAD) {
+                        $nameProduct .="<br><a href='".lc_path_download_render($pathDownload)."'>Download</a>";
                     }
 
                     $orderDetail .= '<tr>
                                     <td>' . ($key + 1) . '</td>
                                     <td>' . $detail['sku'] . '</td>
                                     <td>' . $nameProduct . '</td>
-                                    <td>' . bc_currency_render($detail['price'], '', '', '', false) . '</td>
+                                    <td>' . lc_currency_render($detail['price'], '', '', '', false) . '</td>
                                     <td>' . number_format($detail['qty']) . '</td>
-                                    <td align="right">' . bc_currency_render($detail['total_price'], '', '', '', false) . '</td>
+                                    <td align="right">' . lc_currency_render($detail['total_price'], '', '', '', false) . '</td>
                                 </tr>';
                 }
                 $dataFind = [
@@ -1097,28 +1097,28 @@ class ShopCartController extends RootFrontController
                     $data['phone'],
                     $data['comment'],
                     $orderDetail,
-                    bc_currency_render($data['subtotal'], '', '', '', false),
-                    bc_currency_render($data['shipping'], '', '', '', false),
-                    bc_currency_render($data['discount'], '', '', '', false),
-                    bc_currency_render($data['total'], '', '', '', false),
+                    lc_currency_render($data['subtotal'], '', '', '', false),
+                    lc_currency_render($data['shipping'], '', '', '', false),
+                    lc_currency_render($data['discount'], '', '', '', false),
+                    lc_currency_render($data['total'], '', '', '', false),
                 ];
 
                 // Send mail order success to admin 
-                if (bc_config('order_success_to_admin') && $checkContent) {
+                if (lc_config('order_success_to_admin') && $checkContent) {
                     $content = $checkContent->text;
                     $content = preg_replace($dataFind, $dataReplace, $content);
                     $dataView = [
                         'content' => $content,
                     ];
                     $config = [
-                        'to' => bc_store('email'),
+                        'to' => lc_store('email'),
                         'subject' => trans('order.send_mail.new_title') . '#' . $orderID,
                     ];
-                    bc_send_mail($this->templatePath . '.Mail.order_success_to_admin', $dataView, $config, []);
+                    lc_send_mail($this->templatePath . '.Mail.order_success_to_admin', $dataView, $config, []);
                 }
 
                 // Send mail order success to customer
-                if (bc_config('order_success_to_customer') && $checkContentCustomer) {
+                if (lc_config('order_success_to_customer') && $checkContentCustomer) {
                     $contentCustomer = $checkContentCustomer->text;
                     $contentCustomer = preg_replace($dataFind, $dataReplace, $contentCustomer);
                     $dataView = [
@@ -1126,12 +1126,12 @@ class ShopCartController extends RootFrontController
                     ];
                     $config = [
                         'to' => $data['email'],
-                        'replyTo' => bc_store('email'),
+                        'replyTo' => lc_store('email'),
                         'subject' => trans('order.send_mail.new_title'),
                     ];
 
                     $attach = [];
-                    if (bc_config('order_success_to_customer_pdf')) {
+                    if (lc_config('order_success_to_customer_pdf')) {
                         // Invoice pdf
                         \PDF::loadView($this->templatePath . '.Mail.order_success_to_customer_pdf', $dataView)
                             ->save(\Storage::disk('invoice')->path('order-'.$orderID.'.pdf'));
@@ -1143,13 +1143,13 @@ class ShopCartController extends RootFrontController
                         ];
                     }
 
-                    bc_send_mail($this->templatePath . '.Mail.order_success_to_customer', $dataView, $config, $attach);
+                    lc_send_mail($this->templatePath . '.Mail.order_success_to_customer', $dataView, $config, $attach);
                 }
             }
 
         }
 
-        return redirect(bc_route('order.success'))->with('orderID', $orderID);
+        return redirect(lc_route('order.success'))->with('orderID', $orderID);
     }
 
 
@@ -1163,7 +1163,7 @@ class ShopCartController extends RootFrontController
     {
         if (config('app.seoLang')) {
             $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
+            lc_lang_switch($lang);
         }
         return $this->_orderSuccess();
     }
@@ -1178,7 +1178,7 @@ class ShopCartController extends RootFrontController
         if (!session('orderID')) {
             return redirect()->route('home');
         }
-        return redirect(bc_route('home'))->with('order_success', trans('order.success.title',['order_id'=>session('orderID')]));
+        return redirect(lc_route('home'))->with('order_success', trans('order.success.title',['order_id'=>session('orderID')]));
     }
 
 }
