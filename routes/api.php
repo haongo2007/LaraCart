@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+$suffix = Lc_config('SUFFIX_URL')??'';
+
 Route::group([
         'prefix' => LC_ADMIN_PREFIX,
         'namespace' => 'Api\Admin'

@@ -113,7 +113,7 @@ class ShopDiscount extends Model
      * @return  [type]         [return description]
      */
     public function getPromotionByCode($code) {
-        if (config('app.storeId') == BC_ID_ROOT) {
+        if (config('app.storeId') == LC_ID_ROOT) {
             //If store is primary store, dont check store id
             $promocode = $this
                 ->where('code', $code)

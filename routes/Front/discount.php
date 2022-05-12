@@ -1,3 +1,4 @@
 <?php 
-
-Route::post('discount/checkCoupon', 'ShopDiscountController@checkCoupon');
+Route::group(['prefix' => 'discount'], function () {
+	Route::post('checkCoupon', 'ShopDiscountController@checkCoupon');
+});

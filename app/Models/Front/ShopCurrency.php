@@ -4,7 +4,6 @@
  */
 namespace App\Models\Front;
 
-use Cart;
 use Illuminate\Database\Eloquent\Model;
 
 class ShopCurrency extends Model
@@ -263,30 +262,30 @@ class ShopCurrency extends Model
      */
     public static function sumCart(float $rate = null)
     {
-        $carts = Cart::instance('default')->getItemsGroupByStore();
-        $dataReturn = [];
+        // $carts = Cart::instance('default')->getItemsGroupByStore();
+        // $dataReturn = [];
 
-        $sumSubtotal  = 0;
-        $sumSubtotalWithTax  = 0;
-        $rate = ($rate) ? $rate : self::$exchange_rate;
-        foreach ($carts as $storeId => $cart) {
-            $sumSubtotalStore  = 0;
-            $sumSubtotalWithTaxStore  = 0;
-            foreach ($cart as $detail) {
-                $sumValue = $detail->qty * self::getValue($detail->price, $rate);
-                $sumValueWithTax = $detail->qty * self::getValue(bc_tax_price($detail->price, $detail->tax), $rate);
-                $sumSubtotal += $sumValue;
-                $sumSubtotalStore += $sumValue;
-                $sumSubtotalWithTax +=  $sumValueWithTax;
-                $sumSubtotalWithTaxStore+= $sumValueWithTax;
-            }
-            $dataReturn['store'][$storeId]['subTotal'] = $sumSubtotalStore;
-            $dataReturn['store'][$storeId]['subTotalWithTax'] = $sumSubtotalWithTaxStore;
+        // $sumSubtotal  = 0;
+        // $sumSubtotalWithTax  = 0;
+        // $rate = ($rate) ? $rate : self::$exchange_rate;
+        // foreach ($carts as $storeId => $cart) {
+        //     $sumSubtotalStore  = 0;
+        //     $sumSubtotalWithTaxStore  = 0;
+        //     foreach ($cart as $detail) {
+        //         $sumValue = $detail->qty * self::getValue($detail->price, $rate);
+        //         $sumValueWithTax = $detail->qty * self::getValue(bc_tax_price($detail->price, $detail->tax), $rate);
+        //         $sumSubtotal += $sumValue;
+        //         $sumSubtotalStore += $sumValue;
+        //         $sumSubtotalWithTax +=  $sumValueWithTax;
+        //         $sumSubtotalWithTaxStore+= $sumValueWithTax;
+        //     }
+        //     $dataReturn['store'][$storeId]['subTotal'] = $sumSubtotalStore;
+        //     $dataReturn['store'][$storeId]['subTotalWithTax'] = $sumSubtotalWithTaxStore;
 
-        }
-        $dataReturn['subTotal'] = $sumSubtotal;
-        $dataReturn['subTotalWithTax'] = $sumSubtotalWithTax;
-        return $dataReturn;
+        // }
+        // $dataReturn['subTotal'] = $sumSubtotal;
+        // $dataReturn['subTotalWithTax'] = $sumSubtotalWithTax;
+        // return $dataReturn;
     }
 
     public static function getListRate()

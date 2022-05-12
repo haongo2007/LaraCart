@@ -263,8 +263,7 @@ class ShopDiscountController extends Controller
  */
     public function checkCoupon()
     {
-        dd(request());
-        $html = '';
+        $data = '';
         $code = request('code');
         $uID = request('uID');
         $check = json_decode($this->check($code, $uID), true);
@@ -294,21 +293,11 @@ class ShopDiscountController extends Controller
             } else {
                 $error = 0;
                 $msg = trans('promotion.process.completed');
-
-                //Set session discount
-                $totalMethod = session('totalMethod',[]);
-                $totalMethod[$this->plugin->configKey] = $code;
-                session(['totalMethod' => $totalMethod]);
-
-                $objects = ShopOrderTotal::getObjectOrderTotal();
-                $dataTotal = ShopOrderTotal::processDataTotal($objects);
-                if (view()->exists($this->templatePath.'.common.render_total')) {
-                    $html = view($this->templatePath.'.common.render_total')->with(['dataTotal' => $dataTotal])->render();
-                }
+                $data = $content;
             }
 
         }
-        return json_encode(['error' => $error, 'msg' => $msg, 'html' => $html]);
+        return json_encode(['error' => $error, 'msg' => $msg, 'data' => $data]);
 
     }
 

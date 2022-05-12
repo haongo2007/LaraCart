@@ -1,27 +1,26 @@
 <?php
-namespace BlackCart\Core\Front\Controllers;
+namespace App\Http\Controllers\Api\Front;
 
-use App\Http\Controllers\RootFrontController;
-use BlackCart\Core\Front\Models\ShopCountry;
-use BlackCart\Core\Front\Models\ShopOrder;
-use BlackCart\Core\Front\Models\ShopOrderStatus;
-use BlackCart\Core\Front\Models\ShopShippingStatus;
-use BlackCart\Core\Front\Models\ShopCustomer;
-use BlackCart\Core\Front\Models\ShopAttributeGroup;
-use BlackCart\Core\Front\Models\ShopCustomerAddress;
+use App\Http\Controllers\Controller;
+use App\Models\Front\ShopCountry;
+use App\Models\Front\ShopOrder;
+use App\Models\Front\ShopOrderStatus;
+use App\Models\Front\ShopShippingStatus;
+use App\Models\Front\ShopCustomer;
+use App\Models\Front\ShopAttributeGroup;
+use App\Models\Front\ShopCustomerAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use BlackCart\Core\Front\Controllers\Auth\AuthTrait;
+use App\Http\Controllers\Api\Front\Auth\AuthTrait;
 use Carbon\Carbon;
 
-class ShopAccountController extends RootFrontController
+class ShopAccountController extends Controller
 {
     use AuthTrait;
 
     public function __construct()
     {
-        parent::__construct();
     }
 
     /**
@@ -30,32 +29,15 @@ class ShopAccountController extends RootFrontController
      * @param [type] ...$params
      * @return void
      */
-    public function indexProcessFront(...$params) 
+    public function showCustomer(Request $request) 
     {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
-        }
-        return $this->_index();
-    }
-
-    /**
-     * Index user profile
-     *
-     * @return  [view]
-     */
-    private function _index()
-    {
-        $customer = auth()->user();
-
-        bc_check_view($this->templatePath . '.account.index');
-        return view($this->templatePath . '.account.index')
-            ->with(
-                [
-                    'title' => trans('account.my_profile'),
-                    'customer' => $customer
-                ]
-            );
+        $customer = $request->user();
+        return response()->json([
+                    'error' => '',
+                    'data' => $customer,
+                    'msg'   => 'Successfully',
+                    ]
+                );
     }
 
     /**
