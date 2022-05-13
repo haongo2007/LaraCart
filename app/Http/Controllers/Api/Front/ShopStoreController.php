@@ -6,6 +6,7 @@ use App\Models\Front\ShopStore;
 use Illuminate\Http\Response;
 use App\Helper\JsonResponse;
 use App\Models\Front\ShopLanguage;
+use App\Models\Admin\Config;
 use App\Models\Front\ShopCurrency;
 use App\Models\Front\ShopCategory;
 use App\Models\Front\ShopBanner;
@@ -30,6 +31,7 @@ class ShopStoreController extends Controller
             $data['brands'] = ShopBrand::where([['store_id',$key],['status',1]])->get();
             $data['banner'] = ShopBanner::where([['store_id',$key],['type','banner_home'],['status',1]])->get();
             $data['categories'] = new CategoryCollection(ShopCategory::where([['store_id',$key],['parent',0]])->get());
+            $data['config'] = Config::where('store_id',$key)->get();
             return response()->json(new JsonResponse($data, ''), Response::HTTP_OK);
         }
     }
