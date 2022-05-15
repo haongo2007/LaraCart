@@ -5,6 +5,10 @@ use App\Models\Front\ShopDiscount;
 use App\Models\Front\ShopOrderTotal;
 use Carbon\Carbon;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Response;
+use Illuminate\Http\Request;
+use App\Helper\JsonResponse;
+
 class ShopDiscountController extends Controller
 {
     private $codes = [];
@@ -85,24 +89,24 @@ class ShopDiscountController extends Controller
  * @param  [type]  $uID        [description]
  * @return [type]              [description]
  */
-    public function check($code, $uID = null)
+    public function check($code, $uID = null,$store_id = null)
     {
         $uID = (int) $uID;
-        $promocode = (new ShopDiscount)->getPromotionByCode($code);
+        $promocode = (new ShopDiscount)->getPromotionByCode($code,$store_id);
         if ($promocode === null) {
-            return json_encode(['error' => 1, 'msg' => "error_code_not_exist"]);
+            return false;
         }
         //Check user  login
         if ($promocode->login && !$uID) {
-            return json_encode(['error' => 1, 'msg' => "error_login"]);
+            return false;
         }
 
         if ($promocode->limit == 0 || $promocode->limit <= $promocode->used) {
-            return json_encode(['error' => 1, 'msg' => "error_code_cant_use"]);
+            return false;
         }
 
         if ($promocode->status == 0 || $promocode->isExpired()) {
-            return json_encode(['error' => 1, 'msg' => "error_code_expired_disabled"]);
+            return false;
         }
         if ($promocode->login) {
             //check if this user has already used this code already
@@ -111,11 +115,11 @@ class ShopDiscountController extends Controller
                 $arrUsers[] = $value->pivot->customer_id;
             }
             if (in_array($uID, $arrUsers)) {
-                return json_encode(['error' => 1, 'msg' => "error_user_used"]);
+                return false;
             }
         }
 
-        return json_encode(['error' => 0, 'content' => $promocode]);
+        return $promocode;
     }
 
 /**
@@ -261,43 +265,23 @@ class ShopDiscountController extends Controller
  * [checkCoupon description]
  * @return [type]           [description]
  */
-    public function checkCoupon()
+    public function checkCoupon(Request $request)
     {
-        $data = '';
         $code = request('code');
         $uID = request('uID');
-        $check = json_decode($this->check($code, $uID), true);
-        if ($check['error'] == 1) {
-            $error = 1;
-            if ($check['msg'] == 'error_code_not_exist') {
-                $msg = trans('promotion.process.invalid');
-            } elseif ($check['msg'] == 'error_code_cant_use') {
-                $msg = trans('promotion.process.over');
-            } elseif ($check['msg'] == 'error_code_expired_disabled') {
-                $msg = trans('promotion.process.expire');
-            } elseif ($check['msg'] == 'error_user_used') {
-                $msg = trans('promotion.process.used');
-            } elseif ($check['msg'] == 'error_uID_input') {
-                $msg = trans('promotion.process.customer_id_invalid');
-            } elseif ($check['msg'] == 'error_login') {
-                $msg = trans('promotion.process.must_login');
-            } else {
-                $msg = trans('promotion.process.undefined');
-            }
+        $storeId = request()->header('x-store');
+        $check = $this->check($code, $uID,$storeId);
+        $message = '';
+        $err = true;
+        if (!$check) {
+            $status = Response::HTTP_NOT_FOUND;
+            $message = trans('promotion.process.invalid');
         } else {
-            $content = $check['content'];
-            if ($content['type'] === 1) {
-                //Point use in my page
-                $error = 1;
-                $msg = trans('promotion.process.not_allow');
-            } else {
-                $error = 0;
-                $msg = trans('promotion.process.completed');
-                $data = $content;
-            }
-
+            $status = Response::HTTP_OK;
+            $message = trans('promotion.process.completed');
         }
-        return json_encode(['error' => $error, 'msg' => $msg, 'data' => $data]);
+
+        return response()->json(new JsonResponse($check,$message), $status);
 
     }
 

@@ -1,20 +1,21 @@
 <?php
-namespace BlackCart\Core\Front\Controllers;
+namespace App\Http\Controllers\Api\Front;
 
-use App\Http\Controllers\RootFrontController;
-use BlackCart\Core\Front\Models\ShopEmailTemplate;
-use BlackCart\Core\Front\Models\ShopAttributeGroup;
-use BlackCart\Core\Front\Models\ShopCountry;
-use BlackCart\Core\Front\Models\ShopOrder;
-use BlackCart\Core\Front\Models\ShopOrderTotal;
-use BlackCart\Core\Front\Models\ShopProduct;
-use BlackCart\Core\Front\Models\ShopCustomer;
-use BlackCart\Core\Front\Models\ShopCustomerAddress;
-use Cart;
+use App\Http\Controllers\Controller;
+use App\Models\Front\ShopEmailTemplate;
+use App\Models\Front\ShopAttributeGroup;
+use App\Models\Front\ShopCountry;
+use App\Models\Front\ShopOrder;
+use App\Models\Front\ShopOrderTotal;
+use App\Models\Front\ShopProduct;
+use App\Models\Front\ShopCustomer;
+use App\Models\Front\ShopCustomerAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 
-class ShopCartController extends RootFrontController
+class ShopCheckoutController extends Controller
 {
     const ORDER_STATUS_NEW = 1;
     const PAYMENT_UNPAID = 1;
@@ -22,24 +23,47 @@ class ShopCartController extends RootFrontController
 
     public function __construct()
     {
-        parent::__construct();
 
     }
+
 
     /**
-     * Process front get cart
-     *
-     * @param [type] ...$params
-     * @return void
+     * Checkout screen
+     * @return [view]
      */
-    public function getCartProcessFront(...$params) 
+    public function getInfo()
     {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            lc_lang_switch($lang);
+        //Shipping method
+        $storeId = request()->header('x-store');
+        
+        $moduleShipping = lc_get_plugin_installed('shipping');
+        $sourcesShipping = lc_get_all_plugin('shipping');
+        $shippingMethod = array();
+        foreach ($moduleShipping as $module) {
+            if (array_key_exists($module['key'], $sourcesShipping)) {
+                $moduleClass = lc_get_class_plugin_config('shipping', $module['key']);
+                $shippingMethod[$module['key']] = (new $moduleClass)->getData();
+            }
         }
-        return $this->_getCart();
+
+        //Payment method
+        $modulePayment = lc_get_plugin_installed('payment');
+        $sourcesPayment = lc_get_all_plugin('payment');
+        $paymentMethod = array();
+        foreach ($modulePayment as $module) {
+            if (array_key_exists($module['key'], $sourcesPayment)) {
+                $moduleClass = $sourcesPayment[$module['key']].'\AppConfig';
+                $paymentMethod[$module['key']] = (new $moduleClass)->getData();
+            }
+        }     
+
+        $data = [   
+                    'paymentMethod'     => $paymentMethod,
+                    'shippingMethod'    => $shippingMethod,
+                ];
+        return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }
+    
 
     /**
      * Get list cart: screen get cart
@@ -160,7 +184,7 @@ class ShopCartController extends RootFrontController
                 'title'           => trans('front.cart_title'),
                 'description'     => '',
                 'keyword'         => '',
-                'cart'            => Cart::instance('default')->content(),
+                // 'cart'            => Cart::instance('default')->content(),
                 'shippingMethod'  => $shippingMethod,
                 'paymentMethod'   => $paymentMethod,
                 'totalMethod'     => $totalMethod,
@@ -175,20 +199,6 @@ class ShopCartController extends RootFrontController
         );
     }
 
-    /**
-     * Process front prepare checkout
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function checkoutPrepareProcessFront(...$params) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            lc_lang_switch($lang);
-        }
-        return $this->_checkoutPrepare();
-    }
 
     /**
      * Process Cart, prepare for the checkout screen
@@ -196,9 +206,9 @@ class ShopCartController extends RootFrontController
     private function _checkoutPrepare()
     {
         $customer = auth()->user();
-        if (Cart::instance('default')->count() == 0) {
-            return redirect(lc_route('cart'));
-        }
+        // if (Cart::instance('default')->count() == 0) {
+        //     return redirect(lc_route('cart'));
+        // }
 
         //Not allow for guest
         if (!lc_config('shop_allow_guest') && !$customer) {
@@ -373,7 +383,7 @@ class ShopCartController extends RootFrontController
 
         //Check minimum
         $arrCheckQty = [];
-        $cart = Cart::instance('default')->content()->toArray();
+        // $cart = Cart::instance('default')->content()->toArray();
         foreach ($cart as $key => $row) {
             $arrCheckQty[$row['id']] = ($arrCheckQty[$row['id']] ?? 0) + $row['qty'];
         }
@@ -392,600 +402,6 @@ class ShopCartController extends RootFrontController
         return redirect(lc_route('checkout'));
     }
 
-    /**
-     * Process front checkout screen
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function getCheckoutProcessFront(...$params) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            lc_lang_switch($lang);
-        }
-        return $this->_getCheckout();
-    }
-
-    /**
-     * Checkout screen
-     * @return [view]
-     */
-    private function _getCheckout()
-    {
-        //Check shipping address
-        if (
-            !session('shippingAddress')
-        ) {
-            return redirect(lc_route('cart'));
-        }
-        $shippingAddress = session('shippingAddress');
-
-
-        //Shipping method
-        if (lc_config('shipping_off')) {
-            $shippingMethodData = null;
-        } else {
-            if (!session('shippingMethod')) {
-                return redirect(lc_route('cart'));
-            }
-            $shippingMethod = session('shippingMethod');
-            $classShippingMethod = lc_get_class_plugin_config('Shipping', $shippingMethod);
-            $shippingMethodData = (new $classShippingMethod)->getData();
-        }
-
-        //Payment method
-        if (lc_config('payment_off')) {
-            $paymentMethodData = null;
-        } else {
-            if (!session('paymentMethod')) {
-                return redirect(lc_route('cart'));
-            }
-            $paymentMethod = session('paymentMethod');
-            $classPaymentMethod = lc_get_class_plugin_config('Payment', $paymentMethod);
-            $paymentMethodData = (new $classPaymentMethod)->getData();
-        }
-        $objects = ShopOrderTotal::getObjectOrderTotal();
-        $dataTotal = ShopOrderTotal::processDataTotal($objects);
-
-        //Set session dataTotal
-        session(['dataTotal' => $dataTotal]);
-
-        lc_check_view($this->templatePath . '.Cart.checkout');
-        return view(
-            $this->templatePath . '.Cart.checkout',
-            [
-                'title'              => trans('front.checkout_title'),
-                'cart'               => Cart::instance('default')->content(),
-                'dataTotal'          => $dataTotal,
-                'paymentMethodData'  => $paymentMethodData,
-                'shippingMethodData' => $shippingMethodData,
-                'shippingAddress'    => $shippingAddress,
-                'attributesGroup'    => ShopAttributeGroup::getListAll(),
-                'layout_page'        => 'checkout',
-            ]
-        );
-    }
-
-    /**
-     * Add to cart by method post, always use in the product page detail
-     * 
-     * @return [redirect]
-     */
-    public function addToCart()
-    {
-        $data      = request()->all();
-
-        //Process escape
-        $data      = lc_clean($data);
-
-        $productId = $data['product_id'];
-        $qty       = $data['qty'] ?? 0;
-        $storeId   = $data['storeId'] ?? config('app.storeId');
-
-        //Process attribute price
-        $formAttr = $data['form_attr'] ?? null;
-        $optionPrice  = 0;
-        if ($formAttr) {
-            foreach ($formAttr as $key => $attr) {
-                $optionPrice += explode('__', $attr)[1] ??0;
-            }
-        }
-        //End addtribute price
-        $product = (new ShopProduct)->getDetail($productId, null, $storeId);
-
-        if (!$product) {
-            return response()->json(
-                [
-                    'error' => 1,
-                    'msg' => trans('front.notfound'),
-                ]
-            );
-        }
-        
-        if ($product->allowSale()) {
-            $options = array();
-            $options = $formAttr;
-            $dataCart = array(
-                'id'      => $product->id,
-                'name'    => $product->name,
-                'qty'     => $qty,
-                'price'   => $product->getFinalPrice() + $optionPrice,
-                'tax'     => $product->getTaxValue(),
-                'storeId' => $storeId,
-            );
-            if ($options) {
-                $dataCart['options'] = $options;
-            }
-            Cart::instance('default')->add($dataCart);
-        } else {
-            return redirect(lc_route('cart'))
-                ->with(
-                    ['error' => trans('cart.dont_allow_sale')]
-                );
-        }
-        return redirect(lc_route('cart'))->with(['success' => trans('cart.success', ['instance' => 'cart'])]);
-
-    }
-
-    /**
-     * Create new order
-     * @return [redirect]
-     */
-    public function addOrder(Request $request)
-    {
-        $customer = auth()->user();
-        $uID = $customer->id ?? 0;
-        //if cart empty
-        if (Cart::instance('default')->count() == 0) {
-            return redirect()->route('home');
-        }
-        //Not allow for guest
-        if (!lc_config('shop_allow_guest') && !$customer) {
-            return redirect(lc_route('login'));
-        } //
-
-        $data = request()->all();
-        if (!$data) {
-            return redirect(lc_route('cart'));
-        } else {
-            $dataTotal       = session('dataTotal') ?? [];
-            $shippingAddress = session('shippingAddress') ?? [];
-            $paymentMethod   = session('paymentMethod') ?? '';
-            $shippingMethod  = session('shippingMethod') ?? '';
-            $address_process = session('address_process') ?? '';
-        }
-
-        //Process total
-        $subtotal = (new ShopOrderTotal)->sumValueTotal('subtotal', $dataTotal); //sum total
-        $tax      = (new ShopOrderTotal)->sumValueTotal('tax', $dataTotal); //sum tax
-        $shipping = (new ShopOrderTotal)->sumValueTotal('shipping', $dataTotal); //sum shipping
-        $discount = (new ShopOrderTotal)->sumValueTotal('discount', $dataTotal); //sum discount
-        $received = (new ShopOrderTotal)->sumValueTotal('received', $dataTotal); //sum received
-        $total    = (new ShopOrderTotal)->sumValueTotal('total', $dataTotal);
-        //end total
-
-        $dataOrder['customer_id']     = $uID;
-        $dataOrder['subtotal']        = $subtotal;
-        $dataOrder['shipping']        = $shipping;
-        $dataOrder['discount']        = $discount;
-        $dataOrder['received']        = $received;
-        $dataOrder['tax']             = $tax;
-        $dataOrder['payment_status']  = self::PAYMENT_UNPAID;
-        $dataOrder['shipping_status'] = self::SHIPPING_NOTSEND;
-        $dataOrder['status']          = self::ORDER_STATUS_NEW;
-        $dataOrder['currency']        = lc_currency_code();
-        $dataOrder['exchange_rate']   = lc_currency_rate();
-        $dataOrder['total']           = $total;
-        $dataOrder['balance']         = $total + $received;
-        $dataOrder['email']           = $shippingAddress['email'];
-        $dataOrder['first_name']      = $shippingAddress['first_name'];
-        $dataOrder['payment_method']  = $paymentMethod;
-        $dataOrder['shipping_method'] = $shippingMethod;
-        $dataOrder['user_agent']      = $request->header('User-Agent');
-        $dataOrder['ip']              = $request->ip();
-        $dataOrder['created_at']      = date('Y-m-d H:i:s');
-
-        if (!empty($shippingAddress['last_name'])) {
-            $dataOrder['last_name']       = $shippingAddress['last_name'];
-        }
-        if (!empty($shippingAddress['first_name_kana'])) {
-            $dataOrder['first_name_kana']       = $shippingAddress['first_name_kana'];
-        }
-        if (!empty($shippingAddress['last_name_kana'])) {
-            $dataOrder['last_name_kana']       = $shippingAddress['last_name_kana'];
-        }
-        if (!empty($shippingAddress['address1'])) {
-            $dataOrder['address1']       = $shippingAddress['address1'];
-        }
-        if (!empty($shippingAddress['address2'])) {
-            $dataOrder['address2']       = $shippingAddress['address2'];
-        }
-        if (!empty($shippingAddress['address3'])) {
-            $dataOrder['address3']       = $shippingAddress['address3'];
-        }
-        if (!empty($shippingAddress['country'])) {
-            $dataOrder['country']       = $shippingAddress['country'];
-        }
-        if (!empty($shippingAddress['phone'])) {
-            $dataOrder['phone']       = $shippingAddress['phone'];
-        }
-        if (!empty($shippingAddress['postcode'])) {
-            $dataOrder['postcode']       = $shippingAddress['postcode'];
-        }
-        if (!empty($shippingAddress['company'])) {
-            $dataOrder['company']       = $shippingAddress['company'];
-        }
-        if (!empty($shippingAddress['comment'])) {
-            $dataOrder['comment']       = $shippingAddress['comment'];
-        }
-
-        $arrCartDetail = [];
-        foreach (Cart::instance('default')->content() as $cartItem) {
-            $arrDetail['product_id']  = $cartItem->id;
-            $arrDetail['name']        = $cartItem->name;
-            $arrDetail['price']       = lc_currency_value($cartItem->price);
-            $arrDetail['qty']         = $cartItem->qty;
-            $arrDetail['store_id']    = $cartItem->storeId;
-            $arrDetail['attribute']   = ($cartItem->options) ? json_encode($cartItem->options) : null;
-            $arrDetail['total_price'] = lc_currency_value($cartItem->price) * $cartItem->qty;
-            $arrCartDetail[]          = $arrDetail;
-        }
-
-        //Set session info order
-        session(['dataOrder' => $dataOrder]);
-        session(['arrCartDetail' => $arrCartDetail]);
-        //Create new order
-        $newOrder = (new ShopOrder)->createOrder($dataOrder, $dataTotal, $arrCartDetail);
-
-        if ($newOrder['error'] == 1) {
-            return redirect(lc_route('cart'))->with(['error' => $newOrder['msg']]);
-        }
-        //Set session orderID
-        session(['orderID' => $newOrder['orderID']]);
-
-        //Create new address
-        if ($address_process == 'new') {
-            $addressNew = [
-                'first_name'      => $shippingAddress['first_name'] ?? '',
-                'last_name'       => $shippingAddress['last_name'] ?? '',
-                'first_name_kana' => $shippingAddress['first_name_kana'] ?? '',
-                'last_name_kana'  => $shippingAddress['last_name_kana'] ?? '',
-                'postcode'        => $shippingAddress['postcode'] ?? '',
-                'address1'        => $shippingAddress['address1'] ?? '',
-                'address2'        => $shippingAddress['address2'] ?? '',
-                'address3'        => $shippingAddress['address3'] ?? '',
-                'country'         => $shippingAddress['country'] ?? '',
-                'phone'           => $shippingAddress['phone'] ?? '',
-            ];
-
-            //Process escape
-            $addressNew = lc_clean($addressNew);
-
-            ShopCustomer::find($uID)->addresses()->save(new ShopCustomerAddress($addressNew));
-            session()->forget('address_process'); //destroy address_process
-        }
-
-        $paymentMethod = lc_get_class_plugin_controller('Payment', session('paymentMethod'));
-
-        if ($paymentMethod) {
-            // Check payment method
-            return (new $paymentMethod)->processOrder();
-        } else {
-            return (new ShopCartController)->completeOrder();
-        }
-    }
-
-    /**
-     * Add product to cart
-     * @param Request $request [description]
-     * @return [json]
-     */
-    public function addToCartAjax(Request $request)
-    {
-        if (!$request->ajax()) {
-            return redirect(lc_route('cart'));
-        }
-        $data     = request()->all();
-        $instance = $data['instance'] ?? 'default';
-        $id       = $data['id'] ?? '';
-        $storeId  = $data['storeId'] ?? config('app.storeId');
-        $cart     = Cart::instance($instance);
-        $product    = (new ShopProduct)->getDetail($id, null, $storeId);
-        $cart_items = '';
-        $msg        = trans('cart.success', ['instance' => ($instance == 'default') ? 'cart' : $instance]);
-
-        if (!$product) {
-            return response()->json(
-                [
-                    'error' => 1,
-                    'msg' => trans('front.notfound'),
-                ]
-            );
-        }
-        switch ($instance) {
-            case 'default':
-                if ($product->attributes->count() || $product->kind == LC_PRODUCT_GROUP) {
-                    //Products have attributes or kind is group,
-                    //need to select properties before adding to the cart
-                    return response()->json(
-                        [
-                            'error' => 1,
-                            'redirect' => $product->getUrl(),
-                            'msg' => '',
-                        ]
-                    );
-                }
-
-                //Check product allow for sale
-                if ($product->allowSale()) {
-                    $cart->add(
-                        array(
-                            'id'      => $id,
-                            'name'    => $product->name,
-                            'qty'     => 1,
-                            'price'   => $product->getFinalPrice(),
-                            'tax'     => $product->getTaxValue(),
-                            'storeId' => $storeId,
-                        )
-                    );
-                    $carts_content = $cart->content();
-                    $cart_items = view($this->templatePath . '.Common.cart_items',['carts'=>$carts_content])->render();
-                } else {
-                    return response()->json(
-                        [
-                            'error' => 1,
-                            'msg' => trans('cart.dont_allow_sale'),
-                        ]
-                    );
-                }
-                break;
-
-            default:
-                //Favorite or Compare...
-                ${'arrID' . $instance} = array_keys($cart->content()->groupBy('id')->toArray());
-                if (!in_array($id, ${'arrID' . $instance})) {
-                    try {
-                        $cart->add(
-                            array(
-                                'id'      => $id,
-                                'name'    => $product->name,
-                                'qty'     => 1,
-                                'price'   => $product->getFinalPrice(),
-                                'tax'     => $product->getTaxValue(),
-                                'storeId' => $storeId,
-                            )
-                        );
-                    } catch (\Throwable $e) {
-                        return response()->json(
-                            [
-                                'error' => 1,
-                                'msg' => $e->getMessage(),
-                            ]
-                        );
-                    }
-
-                }elseif (in_array($id, ${'arrID' . $instance}) && $instance == 'favorite') {
-                    try {
-                        $item = Cart::instance($instance)->content()->groupBy('id')->toArray();
-                        if (array_key_exists($id, $item)) {
-                            $cart->remove($item[$id][0]['rowId']);
-                            $msg   = trans('cart.delete_success', ['instance' => 'favorite']);
-                        }
-                    } catch (\Throwable $e) {
-                        return response()->json(
-                            [
-                                'error' => 1,
-                                'msg' => $e->getMessage(),
-                            ]
-                        );
-                    }
-                } 
-                else {
-                    return response()->json(
-                        [
-                            'error' => 1,
-                            'msg' => trans('cart.exist', ['instance' => $instance]),
-                        ]
-                    );
-                }
-                break;
-        }
-        $carts      = Cart::getListCart($instance);
-        return response()->json(
-            [
-                'error'      => 0,
-                'count_cart' => $carts['count'],
-                'instance'   => $instance,
-                'subtotal'   => $carts['subtotal'],
-                'msg'        => $msg,
-                'html_items'  => $cart_items
-            ]
-        );
-    }
-
-    /**
-     * Update product to cart
-     * @param  Request $request [description]
-     * @return [json]
-     */
-    public function updateToCart(Request $request)
-    {
-        if (!$request->ajax()) {
-            return redirect(lc_route('cart'));
-        }
-        $data    = request()->all();
-        $id      = $data['id'] ?? '';
-        $rowId   = $data['rowId'] ?? '';
-        $new_qty = $data['new_qty'] ?? 0;
-        $storeId = $data['storeId'] ?? config('app.storeId');
-        $product = (new ShopProduct)->getDetail($id, null, $storeId);
-        
-        if (!$product) {
-            return response()->json(
-                [
-                    'error' => 1,
-                    'msg' => trans('front.notfound'),
-                ]
-            );
-        }
-        
-        if ($product->stock < $new_qty && !lc_config('product_buy_out_of_stock', $product->store_id)) {
-            return response()->json(
-                [
-                    'error' => 1,
-                    'msg' => trans('cart.over', ['item' => $product->sku]),
-                ]
-            );
-        } else {
-            Cart::instance('default')->update($rowId, ($new_qty) ? $new_qty : 0);
-            return response()->json(
-                [
-                    'error' => 0,
-                ]
-            );
-        }
-
-    }
-
-    /**
-     * Process front favorite
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function favoriteListProcessFront(...$params) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            lc_lang_switch($lang);
-        }
-        return $this->_favorite();
-    }
-
-    /**
-     * Get product in favorite
-     * @return [view]
-     */
-    private function _favorite()
-    {
-
-        $favorites = Cart::instance('favorite')->content();
-        lc_check_view($this->templatePath . '.Shop.shop_favorite');
-        return view(
-            $this->templatePath . '.Shop.shop_favorite',
-            array(
-                'title'       => trans('front.favorite'),
-                'description' => '',
-                'keyword'     => '',
-                'favorites'    => $favorites,
-                'layout_page' => 'shop_favorite',
-            )
-        );
-    }
-
-    /**
-     * Process front compare
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function compareProcessFront(...$params) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            lc_lang_switch($lang);
-        }
-        return $this->_compare();
-    }
-
-    /**
-     * Get product in compare
-     * @return [view]
-     */
-    private function _compare()
-    {
-        $compare = Cart::instance('compare')->content();
-
-        lc_check_view($this->templatePath . '.Product.compare');
-        return view(
-            $this->templatePath . '.Product.compare',
-            array(
-                'title'       => trans('front.compare'),
-                'description' => '',
-                'keyword'     => '',
-                'compare'     => $compare,
-                'layout_page' => 'shop_compare',
-            )
-        );
-    }
-
-
-    /**
-     * Process front compare
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function clearCartProcessFront(...$params) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            $instance = $params[1] ?? 'cart';
-            lc_lang_switch($lang);
-        } else {
-            $instance = $params[0] ?? 'cart';
-        }
-        return $this->_clearCart($instance);
-    }
-
-
-    /**
-     * Clear all cart
-     * @return [redirect]
-     */
-    private function _clearCart($instance = 'cart')
-    {
-        Cart::instance($instance)->destroy();
-        return redirect(lc_route($instance));
-    }
-
-    /**
-     * Process front remove item cart
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function removeItemProcessFront(...$params) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            $instance = $params[1] ?? 'cart';
-            $id = $params[2] ?? '';
-            lc_lang_switch($lang);
-        } else {
-            $instance = $params[0] ?? 'cart';
-            $id = $params[1] ?? '';
-        }
-        return $this->_removeItem($instance, $id);
-    }
-
-
-    /**
-     * Remove item from cart
-     * @return [redirect]
-     */
-    private function _removeItem($instance = 'cart', $id = null)
-    {
-        if ($id === null) {
-            return redirect(lc_route($instance));
-        }
-        if (array_key_exists($id, Cart::instance($instance)->content()->toArray())) {
-            Cart::instance($instance)->remove($id);
-        }
-        return redirect(lc_route($instance));
-    }
-
     
     /**
      * Complete order
@@ -998,7 +414,7 @@ class ShopCartController extends RootFrontController
         if ($orderID == 0){
             return redirect()->route('home', ['error' => 'Error Order ID!']);
         }
-        Cart::destroy(); // destroy cart
+        // Cart::destroy(); // destroy cart
 
         $paymentMethod = session('paymentMethod');
         $shippingMethod = session('shippingMethod');
@@ -1153,32 +569,5 @@ class ShopCartController extends RootFrontController
     }
 
 
-    /**
-     * Process front page order success
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function orderSuccessProcessFront(...$params) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            lc_lang_switch($lang);
-        }
-        return $this->_orderSuccess();
-    }
-
-    /**
-     * order success
-     *
-     * @return  [redirect to home with message]
-     */
-    private function _orderSuccess() {
-
-        if (!session('orderID')) {
-            return redirect()->route('home');
-        }
-        return redirect(lc_route('home'))->with('order_success', trans('order.success.title',['order_id'=>session('orderID')]));
-    }
 
 }

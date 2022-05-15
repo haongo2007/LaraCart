@@ -125,16 +125,16 @@ class ShopProductController extends Controller
      *
      * @return  [mix]
      */
-    private function _productDetail($alias,$type, $storeId,$view = '.Product.detail')
+    private function _productDetail($alias,$type, $storeId)
     {
         $product = (new ShopProduct)->getDetail($alias, $type, $storeId);
-        if ($product && $product->status && (!lc_config('product_stock', $storeId) || lc_config('product_display_out_of_stock', $storeId) || $product->stock > 0)) {
+        // if ($product && $product->status && (!lc_config('product_stock', $storeId) || lc_config('product_display_out_of_stock', $storeId) || $product->stock > 0)) {
             //Update last view
             $product->view += 1;
             $product->date_lastview = date('Y-m-d H:i:s');
             $product->save();
             //End last viewed
-
+            
             //Product relation by categories
             $categories = $product->categories->keyBy('id')->toArray();
             $arrCategoriId = array_keys($categories);
@@ -145,14 +145,7 @@ class ShopProductController extends Controller
                 ->setRandom()
                 ->getData()
                 ->where('id','<>',$product->id);
-            //End Product relation by categories
 
-            //Product last view
-                // $arrlastView = empty(\Cookie::get('productsLastView')) ? array() : json_decode(\Cookie::get('productsLastView'), true);
-                // $arrlastView[$product->id] = date('Y-m-d H:i:s');
-                // arsort($arrlastView);
-                // \Cookie::queue('productsLastView', json_encode($arrlastView), (86400 * 30));
-            //End product last view
             $prev_product = (new ShopProduct)->setStore($storeId)->getData()->where('id', '<', $product->id)->first();
             if ($prev_product) {
                 $prev_product = new ProductCollection($prev_product);
@@ -168,9 +161,9 @@ class ShopProductController extends Controller
             $data['product'] = new ProductCollection($product);
             $data['relatedProducts'] = new ProductRelatedCollection($productRelation);
             return response()->json(new JsonResponse($data), Response::HTTP_OK);
-        } else {
-            return response()->json(new JsonResponse([]), Response::HTTP_OK);
-        }
+        // } else {
+        //     return response()->json(new JsonResponse([]), Response::HTTP_OK);
+        // }
     }
     public function productDetailQuickViewProcess(Request $request)
     {

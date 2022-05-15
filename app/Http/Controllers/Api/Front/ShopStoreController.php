@@ -17,22 +17,20 @@ class ShopStoreController extends Controller
 {
     public function getInfo()
     {
-        $domain = lc_process_domain_store(basename(request()->headers->get('referer')));
-        $arrDomain = ShopStore::getDomainPartner();
-        if (!in_array($domain, $arrDomain) && lc_config_global('domain_strict')) {
-            return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
-        }else{
-        	$key = array_search($domain, $arrDomain);
-        	$data = [];
-            $data['store'] = ShopStore::with('descriptionsCurrentLang')->find($key);
-            $data['languages'] = ShopLanguage::where('store_id',$key)->get();
-            $data['currencies'] = ShopCurrency::where('store_id',$key)->get();
-            $data['slider'] = ShopBanner::where([['store_id',$key],['type','slider_home'],['status',1]])->get();
-            $data['brands'] = ShopBrand::where([['store_id',$key],['status',1]])->get();
-            $data['banner'] = ShopBanner::where([['store_id',$key],['type','banner_home'],['status',1]])->get();
-            $data['categories'] = new CategoryCollection(ShopCategory::where([['store_id',$key],['parent',0]])->get());
-            $data['config'] = Config::where('store_id',$key)->get();
-            return response()->json(new JsonResponse($data, ''), Response::HTTP_OK);
+        $storeId = request()->header('x-store');
+        if (!$storeId) {
+            $domain = lc_process_domain_store(basename(request()->headers->get('referer')));
+            $arrDomain = ShopStore::getDomainPartner();
+            $storeId = array_search($domain, $arrDomain);
         }
+    	$data = [];
+        $data['store'] = ShopStore::with('descriptionsCurrentLang')->find($storeId);
+        $data['languages'] = ShopLanguage::where('store_id',$storeId)->get();
+        $data['currencies'] = ShopCurrency::where('store_id',$storeId)->get();
+        $data['slider'] = ShopBanner::where([['store_id',$storeId],['type','slider_home'],['status',1]])->get();
+        $data['brands'] = ShopBrand::where([['store_id',$storeId],['status',1]])->get();
+        $data['banner'] = ShopBanner::where([['store_id',$storeId],['type','banner_home'],['status',1]])->get();
+        $data['categories'] = new CategoryCollection(ShopCategory::where([['store_id',$storeId],['parent',0]])->get());
+        return response()->json(new JsonResponse($data, ''), Response::HTTP_OK);
     }
 }

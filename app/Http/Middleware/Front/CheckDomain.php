@@ -18,14 +18,12 @@ class CheckDomain
      */
     public function handle($request, Closure $next)
     {
-        // if (lc_config_global('MultiVendorPro') || lc_config_global('MultiStorePro')) {
-        //     //Check domain exist
-        //     $domain = lc_process_domain_store(basename(request()->headers->get('referer')));
-        //     $arrDomain = ShopStore::getDomainPartner();
-        //     if (!in_array($domain, $arrDomain) && lc_config_global('domain_strict')) {
-        //         return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
-        //     }
-        //}
+        //Check domain exist
+        // $domain = lc_process_domain_store(basename(request()->headers->get('referer')));
+        // $arrDomain = ShopStore::getDomainPartner();
+        // if (!in_array($domain, $arrDomain) && lc_config_global('domain_strict')) {
+        //     return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
+        // }
         return $next($request);
     }
 }

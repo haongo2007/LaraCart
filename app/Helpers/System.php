@@ -10,7 +10,7 @@ if (!function_exists('lc_admin_can_config')) {
      */
     function lc_admin_can_config()
     {
-        return \BlackCart\Core\Admin\Admin::user()->checkPermissionconfig();
+        return \App\Models\Admin\Admin::user()->checkPermissionconfig();
     }
 }
 

@@ -112,19 +112,11 @@ class ShopDiscount extends Model
      *
      * @return  [type]         [return description]
      */
-    public function getPromotionByCode($code) {
-        if (config('app.storeId') == LC_ID_ROOT) {
-            //If store is primary store, dont check store id
-            $promocode = $this
-                ->where('code', $code)
-                ->first();
-        } else {
-            // Only use for owner store
-            $promocode = $this
-                ->where('store_id', config('app.storeId'))
-                ->where('code', $code)
-                ->first();
-        }
+    public function getPromotionByCode($code,$store_id = LC_ID_ROOT) {
+        $promocode = $this
+        ->where('store_id', $store_id)
+        ->where('code', $code)
+        ->first();
 
         return $promocode;
     }

@@ -83,11 +83,16 @@ class JsonResponse implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return [
+        $res = [
             'success' => $this->success,
             'data' => $this->data,
             'error' => $this->error,
         ];
+        if (!empty($this->data) || !$this->error) {
+            $res['message'] = $this->error;
+            unset($res['error']);
+        }
+        return $res;
     }
 
 
