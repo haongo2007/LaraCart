@@ -80,12 +80,16 @@
                     filterable
                   /> -->
                   <el-autocomplete
-                    v-model="dataTemp.parent"
+                    style="margin-right: 20px"
+                    v-for="(item,index) in categories"
+                    :key="index"
+                    v-model="item.name"
                     :fetch-suggestions="querySearchAsync"
+                    @focus="checkParentFocus(index)"
                     placeholder="Please input"
                     @select="handleSelectCategory"
-                    value-key="name"
-                  ></el-autocomplete>
+                    value-key="name"/>
+
                 </el-form-item>
 
                 <el-form-item :label="$t('table.status')" prop="status">
@@ -178,8 +182,13 @@ export default {
       active: 0,
       componentStorage: '',
       disableUseStorage: false,
+      categories:[{
+          'name':'',
+          'id':'0',
+          'parent':'0',
+      }],
       category:[],
-      cateLevel:1,
+      cateLevel:0,
       timeout:  null,
       // cateRecurProps: {
       //   children: 'children',
@@ -235,21 +244,24 @@ export default {
       }
     },
     async getCategory(id){
-      let obj = {parent:0};
+      let obj = {
+          parent:0,
+          store_id : this.dataTemp.store_id
+      };
+
       if (id) {
         obj['id'] = id;
       }
       const { data } = await categoryResource.list(obj);
       // data.unshift(this.listRecursive[0]);
-      this.category = data;
-      if (this.cateLevel == 1) {
-        this.category.unshift({
+      this.category.push(data);
+      if (this.cateLevel == 0) {
+        this.category[this.cateLevel].unshift({
           id: '0',
           parent: 0,
           name: 'Is parent',
         })
       }
-      this.cateLevel++;
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -357,7 +369,7 @@ export default {
       this.dynamicTags = '';
     },
     querySearchAsync(queryString, cb) {
-      var category = this.category;
+      var category = this.category[this.cateLevel];
       var results = queryString ? category.filter(this.createFilter(queryString)) : category;
       
       clearTimeout(this.timeout);
@@ -370,8 +382,20 @@ export default {
         return (category.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
       };
     },
-    handleSelectCategory(item){
-      console.log(item);
+    checkParentFocus(level){
+      this.cateLevel = level;
+    },
+    async handleSelectCategory(item){
+      if (item.hasChildren) {
+        this.cateLevel++;
+        const { data } = await categoryResource.getChildren(item.id);
+        this.category.push(data);
+        this.categories.push({
+          id:String(this.cateLevel),
+          parent:item.id,
+          name:''
+        });
+      }
     }
   },
 };

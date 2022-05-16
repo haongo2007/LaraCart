@@ -35,6 +35,15 @@
         </template>
       </el-table-column>
 
+      <el-table-column label="Store" min-width="150">
+        <template slot-scope="scope">
+          <el-tag type="success">
+            <i class="el-icon-s-shop"></i>
+            {{ scope.row.store.descriptions_current_lang[0].title && scope.row.store.descriptions_current_lang[0].title }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      
       <el-table-column :label="$t('table.name')" min-width="150px">
         <template slot-scope="scope">
           <el-tag>{{ scope.row.name }}</el-tag>

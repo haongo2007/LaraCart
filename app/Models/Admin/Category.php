@@ -3,8 +3,6 @@
 namespace App\Models\Admin;
 
 use App\Models\Front\ShopCategory;
-use App\Models\Admin\StoreCategory;
-use App\Models\Admin\StoreCategoryDescription;
 use Cache;
 use App\Models\Front\ShopCategoryDescription;
 use Illuminate\Support\Arr;
@@ -43,21 +41,16 @@ class Category extends ShopCategory
         $status= Arr::get($dataSearch, 'status', self::ACTIVE);
         $title = Arr::get($dataSearch, 'name', '');
         $parent = Arr::get($dataSearch, 'parent', '');
+        $storeId = Arr::get($dataSearch, 'store_id', '');
         $arrSort = [
             'id__desc' => trans('category.admin.sort_order.id_desc'),
             'id__asc' => trans('category.admin.sort_order.id_asc'),
             'title__desc' => trans('category.admin.sort_order.title_desc'),
             'title__asc' => trans('category.admin.sort_order.title_asc'),
         ];
-        if (count(session('adminStoreId')) == 1) {
-            $tableDescription = (new StoreCategoryDescription)->getTable();
-            $tableCategory    = (new StoreCategory)->getTable();
-            $categoryList     = (new StoreCategory);
-        }else{
-            $tableDescription = (new ShopCategoryDescription)->getTable();
-            $tableCategory    = (new ShopCategory)->getTable();
-            $categoryList     = (new ShopCategory);
-        }
+        $tableDescription = (new ShopCategoryDescription)->getTable();
+        $tableCategory    = (new ShopCategory)->getTable();
+        $categoryList     = (new ShopCategory);
 
         $categoryList = $categoryList->leftJoin($tableDescription, $tableDescription . '.category_id', $tableCategory . '.id')
             ->where($tableDescription . '.lang', lc_get_locale());
@@ -75,8 +68,11 @@ class Category extends ShopCategory
             $categoryList = $categoryList->whereIn('status',$status);
         }
 
-        if (count(session('adminStoreId')) == 1) {
-            $categoryList = $categoryList->where('store_id',session('adminStoreId'));
+        if (count(session('adminStoreId')) == 1 || $storeId) {
+            if (!$storeId) {
+                $storeId = session('adminStoreId');
+            }
+            $categoryList = $categoryList->where('store_id',$storeId);
         }
         if ($sort && array_key_exists($sort, $arrSort)) {
             $field = explode('__', $sort)[0];

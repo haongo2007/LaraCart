@@ -42,6 +42,15 @@ class ShopCategory extends Model
     {
         return $this->belongsToMany(ShopProduct::class, 'shop_product_category', 'category_id', 'product_id');
     }
+    /**
+     * A order has and belongs to many stores.
+     *
+     * @return BelongsToMany
+     */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
     //Function get text description 
     public function getText() {
         return $this->descriptions()->where('lang', lc_get_locale())->first();

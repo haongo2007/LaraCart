@@ -22,6 +22,7 @@ class CategoryCollection extends JsonResource
             'top' => $this->top,
             'alias' => $this->alias,
             'parent' => $this->parent,
+            'store' => $this->stores,
             'image' => $this->image
         ];
 

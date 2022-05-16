@@ -76,9 +76,7 @@ export default {
           this.temp.top = String(data.top);
           this.temp.status = String(data.status);
           this.temp.id = data.id;
-          if (data.store_id) {
-            this.temp.store_id = data.store_id;
-          }
+          this.temp.store_id = data.store_id;
           // const codes = [];
           // for (var i = 0; i < desc.length; i++) {
           //   codes.push(data.descriptions[i].lang);
@@ -102,7 +100,7 @@ export default {
         });
     },
     fetchLanguages(desc) {
-      languageResource.fetchLanguagesActive()
+      languageResource.fetchLanguagesActive(this.temp.store_id)
         .then(data => {
           var that = this;
           Object.keys(data.data).forEach(function(key, index) {

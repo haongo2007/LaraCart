@@ -1,5 +1,23 @@
 <template>
-  <category-detail v-if="!loading" :is-edit="false" :data-temp="temp" :data-rules="rules" :data-languages="languages" />
+  <div>
+    <category-detail v-if="!loading && !confirmStoreDialog" :is-edit="false" :data-temp="temp" :data-rules="rules" :data-languages="languages" />
+    <el-dialog
+      :show-close="false"
+      title="Please Choose store you want add category"
+      :visible.sync="confirmStoreDialog"
+      :before-close="handleConfirm"
+      width="30%"
+    >
+      <div>
+        <el-radio v-for="(item,index) in storeList" :key="index" v-model="temp.store_id" :label="index">
+          {{ item.descriptions_current_lang[0].title }}
+        </el-radio>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" :disabled="temp.store_id == 0" @click="confirmChooseStore">Confirm</el-button>
+      </span>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -53,7 +71,14 @@ export default {
         ],
         descriptions: [],
       },
+      confirmStoreDialog: false,
     };
+  },
+  computed: {
+    storeList(){
+      const storeList = this.$store.state.user.storeList;
+      return storeList;
+    },
   },
   created() {
     let store_ck = Cookies.get('store');
@@ -62,12 +87,15 @@ export default {
     }
     if (store_ck && store_ck.length == 1) {
       this.temp.store_id = store_ck[0];
+    }else{
+      this.confirmStoreDialog = true;
+      return false;
     }
     this.fetchLanguages();
   },
   methods: {
-    fetchLanguages() {
-      languageResource.fetchLanguagesActive(this.temp.store_id)
+    fetchLanguages(id) {
+      languageResource.fetchLanguagesActive(id)
         .then(data => {
           var that = this;
           Object.keys(data.data).forEach(function(key, index) {
@@ -100,6 +128,15 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+    confirmChooseStore(){
+      this.fetchLanguages(this.temp.store_id);
+      this.confirmStoreDialog = false;
+    },
+    handleConfirm(done){
+      if (this.temp.store_id != 0) {
+        done();
+      }
     },
   },
 };

@@ -6,7 +6,6 @@ use App\Models\Front\ShopLanguage;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\Admin\Category;
-use App\Models\Admin\StoreCategory;
 use Illuminate\Http\Response;
 use App\Helper\JsonResponse;
 use App\Http\Resources\CategoryCollection;
@@ -46,11 +45,7 @@ class CategoryController extends Controller
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
-        if ($data['store_id'] == 0) {
-            $Instance = new Category();
-        }else{
-            $Instance = new StoreCategory();
-        }
+        $Instance = new Category();
         $validator = Validator::make($data, [
                 'parent'                 => 'required',
                 'sort'                   => 'numeric|min:0',
@@ -111,11 +106,7 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        if (count(session('adminStoreId')) == 1) {
-            $Instance = new StoreCategory();
-        }else{
-            $Instance = new Category();
-        }
+        $Instance = new Category();
         $category = $Instance::with('descriptions')->find($id);
         if (!$category) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
@@ -130,11 +121,7 @@ class CategoryController extends Controller
     public function update(Request $request,$id)
     {
         $data = request()->all();
-        if ($data['store_id'] == 0) {
-            $Instance = new Category();
-        }else{
-            $Instance = new StoreCategory();
-        }
+        $Instance = new Category();
 
         $category = $Instance::getCategoryAdmin($id);
         if (!$category) {
@@ -312,19 +299,7 @@ class CategoryController extends Controller
      */
     public function getChildren(Request $request)
     {
-        $category = Category::where('parent',$request->id)->get();
-        if (!$category) {
-            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
-        }
-        return response()->json(new JsonResponse(CategoryCollection::collection($category)), Response::HTTP_OK);
-    }
-    /*
-     * API get nested show
-     */
-    public function getNested(Request $request)
-    {
-        dd($request->ids);
-        $category = Category::where('parent',$request->id)->get();
+        $category = Category::with('descriptionsWithLangDefault:title,category_id')->where('parent',$request->id)->get();
         if (!$category) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
