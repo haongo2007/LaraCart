@@ -16,6 +16,26 @@ class CreateTablesShop extends Migration
     {
         //Drop table if exist
         $this->down();
+        Schema::create('store_category', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('image', 100)->nullable();
+            $table->integer('parent')->default(0);
+            $table->string('alias', 120)->index();
+            $table->integer('store_id')->default(1)->index();
+            $table->tinyInteger('sort')->default(0);
+            $table->tinyInteger('status')->default(0);
+            $table->text('parent_list')->nullable();
+            $table->integer('top')->nullable()->default(0);
+        });
+
+        Schema::create('store_category_description', function (Blueprint $table) {
+            $table->integer('category_id');
+            $table->string('lang', 10);
+            $table->string('title', 200)->nullable();
+            $table->string('keyword', 200)->nullable();
+            $table->string('description', 300)->nullable();
+            $table->primary(['category_id', 'lang']);
+        });
 
         Schema::create('shop_banner', function (Blueprint $table) {
             $table->increments('id');

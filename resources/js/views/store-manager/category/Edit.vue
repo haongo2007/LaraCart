@@ -19,6 +19,7 @@ export default {
     	loading: true,
     	languages: [],
       temp: {
+        store_id: 0,
 			  id: '',
 			  alias: '',
 			  sort: '',
@@ -75,6 +76,9 @@ export default {
           this.temp.top = String(data.top);
           this.temp.status = String(data.status);
           this.temp.id = data.id;
+          if (data.store_id) {
+            this.temp.store_id = data.store_id;
+          }
           // const codes = [];
           // for (var i = 0; i < desc.length; i++) {
           //   codes.push(data.descriptions[i].lang);

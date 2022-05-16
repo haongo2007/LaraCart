@@ -41,19 +41,19 @@ export default {
     return {
       confirmStoreDialog: false,
       loading: true,
-    	languages: {},
+      languages: {},
       componentInfo: {},
       stepContent: {},
-  		temp: {
+      temp: {
         store_id: 0,
-			  id: 0,
-			  kind: 0,
-			  descriptions: {},
+        id: 0,
+        kind: 0,
+        descriptions: {},
       },
       rules: {
         descriptions: [],
       },
-  	};
+    };
   },
   computed: {
     storeList(){
@@ -99,7 +99,7 @@ export default {
       loading.close();
       this.loading = false;
     },
-	  setTemp(){
+    setTemp(){
       var that = this;
       const data = Object.assign({}, this.languages);
       Object.keys(data).forEach(function(key, index) {

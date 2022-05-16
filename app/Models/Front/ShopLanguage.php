@@ -72,10 +72,17 @@ class ShopLanguage extends Model
 
     public static function getCodeActive($storeId)
     {
+        // Print the entire match result
+
         if (self::$getCodeActive === null) {
             self::$getCodeActive = self::where('status', 1);
+            $storeId = (int) $storeId;
             if (!$storeId || $storeId == 'undefined') {
-                self::$getCodeActive = self::$getCodeActive->whereIn('store_id',session('adminStoreId'));
+                if ($storeId == 0) {
+                    self::$getCodeActive = self::$getCodeActive->where('store_id',$storeId);
+                }else{
+                    self::$getCodeActive = self::$getCodeActive->whereIn('store_id',session('adminStoreId'));
+                }
             }else{
                 self::$getCodeActive = self::$getCodeActive->where('store_id',$storeId);
             }

@@ -11,7 +11,7 @@
           :key="index"
           size="mini"
           :label="item.descriptions_current_lang[0].title"
-          :value="index"
+          :value="String(index)"
         />
       </el-select>
 
@@ -88,11 +88,8 @@ export default {
       'avatar',
       'device',
       'userId',
+      'storeList'
     ]),
-    storeList(){
-      const storeList = this.$store.state.user.storeList;
-      return storeList;
-    },
   },
   created(){
     let store_ck = Cookies.get('store');
@@ -101,7 +98,7 @@ export default {
       if (store_ck.length < 1) {
         Cookies.remove('store');
       } else {
-        this.currentStore.push(String(store_ck));
+        this.currentStore = store_ck;
       }
     }
   },

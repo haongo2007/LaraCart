@@ -193,3 +193,8 @@ aside {
     padding:0px !important;
   }
 }
+.el-step__title{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -6,6 +6,7 @@ use App\Models\Front\ShopLanguage;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\Admin\Category;
+use App\Models\Admin\StoreCategory;
 use Illuminate\Http\Response;
 use App\Helper\JsonResponse;
 use App\Http\Resources\CategoryCollection;
@@ -45,11 +46,15 @@ class CategoryController extends Controller
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
-
+        if ($data['store_id'] == 0) {
+            $Instance = new Category();
+        }else{
+            $Instance = new StoreCategory();
+        }
         $validator = Validator::make($data, [
                 'parent'                 => 'required',
                 'sort'                   => 'numeric|min:0',
-                'alias'                  => 'required|unique:"'.Category::class.'",alias|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
+                'alias'                  => 'required|unique:"'.$Instance::class.'",alias|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
                 'descriptions.*.title'   => 'required|string|max:200',
                 'descriptions.*.keyword' => 'nullable|string|max:200',
                 'descriptions.*.description' => 'nullable|string|max:300',
@@ -80,7 +85,10 @@ class CategoryController extends Controller
             'status'   => !empty($data['status']) ? 1 : 0,
             'sort'     => (int) $data['sort'],
         ];
-        $category = Category::createCategoryAdmin($dataInsert);
+        if ($data['store_id'] !== 0) {
+            $dataInsert['store_id'] = $data['store_id'];
+        }
+        $category = $Instance::createCategoryAdmin($dataInsert);
         $dataDes = [];
         $languages = $this->languages;
         foreach ($languages as $code => $value) {
@@ -92,7 +100,7 @@ class CategoryController extends Controller
                 'description' => $data['descriptions']->$code->description,
             ];
         }
-        Category::insertDescriptionAdmin($dataDes);
+        $Instance::insertDescriptionAdmin($dataDes);
 
         return response()->json(new JsonResponse(), Response::HTTP_OK);
 
@@ -103,7 +111,12 @@ class CategoryController extends Controller
      */
     public function show($id)
     {
-        $category = Category::with('descriptions')->find($id);
+        if (count(session('adminStoreId')) == 1) {
+            $Instance = new StoreCategory();
+        }else{
+            $Instance = new Category();
+        }
+        $category = $Instance::with('descriptions')->find($id);
         if (!$category) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
@@ -116,11 +129,17 @@ class CategoryController extends Controller
      */
     public function update(Request $request,$id)
     {
-        $category = Category::getCategoryAdmin($id);
+        $data = request()->all();
+        if ($data['store_id'] == 0) {
+            $Instance = new Category();
+        }else{
+            $Instance = new StoreCategory();
+        }
+
+        $category = $Instance::getCategoryAdmin($id);
         if (!$category) {
             return response()->json(new JsonResponse([], 'Data not Found'), Response::HTTP_FORBIDDEN);
         }
-        $data = request()->all();
         $data['descriptions'] = json_decode($data['descriptions']);
         $data['parent'] = json_decode($data['parent']);
         $data['parent_list'] = (is_array($data['parent']) ? implode(',',$data['parent']) : $data['parent']);
@@ -135,7 +154,7 @@ class CategoryController extends Controller
         $validator = Validator::make($data, [
             'parent'                 => 'required',
             'sort'                   => 'numeric|min:0',
-            'alias'                  => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100|unique:"'.Category::class.'",alias,' . $id . '',
+            'alias'                  => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100|unique:"'.$Instance::class.'",alias,' . $id . '',
             'descriptions.*.title'   => 'required|string|max:200',
             'descriptions.*.keyword' => 'nullable|string|max:200',
             'descriptions.*.description' => 'nullable|string|max:300',
@@ -181,7 +200,7 @@ class CategoryController extends Controller
                 'description' => $row->description,
             ];
         }
-        Category::insertDescriptionAdmin($dataDes);
+        $Instance::insertDescriptionAdmin($dataDes);
 
         return response()->json(new JsonResponse(), Response::HTTP_OK);
 

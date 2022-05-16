@@ -1,111 +1,127 @@
 <template>
-  <el-row :gutter="20" style="margin:0px;overflow-y: scroll;height: calc(100vh - 85px);">
+  <el-row :gutter="20">
     <div style="padding: 24px;">
       <el-page-header :content="$t('route.'+this.$route.meta.title) + (this.$route.params.id ? ' - ' + this.$route.params.id : '' ) " @back="goBackList" />
     </div>
     <el-col :span="18" :offset="3">
-      <el-form ref="dataForm" :model="dataTemp" :rules="dataRules" class="form-container" label-width="120px">
+      <el-form ref="dataForm" :model="dataTemp" :rules="dataRules" class="form-container" label-width="150px">
         <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
           <el-step v-for="(lang,key,index) in dataLanguages" :key="index" :title="lang" :icon="key == 'last' ? 'el-icon-picture' : 'el-icon-edit'" />
         </el-steps>
         <div v-for="(lang,key,index) in dataLanguages" :key="key">
           <div v-if="key != 'last'" v-show="index === active">
-            <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
-              <el-input v-model="dataTemp.descriptions[key].title" />
-            </el-form-item>
+            <el-row class="el-main-form">
+              <el-col :span="24">
+                <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
+                  <el-input v-model="dataTemp.descriptions[key].title" />
+                </el-form-item>
 
-            <el-form-item :label="$t('table.tags')">
-              <el-tag
-                v-for="tag in dataTemp.descriptions[key].keyword"
-                :key="tag"
-                closable
-                :disable-transitions="false"
-                @close="handleClose(tag,key)"
-              >
-                {{ tag }}
-              </el-tag>
+                <el-form-item :label="$t('table.tags')">
+                  <el-tag
+                    v-for="tag in dataTemp.descriptions[key].keyword"
+                    :key="tag"
+                    closable
+                    :disable-transitions="false"
+                    @close="handleClose(tag,key)"
+                  >
+                    {{ tag }}
+                  </el-tag>
 
-              <el-input
-                v-if="inputTagsVisible"
-                ref="savekeywordInput"
-                v-model="dynamicTags"
-                class="input-new-tag"
-                size="mini"
-                @keyup.enter.native="handleInputConfirm(key)"
-                @blur="handleInputConfirm(key)"
-              />
-              <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
-            </el-form-item>
+                  <el-input
+                    v-if="inputTagsVisible"
+                    ref="savekeywordInput"
+                    v-model="dynamicTags"
+                    class="input-new-tag"
+                    size="mini"
+                    @keyup.enter.native="handleInputConfirm(key)"
+                    @blur="handleInputConfirm(key)"
+                  />
+                  <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
+                </el-form-item>
 
-            <el-form-item :label="$t('table.description')">
-              <el-input
-                v-model="dataTemp.descriptions[key].description"
-                :rows="2"
-                type="textarea"
-                placeholder="Please input"
-              />
-            </el-form-item>
+                <el-form-item :label="$t('table.description')">
+                  <el-input
+                    v-model="dataTemp.descriptions[key].description"
+                    :rows="2"
+                    type="textarea"
+                    placeholder="Please input"
+                  />
+                </el-form-item>
+              </el-col>
+            </el-row>
           </div>
 
           <div v-if="key === 'last'" v-show="index === active">
+            <el-row class="el-main-form">
+              <el-col :span="24">
+                <el-form-item :label="$t('table.sort')" prop="sort">
+                  <el-input-number v-model.number="dataTemp.sort" :min="1" />
+                </el-form-item>
 
-            <el-form-item :label="$t('table.sort')" prop="sort">
-              <el-input-number v-model.number="dataTemp.sort" :min="1" />
-            </el-form-item>
+                <el-form-item :label="$t('table.top')" prop="top">
+                  <el-tooltip :content="'Switch value: ' + dataTemp.top" placement="top">
+                    <el-switch
+                      v-model="dataTemp.top"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                      active-value="1"
+                      inactive-value="0"
+                    />
+                  </el-tooltip>
+                </el-form-item>
 
-            <el-form-item :label="$t('table.top')" prop="top">
-              <el-tooltip :content="'Switch value: ' + dataTemp.top" placement="top">
-                <el-switch
-                  v-model="dataTemp.top"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949"
-                  active-value="1"
-                  inactive-value="0"
-                />
-              </el-tooltip>
-            </el-form-item>
+                <el-form-item :label="$t('table.parent')" prop="parent">
+                  <!-- <el-cascader
+                    v-model="dataTemp.parent"
+                    :options="listRecursive"
+                    :props="cateRecurProps"
+                    :show-all-levels="false"
+                    clearable
+                    filterable
+                  /> -->
+                  <el-autocomplete
+                    v-model="dataTemp.parent"
+                    :fetch-suggestions="querySearchAsync"
+                    placeholder="Please input"
+                    @select="handleSelectCategory"
+                    value-key="name"
+                  ></el-autocomplete>
+                </el-form-item>
 
-            <el-form-item :label="$t('table.parent')" prop="parent">
-              <el-cascader
-                v-model="dataTemp.parent"
-                :options="listRecursive"
-                :props="cateRecurProps"
-                :show-all-levels="false"
-                clearable
-                filterable
-              />
-            </el-form-item>
+                <el-form-item :label="$t('table.status')" prop="status">
+                  <el-tooltip :content="'Switch value: ' + dataTemp.status" placement="top">
+                    <el-switch
+                      v-model="dataTemp.status"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                      active-value="1"
+                      inactive-value="0"
+                    />
+                  </el-tooltip>
 
-            <el-form-item :label="$t('table.status')" prop="status">
-              <el-tooltip :content="'Switch value: ' + dataTemp.status" placement="top">
-                <el-switch
-                  v-model="dataTemp.status"
-                  active-color="#13ce66"
-                  inactive-color="#ff4949"
-                  active-value="1"
-                  inactive-value="0"
-                />
-              </el-tooltip>
+                </el-form-item>
 
-            </el-form-item>
-
-            <el-form-item :label="$t('table.banner')">
-              <el-button size="small" type="success" @click="handleVisibleStorage()">Pick Image</el-button>
-            </el-form-item>
-            <div class="image-uploading">
-              <el-image v-if="dataTemp.fileUrl" :src="dataTemp.fileUrl">
-                <div slot="placeholder" class="image-slot">
-                  <i class="el-icon-loading" />
+                <el-form-item :label="$t('table.banner')">
+                  <el-button size="small" type="success" @click="handleVisibleStorage()">Pick Image</el-button>
+                </el-form-item>
+                <div class="image-uploading">
+                  <el-image v-if="dataTemp.fileUrl" :src="dataTemp.fileUrl">
+                    <div slot="placeholder" class="image-slot">
+                      <i class="el-icon-loading" />
+                    </div>
+                  </el-image>
+                  <i v-if="dataTemp.fileUrl" class="el-icon-close" @click="resetImageUpload()" />
                 </div>
-              </el-image>
-              <i v-if="dataTemp.fileUrl" class="el-icon-close" @click="resetImageUpload()" />
-            </div>
-            <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
-              <component :is="componentStorage" :get-file="true" />
-            </el-dialog>
+                <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
+                  <component :is="componentStorage" :get-file="true" />
+                </el-dialog>
+              </el-col>
+            </el-row>
           </div>
         </div>
 
+      </el-form>
+      <el-row>
         <el-button-group class="pull-right">
           <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
             Previous
@@ -117,7 +133,7 @@
             Done
           </el-button>
         </el-button-group>
-      </el-form>
+      </el-row>
     </el-col>
     <slot />
   </el-row>
@@ -162,17 +178,20 @@ export default {
       active: 0,
       componentStorage: '',
       disableUseStorage: false,
-      cateRecurProps: {
-        children: 'children',
-        label: 'title',
-        value: 'id',
-        checkStrictly: true,
-      },
-      listRecursive: [{
-        id: '0',
-        parent: 0,
-        title: 'Is parent',
-      }],
+      category:[],
+      cateLevel:1,
+      timeout:  null,
+      // cateRecurProps: {
+      //   children: 'children',
+      //   label: 'title',
+      //   value: 'id',
+      //   checkStrictly: true,
+      // },
+      // listRecursive: [{
+      //   id: '0',
+      //   parent: 0,
+      //   title: 'Is parent',
+      // }],
       inputTagsVisible: false,
       dynamicTags: '',
     };
@@ -182,7 +201,7 @@ export default {
     if (this.isEdit){
       id = this.$route.params && this.$route.params.id;
     }
-    this.getRecursive(id);
+    this.getCategory();
     EventBus.$on('getFileResponse', this.handlerGeturl);
   },
   methods: {
@@ -215,10 +234,22 @@ export default {
         this.dialogStorageClose();
       }
     },
-    async getRecursive(id){
-      const { data } = await categoryResource.getRecursive(id);
-      data.unshift(this.listRecursive[0]);
-      this.listRecursive = data;
+    async getCategory(id){
+      let obj = {parent:0};
+      if (id) {
+        obj['id'] = id;
+      }
+      const { data } = await categoryResource.list(obj);
+      // data.unshift(this.listRecursive[0]);
+      this.category = data;
+      if (this.cateLevel == 1) {
+        this.category.unshift({
+          id: '0',
+          parent: 0,
+          name: 'Is parent',
+        })
+      }
+      this.cateLevel++;
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -325,6 +356,23 @@ export default {
       this.inputTagsVisible = false;
       this.dynamicTags = '';
     },
+    querySearchAsync(queryString, cb) {
+      var category = this.category;
+      var results = queryString ? category.filter(this.createFilter(queryString)) : category;
+      
+      clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        cb(results);
+      }, 500 * Math.random());
+    },
+    createFilter(queryString) {
+      return (category) => {
+        return (category.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+      };
+    },
+    handleSelectCategory(item){
+      console.log(item);
+    }
   },
 };
 </script>
@@ -358,5 +406,14 @@ export default {
   .input-new-tag {
     width: 90px;
     vertical-align: bottom;
+  }
+
+  .el-main-form{
+    height: calc(100vh - 320px);
+    overflow-y: scroll;
+  }
+  .el-main-form::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
   }
 </style>

@@ -39,7 +39,7 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-input v-model="dataQuery.title" clearable :placeholder="$t('table.name')" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.name" clearable :placeholder="$t('table.name')" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
       </div>

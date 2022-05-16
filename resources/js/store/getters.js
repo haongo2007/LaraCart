@@ -15,5 +15,6 @@ const getters = {
   permissions: state => state.user.permissions,
   permissionRoutes: state => state.permission.routes,
   addRoutes: state => state.permission.addRoutes,
+  storeList: state => state.user.storeList,
 };
 export default getters;

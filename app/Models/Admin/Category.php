@@ -3,6 +3,8 @@
 namespace App\Models\Admin;
 
 use App\Models\Front\ShopCategory;
+use App\Models\Admin\StoreCategory;
+use App\Models\Admin\StoreCategoryDescription;
 use Cache;
 use App\Models\Front\ShopCategoryDescription;
 use Illuminate\Support\Arr;
@@ -47,16 +49,19 @@ class Category extends ShopCategory
             'title__desc' => trans('category.admin.sort_order.title_desc'),
             'title__asc' => trans('category.admin.sort_order.title_asc'),
         ];
-
-        $tableDescription = (new ShopCategoryDescription)->getTable();
-        $tableCategory    = (new ShopCategory)->getTable();
-
-        $categoryList     = (new ShopCategory);
-        if ($parent != '') {
-            $categoryList->with('Parent.descriptionsWithLang:title,category_id');    
+        if (count(session('adminStoreId')) == 1) {
+            $tableDescription = (new StoreCategoryDescription)->getTable();
+            $tableCategory    = (new StoreCategory)->getTable();
+            $categoryList     = (new StoreCategory);
+        }else{
+            $tableDescription = (new ShopCategoryDescription)->getTable();
+            $tableCategory    = (new ShopCategory)->getTable();
+            $categoryList     = (new ShopCategory);
         }
+
         $categoryList = $categoryList->leftJoin($tableDescription, $tableDescription . '.category_id', $tableCategory . '.id')
             ->where($tableDescription . '.lang', lc_get_locale());
+
         if ($title) {
             $categoryList = $categoryList->where(function ($sql) use($tableDescription, $title){
                 $sql->where($tableDescription . '.title', 'like', '%' . $title . '%');
@@ -69,9 +74,10 @@ class Category extends ShopCategory
         if (!is_null($status) && is_array($status)) {
             $categoryList = $categoryList->whereIn('status',$status);
         }
-        
-        $categoryList = $categoryList->whereIn('store_id', session('adminStoreId'));
 
+        if (count(session('adminStoreId')) == 1) {
+            $categoryList = $categoryList->where('store_id',session('adminStoreId'));
+        }
         if ($sort && array_key_exists($sort, $arrSort)) {
             $field = explode('__', $sort)[0];
             $sort_field = explode('__', $sort)[1];

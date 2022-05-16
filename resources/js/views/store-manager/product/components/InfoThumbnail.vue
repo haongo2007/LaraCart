@@ -187,7 +187,7 @@ export default {
     align-items: center;
   }
   .el-main-form{
-    height: calc(100vh - 360px);
+    height: calc(100vh - 320px);
     overflow-y: scroll;
   }
   .el-main-form::-webkit-scrollbar {

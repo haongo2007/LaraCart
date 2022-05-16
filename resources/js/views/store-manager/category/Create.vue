@@ -5,6 +5,7 @@
 <script>
 import CategoryDetail from './components/CategoryDetail';
 import LanguageResource from '@/api/languages';
+import Cookies from 'js-cookie';
 
 const languageResource = new LanguageResource();
 
@@ -16,6 +17,7 @@ export default {
     	loading: true,
     	languages: [],
       temp: {
+        store_id: 0,
 			  id: '',
 			  alias: '',
 			  sort: '',
@@ -54,11 +56,18 @@ export default {
     };
   },
   created() {
+    let store_ck = Cookies.get('store');
+    if (store_ck) {
+      store_ck = JSON.parse(store_ck);
+    }
+    if (store_ck && store_ck.length == 1) {
+      this.temp.store_id = store_ck[0];
+    }
     this.fetchLanguages();
   },
   methods: {
     fetchLanguages() {
-      languageResource.fetchLanguagesActive()
+      languageResource.fetchLanguagesActive(this.temp.store_id)
         .then(data => {
           var that = this;
           Object.keys(data.data).forEach(function(key, index) {
