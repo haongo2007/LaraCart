@@ -128,7 +128,7 @@ const category_parent = 0;
 
 export default {
   name: 'InfoGeneral',
-  props: ['dataActive', 'dataProduct'],
+  props: ['dataActive', 'dataProduct','dataStoreId'],
   data() {
     return {
       temp: {
@@ -160,18 +160,18 @@ export default {
       taxs: [],
       cateRecurProps: {
         multiple: true,
-        checkStrictly: true,
+        store_id:this.dataStoreId,
         lazy: true,
         lazyLoad(node, resolve) {
           var level = node.value;
           if (!node.value) {
             level = category_parent;
           }
-          categoryResource.list({ parent: level }).then((res) => {
+          categoryResource.getChildren({ id: level,store_id:this.store_id }).then((res) => {
             const nodes = res.data.map(item => ({
               value: item.id,
               label: item.name,
-              leaf: item.parent,
+              leaf: item.parent_id,
             }));
             resolve(nodes);
           });

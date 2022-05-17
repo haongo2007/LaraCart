@@ -72,7 +72,7 @@ export default {
     } else {
       this.temp.store_id = store_ck[0];
     }
-    this.fetchLanguages();
+    this.fetchLanguages(this.temp.store_id);
   },
   methods: {
     confirmChooseStore(){

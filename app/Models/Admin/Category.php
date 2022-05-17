@@ -42,6 +42,7 @@ class Category extends ShopCategory
         $title = Arr::get($dataSearch, 'name', '');
         $parent = Arr::get($dataSearch, 'parent', '');
         $storeId = Arr::get($dataSearch, 'store_id', '');
+        $parent_list = Arr::get($dataSearch, 'parent_list', '');
         $arrSort = [
             'id__desc' => trans('category.admin.sort_order.id_desc'),
             'id__asc' => trans('category.admin.sort_order.id_asc'),
@@ -62,6 +63,10 @@ class Category extends ShopCategory
         }
         if ($parent != '') {
             $categoryList = $categoryList->where('parent',$parent);
+        }
+
+        if ($parent_list != '') {
+            $categoryList = $categoryList->whereRaw('FIND_IN_SET(id, "'.$parent_list.'")');
         }
 
         if (!is_null($status) && is_array($status)) {

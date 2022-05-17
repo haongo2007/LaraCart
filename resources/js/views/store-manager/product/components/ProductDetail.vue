@@ -12,7 +12,12 @@
       <div v-for="(content,key,index) in dataStepContent" :key="key">
 
         <div v-if="dataComponentInfo.hasOwnProperty(key)" v-show="index === active">
-          <component :is="dataComponentInfo[key]" :data-product="product" :data-active="active" @handleProcessTemp="handleProcessTemp" @handleProcessActive="handleProcessActive" />
+          <component  :is="dataComponentInfo[key]" 
+                      :data-product="product" 
+                      :data-active="active" 
+                      :data-store-id="dataTemp.store_id" 
+                      @handleProcessTemp="handleProcessTemp" 
+                      @handleProcessActive="handleProcessActive" />
         </div>
 
         <div v-else v-show="index === active">

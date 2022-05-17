@@ -25,6 +25,7 @@ export default {
 			  sort: '',
 			  top: '1',
 			  parent: '0',
+        parent_list: null,
 			  status: '1',
 			  image: '',
 			  descriptions: {
@@ -73,6 +74,7 @@ export default {
           this.temp.parent = data.parent ? data.parent : String(data.parent);
           this.temp.alias = data.alias;
           this.temp.sort = data.sort;
+          this.temp.parent_list = data.parent_list;
           this.temp.top = String(data.top);
           this.temp.status = String(data.status);
           this.temp.id = data.id;

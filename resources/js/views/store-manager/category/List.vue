@@ -142,7 +142,7 @@ export default {
   methods: {
     async load(row, treeNode, resolve) {
       const id = row.id;
-      const { data } = await categoryResource.getChildren(id);
+      const { data } = await categoryResource.getChildren({id:id,store_id:row.store.id});
       resolve(data);
     },
     handleListenData(data){

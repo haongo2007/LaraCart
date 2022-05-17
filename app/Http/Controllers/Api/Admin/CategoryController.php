@@ -37,12 +37,12 @@ class CategoryController extends Controller
     public function store (Request $request)
     {
         $data = $request->all();
-        $data['descriptions'] = json_decode($data['descriptions']);
-        $data['parent'] = json_decode($data['parent']);
-        $data['parent_list'] = $data['parent'] ? implode(',',$data['parent']) : 0;
-        $data['parent'] = (is_array($data['parent']) ? end($data['parent']) : $data['parent']);
+        $category = $data['parent'];
+        $data['descriptions'] = $data['descriptions'];
+        $data['parent'] = array_pop($category)['parent'];
+        $data['parent_list'] = array_reduce($category, function($res,$next){ $res .= $next['parent'].','; return $res; });
         $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
-        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
+        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['title'];
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
         $Instance = new Category();
@@ -51,7 +51,7 @@ class CategoryController extends Controller
                 'sort'                   => 'numeric|min:0',
                 'alias'                  => 'required|unique:"'.$Instance::class.'",alias|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
                 'descriptions.*.title'   => 'required|string|max:200',
-                'descriptions.*.keyword' => 'nullable|string|max:200',
+                'descriptions.*.keyword' => 'nullable|array|max:200',
                 'descriptions.*.description' => 'nullable|string|max:300',
             ], [
                 'descriptions.*.title.required' => trans('validation.required', ['attribute' => trans('category.title')]),
@@ -72,7 +72,7 @@ class CategoryController extends Controller
             $data['image'] = LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName;
         }
         $dataInsert = [
-            'image'    => $data['image'],
+            'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'alias'    => $data['alias'],
             'parent'   => (int) $data['parent'],
             'parent_list' => $data['parent_list'],
@@ -90,9 +90,9 @@ class CategoryController extends Controller
             $dataDes[] = [
                 'category_id' => $category->id,
                 'lang'        => $code,
-                'title'       => $data['descriptions']->$code->title,
-                'keyword'     => implode(',',$data['descriptions']->$code->keyword) ,
-                'description' => $data['descriptions']->$code->description,
+                'title'       => $data['descriptions'][$code]['title'],
+                'keyword'     => implode(',',$data['descriptions'][$code]['keyword']) ,
+                'description' => $data['descriptions'][$code]['description'],
             ];
         }
         $Instance::insertDescriptionAdmin($dataDes);
@@ -128,9 +128,8 @@ class CategoryController extends Controller
             return response()->json(new JsonResponse([], 'Data not Found'), Response::HTTP_FORBIDDEN);
         }
         $data['descriptions'] = json_decode($data['descriptions']);
-        $data['parent'] = json_decode($data['parent']);
-        $data['parent_list'] = (is_array($data['parent']) ? implode(',',$data['parent']) : $data['parent']);
-        $data['parent'] = (is_array($data['parent']) ? end($data['parent']) : $data['parent']);
+        $data['parent'] = array_pop($category)['parent'];
+        $data['parent_list'] = array_reduce($category, function($res,$next){ $res .= $next['parent'].','; return $res; });
 
 
         $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
@@ -167,9 +166,10 @@ class CategoryController extends Controller
 
         //Edit
         $dataUpdate = [
-            'image'    => $data['image'],
+            'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'alias'    => $data['alias'],
             'parent'   => $data['parent'],
+            'parent_list' => $data['parent_list'],
             'sort'     => $data['sort'],
             'top'      => empty($data['top']) ? 0 : 1,
             'status'   => empty($data['status']) ? 0 : 1,
@@ -299,7 +299,11 @@ class CategoryController extends Controller
      */
     public function getChildren(Request $request)
     {
-        $category = Category::with('descriptionsWithLangDefault:title,category_id')->where('parent',$request->id)->get();
+        $where = [['parent',$request->id]];
+        if ($request->store_id) {
+            array_push($where,['store_id',$request->store_id]);
+        }
+        $category = Category::with('descriptionsWithLangDefault:title,category_id')->where($where)->get();
         if (!$category) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }

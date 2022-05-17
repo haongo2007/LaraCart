@@ -70,7 +70,7 @@
                   </el-tooltip>
                 </el-form-item>
 
-                <el-form-item :label="$t('table.parent')" prop="parent">
+                <el-form-item :label="$t('table.category')" prop="parent">
                   <!-- <el-cascader
                     v-model="dataTemp.parent"
                     :options="listRecursive"
@@ -79,17 +79,18 @@
                     clearable
                     filterable
                   /> -->
-                  <el-autocomplete
-                    style="margin-right: 20px"
-                    v-for="(item,index) in categories"
-                    :key="index"
-                    v-model="item.name"
-                    :fetch-suggestions="querySearchAsync"
-                    @focus="checkParentFocus(index)"
-                    placeholder="Please input"
-                    @select="handleSelectCategory"
-                    value-key="name"/>
-
+                  <div class="category-list">
+                    <div style="margin-right: 20px" v-for="(item,index) in categories" :key="index">
+                      <el-autocomplete
+                        v-model="item.name"
+                        :fetch-suggestions="querySearchAsync"
+                        @focus="checkParentFocus(index)"
+                        placeholder="Please choose children"
+                        @select="handleSelectCategory"
+                        value-key="name"/>
+                        <i style="margin-left: 10px;" v-if="index == cateLevel" class="el-icon-arrow-right"></i>
+                    </div>
+                  </div>
                 </el-form-item>
 
                 <el-form-item :label="$t('table.status')" prop="status">
@@ -207,10 +208,10 @@ export default {
   },
   created() {
     let id = '';
-    if (this.isEdit){
-      id = this.$route.params && this.$route.params.id;
+    if (this.dataTemp.parent_list) {
+      id = this.dataTemp.parent_list + this.dataTemp.parent;
     }
-    this.getCategory();
+    this.getCategory(id);
     EventBus.$on('getFileResponse', this.handlerGeturl);
   },
   methods: {
@@ -245,23 +246,44 @@ export default {
     },
     async getCategory(id){
       let obj = {
-          parent:0,
           store_id : this.dataTemp.store_id
       };
 
       if (id) {
-        obj['id'] = id;
+        obj['parent_list'] = id;
+      }else{
+        obj['parent'] = 0;
       }
-      const { data } = await categoryResource.list(obj);
-      // data.unshift(this.listRecursive[0]);
-      this.category.push(data);
-      if (this.cateLevel == 0) {
+      let { data } = await categoryResource.list(obj);
+      if (this.isEdit) {
+        this.$set(this.category,this.cateLevel,[]);
+        let iAr = id.split(',');
+        data = iAr.map((i) => data.find((j) => parseInt(j.id) === parseInt(i) ));
+        this.categories = data;
+        for(let cate in this.categories){
+          if (!this.category.hasOwnProperty(cate)) {
+            this.$set(this.category,cate,[]);
+          }
+          this.category[cate] = [this.categories[cate]];
+          if (cate == 0) {
+            this.category[0].push({
+              id: '0',
+              parent: 0,
+              name: 'Is parent',
+            });
+          }
+        }
+        this.cateLevel = this.category.length;
+      }else{
+        this.category.push(data);
         this.category[this.cateLevel].unshift({
           id: '0',
           parent: 0,
           name: 'Is parent',
         })
       }
+      // data.unshift(this.listRecursive[0]);
+      
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -269,15 +291,8 @@ export default {
           const loading = this.$loading({
             target: '.el-form',
           });
-          const form_data = new FormData();
-          for (var key in this.dataTemp) {
-            if ((typeof this.dataTemp[key] === 'object' || typeof this.dataTemp[key] === 'array') && key != 'image') {
-              form_data.append(key, JSON.stringify(this.dataTemp[key]));
-            } else {
-              form_data.append(key, this.dataTemp[key]);
-            }
-          }
-          categoryResource.store(form_data).then((res) => {
+          this.dataTemp['parent'] = this.categories;
+          categoryResource.store(this.dataTemp).then((res) => {
             if (res) {
               loading.close();
               this.$message({
@@ -307,17 +322,9 @@ export default {
           const loading = this.$loading({
             target: '.el-form',
           });
-          const form_data = new FormData();
-          for (var key in this.dataTemp) {
-            if ((typeof this.dataTemp[key] === 'object' || typeof this.dataTemp[key] === 'array') && key != 'image') {
-              form_data.append(key, JSON.stringify(this.dataTemp[key]));
-            } else {
-              form_data.append(key, this.dataTemp[key]);
-            }
-          }
-          form_data.append('_method', 'PUT');
 
-          categoryResource.update(this.dataTemp.id, form_data).then((res) => {
+          this.dataTemp['parent'] = this.categories;
+          categoryResource.update(this.dataTemp.id, this.dataTemp).then((res) => {
             reloadRedirectToList('CategoryList');
 
             this.$message({
@@ -386,15 +393,23 @@ export default {
       this.cateLevel = level;
     },
     async handleSelectCategory(item){
+      let leng = this.categories.length - 1;// 2
+      if (this.cateLevel < leng) {
+        this.categories.splice(this.cateLevel+1,leng);
+        this.category.splice(this.cateLevel+1,leng);
+      }
       if (item.hasChildren) {
+        this.categories[this.cateLevel].parent = item.id;
         this.cateLevel++;
-        const { data } = await categoryResource.getChildren(item.id);
+        const { data } = await categoryResource.getChildren({id:item.id,store_id:item.store.id});
         this.category.push(data);
         this.categories.push({
           id:String(this.cateLevel),
           parent:item.id,
           name:''
         });
+      }else{
+        this.categories[this.cateLevel].parent = item.id;
       }
     }
   },
@@ -439,5 +454,10 @@ export default {
   .el-main-form::-webkit-scrollbar {
       width: 0;
       background: transparent;
+  }
+  .category-list{
+    display: flex;
+    flex-wrap:wrap;
+    justify-content: flex-start;
   }
 </style>

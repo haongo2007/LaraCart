@@ -12,11 +12,11 @@ class CategoryResource extends Resource {
       data: { id: id },
     });
   }
-  getChildren(id) {
+  getChildren(data) {
     return request({
       url: '/' + this.uri + '/getChildren',
       method: 'post',
-      data: { id: id },
+      data: data,
     });
   }
   getNested(ids) {
