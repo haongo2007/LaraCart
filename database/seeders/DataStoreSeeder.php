@@ -17,6 +17,14 @@ class DataStoreSeeder extends Seeder
         if (!$storeId) {
           $storeId = empty(session('lastStoreId')) ? 1 : session('lastStoreId');
         }
+
+
+        DB::connection(config('const.LC_CONNECTION'))->table('shop_language')->insert(
+            [
+                ['name' => 'English', 'code' => 'en', 'icon' => '/data/language/flag_uk.png', 'status' => '1', 'rtl' => '0', 'sort' => '1', 'store_id' => $storeId],
+            ]
+        );
+
         DB::connection(config('const.LC_CONNECTION'))->table('admin_config')->insertOrIgnore(
             [
             ['group' => '', 'code' => 'product_config_attribute', 'key' => 'product_brand', 'value' => '1', 'sort' => '0', 'detail' => 'lang::product.config_manager.brand', 'store_id' => $storeId],

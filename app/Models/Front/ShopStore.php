@@ -41,6 +41,11 @@ class ShopStore extends Model
         return $this->hasMany(ShopBanner::class, 'store_id', 'id');
     }
 
+    public function languages()
+    {
+        return $this->hasMany(ShopLanguage::class, 'store_id', 'id');
+    }
+
     public function news()
     {
         return $this->hasMany(ShopNews::class, 'store_id', 'id');
@@ -72,6 +77,7 @@ class ShopStore extends Model
             $store->banners()->delete();
             $store->pages()->delete();
             $store->orders()->delete();
+            $store->languages()->delete();
             Config::where('store_id', $store->id)->delete();
             UserStore::where('store_id', $store->id)->delete();
         });

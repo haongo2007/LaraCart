@@ -44,14 +44,7 @@ export default {
           {
             required: true,
             message: 'parent is required',
-            trigger: 'change',
-          },
-        ],
-        status: [
-          {
-            required: true,
-            message: 'status is required',
-            trigger: 'change',
+            trigger: 'blur',
           },
         ],
         descriptions: [],

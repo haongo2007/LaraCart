@@ -41,7 +41,7 @@ class ProductController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->languages       = ShopLanguage::getListActive();
+        $this->languages       = ShopLanguage::getListActive(session('adminStoreId'));
         $this->listWeight      = ShopWeight::getListAll();
         $this->listLength      = ShopLength::getListAll();
         $this->attributeGroup  = ShopAttributeGroup::getListType();
@@ -470,7 +470,7 @@ public function createProductGroup()
 
         //Insert description
         $dataDes = [];
-        $languages = $this->languages;
+        $languages = ShopLanguage::getListActive($data['store_id']);
         foreach ($languages as $code => $value) {
             $dataDes[] = [
                 'product_id'  => $product->id,
@@ -708,7 +708,7 @@ public function createProductGroup()
         $product->descriptions()->delete();
 
         $dataDes = [];
-        $languages = $this->languages;
+        $languages = ShopLanguage::getListActive($data['store_id']);
         foreach ($languages as $code => $value) {
             $dataDes[] = [
                 'product_id'  => $product->id,

@@ -681,12 +681,29 @@ export default {
         this.temp.time_active = JSON.parse(this.temp.time_active);
       }
     }
+    let j = 0;
     let that = this;
-    this.temp.descriptions.forEach(function(v,i) {
-      that.$set(that.temp.descriptions[i],'description',{value:v.description?v.description:'',visible:false});
-      that.$set(that.temp.descriptions[i],'title',{value:v.title?v.title:'',visible:false});
-      that.$set(that.temp.descriptions[i],'keyword',{value:v.keyword?v.keyword:'',visible:false});
-    });
+    for(let key in this.temp.languages) {
+      let find = that.temp.descriptions.filter((item) => item.lang == key);
+      if (find.length > 0) {
+        let v = find[0];
+        that.$set(that.temp.descriptions[j],'description',{value:v.description,visible:false});
+        that.$set(that.temp.descriptions[j],'title',{value:v.title,visible:false});
+        that.$set(that.temp.descriptions[j],'keyword',{value:v.keyword,visible:false});
+      }else{
+        if(!that.temp.descriptions.hasOwnProperty(j)){
+          that.$set(that.temp.descriptions,j,{});
+        }
+        that.$set(that.temp.descriptions[j],'description',{value:null,visible:false});
+        that.$set(that.temp.descriptions[j],'title',{value:null,visible:false});
+        that.$set(that.temp.descriptions[j],'keyword',{value:null,visible:false});
+        that.$set(that.temp.descriptions[j],'lang',key);
+        that.$set(that.temp.descriptions[j],'store_id',this.temp.id);
+        that.$set(that.temp.descriptions[j],'maintain_content',null);
+        that.$set(that.temp.descriptions[j],'maintain_note',null);
+      }
+      j++;
+    };
   },
   watch: {
     'dataQuery.limit': {

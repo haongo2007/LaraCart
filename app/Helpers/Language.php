@@ -4,9 +4,9 @@ use App\Models\Front\ShopLanguage;
 
 if (!function_exists('lc_language_all')) {
     //Get all language
-    function lc_language_all()
+    function lc_language_all($storeId)
     {
-        return ShopLanguage::getListActive();
+        return ShopLanguage::getListActive($storeId);
     }
 }
 

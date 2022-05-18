@@ -297,15 +297,14 @@ export default {
         name: 'Is parent',
       });
       // data.unshift(this.listRecursive[0]);
-      
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.dataTemp['parent'] = this.categories;
           const loading = this.$loading({
             target: '.el-form',
           });
-          this.dataTemp['parent'] = this.categories;
           for(let index in this.dataTemp['parent']){
             if (this.dataTemp['parent'][index].name == '') {
               this.dataTemp['parent'].splice(index,1);
@@ -338,11 +337,15 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.dataTemp['parent'] = this.categories;
           const loading = this.$loading({
             target: '.el-form',
           });
-
-          this.dataTemp['parent'] = this.categories;
+          for(let index in this.dataTemp['parent']){
+            if (this.dataTemp['parent'][index].name == '') {
+              this.dataTemp['parent'].splice(index,1);
+            }
+          }
           categoryResource.update(this.dataTemp.id, this.dataTemp).then((res) => {
             reloadRedirectToList('CategoryList');
 

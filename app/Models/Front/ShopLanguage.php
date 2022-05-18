@@ -60,12 +60,17 @@ class ShopLanguage extends Model
         return self::$getListAll;
     }
 
-    public static function getListActive()
+    public static function getListActive($storeId)
     {
         if (self::$getListActive === null) {
-            self::$getListActive = self::where('status', 1)
-                ->get()
-                ->keyBy('code');
+            $langActive = self::where('status', 1);
+            if (!$storeId) {
+                $langActive = $langActive->where('store_id',0);
+            }else{
+                $langActive = $langActive->where('store_id',$storeId);
+            }
+            $langActive = $langActive->get()->keyBy('code');
+            self::$getListActive = $langActive;
         }
         return self::$getListActive;
     }

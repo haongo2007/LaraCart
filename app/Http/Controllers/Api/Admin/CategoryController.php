@@ -16,12 +16,6 @@ class CategoryController extends Controller
 
     public $categoryTmp = [];
     public $id_disabled;
-    public $languages;
-
-    public function __construct()
-    {
-        $this->languages = ShopLanguage::getListActive();
-    }
 
     public function index()
     {        
@@ -37,11 +31,14 @@ class CategoryController extends Controller
     public function store (Request $request)
     {
         $data = $request->all();
-        $category = $data['parent'];
-        $data['descriptions'] = $data['descriptions'];
-        $data['parent'] = array_pop($category)['parent'];
-        $data['parent_list'] = array_reduce($category, function($res,$next){ $res .= $next['parent'].','; return $res; });
-        $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
+
+        if ($data['parent'] && is_array($data['parent'])) {
+            $category = $data['parent'];
+            $data['parent'] = array_pop($category)['parent'];
+            $data['parent_list'] = array_reduce($category, function($res,$next){ $res .= $next['parent'].','; return $res; });
+        }
+
+        $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['title'];
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
@@ -85,7 +82,7 @@ class CategoryController extends Controller
         }
         $category = $Instance::createCategoryAdmin($dataInsert);
         $dataDes = [];
-        $languages = $this->languages;
+        $languages = ShopLanguage::getListActive($data['store_id']);
         foreach ($languages as $code => $value) {
             $dataDes[] = [
                 'category_id' => $category->id,
@@ -125,13 +122,18 @@ class CategoryController extends Controller
         if (!$category) {
             return response()->json(new JsonResponse([], 'Data not Found'), Response::HTTP_FORBIDDEN);
         }
-        $parents = $data['parent'];
-        $data['descriptions'] = $data['descriptions'];
-        $data['parent'] = array_pop($parents)['parent'];
-        $data['parent_list'] = array_reduce($parents, function($res,$next){ $res .= $next['parent'].','; return $res; });
 
+        if ($data['parent']) {
+            $parents = $data['parent'];
+            if (count($parents) == 1) {
+                $data['parent'] = $data['parent'][0]['id'];
+            }else{
+                $data['parent'] = array_pop($parents)['parent'];
+                $data['parent_list'] = array_reduce($parents, function($res,$next){ $res .= $next['parent'].','; return $res; });
+            }
+        }
 
-        $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
+        $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['title'];
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
@@ -168,7 +170,7 @@ class CategoryController extends Controller
             'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'alias'    => $data['alias'],
             'parent'   => (int) $data['parent'],
-            'parent_list' => $data['parent_list'],
+            'parent_list' => $data['parent_list'] ?? null,
             'sort'     => $data['sort'],
             'top'      => empty($data['top']) ? 0 : 1,
             'status'   => empty($data['status']) ? 0 : 1,

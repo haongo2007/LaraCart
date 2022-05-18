@@ -34,13 +34,6 @@ class DataShopSeeder extends Seeder
             ]
         );
 
-        DB::connection(config('const.LC_CONNECTION'))->table('shop_language')->insert(
-            [
-                ['id' => '1', 'name' => 'English', 'code' => 'en', 'icon' => '/data/language/flag_uk.png', 'status' => '1', 'rtl' => '0', 'sort' => '1'],
-                ['id' => '2', 'name' => 'Tiếng Việt', 'code' => 'vi', 'icon' => '/data/language/flag_vn.png', 'status' => '1', 'rtl' => '0', 'sort' => '1'],
-            ]
-        );
-
 
         DB::connection(config('const.LC_CONNECTION'))->table('shop_layout_page')->insert(
             [

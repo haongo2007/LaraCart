@@ -438,15 +438,15 @@ class CreateTablesShop extends Migration
             }
         );
 
-        Schema::create('shop_shoppingcart', function (Blueprint $table) {
-            $table->string('identifier', 100);
-            $table->string('instance', 100);
-            $table->text('content');
-            $table->timestamps();
-            $table->index(['identifier', 'instance']);
-            $table->integer('store_id')->default(1)->index();
-            }
-        );
+        // Schema::create('shop_shoppingcart', function (Blueprint $table) {
+        //     $table->string('identifier', 100);
+        //     $table->string('instance', 100);
+        //     $table->text('content');
+        //     $table->timestamps();
+        //     $table->index(['identifier', 'instance']);
+        //     $table->integer('store_id')->default(1)->index();
+        //     }
+        // );
 
         Schema::create('shop_customer', function (Blueprint $table) {
             $table->increments('id');
@@ -758,7 +758,7 @@ class CreateTablesShop extends Migration
         Schema::dropIfExists('shop_product_group');
         Schema::dropIfExists('shop_product_category');
         Schema::dropIfExists('shop_shipping_status');
-        Schema::dropIfExists('shop_shoppingcart');
+        // Schema::dropIfExists('shop_shoppingcart');
         Schema::dropIfExists('shop_product_promotion');
         Schema::dropIfExists('shop_customer');
         Schema::dropIfExists('shop_supplier');
