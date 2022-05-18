@@ -21,6 +21,7 @@ class CategoryCollection extends JsonResource
             'sort' => $this->sort,
             'top' => $this->top,
             'alias' => $this->alias,
+            'parent_id' => $this->parent,
             'parent' => $this->parent,
             'store' => $this->stores,
             'image' => $this->image
@@ -29,9 +30,11 @@ class CategoryCollection extends JsonResource
         if (!$parent = $request->parent === '0' ? true : false) {
             if ($this->Parent) {
                 $res['parent'] = $this->Parent->descriptionsWithLangDefault->title;
-                if ($request->id && !$this->Children->where('store_id',$this->stores->id)->isEmpty()) {
+                if (($request->id || $request->parent_list) && !$this->Children->where('store_id',$this->stores->id)->isEmpty()) {
                     $res['hasChildren'] = true;
                 }
+            }else{
+                $res['hasChildren'] = true;
             }
         }else{
             if (!$this->Children->where('store_id',$this->stores->id)->isEmpty()) {

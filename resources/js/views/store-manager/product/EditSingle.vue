@@ -40,15 +40,15 @@ export default {
       this.temp.kind = data.kind;
       this.product = data;
 
-      this.fetchLanguages();
+      this.fetchLanguages(data.store_id);
     }).catch(err => {
       console.log(err);
     });
 
   },
   methods: {
-    fetchLanguages() {
-      languageResource.fetchLanguagesActive()
+    fetchLanguages(id) {
+      languageResource.fetchLanguagesActive(id)
         .then(data => {
           this.languages = data.data;
           this.setTemp();

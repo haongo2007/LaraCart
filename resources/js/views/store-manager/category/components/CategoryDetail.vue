@@ -70,7 +70,7 @@
                   </el-tooltip>
                 </el-form-item>
 
-                <el-form-item :label="$t('table.category')" prop="parent">
+                <el-form-item :label="$t('table.category')" prop="parent" style="margin-bottom: 0px;">
                   <!-- <el-cascader
                     v-model="dataTemp.parent"
                     :options="listRecursive"
@@ -80,7 +80,7 @@
                     filterable
                   /> -->
                   <div class="category-list">
-                    <div style="margin-right: 20px" v-for="(item,index) in categories" :key="index">
+                    <div style="margin: 0px 20px 20px 0px;" v-for="(item,index) in categories" :key="index">
                       <el-autocomplete
                         v-model="item.name"
                         :fetch-suggestions="querySearchAsync"
@@ -210,6 +210,18 @@ export default {
     let id = '';
     if (this.dataTemp.parent_list) {
       id = this.dataTemp.parent_list + this.dataTemp.parent;
+    }else{      
+      id = this.dataTemp.parent;
+      if (id == 0 && this.isEdit) {
+        this.categories[this.cateLevel].name = 'Is parent';
+        this.categories[this.cateLevel].id = this.dataTemp.id;
+        this.$set(this.category,this.cateLevel,[{
+          id: '0',
+          parent: 0,
+          name: 'Is parent',
+        }]);
+        return;
+      }
     }
     this.getCategory(id);
     EventBus.$on('getFileResponse', this.handlerGeturl);
@@ -245,43 +257,45 @@ export default {
       }
     },
     async getCategory(id){
-      let obj = {
+      let params = {
           store_id : this.dataTemp.store_id
       };
 
-      if (id) {
-        obj['parent_list'] = id;
+      if (id && parseInt(id) !== 0) {
+        params['parent_list'] = id;
       }else{
-        obj['parent'] = 0;
+        params['parent'] = 0;
       }
-      let { data } = await categoryResource.list(obj);
+      let { data } = await categoryResource.list(params);
       if (this.isEdit) {
-        this.$set(this.category,this.cateLevel,[]);
-        let iAr = id.split(',');
-        data = iAr.map((i) => data.find((j) => parseInt(j.id) === parseInt(i) ));
+        let iAr;
+        if( String(id).indexOf(',') != -1 ){
+          iAr = id.split(',');
+        }else{
+          iAr = [id];
+        }
+        data = iAr.map((i) => data.find((j) => parseInt(j.id) === parseInt(i) )); // sort array
         this.categories = data;
-        for(let cate in this.categories){
+        for(let cate in data){
           if (!this.category.hasOwnProperty(cate)) {
             this.$set(this.category,cate,[]);
           }
-          this.category[cate] = [this.categories[cate]];
-          if (cate == 0) {
-            this.category[0].push({
-              id: '0',
-              parent: 0,
-              name: 'Is parent',
-            });
-          }
+          this.category[cate].push({
+            id:data[cate].id,
+            parent:data[cate].parent_id,
+            name:data[cate].name,
+            store:data[cate].store,
+            hasChildren:data[cate].hasOwnProperty('hasChildren') ? data[cate].hasChildren : false 
+          });
         }
-        this.cateLevel = this.category.length;
       }else{
         this.category.push(data);
-        this.category[this.cateLevel].unshift({
-          id: '0',
-          parent: 0,
-          name: 'Is parent',
-        })
       }
+      this.category[0].unshift({
+        id: '0',
+        parent: 0,
+        name: 'Is parent',
+      });
       // data.unshift(this.listRecursive[0]);
       
     },
@@ -292,6 +306,11 @@ export default {
             target: '.el-form',
           });
           this.dataTemp['parent'] = this.categories;
+          for(let index in this.dataTemp['parent']){
+            if (this.dataTemp['parent'][index].name == '') {
+              this.dataTemp['parent'].splice(index,1);
+            }
+          }
           categoryResource.store(this.dataTemp).then((res) => {
             if (res) {
               loading.close();
@@ -375,10 +394,29 @@ export default {
       this.inputTagsVisible = false;
       this.dynamicTags = '';
     },
-    querySearchAsync(queryString, cb) {
+    async querySearchAsync(queryString, cb) {
       var category = this.category[this.cateLevel];
       var results = queryString ? category.filter(this.createFilter(queryString)) : category;
-      
+      if (this.isEdit) {
+        results = results.filter((item) => parseInt(item.id) !== parseInt(this.dataTemp.id));
+      }
+      if (results.length == 0) {
+        let params = {
+          'name':queryString,
+          'except_id':this.dataTemp.id
+        };
+        if (this.cateLevel == 0) {
+          params['parent'] = 0;
+        }else{
+          let parentId = this.categories[this.cateLevel - 1].id;
+          params['parent'] = parentId;
+        }
+        results = await categoryResource.list(params);
+        results = results.data;
+        if (results.length > 0) {
+          this.category[this.cateLevel] = [...results,...this.category[this.cateLevel]];
+        }
+      }
       clearTimeout(this.timeout);
       this.timeout = setTimeout(() => {
         cb(results);
@@ -393,6 +431,9 @@ export default {
       this.cateLevel = level;
     },
     async handleSelectCategory(item){
+      if (parseInt(this.categories[this.cateLevel].id) == parseInt(item.id)) {
+        return;
+      }
       let leng = this.categories.length - 1;// 2
       if (this.cateLevel < leng) {
         this.categories.splice(this.cateLevel+1,leng);
@@ -409,6 +450,7 @@ export default {
           name:''
         });
       }else{
+        this.categories[this.cateLevel].id = this.cateLevel;
         this.categories[this.cateLevel].parent = item.id;
       }
     }

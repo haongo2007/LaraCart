@@ -43,6 +43,8 @@ class Category extends ShopCategory
         $parent = Arr::get($dataSearch, 'parent', '');
         $storeId = Arr::get($dataSearch, 'store_id', '');
         $parent_list = Arr::get($dataSearch, 'parent_list', '');
+        $except_id = Arr::get($dataSearch, 'except_id', '');
+
         $arrSort = [
             'id__desc' => trans('category.admin.sort_order.id_desc'),
             'id__asc' => trans('category.admin.sort_order.id_asc'),
@@ -78,6 +80,9 @@ class Category extends ShopCategory
                 $storeId = session('adminStoreId');
             }
             $categoryList = $categoryList->where('store_id',$storeId);
+        }
+        if ($except_id) {
+            $categoryList = $categoryList->where('id','!=',$except_id);
         }
         if ($sort && array_key_exists($sort, $arrSort)) {
             $field = explode('__', $sort)[0];

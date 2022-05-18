@@ -26,13 +26,6 @@ class CategoryResource extends Resource {
       data: { ids: ids },
     });
   }
-  update(id, resource) {
-    return request({
-      url: '/' + this.uri + '/' + id,
-      method: 'post',
-      data: resource,
-    });
-  }
 }
 
 export { CategoryResource as default };

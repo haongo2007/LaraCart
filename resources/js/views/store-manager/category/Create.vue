@@ -91,7 +91,7 @@ export default {
       this.confirmStoreDialog = true;
       return false;
     }
-    this.fetchLanguages();
+    this.fetchLanguages(this.temp.store_id);
   },
   methods: {
     fetchLanguages(id) {

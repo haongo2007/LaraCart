@@ -120,16 +120,15 @@ class CategoryController extends Controller
      */
     public function update(Request $request,$id)
     {
-        $data = request()->all();
-        $Instance = new Category();
-
-        $category = $Instance::getCategoryAdmin($id);
+        $data = $request->all();
+        $category = Category::getCategoryAdmin($id);
         if (!$category) {
             return response()->json(new JsonResponse([], 'Data not Found'), Response::HTTP_FORBIDDEN);
         }
-        $data['descriptions'] = json_decode($data['descriptions']);
-        $data['parent'] = array_pop($category)['parent'];
-        $data['parent_list'] = array_reduce($category, function($res,$next){ $res .= $next['parent'].','; return $res; });
+        $parents = $data['parent'];
+        $data['descriptions'] = $data['descriptions'];
+        $data['parent'] = array_pop($parents)['parent'];
+        $data['parent_list'] = array_reduce($parents, function($res,$next){ $res .= $next['parent'].','; return $res; });
 
 
         $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
@@ -140,9 +139,9 @@ class CategoryController extends Controller
         $validator = Validator::make($data, [
             'parent'                 => 'required',
             'sort'                   => 'numeric|min:0',
-            'alias'                  => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100|unique:"'.$Instance::class.'",alias,' . $id . '',
+            'alias'                  => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100|unique:"'.$category::class.'",alias,' . $id . '',
             'descriptions.*.title'   => 'required|string|max:200',
-            'descriptions.*.keyword' => 'nullable|string|max:200',
+            'descriptions.*.keyword' => 'nullable|array|max:200',
             'descriptions.*.description' => 'nullable|string|max:300',
             ], [
                 'descriptions.*.title.required' => trans('validation.required', ['attribute' => trans('category.title')]),
@@ -168,26 +167,26 @@ class CategoryController extends Controller
         $dataUpdate = [
             'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'alias'    => $data['alias'],
-            'parent'   => $data['parent'],
+            'parent'   => (int) $data['parent'],
             'parent_list' => $data['parent_list'],
             'sort'     => $data['sort'],
             'top'      => empty($data['top']) ? 0 : 1,
             'status'   => empty($data['status']) ? 0 : 1,
         ];
-
         $category->update($dataUpdate);
         $category->descriptions()->delete();
+
         $dataDes = [];
         foreach ($data['descriptions'] as $code => $row) {
             $dataDes[] = [
                 'category_id' => $id,
                 'lang'        => $code,
-                'title'       => $row->title,
-                'keyword'     => implode(',', $row->keyword),
-                'description' => $row->description,
+                'title'       => $row['title'],
+                'keyword'     => implode(',', $row['keyword']),
+                'description' => $row['description'],
             ];
         }
-        $Instance::insertDescriptionAdmin($dataDes);
+        $category::insertDescriptionAdmin($dataDes);
 
         return response()->json(new JsonResponse(), Response::HTTP_OK);
 
