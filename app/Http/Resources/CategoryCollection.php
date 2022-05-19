@@ -32,9 +32,13 @@ class CategoryCollection extends JsonResource
                 $res['parent'] = $this->Parent->descriptionsWithLangDefault->title;
                 if (($request->id || $request->parent_list || $request->parent) && !$this->Children->where('store_id',$this->stores->id)->isEmpty()) {
                     $res['hasChildren'] = true;
+
+                    if ($request->except_id) {
+                        if ($this->Children->where('id','!=',$request->except_id)->isEmpty()) {
+                            $res['hasChildren'] = false;
+                        }
+                    }
                 }
-            }else{
-                $res['hasChildren'] = true;
             }
         }else{
             if (!$this->Children->where('store_id',$this->stores->id)->isEmpty()) {

@@ -33,9 +33,6 @@ class CategoryController extends Controller
         $data = $request->all();
 
         if ($data['parent'] && is_array($data['parent'])) {
-            if (count($data['parent']) > 1) {
-                array_pop($data['parent']);//remove last empty
-            }
             $data['parent_list'] = array_reduce($data['parent'], function($res,$next){ $res .= $next['id'].','; return $res; });
             $data['parent'] = end($data['parent'])['id'];
         }
@@ -123,15 +120,10 @@ class CategoryController extends Controller
         if (!$category) {
             return response()->json(new JsonResponse([], 'Data not Found'), Response::HTTP_FORBIDDEN);
         }
-
-        if ($data['parent']) {
-            $parents = $data['parent'];
-            if (count($parents) == 1) {
-                $data['parent'] = $data['parent'][0]['id'];
-            }else{
-                $data['parent'] = array_pop($parents)['parent'];
-                $data['parent_list'] = array_reduce($parents, function($res,$next){ $res .= $next['parent'].','; return $res; });
-            }
+        
+        if ($data['parent'] && is_array($data['parent'])) {
+            $data['parent_list'] = array_reduce($data['parent'], function($res,$next){ $res .= $next['id'].','; return $res; });
+            $data['parent'] = end($data['parent'])['id'];
         }
 
         $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active

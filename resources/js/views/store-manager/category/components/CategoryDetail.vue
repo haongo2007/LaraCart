@@ -82,9 +82,11 @@
                   <div class="category-list">
                     <div style="margin: 0px 20px 20px 0px;" v-for="(item,index) in category" :key="index">
                       <el-autocomplete
+                        :debounce="300"
                         v-model="item.name"
                         :fetch-suggestions="querySearchAsync"
                         @focus="checkParentFocus(index)"
+                        @blur="checkToReName(index)"
                         placeholder="Please choose children"
                         @select="handleSelectCategory"
                         value-key="name"/>
@@ -241,7 +243,19 @@ export default {
         'limit':10
       };
       if (this.isEdit) {
+        if (this.dataTemp.parent == 0) {
+          this.$set(this.category,this.categoryLevel, {
+            'name':'Is parent',
+            'id':0,
+            'parent':0,
+          });
+          params['parent'] = 0;
+          let { data } = await categoryResource.list(params);
+          this.categories[this.categoryLevel] = [...data,...this.categories[this.categoryLevel]];
+          return;
+        }
         params['parent_list'] = this.dataTemp.parent_list;
+        
         let { data } = await categoryResource.list(params);
 
         let sort;
@@ -258,10 +272,10 @@ export default {
             this.$set(this.category,cate,[]);
             this.$set(this.categories,cate,[]);
           }
-          if (this.categories[this.categoryLevel].hasOwnProperty(cate)) {
-            this.categories[this.categoryLevel].push({...data[cate]});
+          if (this.categories[cate].hasOwnProperty(cate)) {
+            this.categories[cate].push({...data[cate]});
           }
-          this.category[cate] = data[cate];
+          this.$set(this.category,cate,data[cate])
         }
       }else{
         params['parent'] = 0;
@@ -273,6 +287,12 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           this.dataTemp['parent'] = this.category;
+          // check last not exist remove
+          let last = this.dataTemp['parent'][this.dataTemp['parent'].length - 1];
+          if(last.name == null && last.parent == null && last.id == null){
+            this.dataTemp['parent'].splice(this.dataTemp['parent'].length - 1,this.dataTemp['parent'].length);
+          }
+
           const loading = this.$loading({
             target: '.el-form',
           });
@@ -308,7 +328,13 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.dataTemp['parent'] = this.categories;
+          this.dataTemp['parent'] = this.category;
+          // check last not exist remove
+          let last = this.dataTemp['parent'][this.dataTemp['parent'].length - 1];
+          if(last.name == null && last.parent == null && last.id == null){
+            this.dataTemp['parent'].splice(this.dataTemp['parent'].length - 1,this.dataTemp['parent'].length);
+          }
+
           const loading = this.$loading({
             target: '.el-form',
           });
@@ -373,15 +399,27 @@ export default {
       var results = queryString ? categories.filter(this.categoriesFilter(queryString)) : categories;
 
       // check if not exist search in server
-      if (results.length == 0) {
+      if (results.length == 0 || queryString == '') {
         let params = {
           'name':queryString,
           'limit':10,
-          'parent':this.category[this.categoryLevel - 1].id
+          'except_id':this.dataTemp.id,
         };
+        if (this.categoryLevel > 0) {
+          params['parent'] = this.category[this.categoryLevel - 1].id
+        }else{
+          params['parent'] = 0;
+        }
         let { data } = await categoryResource.list(params);
         this.categories[this.categoryLevel] = data;
         results = data;
+        if (this.categoryLevel == 0) {
+          results.push({
+            'name':'Is parent',
+            'id':0,
+            'parent':0,
+          });
+        }
       }
       cb(results);
     },
@@ -392,6 +430,16 @@ export default {
     },
     checkParentFocus(level){
       this.categoryLevel = level;
+    },
+    checkToReName(level){
+      if(this.category[level].name == ''){
+        let that = this;
+        this.categories[level].forEach( function(val, index) {
+          if (val.id == that.category[level].id) {
+            that.category[level].name = val.name;
+          }
+        });
+      }
     },
     async handleSelectCategory(item){
 
@@ -416,7 +464,8 @@ export default {
         });
         let params = {
           'limit':10,
-          'parent':this.category[this.categoryLevel - 1].id
+          'parent':this.category[this.categoryLevel - 1].id,
+          'except_id':this.dataTemp.id,
         };
         let { data } = await categoryResource.list(params);
         if (!this.categories.hasOwnProperty(this.categoryLevel)) {

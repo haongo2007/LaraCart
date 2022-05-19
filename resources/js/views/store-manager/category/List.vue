@@ -49,14 +49,9 @@
           <el-tag>{{ scope.row.name }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.alias')" min-width="150px" prop="alias">
+      <el-table-column :label="$t('table.image')" min-width="100px" prop="image">
         <template slot-scope="scope">
-          <el-tag>{{ scope.row.alias }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column :label="$t('table.image')" min-width="150px" prop="image">
-        <template slot-scope="scope">
-          <el-image :src="scope.row.image+'&w=260'">
+          <el-image :src="scope.row.image+'&w=100'">
             <div slot="error" class="image-slot">
               <i class="el-icon-picture-outline" />
             </div>
