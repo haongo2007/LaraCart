@@ -14,13 +14,11 @@ use Validator;
 class CustomerController extends Controller
 {
     use AuthTrait;
-    public $languages, $countries;
+    public $countries;
 
     public function __construct()
     {
-        $this->languages = ShopLanguage::getListActive();
         $this->countries = ShopCountry::getListAll();
-
     }
 
     public function index()

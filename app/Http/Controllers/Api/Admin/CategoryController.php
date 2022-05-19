@@ -33,11 +33,12 @@ class CategoryController extends Controller
         $data = $request->all();
 
         if ($data['parent'] && is_array($data['parent'])) {
-            $category = $data['parent'];
-            $data['parent'] = array_pop($category)['parent'];
-            $data['parent_list'] = array_reduce($category, function($res,$next){ $res .= $next['parent'].','; return $res; });
+            if (count($data['parent']) > 1) {
+                array_pop($data['parent']);//remove last empty
+            }
+            $data['parent_list'] = array_reduce($data['parent'], function($res,$next){ $res .= $next['id'].','; return $res; });
+            $data['parent'] = end($data['parent'])['id'];
         }
-
         $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['title'];
         $data['alias'] = lc_word_format_url($data['alias']);

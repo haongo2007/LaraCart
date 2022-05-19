@@ -80,7 +80,7 @@
                     filterable
                   /> -->
                   <div class="category-list">
-                    <div style="margin: 0px 20px 20px 0px;" v-for="(item,index) in categories" :key="index">
+                    <div style="margin: 0px 20px 20px 0px;" v-for="(item,index) in category" :key="index">
                       <el-autocomplete
                         v-model="item.name"
                         :fetch-suggestions="querySearchAsync"
@@ -88,7 +88,7 @@
                         placeholder="Please choose children"
                         @select="handleSelectCategory"
                         value-key="name"/>
-                        <i style="margin-left: 10px;" v-if="index == cateLevel" class="el-icon-arrow-right"></i>
+                        <i style="margin-left: 10px;" v-if="index == categoryLevel" class="el-icon-arrow-right"></i>
                     </div>
                   </div>
                 </el-form-item>
@@ -183,47 +183,27 @@ export default {
       active: 0,
       componentStorage: '',
       disableUseStorage: false,
-      categories:[{
-          'name':'',
-          'id':'0',
-          'parent':'0',
-      }],
-      category:[],
-      cateLevel:0,
-      timeout:  null,
-      // cateRecurProps: {
-      //   children: 'children',
-      //   label: 'title',
-      //   value: 'id',
-      //   checkStrictly: true,
-      // },
-      // listRecursive: [{
-      //   id: '0',
-      //   parent: 0,
-      //   title: 'Is parent',
-      // }],
+      categoryLevel:0,
+      category:[
+        {
+          'name':null,
+          'id':null,
+          'parent':null,
+        }
+      ],
+      categories:[
+        [{
+          'name':'Is parent',
+          'id':0,
+          'parent':0,
+        }]
+      ],
       inputTagsVisible: false,
       dynamicTags: '',
     };
   },
   created() {
-    let id = '';
-    if (this.dataTemp.parent_list) {
-      id = this.dataTemp.parent_list + this.dataTemp.parent;
-    }else{      
-      id = this.dataTemp.parent;
-      if (id == 0 && this.isEdit) {
-        this.categories[this.cateLevel].name = 'Is parent';
-        this.categories[this.cateLevel].id = this.dataTemp.id;
-        this.$set(this.category,this.cateLevel,[{
-          id: '0',
-          parent: 0,
-          name: 'Is parent',
-        }]);
-        return;
-      }
-    }
-    this.getCategory(id);
+    this.getCategory();
     EventBus.$on('getFileResponse', this.handlerGeturl);
   },
   methods: {
@@ -256,52 +236,43 @@ export default {
         this.dialogStorageClose();
       }
     },
-    async getCategory(id){
+    async getCategory(){
       let params = {
-          store_id : this.dataTemp.store_id
+        'limit':10
       };
-
-      if (id && parseInt(id) !== 0) {
-        params['parent_list'] = id;
-      }else{
-        params['parent'] = 0;
-      }
-      let { data } = await categoryResource.list(params);
       if (this.isEdit) {
-        let iAr;
+        params['parent_list'] = this.dataTemp.parent_list;
+        let { data } = await categoryResource.list(params);
+
+        let sort;
+        let id = this.dataTemp.parent_list;
         if( String(id).indexOf(',') != -1 ){
-          iAr = id.split(',');
+          sort = id.split(',').filter(Boolean);
         }else{
-          iAr = [id];
+          sort = [id];
         }
-        data = iAr.map((i) => data.find((j) => parseInt(j.id) === parseInt(i) )); // sort array
-        this.categories = data;
+        data = sort.map((i) => data.find((j) => parseInt(j.id) === parseInt(i) )); // sort array
+
         for(let cate in data){
           if (!this.category.hasOwnProperty(cate)) {
             this.$set(this.category,cate,[]);
+            this.$set(this.categories,cate,[]);
           }
-          this.category[cate].push({
-            id:data[cate].id,
-            parent:data[cate].parent_id,
-            name:data[cate].name,
-            store:data[cate].store,
-            hasChildren:data[cate].hasOwnProperty('hasChildren') ? data[cate].hasChildren : false 
-          });
+          if (this.categories[this.categoryLevel].hasOwnProperty(cate)) {
+            this.categories[this.categoryLevel].push({...data[cate]});
+          }
+          this.category[cate] = data[cate];
         }
       }else{
-        this.category.push(data);
+        params['parent'] = 0;
+        let { data } = await categoryResource.list(params);
+        this.categories[this.categoryLevel] = [...data,...this.categories[this.categoryLevel]];
       }
-      this.category[0].unshift({
-        id: '0',
-        parent: 0,
-        name: 'Is parent',
-      });
-      // data.unshift(this.listRecursive[0]);
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.dataTemp['parent'] = this.categories;
+          this.dataTemp['parent'] = this.category;
           const loading = this.$loading({
             target: '.el-form',
           });
@@ -398,63 +369,60 @@ export default {
       this.dynamicTags = '';
     },
     async querySearchAsync(queryString, cb) {
-      var category = this.category[this.cateLevel];
-      var results = queryString ? category.filter(this.createFilter(queryString)) : category;
-      if (this.isEdit) {
-        results = results.filter((item) => parseInt(item.id) !== parseInt(this.dataTemp.id));
-      }
+      const categories = this.categories[this.categoryLevel];
+      var results = queryString ? categories.filter(this.categoriesFilter(queryString)) : categories;
+
+      // check if not exist search in server
       if (results.length == 0) {
         let params = {
           'name':queryString,
-          'except_id':this.dataTemp.id
+          'limit':10,
+          'parent':this.category[this.categoryLevel - 1].id
         };
-        if (this.cateLevel == 0) {
-          params['parent'] = 0;
-        }else{
-          let parentId = this.categories[this.cateLevel - 1].id;
-          params['parent'] = parentId;
-        }
-        results = await categoryResource.list(params);
-        results = results.data;
-        if (results.length > 0) {
-          this.category[this.cateLevel] = [...results,...this.category[this.cateLevel]];
-        }
+        let { data } = await categoryResource.list(params);
+        this.categories[this.categoryLevel] = data;
+        results = data;
       }
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
-        cb(results);
-      }, 500 * Math.random());
+      cb(results);
     },
-    createFilter(queryString) {
-      return (category) => {
-        return (category.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+    categoriesFilter(queryString) {
+      return (categories) => {
+        return (categories.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
       };
     },
     checkParentFocus(level){
-      this.cateLevel = level;
+      this.categoryLevel = level;
     },
     async handleSelectCategory(item){
-      if (parseInt(this.categories[this.cateLevel].id) == parseInt(item.id)) {
+
+      if (parseInt(this.category[this.categoryLevel].id) == parseInt(item.id)) { // check itself return
         return;
       }
-      let leng = this.categories.length - 1;// 2
-      if (this.cateLevel < leng) {
-        this.categories.splice(this.cateLevel+1,leng);
-        this.category.splice(this.cateLevel+1,leng);
+
+      let leng = this.category.length - 1;
+      if (this.categoryLevel < leng) { // check change parent remove children
+        this.category.splice(this.categoryLevel+1,leng);
+        this.categories.splice(this.categoryLevel+1,leng);
       }
-      if (item.hasChildren) {
-        this.categories[this.cateLevel].parent = item.id;
-        this.cateLevel++;
-        const { data } = await categoryResource.getChildren({id:item.id,store_id:item.store.id});
-        this.category.push(data);
-        this.categories.push({
-          id:String(this.cateLevel),
-          parent:item.id,
-          name:''
+
+      this.$set(this.category,this.categoryLevel,{...item});// set for current
+
+      if (item.hasOwnProperty('hasChildren') && item.hasChildren == true) {
+        this.categoryLevel++; // for child
+        this.$set(this.category,this.categoryLevel,{
+            'name':null,
+            'id':null,
+            'parent':null,
         });
-      }else{
-        this.categories[this.cateLevel].id = this.cateLevel;
-        this.categories[this.cateLevel].parent = item.id;
+        let params = {
+          'limit':10,
+          'parent':this.category[this.categoryLevel - 1].id
+        };
+        let { data } = await categoryResource.list(params);
+        if (!this.categories.hasOwnProperty(this.categoryLevel)) {
+          this.$set(this.categories,this.categoryLevel,[]);
+        }
+        this.categories[this.categoryLevel] = data;
       }
     }
   },
