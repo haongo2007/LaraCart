@@ -1,6 +1,21 @@
 import { pluralize } from '@/filters';
 import router from '@/router';
 import store from '@/store';
+import Cookies from 'js-cookie';
+
+export function checkOnlyStore() {
+  let store_ck = Cookies.get('store');
+  if (store_ck) {
+    store_ck = JSON.parse(store_ck);
+    if (store_ck.length == 1) {
+      return false;
+    } else {
+      return true;
+    }
+  }else{
+    return true;
+  }
+}
 
 export function parseTime(time, cFormat) {
   if (arguments.length === 0) {

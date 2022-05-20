@@ -35,7 +35,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150">
+      <el-table-column label="Store" min-width="150" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -103,6 +103,7 @@ import RightPanel from '@/components/RightPanel';
 import FilterSystemCategory from './components/FilterSystemCategory';
 import EventBus from '@/components/FileManager/eventBus';
 import CategoryResource from '@/api/category';
+import { checkOnlyStore } from '@/utils';
 
 const categoryResource = new CategoryResource();
 
@@ -130,9 +131,9 @@ export default {
     labelChildOrParent(){
       return (this.listQuery.parent === false ? this.$t('table.parent') : this.$t('table.children'));
     },
+    checkOnlyStore
   },
   created() {
-
   },
   methods: {
     async load(row, treeNode, resolve) {

@@ -37,14 +37,6 @@
             />
           </el-form-item>
 
-          <el-form-item :label="$t('table.url_config')" prop="alias">
-            <el-input
-              v-model="temp.alias"
-              placeholder="Please input"
-              clearable
-            />
-          </el-form-item>
-
         </el-col>
         <el-col :span="12">
 
@@ -81,9 +73,9 @@
             />
           </el-form-item>
 
-          <el-form-item :label="$t('table.category')" prop="category">
+          <!-- <el-form-item :label="$t('table.category')" prop="category">
             <el-cascader v-model="temp.category" style="width: 100%" :props="cateRecurProps" clearable />
-          </el-form-item>
+          </el-form-item> -->
 
           <el-form-item :label="$t('table.sell_date')" prop="date_available">
             <el-date-picker
@@ -96,6 +88,19 @@
             />
           </el-form-item>
 
+          <el-form-item :label="$t('table.url_config')" prop="alias">
+            <el-input
+              v-model="temp.alias"
+              placeholder="Please input"
+              clearable
+            />
+          </el-form-item>
+
+        </el-col>
+        <el-col :span="24">
+          <el-form-item :label="$t('table.category')" prop="category">
+            <category-multiple @handleProcessCategory="handleProcessCategory" :is-multiple="true" :is-edit="isEdit" />
+          </el-form-item>
         </el-col>
       </el-row>
     </el-form>
@@ -118,6 +123,7 @@ import CategoryResource from '@/api/category';
 import BrandResource from '@/api/brand';
 import SupplierResource from '@/api/supplier';
 import TaxResource from '@/api/tax';
+import CategoryMultiple from '@/components/CategoryMultiple';
 
 const categoryResource = new CategoryResource();
 const brandResource = new BrandResource();
@@ -128,6 +134,9 @@ const category_parent = 0;
 
 export default {
   name: 'InfoGeneral',
+  components:{
+    CategoryMultiple
+  },
   props: ['dataActive', 'dataProduct','dataStoreId'],
   data() {
     return {
@@ -152,6 +161,7 @@ export default {
         stock: 0,
         alias: '',
       },
+      isEdit:Object.keys(this.dataProduct).length > 0 ? true : false,
       minimum: 0,
       date_available: '',
       loading: true,
@@ -159,6 +169,7 @@ export default {
       suppliers: [],
       taxs: [],
       cateRecurProps: {
+        checkStrictly: true,
         multiple: true,
         store_id:this.dataStoreId,
         lazy: true,
@@ -167,11 +178,11 @@ export default {
           if (!node.value) {
             level = category_parent;
           }
-          categoryResource.getChildren({ id: level,store_id:this.store_id }).then((res) => {
+          categoryResource.list({ parent: level,store_id:this.store_id }).then((res) => { 
             const nodes = res.data.map(item => ({
               value: item.id,
               label: item.name,
-              leaf: item.parent_id,
+              leaf: item.hasOwnProperty('hasChildren') && item.hasChildren == true ? item.id : level,
             }));
             resolve(nodes);
           });
@@ -257,6 +268,9 @@ export default {
     }
   },
   methods: {
+    handleProcessCategory(data){
+
+    },
     cbGetBrands(res) {
       const selectedBrand = this.brands.filter(brand => brand.id == this.dataProduct.brand_id);
       this.temp.brand.label = selectedBrand[0].name;

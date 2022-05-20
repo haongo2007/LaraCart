@@ -43,6 +43,7 @@ class Category extends ShopCategory
         $parent = Arr::get($dataSearch, 'parent', '');
         $storeId = Arr::get($dataSearch, 'store_id', '');
         $parent_list = Arr::get($dataSearch, 'parent_list', '');
+        $id_list = Arr::get($dataSearch, 'id_list', '');
         $except_id = Arr::get($dataSearch, 'except_id', '');
 
         $arrSort = [
@@ -67,8 +68,12 @@ class Category extends ShopCategory
             $categoryList = $categoryList->where('parent',$parent);
         }
 
+        if ($id_list != '') {
+            $categoryList = $categoryList->whereRaw('FIND_IN_SET(id, "'.$id_list.'")');
+        }
+
         if ($parent_list != '') {
-            $categoryList = $categoryList->whereRaw('FIND_IN_SET(id, "'.$parent_list.'")');
+            $categoryList = $categoryList->whereRaw('FIND_IN_SET(parent, "'.$parent_list.'")');
         }
 
         if (!is_null($status) && is_array($status)) {

@@ -23,6 +23,7 @@ export default {
   		temp: {
 			  id: 0,
 			  kind: 0,
+        store_id: 0,
 			  descriptions: {},
       },
       rules: {
@@ -38,6 +39,7 @@ export default {
     productResource.get(id).then(({ data } = response) => {
       this.temp.id = data.id;
       this.temp.kind = data.kind;
+      this.temp.store_id = data.store_id;
       this.product = data;
 
       this.fetchLanguages(data.store_id);

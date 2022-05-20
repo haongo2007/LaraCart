@@ -31,7 +31,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150">
+      <el-table-column label="Store" min-width="150" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -142,6 +142,7 @@ import FilterSystemOrder from './components/FilterSystemOrder';
 import OrderStatusResource from '@/api/order-status';
 import Pagination from '@/components/Pagination';
 import EventBus from '@/components/FileManager/eventBus';
+import { checkOnlyStore } from '@/utils';
 
 const orderStatusResource = new OrderStatusResource();
 var statusMap = null;
@@ -176,6 +177,9 @@ export default {
         customer_phone: '',
       },
     };
+  },
+  computed:{
+    checkOnlyStore
   },
   created(){
     this.getListStatus();

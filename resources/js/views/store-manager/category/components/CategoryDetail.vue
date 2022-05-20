@@ -71,28 +71,7 @@
                 </el-form-item>
 
                 <el-form-item :label="$t('table.category')" prop="parent" style="margin-bottom: 0px;">
-                  <!-- <el-cascader
-                    v-model="dataTemp.parent"
-                    :options="listRecursive"
-                    :props="cateRecurProps"
-                    :show-all-levels="false"
-                    clearable
-                    filterable
-                  /> -->
-                  <div class="category-list">
-                    <div style="margin: 0px 20px 20px 0px;" v-for="(item,index) in category" :key="index">
-                      <el-autocomplete
-                        :debounce="300"
-                        v-model="item.name"
-                        :fetch-suggestions="querySearchAsync"
-                        @focus="checkParentFocus(index)"
-                        @blur="checkToReName(index)"
-                        placeholder="Please choose children"
-                        @select="handleSelectCategory"
-                        value-key="name"/>
-                        <i style="margin-left: 10px;" v-if="index == categoryLevel" class="el-icon-arrow-right"></i>
-                    </div>
-                  </div>
+                  <category-multiple @handleProcessCategory="handleProcessCategory" :is-edit="isEdit" :data-temp="dataTemp"/>
                 </el-form-item>
 
                 <el-form-item :label="$t('table.status')" prop="status">
@@ -151,6 +130,7 @@ import reloadRedirectToList from '@/utils';
 import Sticky from '@/components/Sticky'; // Sticky header
 import FileManager from '@/components/FileManager';
 import EventBus from '@/components/FileManager/eventBus';
+import CategoryMultiple from '@/components/CategoryMultiple';
 import CategoryResource from '@/api/category';
 const categoryResource = new CategoryResource();
 
@@ -159,6 +139,7 @@ export default {
   components: {
     Sticky,
     FileManager,
+    CategoryMultiple
   },
   props: {
     isEdit: {
@@ -180,32 +161,17 @@ export default {
   },
   data() {
     return {
+      category:[],
       dialogStorageVisible: false,
       action: false,
       active: 0,
       componentStorage: '',
       disableUseStorage: false,
-      categoryLevel:0,
-      category:[
-        {
-          'name':null,
-          'id':null,
-          'parent':null,
-        }
-      ],
-      categories:[
-        [{
-          'name':'Is parent',
-          'id':0,
-          'parent':0,
-        }]
-      ],
       inputTagsVisible: false,
       dynamicTags: '',
     };
   },
   created() {
-    this.getCategory();
     EventBus.$on('getFileResponse', this.handlerGeturl);
   },
   methods: {
@@ -238,50 +204,9 @@ export default {
         this.dialogStorageClose();
       }
     },
-    async getCategory(){
-      let params = {
-        'limit':10
-      };
-      if (this.isEdit) {
-        if (this.dataTemp.parent == 0) {
-          this.$set(this.category,this.categoryLevel, {
-            'name':'Is parent',
-            'id':0,
-            'parent':0,
-          });
-          params['parent'] = 0;
-          let { data } = await categoryResource.list(params);
-          this.categories[this.categoryLevel] = [...data,...this.categories[this.categoryLevel]];
-          return;
-        }
-        params['parent_list'] = this.dataTemp.parent_list;
-        
-        let { data } = await categoryResource.list(params);
-
-        let sort;
-        let id = this.dataTemp.parent_list;
-        if( String(id).indexOf(',') != -1 ){
-          sort = id.split(',').filter(Boolean);
-        }else{
-          sort = [id];
-        }
-        data = sort.map((i) => data.find((j) => parseInt(j.id) === parseInt(i) )); // sort array
-
-        for(let cate in data){
-          if (!this.category.hasOwnProperty(cate)) {
-            this.$set(this.category,cate,[]);
-            this.$set(this.categories,cate,[]);
-          }
-          if (this.categories[cate].hasOwnProperty(cate)) {
-            this.categories[cate].push({...data[cate]});
-          }
-          this.$set(this.category,cate,data[cate])
-        }
-      }else{
-        params['parent'] = 0;
-        let { data } = await categoryResource.list(params);
-        this.categories[this.categoryLevel] = [...data,...this.categories[this.categoryLevel]];
-      }
+    handleProcessCategory(data){
+      console.log(data);
+      this.category = data;
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
@@ -394,86 +319,6 @@ export default {
       this.inputTagsVisible = false;
       this.dynamicTags = '';
     },
-    async querySearchAsync(queryString, cb) {
-      const categories = this.categories[this.categoryLevel];
-      var results = queryString ? categories.filter(this.categoriesFilter(queryString)) : categories;
-
-      // check if not exist search in server
-      if (results.length == 0 || queryString == '') {
-        let params = {
-          'name':queryString,
-          'limit':10,
-          'except_id':this.dataTemp.id,
-        };
-        if (this.categoryLevel > 0) {
-          params['parent'] = this.category[this.categoryLevel - 1].id
-        }else{
-          params['parent'] = 0;
-        }
-        let { data } = await categoryResource.list(params);
-        this.categories[this.categoryLevel] = data;
-        results = data;
-        if (this.categoryLevel == 0) {
-          results.push({
-            'name':'Is parent',
-            'id':0,
-            'parent':0,
-          });
-        }
-      }
-      cb(results);
-    },
-    categoriesFilter(queryString) {
-      return (categories) => {
-        return (categories.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-      };
-    },
-    checkParentFocus(level){
-      this.categoryLevel = level;
-    },
-    checkToReName(level){
-      if(this.category[level].name == ''){
-        let that = this;
-        this.categories[level].forEach( function(val, index) {
-          if (val.id == that.category[level].id) {
-            that.category[level].name = val.name;
-          }
-        });
-      }
-    },
-    async handleSelectCategory(item){
-
-      if (parseInt(this.category[this.categoryLevel].id) == parseInt(item.id)) { // check itself return
-        return;
-      }
-
-      let leng = this.category.length - 1;
-      if (this.categoryLevel < leng) { // check change parent remove children
-        this.category.splice(this.categoryLevel+1,leng);
-        this.categories.splice(this.categoryLevel+1,leng);
-      }
-
-      this.$set(this.category,this.categoryLevel,{...item});// set for current
-
-      if (item.hasOwnProperty('hasChildren') && item.hasChildren == true) {
-        this.categoryLevel++; // for child
-        this.$set(this.category,this.categoryLevel,{
-            'name':null,
-            'id':null,
-            'parent':null,
-        });
-        let params = {
-          'limit':10,
-          'parent':this.category[this.categoryLevel - 1].id,
-          'except_id':this.dataTemp.id,
-        };
-        let { data } = await categoryResource.list(params);
-        if (!this.categories.hasOwnProperty(this.categoryLevel)) {
-          this.$set(this.categories,this.categoryLevel,[]);
-        }
-        this.categories[this.categoryLevel] = data;
-      }
-    }
   },
 };
 </script>
