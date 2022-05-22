@@ -1,27 +1,30 @@
 <template>
-  <div class="category-list">
-      <div style="margin: 0px 20px 20px 0px;" v-if="isMultiple" v-for="(value,key) in categoryMultiple" :key="key">
+  <div >
+    <div v-if="isMultiple" class="category-list">
+      <div style="margin: 0px 20px 20px 0px;" v-for="(value,key) in categoryMultiple" :key="key">
         <el-select
-          v-model="categoryMultipleValue[categoryLevel]"
+          v-model="categoryMultipleValue[key]"
           multiple
           filterable
           remote
           reserve-keyword
+          collapse-tags
           value-key="name"
           placeholder="Please enter a keyword"
-          @change="handleSelectCategoryMultiple"
-          @focus="checkParentFocus(key)"
-          :remote-method="remoteMethod"
+          @change="handleSelectCategoryMultiple($event, key)"
+          @remote-method="remoteMethod($event, key)"
           :loading="loading">
           <el-option
-            v-for="item in categoryMultiple[categoryLevel]"
+            v-for="item in categoryMultiple[key]"
             :key="item.id"
             :label="item.name"
             :value="item">
           </el-option>
         </el-select>
       </div>
-      <div style="margin: 0px 20px 20px 0px;" v-for="(item,index) in category" :key="index" v-else>
+    </div>
+    <div v-else class="category-list">
+      <div style="margin: 0px 20px 20px 0px;" v-for="(item,index) in category" :key="index">
         <el-autocomplete
           :debounce="300"
           v-model="item.name"
@@ -33,6 +36,7 @@
           value-key="name"/>
           <i style="margin-left: 10px;" v-if="index == categoryLevel" class="el-icon-arrow-right"></i>
       </div>
+    </div>
   </div>
 </template>
 
@@ -65,7 +69,6 @@ export default {
     return {
       categoryMultipleValue: [],//value
       categoryMultiple: [],//option
-      categoriesMultiple: [],// list
       loading: false,
       categoryLevel:0,
       category:[
@@ -92,37 +95,55 @@ export default {
     }
   },
   methods: {
-    async handleSelectCategoryMultiple(value){
+    /// multiple for product menu
+    async handleSelectCategoryMultiple(value,key){
+      let that = this;
       let parent = value.map(function(val, i) {
         return val.id;
       })
+      if (parent == '') {        
+        this.categoryMultipleValue.splice(key+1,this.categoryMultipleValue.length);
+        this.categoryMultiple.splice(key+1,this.categoryMultiple.length);
+        return;
+      }
       parent = parent.join(',');
-
       let params = {
         'limit':10,
         'parent_list':parent
       };
       let { data } = await categoryResource.list(params);
+      key++;
       if (data.length) {
-        this.categoryLevel++;
-        this.$set(this.categoryMultiple,this.categoryLevel,[]);
-        this.$set(this.categoriesMultiple,this.categoryLevel,data);
+        if (!this.categoryMultiple.hasOwnProperty(key)) {
+          this.$set(this.categoryMultiple,key,data);
+        }else{
+
+        }
+        if (!this.categoryMultipleValue.hasOwnProperty(key)) {
+          this.$set(this.categoryMultipleValue,key,[]);
+        }else{
+
+        }
+      }else{
+        if (this.categoryMultiple.hasOwnProperty(key)) {
+          this.categoryMultiple.splice(key,this.categoryMultiple.length);
+          this.categoryMultipleValue.splice(key,this.categoryMultipleValue.length);
+        }
       }
     },
-    remoteMethod(query) {
-        if (query !== '') {
-          this.loading = true;
-          setTimeout(() => {
-            this.loading = false;
-            this.categoryMultiple[this.categoryLevel] = this.categoriesMultiple[this.categoryLevel].filter(item => {
-              return item.name.toLowerCase()
-                .indexOf(query.toLowerCase()) > -1;
-            });
-          }, 200);
-        } else {
-          this.categoryMultiple[this.categoryLevel] = [];
-        }
-      },
+    remoteMethod(query,key) {
+      if (query !== '') {
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+          this.categoryMultiple[key] = this.categoryMultiple[key].filter(item => {
+            return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
+          });
+        }, 200);
+      } else {
+        this.categoryMultiple[this.categoryLevel] = [];
+      }
+    },
     async getCategoryMultiple(){
       let params = {
         'limit':10
@@ -130,9 +151,9 @@ export default {
       params['parent'] = 0;
       let { data } = await categoryResource.list(params);
       this.$set(this.categoryMultipleValue,this.categoryLevel,[]);
-      this.$set(this.categoryMultiple,this.categoryLevel,[]);
-      this.$set(this.categoriesMultiple,this.categoryLevel,data);
+      this.$set(this.categoryMultiple,this.categoryLevel,data);
     },
+    /// single for categories menu
     async getCategory(){
       let params = {
         'limit':10
