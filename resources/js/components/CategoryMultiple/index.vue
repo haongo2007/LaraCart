@@ -68,6 +68,7 @@ export default {
   data() {
     return {
       categoryMultipleValue: [],//value
+      categoryMultipleTotal: [],//option
       categoryMultiple: [],//option
       loading: false,
       categoryLevel:0,
@@ -106,28 +107,41 @@ export default {
         this.categoryMultiple.splice(key+1,this.categoryMultiple.length);
         return;
       }
-      parent = parent.join(',');
+      let parents = parent.join(',');
       let params = {
         'limit':10,
-        'parent_list':parent
+        'parent_list':parents
       };
       let { data } = await categoryResource.list(params);
-      key++;
-      if (data.length) {
-        if (!this.categoryMultiple.hasOwnProperty(key)) {
-          this.$set(this.categoryMultiple,key,data);
-        }else{
-
+      let added = true;
+      if (this.categoryMultipleTotal.hasOwnProperty(key)) {
+        if (this.categoryMultipleTotal[key] > value.length) {
+          added = false;
         }
-        if (!this.categoryMultipleValue.hasOwnProperty(key)) {
-          this.$set(this.categoryMultipleValue,key,[]);
-        }else{
+      }
+      this.$set(this.categoryMultipleTotal,key,value.length);
+      let next = key + 1;
+      if (data.length) {
+        this.$set(this.categoryMultiple,next,data);
 
+        if (!this.categoryMultipleValue.hasOwnProperty(next)) {
+          this.$set(this.categoryMultipleValue,next,[]);
+        }else{
+          let dif = [];
+          this.categoryMultipleValue[next].forEach((obj,k) => {
+            data.filter(res => {
+              if (res.id !== obj.id) {
+                if (that.categoryMultipleValue[next].hasOwnProperty(k) && added !== true) {
+                  that.categoryMultipleValue[next].splice(k,1);
+                }
+              }  
+            })
+          });
         }
       }else{
-        if (this.categoryMultiple.hasOwnProperty(key)) {
-          this.categoryMultiple.splice(key,this.categoryMultiple.length);
-          this.categoryMultipleValue.splice(key,this.categoryMultipleValue.length);
+        if (this.categoryMultiple.hasOwnProperty(next)) {
+          this.categoryMultiple.splice(next,this.categoryMultiple.length);
+          this.categoryMultipleValue.splice(next,this.categoryMultipleValue.length);
         }
       }
     },
