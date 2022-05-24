@@ -24,11 +24,13 @@ class ShopCurrency extends Model
     protected static $checkListCurrency = [];
     protected $guarded                  = [];
     const ITEM_PER_PAGE = 15;
+    const ACTIVE = ['1'];
 
 
     public function getCurrencyListAdmin($searchParams='')
     {
         $sort_order = $searchParams['sort_order'] ?? 'id_desc';
+        $status= $dataSearch['status'] ?? self::ACTIVE;
         $keyword = $searchParams['keyword'] ?? '';
         $limit = $searchParams['limit'] ?? self::ITEM_PER_PAGE;
         $arrSort = [
@@ -46,6 +48,10 @@ class ShopCurrency extends Model
         }
         
         $currencyList = $currencyList->whereIn('store_id', session('adminStoreId'));
+
+        if (!is_null($status) && is_array($status)) {
+            $currencyList = $currencyList->whereIn('status',$status);
+        }
 
         if ($sort_order && array_key_exists($sort_order, $arrSort)) {
             $field = explode('__', $sort_order)[0];

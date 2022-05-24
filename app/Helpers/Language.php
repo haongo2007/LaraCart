@@ -25,6 +25,18 @@ if (!function_exists('lc_language_render')) {
     }
 }
 
+if (!function_exists('lc_language_default')) {
+    /*
+    Default language
+     */
+    function lc_language_default()
+    {
+        $languageList     = (new ShopLanguage);
+        $languageList = $languageList->where('store_id', 0);
+        $languageList = $languageList->paginate();
+        return $languageList;
+    }
+}
 
 if (!function_exists('lc_get_locale')) {
     /*

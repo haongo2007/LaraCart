@@ -125,3 +125,12 @@ if (!function_exists('lc_convert_price_to_origin')) {
         }
     }
 }
+
+//Get currencies default
+if (!function_exists('lc_currency_default')) {
+    function lc_currency_default()
+    {
+        $currencyList = ShopCurrency::where('store_id', 0)->paginate();
+        return $currencyList;
+    }
+}

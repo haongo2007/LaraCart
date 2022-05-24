@@ -8,7 +8,6 @@
           filterable
           remote
           reserve-keyword
-          collapse-tags
           value-key="name"
           placeholder="Please enter a keyword"
           @change="handleSelectCategoryMultiple($event, key)"
@@ -97,12 +96,63 @@ export default {
   },
   methods: {
     /// multiple for product menu
+    handleRemoveCategoryMultipleChild(key,oldValue = null,next = false){
+      let that = this;
+      let del = [];
+      let nextdel = [];
+      if (next == true) {
+        del = this.categoryMultipleValue[key].filter(function(obj) {
+            return oldValue.some(function(obj2) {
+                return obj.parent_id === obj2.id;
+            });
+        });
+        del = del.map((item)=>{
+          return item.id;
+        });
+      }else{
+        del = this.categoryMultipleValue[key].filter(function(obj) {
+            return !oldValue.some(function(obj2) {
+                return obj.id === obj2.id;
+            });
+        });
+        del = del.map((item)=>{
+          return item.id;
+        });
+      }
+      this.categoryMultipleValue[key].forEach((child,index) => {
+        if (del.includes(child.id)) {
+          nextdel.push(that.categoryMultipleValue[key][index]);
+          delete that.categoryMultipleValue[key][index];
+        }
+      })
+      this.categoryMultiple[key].forEach((child,index) => {
+        if (del.includes(child.id)) {
+          that.categoryMultiple[key].splice(index,1);
+        }
+      })
+      if (this.categoryMultiple[key].length == 0) {
+        this.categoryMultiple.splice(key,this.categoryMultiple.length)
+      }
+      if(this.categoryMultiple.hasOwnProperty(key + 1)){
+        this.handleRemoveCategoryMultipleChild(key+1,nextdel,true);
+      }
+    },
+    handleSelectCategoryMultipleChild(value,key,added){
+      this.$set(this.categoryMultiple,key,value);
+      if (!this.categoryMultipleValue.hasOwnProperty(key)) {
+        this.$set(this.categoryMultipleValue,key,[]);
+      }else{
+        if (added !== true) {
+          this.handleRemoveCategoryMultipleChild(key,value);
+        }
+      }  
+    },
     async handleSelectCategoryMultiple(value,key){
       let that = this;
       let parent = value.map(function(val, i) {
         return val.id;
       })
-      if (parent == '') {        
+      if (parent == '') {
         this.categoryMultipleValue.splice(key+1,this.categoryMultipleValue.length);
         this.categoryMultiple.splice(key+1,this.categoryMultiple.length);
         return;
@@ -120,29 +170,12 @@ export default {
         }
       }
       this.$set(this.categoryMultipleTotal,key,value.length);
-      let next = key + 1;
       if (data.length) {
-        this.$set(this.categoryMultiple,next,data);
-
-        if (!this.categoryMultipleValue.hasOwnProperty(next)) {
-          this.$set(this.categoryMultipleValue,next,[]);
-        }else{
-          let dif = [];
-          this.categoryMultipleValue[next].forEach((obj,k) => {
-            data.filter(res => {
-              if (res.id !== obj.id) {
-                if (that.categoryMultipleValue[next].hasOwnProperty(k) && added !== true) {
-                  that.categoryMultipleValue[next].splice(k,1);
-                }
-              }  
-            })
-          });
-        }
+        let next = key + 1;
+        this.handleSelectCategoryMultipleChild(data,next,added);
       }else{
-        if (this.categoryMultiple.hasOwnProperty(next)) {
-          this.categoryMultiple.splice(next,this.categoryMultiple.length);
-          this.categoryMultipleValue.splice(next,this.categoryMultipleValue.length);
-        }
+        this.categoryMultipleValue.splice(key+1,this.categoryMultipleValue.length);
+        this.categoryMultiple.splice(key+1,this.categoryMultiple.length);
       }
     },
     remoteMethod(query,key) {

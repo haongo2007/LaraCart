@@ -22,7 +22,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150">
+      <el-table-column label="Store" min-width="150" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop" />
@@ -42,7 +42,7 @@
           {{ scope.row.code }}
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.icon')" min-width="100px">
+      <el-table-column :label="$t('table.flag')" min-width="100px">
         <template slot-scope="scope">
           <el-image :src="scope.row.icon">
             <div slot="error" class="image-slot">
@@ -96,6 +96,7 @@ import RightPanel from '@/components/RightPanel';
 import FilterSystemLanguages from './components/FilterSystemLanguages';
 import EventBus from '@/components/FileManager/eventBus';
 import StoreResource from '@/api/store';
+import { checkOnlyStore } from '@/utils';
 
 const storeResource = new StoreResource();
 
@@ -116,7 +117,8 @@ export default {
       },
     };
   },
-  created() {
+  computed: {
+    checkOnlyStore
   },
   methods: {
     handleChange(id, val, key){

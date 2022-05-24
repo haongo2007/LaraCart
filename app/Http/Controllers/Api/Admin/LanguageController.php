@@ -15,6 +15,9 @@ class LanguageController extends Controller
     {
         $searchParams = request()->all();
         $data = (new ShopLanguage)->getLanguageListAdmin($searchParams);
+        if ($data->total() == 0) {
+            $data = lc_language_default();
+        }
         return LanguageCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

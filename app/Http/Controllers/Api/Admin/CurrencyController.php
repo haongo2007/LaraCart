@@ -15,6 +15,9 @@ class CurrencyController extends Controller
     {
         $searchParams = request()->all();
         $data = (new ShopCurrency)->getCurrencyListAdmin($searchParams);
+        if ($data->total() == 0) {
+            $data = lc_currency_default();
+        }
         return CurrencyCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

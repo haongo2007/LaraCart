@@ -22,7 +22,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150">
+      <el-table-column label="Store" min-width="150" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop" />
@@ -43,37 +43,37 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('symbol')" min-width="120px" align="center">
+      <el-table-column :label="$t('table.symbol')" min-width="120px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.symbol }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('exchange_rate')" min-width="120px" align="center">
+      <el-table-column :label="$t('table.exchange_rate')" min-width="120px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.exchange_rate }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('precision')" min-width="120px" align="center">
+      <el-table-column :label="$t('table.precision')" min-width="120px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.precision }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('symbol_first')" min-width="120px" align="center">
+      <el-table-column :label="$t('table.symbol_first')" min-width="130px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.symbol_first }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('thousands_symbol')" min-width="120px" align="center">
+      <el-table-column :label="$t('table.thousands_symbol')" min-width="180px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.thousands }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('sort')" min-width="120px" align="center">
+      <el-table-column :label="$t('table.sort')" min-width="120px" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.sort }}</span>
         </template>
@@ -109,6 +109,7 @@ import RightPanel from '@/components/RightPanel';
 import FilterSystemCurrency from './components/FilterSystemCurrency';
 import EventBus from '@/components/FileManager/eventBus';
 import StoreResource from '@/api/store';
+import { checkOnlyStore } from '@/utils';
 
 const storeResource = new StoreResource();
 
@@ -129,7 +130,8 @@ export default {
       },
     };
   },
-  created() {
+  computed: {
+    checkOnlyStore
   },
   methods: {
     handleChange(id, val, key){
