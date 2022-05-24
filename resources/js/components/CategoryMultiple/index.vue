@@ -69,6 +69,7 @@ export default {
       categoryMultipleValue: [],//value
       categoryMultipleTotal: [],//option
       categoryMultiple: [],//option
+      categoryMultipleDisabled: [],//option
       loading: false,
       categoryLevel:0,
       category:[
@@ -125,10 +126,11 @@ export default {
           delete that.categoryMultipleValue[key][index];
         }
       })
-      this.categoryMultiple[key].forEach((child,index) => {
-        if (del.includes(child.id)) {
-          that.categoryMultiple[key].splice(index,1);
-        }
+      let pare = oldValue.map((item)=>{
+        return item.id;
+      });
+      this.categoryMultiple[key] = this.categoryMultiple[key].filter( function(element, index) {
+        return !pare.includes(element.parent_id);
       })
       if (this.categoryMultiple[key].length == 0) {
         this.categoryMultiple.splice(key,this.categoryMultiple.length)
