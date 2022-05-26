@@ -11,6 +11,14 @@ class ShopAttributeGroup extends Model
     protected static $getListType = null;
     protected static $getListAll = null;
     
+    /*
+    Get store
+    */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
+    
     public static function getListAll()
     {
         if (!self::$getListAll) {

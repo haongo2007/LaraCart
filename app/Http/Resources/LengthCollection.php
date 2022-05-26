@@ -18,6 +18,7 @@ class LengthCollection extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
+            'store' => $this->stores,
         ];
         return $res;
     }

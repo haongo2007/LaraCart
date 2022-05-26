@@ -30,18 +30,15 @@ use Carbon\Carbon;
 
 class ProductController extends Controller
 {
-    public $languages;
     public $kinds;
     public $properties;
     public $attributeGroup;
     public $listWeight;
     public $listLength;
     public $categories;
-    public $storeId;
 
     public function __construct(Request $request)
     {
-        $this->languages       = ShopLanguage::getListActive(session('adminStoreId'));
         $this->listWeight      = ShopWeight::getListAll();
         $this->listLength      = ShopLength::getListAll();
         $this->attributeGroup  = ShopAttributeGroup::getListType();
@@ -52,7 +49,6 @@ class ProductController extends Controller
         ];
         $this->properties = (new ShopProductProperty)->pluck('name', 'code')->toArray();
         $this->categories =  (new Category)->getTreeCategoriesAdmin();
-        $this->storeId  = session('adminStoreId');
     }
 
     public function index(Request $request)
@@ -414,7 +410,8 @@ public function createProductGroup()
                                                 'type' => $childvaluepalette->type,
                                                 'hex' => $childvaluepalette->hex,
                                                 'attribute_id' => $justProdAttributeChild->id,
-                                                'product_id' => $product->id
+                                                'product_id' => $product->id,
+                                                'active' => $childvaluepalette->active,
                                             ];
                                         }
                                         ShopAttributePalette::insert($arrDataChildPalette);
@@ -431,7 +428,8 @@ public function createProductGroup()
                                         'type' => $valuepalette->type,
                                         'hex' => $valuepalette->hex,
                                         'attribute_id' => $justProdAttribute->id,
-                                        'product_id' => $product->id
+                                        'product_id' => $product->id,
+                                        'active' => $valuepalette->active,
                                     ];
                                 }
                                 ShopAttributePalette::insert($arrDataPalette);
@@ -505,7 +503,6 @@ public function createProductGroup()
         if ($product === null) {
             return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
         }
-        $storeId = session('adminStoreId');
         $data = $request->all();
         $data['descriptions'] = json_decode($data['descriptions']);
         $data['brand'] = json_decode($data['brand']);
@@ -522,7 +519,7 @@ public function createProductGroup()
 
         $data['date_promotion'] = json_decode($data['date_promotion']);
 
-        $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
+        $langFirst = array_key_first(lc_language_all($product->store_id)->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
@@ -552,7 +549,7 @@ public function createProductGroup()
                     }
                 }
 
-                $arrValidation = $this->validateAttribute($arrValidation,$storeId);
+                $arrValidation = $this->validateAttribute($arrValidation,$product->store_id);
 
                 $arrMsg = [
                     'descriptions.*.name.required'    => trans('validation.required', ['attribute' => trans('product.name')]),
@@ -577,7 +574,7 @@ public function createProductGroup()
                     'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|product_alias_unique:'.$id,
                 ];
 
-                $arrValidation = $this->validateAttribute($arrValidation,$storeId);
+                $arrValidation = $this->validateAttribute($arrValidation,$product->store_id);
                 
                 $arrMsg = [
                     'descriptions.*.name.required' => trans('validation.required', ['attribute' => trans('product.name')]),
@@ -708,7 +705,7 @@ public function createProductGroup()
         $product->descriptions()->delete();
 
         $dataDes = [];
-        $languages = ShopLanguage::getListActive($data['store_id']);
+        $languages = ShopLanguage::getListActive($product->store_id);
         foreach ($languages as $code => $value) {
             $dataDes[] = [
                 'product_id'  => $product->id,
@@ -719,7 +716,6 @@ public function createProductGroup()
                 'content'     => $descriptions->$code->content ?? '',
             ];
         }
-
         Product::insertDescriptionAdmin($dataDes);
 
         $product->categories()->detach();
@@ -812,7 +808,8 @@ public function createProductGroup()
                                                 'type' => $childvaluepalette->type,
                                                 'hex' => $childvaluepalette->hex,
                                                 'attribute_id' => $justProdAttributeChild->id,
-                                                'product_id' => $product->id
+                                                'product_id' => $product->id,
+                                                'active' => $childvaluepalette->active
                                             ];
                                         }
                                         ShopAttributePalette::insert($arrDataChildPalette);
@@ -829,7 +826,8 @@ public function createProductGroup()
                                         'type' => $valuepalette->type,
                                         'hex' => $valuepalette->hex,
                                         'attribute_id' => $justProdAttribute->id,
-                                        'product_id' => $product->id
+                                        'product_id' => $product->id,
+                                        'active' => $valuepalette->active
                                     ];
                                 }
                                 ShopAttributePalette::insert($arrDataPalette);

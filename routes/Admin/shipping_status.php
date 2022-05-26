@@ -14,3 +14,4 @@
 //     Route::post('/delete', 'AdminShipingStatusController@deleteList')
 //         ->name('admin_shipping_status.delete');
 // });
+Route::apiResource('shipping-status', 'ShippingStatusController');

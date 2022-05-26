@@ -194,6 +194,7 @@ export default {
     imageUploadTips: 'Since I was using only the vue@1 version, and it is not compatible with mockjs at the moment, I modified it myself, and if you are going to use it, it is better to use official version.',
   },
   table: {
+    default:'Mặc định',
     flag:'Cờ',
     rtl:'RTL bố cục',
     icon:'Biểu tượng',

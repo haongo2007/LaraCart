@@ -23,9 +23,9 @@ export default {
     ]),
   },
   created() {
-    if (!this.roles.includes('Administrator')) {
-      this.currentRole = 'editorDashboard';
-    }
+    // if (!this.roles.includes('Administrator')) {
+    //   this.currentRole = 'editorDashboard';
+    // }
   },
 };
 </script>

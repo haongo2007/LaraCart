@@ -20,6 +20,7 @@ class SupplierCollection extends JsonResource
             'phone' => $this->phone,
             'email' => $this->email,
             'status' => $this->image,
+            'store' => $this->stores,
         ];
         return $res;
     }

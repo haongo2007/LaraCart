@@ -90,7 +90,6 @@ export default {
   },
   created() {
     if (Object.keys(this.dataProduct).length > 0) {
-      console.log(this.dataProduct);
       if (this.dataProduct.weight){
         this.temp.weight = this.dataProduct.weight;
       }

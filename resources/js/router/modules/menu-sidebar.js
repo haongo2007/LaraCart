@@ -6,6 +6,7 @@ export const menuSidebar = [
         path: 'dashboard',
         name: 'Dashboard',
         meta: { 
+          permissions: ['view.dashboard'],
           title: 'dashboard', 
           icon: 'dashboard' 
         },
@@ -18,8 +19,7 @@ export const menuSidebar = [
     meta: {
       title: 'storeManager',
       icon: 'theme',
-      roles: ['Manager'],
-      permissions: ['Store Manager'],
+      permissions: ['view.orders','view.product','view.category'],
     },
     children: [
       {
@@ -27,8 +27,7 @@ export const menuSidebar = [
         meta: {
           title: 'orders',
           icon: 'form',
-          roles: ['Manager'],
-          permissions: ['Orders Manager','View All'],
+          permissions: ['view.orders'],
         },
       },
       // //////////////end orders
@@ -37,8 +36,7 @@ export const menuSidebar = [
         meta: {
           title: 'Product',
           icon: 'shopping',
-          roles: ['Manager'],
-          permissions: ['Product Manager','View All'],
+          permissions: ['view.product'],
         },
       },
       // //////////////end product
@@ -48,8 +46,7 @@ export const menuSidebar = [
         meta: {
           title: 'Category',
           icon: 'list',
-          roles: ['Manager'],
-          permissions: ['Category Manager','View All'],
+          permissions: ['view.category'],
         },
       },
       // //////////////end category
@@ -61,27 +58,31 @@ export const menuSidebar = [
     meta: {
       title: 'content',
       icon: 'content',
+      permissions: ['view.banner','view.page','view.blog'],
     },
     children: [
       {
         path: '/banner',
         meta: { 
           title: 'banner',
-          icon: 'el-icon-collection-tag'
+          icon: 'el-icon-collection-tag',
+          permissions: ['view.banner'],
         },
       },
       {
         path: '/page',
         meta: { 
           title: 'page',
-          icon:'el-icon-tickets'
+          icon:'el-icon-tickets',
+          permissions: ['view.page'],
         },
       },
       {
         path: '/blog-news',
         meta: { 
           title: 'blogNews',
-          icon:'el-icon-document-copy'
+          icon:'el-icon-document-copy',
+          permissions: ['view.blog'],
         },
       }
     ],
@@ -92,27 +93,38 @@ export const menuSidebar = [
     meta: {
       title: 'marketing',
       icon: 'marketing',
+      permissions: [
+        'view.email.template',
+        'view.coupon',
+        'view.flashsale',
+        'view.customer',
+        'view.seo',
+        'view.reportanalytics',
+      ],
     },
     children: [
       {
         path: '/email-template',
         meta: { 
           title: 'emailTemplate',
-          icon:'email-template'
+          icon:'email-template',
+          permissions: ['view.email.template'],
         },
       },
       {
         path: '/coupon-discount',
         meta: { 
           title: 'couponDiscount',
-          icon:'el-icon-discount'
+          icon:'el-icon-discount',
+          permissions: ['view.coupon'],
         },
       },
       {
         path: '/product-flashsale',
         meta: { 
           title: 'productFlashsale',
-          icon:'flash-sale'
+          icon:'flash-sale',
+          permissions: ['view.flashsale'],
         },
       },
       {
@@ -120,7 +132,8 @@ export const menuSidebar = [
         alwaysShow: true,
         meta: { 
           title: 'customerManager',
-          icon:'customer-manager'
+          icon:'customer-manager',
+          permissions: ['view.customer'],
         },
         children:[
           {
@@ -144,7 +157,8 @@ export const menuSidebar = [
         alwaysShow: true,
         meta: { 
           title: 'seoManager',
-          icon:'seo'
+          icon:'seo',
+          permissions: ['view.seo'],
         },
         children:[
           {
@@ -161,7 +175,8 @@ export const menuSidebar = [
         alwaysShow: true,
         meta: { 
           title: 'reportAnalytics',
-          icon:'el-icon-data-analysis'
+          icon:'el-icon-data-analysis',
+          permissions: ['view.reportanalytics'],
         },
         children:[
           {
@@ -181,7 +196,7 @@ export const menuSidebar = [
     meta: {
       title: 'configStore',
       icon: 'store-setting',
-      permissions: ['Store manager'],
+      permissions: ['view.store'],
     },
     children: [
       {
@@ -189,6 +204,7 @@ export const menuSidebar = [
         meta: {
           title: 'store',
           icon: 'book-shop',
+          permissions: ['view.store'],
         },
       },
     ],
@@ -199,7 +215,7 @@ export const menuSidebar = [
     meta: {
       title: 'library',
       icon: 'storage',
-      permissions: ['File Manager'],
+      permissions: ['view.library'],
     },
     children: [
       {
@@ -217,6 +233,24 @@ export const menuSidebar = [
     meta: {
       title: 'system',
       icon: 'system',
+      permissions: [
+        'view.user',
+        'view.roles',
+        'view.permissions',
+        'view.order.status',
+        'view.shipping.status',
+        'view.payment.status',
+        'view.supplier',
+        'view.brand',
+        'view.custom.field',
+        'view.weight.unit',
+        'view.length.unit',
+        'view.attribute.group',
+        'view.tax',
+        'view.logs',
+        'view.languages',
+        'view.currency',
+      ],
     },
     children: [
       {
@@ -227,7 +261,7 @@ export const menuSidebar = [
           {
             path: '/users-permissions/users',
             meta: { 
-              permissions: ['Users manager'],
+              permissions: ['view.user'],
               title: 'users',
               icon:'user'
             },
@@ -235,6 +269,7 @@ export const menuSidebar = [
           {
             path: '/users-permissions/roles',
             meta: { 
+              permissions: ['view.roles'],
               title: 'roles',
               icon:'role'
             },
@@ -242,6 +277,7 @@ export const menuSidebar = [
           {
             path: '/users-permissions/permissions',
             meta: { 
+              permissions: ['view.permissions'],
               title: 'permissions',
               icon:'permissions'
             },
@@ -251,11 +287,27 @@ export const menuSidebar = [
       {
         path: '/setting',
         alwaysShow: true,
-        meta: { title: 'setting',icon:'settings'},
+        meta: { 
+          title: 'setting',
+          icon:'settings',
+          permissions: [
+            'view.order.status',
+            'view.shipping.status',
+            'view.payment.status',
+            'view.supplier',
+            'view.brand',
+            'view.custom.field',
+            'view.weight.unit',
+            'view.length.unit',
+            'view.attribute.group',
+            'view.tax',
+          ],
+        },
         children:[
           {
             path: '/setting/order-status',
             meta: { 
+              permissions: ['view.order.status'],
               title: 'orderStatus',
               icon:'el-icon-s-order'
             },
@@ -263,6 +315,7 @@ export const menuSidebar = [
           {
             path: '/setting/shipping-status',
             meta: { 
+              permissions: ['view.shipping.status'],
               title: 'shippingStatus',
               icon:'el-icon-truck'
             },
@@ -270,6 +323,7 @@ export const menuSidebar = [
           {
             path: '/setting/payment-status',
             meta: { 
+              permissions: ['view.payment.status'],
               title: 'paymentStatus',
               icon:'el-icon-money'
             },
@@ -277,6 +331,7 @@ export const menuSidebar = [
           {
             path: '/setting/suppliers',
             meta: { 
+              permissions: ['view.supplier'],
               title: 'suppliers',
               icon:'el-icon-s-shop'
             },
@@ -284,6 +339,7 @@ export const menuSidebar = [
           {
             path: '/setting/brand',
             meta: { 
+              permissions: ['view.brand'],
               title: 'brand',
               icon:'el-icon-medal'
             },
@@ -291,6 +347,7 @@ export const menuSidebar = [
           {
             path: '/setting/custom-field',
             meta: { 
+              permissions: ['view.custom.field'],
               title: 'customField',
               icon:'el-icon-postcard'
             },
@@ -298,6 +355,7 @@ export const menuSidebar = [
           {
             path: '/setting/weight-unit',
             meta: { 
+              permissions: ['view.weight.unit'],
               title: 'weightUnit',
               icon:'el-icon-sold-out'
             },
@@ -305,6 +363,7 @@ export const menuSidebar = [
           {
             path: '/setting/length-unit',
             meta: { 
+              permissions: ['view.length.unit'],
               title: 'lengthUnit',
               icon:'el-icon-sell'
             },
@@ -312,6 +371,7 @@ export const menuSidebar = [
           {
             path: '/setting/attribute-group',
             meta: { 
+              permissions: ['view.attribute.group'],
               title: 'attributeGroup',
               icon:'el-icon-news'
             },
@@ -319,6 +379,7 @@ export const menuSidebar = [
           {
             path: '/setting/tax-manager',
             meta: { 
+              permissions: ['view.tax'],
               title: 'taxManager',
               icon:'el-icon-s-check'
             },
@@ -364,14 +425,16 @@ export const menuSidebar = [
         alwaysShow: true,
         meta: { 
           title: 'errorsLogs',
-          icon:'404'
+          icon:'404',
+          permissions: ['view.logs'],
         },
         children:[
           {
             path: '/errors-logs/operationLogs',
             meta: { 
               title: 'operationLogs',
-              icon:'el-icon-document'
+              icon:'el-icon-document',
+              permissions: ['view.logs'],
             },
           },
           // {
@@ -388,12 +451,17 @@ export const menuSidebar = [
         alwaysShow: true,
         meta: { 
           title: 'localization',
-          icon:'language'
+          icon:'language',
+          permissions: [
+            'view.languages',
+            'view.currency',
+          ],
         },
         children:[
           {
             path: '/localization/languages',
             meta: { 
+              permissions: ['view.languages'],
               title: 'languages',
               icon:'language'
             },
@@ -401,6 +469,7 @@ export const menuSidebar = [
           {
             path: '/localization/currency',
             meta: { 
+              permissions: ['view.currency'],
               title: 'currency',
               icon:'dollar'
             },

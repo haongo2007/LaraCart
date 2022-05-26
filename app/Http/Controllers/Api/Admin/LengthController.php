@@ -16,7 +16,7 @@ class LengthController extends Controller
      */
     public function index()
     {
-        $data = ShopLength::orderBy('id', 'desc')->paginate(20);
+        $data = ShopLength::whereIn('store_id', session('adminStoreId'))->paginate(20);
         return LengthCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

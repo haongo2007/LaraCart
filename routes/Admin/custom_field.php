@@ -9,3 +9,5 @@
 //     Route::post('/edit/{id}', 'AdminCustomFieldController@postEdit')->name('admin_custom_field.edit');
 //     Route::post('/delete', 'AdminCustomFieldController@deleteList')->name('admin_custom_field.delete');
 // });
+
+Route::apiResource('custom-field', 'CustomFieldController')->only('index');

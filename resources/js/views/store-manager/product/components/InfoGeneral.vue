@@ -99,7 +99,8 @@
         </el-col>
         <el-col :span="24">
           <el-form-item :label="$t('table.category')" prop="category">
-            <category-multiple @handleProcessCategory="handleProcessCategory" :is-multiple="true" :is-edit="isEdit" />
+            <category-multiple :store-id="dataStoreId" :data-temp-multiple="temp.category" @handleProcessCategory="handleProcessCategory" :is-multiple="true" 
+            :is-edit="isEdit" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -168,31 +169,31 @@ export default {
       brands: [],
       suppliers: [],
       taxs: [],
-      cateRecurProps: {
-        checkStrictly: true,
-        multiple: true,
-        store_id:this.dataStoreId,
-        lazy: true,
-        lazyLoad(node, resolve) {
-          var level = node.value;
-          if (!node.value) {
-            level = category_parent;
-          }
-          categoryResource.list({ parent: level,store_id:this.store_id }).then((res) => { 
-            const nodes = res.data.map(item => ({
-              value: item.id,
-              label: item.name,
-              leaf: item.hasOwnProperty('hasChildren') && item.hasChildren == true ? item.id : level,
-            }));
-            resolve(nodes);
-          });
-        },
-      },
-      listRecursive: [{
-        id: '0',
-        parent: 0,
-        title: 'Is parent',
-      }],
+      // cateRecurProps: {
+      //   checkStrictly: true,
+      //   multiple: true,
+      //   store_id:this.dataStoreId,
+      //   lazy: true,
+      //   lazyLoad(node, resolve) {
+      //     var level = node.value;
+      //     if (!node.value) {
+      //       level = category_parent;
+      //     }
+      //     categoryResource.list({ parent: level,store_id:this.store_id }).then((res) => { 
+      //       const nodes = res.data.map(item => ({
+      //         value: item.id,
+      //         label: item.name,
+      //         leaf: item.hasOwnProperty('hasChildren') && item.hasChildren == true ? item.id : level,
+      //       }));
+      //       resolve(nodes);
+      //     });
+      //   },
+      // },
+      // listRecursive: [{
+      //   id: '0',
+      //   parent: 0,
+      //   title: 'Is parent',
+      // }],
       pickerOptions: {
         shortcuts: [{
           text: 'Today',
@@ -269,7 +270,12 @@ export default {
   },
   methods: {
     handleProcessCategory(data){
-
+      let ids = data.map((item, index) => {
+        return item.map((item1, index1) => {
+          return item1.id;
+        });
+      });
+      this.temp.category = ids;
     },
     cbGetBrands(res) {
       const selectedBrand = this.brands.filter(brand => brand.id == this.dataProduct.brand_id);
@@ -302,15 +308,15 @@ export default {
         }
       });
     },
-    async getRecursive(id){
-      const { data } = await categoryResource.getRecursive(id);
-      data.unshift(this.listRecursive[0]);
-      this.listRecursive = data;
+    // async getRecursive(id){
+    //   const { data } = await categoryResource.getRecursive(id);
+    //   data.unshift(this.listRecursive[0]);
+    //   this.listRecursive = data;
 
-      if (Object.keys(this.dataProduct).length == 0) {
-        this.loading = false;
-      }
-    },
+    //   if (Object.keys(this.dataProduct).length == 0) {
+    //     this.loading = false;
+    //   }
+    // },
     async querySearchBrandAsync(queryString, cb) {
       var brands = this.brands;
       var results = queryString ? brands.filter(this.createFilter(queryString)) : brands;

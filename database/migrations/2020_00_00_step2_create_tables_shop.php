@@ -260,6 +260,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 100);
             $table->string('label', 50);
+            $table->integer('store_id');
 
             }
         );
@@ -419,6 +420,7 @@ class CreateTablesShop extends Migration
             $table->string('hex',100);
             $table->integer('attribute_id');
             $table->integer('product_id');
+            $table->integer('active');
             }
         );
 

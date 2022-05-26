@@ -38,7 +38,7 @@
               {{ $t('navbar.dashboard') }}
             </el-dropdown-item>
           </router-link>
-          <router-link v-show="userId !== null" :to="{ name: 'SelfProfile'}">
+          <router-link v-permission="['view.profile']" v-show="userId !== null" :to="{ name: 'SelfProfile'}">
             <el-dropdown-item>
               {{ $t('navbar.profile') }}
             </el-dropdown-item>
@@ -66,6 +66,7 @@ import SizeSelect from '@/components/SizeSelect';
 import LangSelect from '@/components/LangSelect';
 import Search from '@/components/HeaderSearch';
 import Cookies from 'js-cookie';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 export default {
   components: {
@@ -76,6 +77,7 @@ export default {
     LangSelect,
     Search,
   },
+  directives: { permission },
   data() {
     return {
       currentStore: [],
@@ -98,7 +100,7 @@ export default {
       if (store_ck.length < 1) {
         Cookies.remove('store');
       } else {
-        this.currentStore = store_ck;
+        this.currentStore = String(store_ck);
       }
     }
   },

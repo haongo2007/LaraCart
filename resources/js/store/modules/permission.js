@@ -76,7 +76,7 @@ const actions = {
     return new Promise(resolve => {
       let accessedRoutes;
       let accessedMenus = menuSidebar;
-      if (roles.includes('Administrator')) {
+      if (roles.includes('administrator')) {
         accessedRoutes = asyncRoutes || [];
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles, permissions);

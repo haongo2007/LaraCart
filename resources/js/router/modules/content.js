@@ -8,7 +8,7 @@ const contentRoutes = {
   meta: {
     title: 'content',
     icon: 'table',
-    roles: ['Manager'],
+    permissions: ['view,banner','view.page','view.blog'],
   },
   children:[
     {
@@ -16,21 +16,33 @@ const contentRoutes = {
       component: Layout,
       component: () => import('@/views/content/banner/List'),
       name: 'BannerList',
-      meta: { title: 'banner',parent:'root',},
+      meta: { 
+        title: 'banner',
+        parent:'root',
+        permissions: ['view.banner'],
+      },
     },
     {
       path: '/page',
       component: Layout,
       component: () => import('@/views/content/page/List'),
       name: 'PageList',
-      meta: { title: 'page',parent:'root',},
+      meta: { 
+        title: 'page',
+        parent:'root',
+        permissions: ['view.page'],
+      },
     },
     {
       path: '/blog-news',
       component: Layout,
       component: () => import('@/views/content/blog/List'),
       name: 'BlogList',
-      meta: { title: 'blogNews',parent:'root',},
+      meta: { 
+        title: 'blogNews',
+        parent:'root',
+        permissions: ['view.blog'],
+      },
     },
   ]
 }

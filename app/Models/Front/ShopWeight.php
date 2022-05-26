@@ -12,6 +12,14 @@ class ShopWeight extends Model
     protected $guarded           = [];
     protected static $getList = null;
 
+    /*
+    Get store
+    */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
+    
     public static function getListAll()
     {
         if (!self::$getList) {

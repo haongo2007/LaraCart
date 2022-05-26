@@ -1,17 +1,13 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use App\Models\Front\ShopPaymentStatus;
+use App\Http\Resources\PaymentStatusCollection;
 use Validator;
 
-class PaymentStatusController extends RootAdminController
+class PaymentStatusController extends Controller
 {
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
     /**
      * Index interface.
      *
@@ -19,50 +15,8 @@ class PaymentStatusController extends RootAdminController
      */
     public function index()
     {
-        $data = [
-            'title' => trans('payment_status.admin.list'),
-            'title_action' => '<i class="fa fa-plus" aria-hidden="true"></i> ' . trans('payment_status.admin.add_new_title'),
-            'subTitle' => '',
-            'icon' => 'fa fa-indent',
-            'urlDeleteItem' => bc_route_admin('admin_payment_status.delete'),
-            'removeList' => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort' => 0, // 1 - Enable button sort
-            'css' => '', 
-            'js' => '',
-            'url_action' => bc_route_admin('admin_payment_status.create'),
-        ];
-
-        $listTh = [
-            'id' => trans('payment_status.admin.id'),
-            'name' => trans('payment_status.admin.name'),
-            'action' => trans('payment_status.admin.action'),
-        ];
-        $obj = new ShopPaymentStatus;
-        $obj = $obj->orderBy('id', 'desc');
-        $dataTmp = $obj->paginate(20);
-
-        $dataTr = [];
-        foreach ($dataTmp as $key => $row) {
-            $dataTr[] = [
-                'id' => $row['id'],
-                'name' => $row['name'] ?? 'N/A',
-                'action' => '
-                    <a href="' . bc_route_admin('admin_payment_status.edit', ['id' => $row['id']]) . '"><span title="' . trans('payment_status.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-                  <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('payment_status.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-                  ',
-            ];
-        }
-
-        $data['listTh'] = $listTh;
-        $data['dataTr'] = $dataTr;
-        $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-        $data['resultItems'] = trans('payment_status.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-        $data['layout'] = 'index';
-        return view($this->templatePathAdmin.'screen.payment_status')
-            ->with($data);
+        $data = ShopPaymentStatus::whereIn('store_id', session('adminStoreId'))->paginate(20);
+        return PaymentStatusCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
 /**

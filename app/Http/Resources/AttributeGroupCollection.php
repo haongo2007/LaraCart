@@ -20,6 +20,7 @@ class AttributeGroupCollection extends JsonResource
             'picker' => $this->picker,
             'status' => $this->status,
             'type' => $this->type,
+            'store' => $this->stores,
         ];
         return $res;
     }

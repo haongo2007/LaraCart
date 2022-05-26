@@ -101,7 +101,7 @@ const actions = {
           commit('SET_INTRODUCTION', introduction);
           commit('SET_ID', id);
           commit('SET_STORE_LIST', store);
-          if (!roles.includes('Administrator')) {
+          if (!roles.includes('administrator')) {
             // let first = store.splice(0,1);
             commit('SET_STORE_CURRENT', Object.keys(store)[0]);
           }

@@ -10,7 +10,7 @@ class BrandController extends Controller
 {
     public function index()
     {
-        $data = ShopBrand::paginate(20);
+        $data = ShopBrand::whereIn('store_id', session('adminStoreId'))->paginate(20);
         return BrandCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

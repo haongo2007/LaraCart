@@ -9,3 +9,5 @@
 //     Route::post('/edit/{id}', 'AdminPaymentStatusController@postEdit')->name('admin_payment_status.edit');
 //     Route::post('/delete', 'AdminPaymentStatusController@deleteList')->name('admin_payment_status.delete');
 // });
+
+Route::apiResource('payment-status', 'PaymentStatusController');

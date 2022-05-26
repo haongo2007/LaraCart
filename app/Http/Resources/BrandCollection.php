@@ -18,6 +18,7 @@ class BrandCollection extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'status' => $this->image,
+            'store' => $this->stores,
         ];
         return $res;
     }

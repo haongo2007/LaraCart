@@ -47,6 +47,10 @@ const categoryResource = new CategoryResource();
 export default {
   name: 'CategoryMultiple',
   props: {
+    storeId: {
+      type: Number,
+      default: 1,
+    },
     isEdit: {
       type: Boolean,
       default: false,
@@ -54,6 +58,9 @@ export default {
     isMultiple: {
       type: Boolean,
       default: false,
+    },
+    dataTempMultiple: {
+      type: Array,
     },
     dataTemp: {
       type: Object,
@@ -69,7 +76,6 @@ export default {
       categoryMultipleValue: [],//value
       categoryMultipleTotal: [],//option
       categoryMultiple: [],//option
-      categoryMultipleDisabled: [],//option
       loading: false,
       categoryLevel:0,
       category:[
@@ -91,11 +97,51 @@ export default {
   created() {
     if (this.isMultiple) {
       this.getCategoryMultiple();
+
+      if(this.isEdit){
+        let ids = this.dataTempMultiple.join(',');
+        if (ids.length == 0) {
+          return false;
+        }
+        let params = {
+          id_list : ids
+        }
+        this.getListCategory(params).then((data) => {
+          this.retrieveCategory(0,data);
+        });
+      }
     }else{
       this.getCategory();
     }
   },
   methods: {
+    retrieveCategory(level = 0 ,data,parent = 0){
+      data.forEach((item,index) => {
+        if (item.parent_id == parent) {
+          if(!this.categoryMultiple.hasOwnProperty(level)){
+            this.$set(this.categoryMultiple,level,[]);
+          }else{
+            for(let cat in this.categoryMultiple[level]){
+              if (this.categoryMultiple[level][cat].id == item.id) {
+                this.categoryMultiple[level].splice(cat,1);
+              }
+            }
+          }         
+          this.categoryMultiple[level].push(item);
+          if(!this.categoryMultipleValue.hasOwnProperty(level)){
+            this.$set(this.categoryMultipleValue,level,[]);
+          }
+          this.categoryMultipleValue[level].push(item);
+          this.retrieveCategory(level+1,data,item.id);
+        }
+      })
+    },
+    async getListCategory(params){
+      params['limit'] = 10;
+      params['store_id'] = this.storeId;
+      let { data } = await categoryResource.list(params);
+      return data;
+    },
     /// multiple for product menu
     handleRemoveCategoryMultipleChild(key,oldValue = null,next = false){
       let that = this;
@@ -161,7 +207,6 @@ export default {
       }
       let parents = parent.join(',');
       let params = {
-        'limit':10,
         'parent_list':parents
       };
       let { data } = await categoryResource.list(params);
@@ -179,6 +224,7 @@ export default {
         this.categoryMultipleValue.splice(key+1,this.categoryMultipleValue.length);
         this.categoryMultiple.splice(key+1,this.categoryMultiple.length);
       }
+      this.$emit('handleProcessCategory', this.categoryMultipleValue);
     },
     remoteMethod(query,key) {
       if (query !== '') {
@@ -193,20 +239,18 @@ export default {
         this.categoryMultiple[this.categoryLevel] = [];
       }
     },
-    async getCategoryMultiple(){
+    getCategoryMultiple(){
       let params = {
-        'limit':10
+        'parent':0,
       };
-      params['parent'] = 0;
-      let { data } = await categoryResource.list(params);
-      this.$set(this.categoryMultipleValue,this.categoryLevel,[]);
-      this.$set(this.categoryMultiple,this.categoryLevel,data);
+      this.getListCategory(params).then((data) => {
+        this.$set(this.categoryMultipleValue,this.categoryLevel,[]);
+        this.$set(this.categoryMultiple,this.categoryLevel,data);
+      });
     },
     /// single for categories menu
-    async getCategory(){
-      let params = {
-        'limit':10
-      };
+    getCategory(){
+      let params = {};
       if (this.isEdit) {
         if (this.dataTemp.parent == 0) {
           this.$set(this.category,this.categoryLevel, {
@@ -215,40 +259,42 @@ export default {
             'parent':0,
           });
           params['parent'] = 0;
-          let { data } = await categoryResource.list(params);
-          this.categories[this.categoryLevel] = [...data,...this.categories[this.categoryLevel]];
+          this.getListCategory(params).then((data) => {
+            this.categories[this.categoryLevel] = [...data,...this.categories[this.categoryLevel]];
+          });
           return;
         }
         params['id_list'] = this.dataTemp.parent_list;
         
-        let { data } = await categoryResource.list(params);
-
-        let sort;
-        let id = this.dataTemp.parent_list;
-        if( String(id).indexOf(',') != -1 ){
-          sort = id.split(',').filter(Boolean);
-        }else{
-          sort = [id];
-        }
-        data = sort.map((i) => data.find((j) => parseInt(j.id) === parseInt(i) )); // sort array
-
-        for(let cate in data){
-          if (!this.category.hasOwnProperty(cate)) {
-            this.$set(this.category,cate,[]);
-            this.$set(this.categories,cate,[]);
+        this.getListCategory(params).then((data) => {
+          let sort;
+          let id = this.dataTemp.parent_list;
+          if( String(id).indexOf(',') != -1 ){
+            sort = id.split(',').filter(Boolean);
+          }else{
+            sort = [id];
           }
-          if (this.categories[cate].hasOwnProperty(cate)) {
-            this.categories[cate].push({...data[cate]});
+          data = sort.map((i) => data.find((j) => parseInt(j.id) === parseInt(i) )); // sort array
+
+          for(let cate in data){
+            if (!this.category.hasOwnProperty(cate)) {
+              this.$set(this.category,cate,[]);
+              this.$set(this.categories,cate,[]);
+            }
+            if (this.categories[cate].hasOwnProperty(cate)) {
+              this.categories[cate].push({...data[cate]});
+            }
+            this.$set(this.category,cate,data[cate])
           }
-          this.$set(this.category,cate,data[cate])
-        }
+        });
       }else{
         params['parent'] = 0;
-        let { data } = await categoryResource.list(params);
-        this.categories[this.categoryLevel] = [...data,...this.categories[this.categoryLevel]];
+        this.getListCategory(params).then((data) => {
+          this.categories[this.categoryLevel] = [...data,...this.categories[this.categoryLevel]];
+        });
       }
     },
-    async querySearchAsync(queryString, cb) {
+    querySearchAsync(queryString, cb) {
       const categories = this.categories[this.categoryLevel];
       var results = queryString ? categories.filter(this.categoriesFilter(queryString)) : categories;
 
@@ -256,7 +302,6 @@ export default {
       if (results.length == 0 || queryString == '') {
         let params = {
           'name':queryString,
-          'limit':10,
           'except_id':this.dataTemp.id,
         };
         if (this.categoryLevel > 0) {
@@ -264,16 +309,17 @@ export default {
         }else{
           params['parent'] = 0;
         }
-        let { data } = await categoryResource.list(params);
-        this.categories[this.categoryLevel] = data;
-        results = data;
-        if (this.categoryLevel == 0) {
-          results.push({
-            'name':'Is parent',
-            'id':0,
-            'parent':0,
-          });
-        }
+        let data = this.getListCategory(params).then((data) => {
+          this.categories[this.categoryLevel] = data;
+          results = data;
+          if (this.categoryLevel == 0) {
+            results.push({
+              'name':'Is parent',
+              'id':0,
+              'parent':0,
+            });
+          }
+        });
       }
       cb(results);
     },
@@ -295,7 +341,7 @@ export default {
         });
       }
     },
-    async handleSelectCategory(item){
+    handleSelectCategory(item){
 
       if (parseInt(this.category[this.categoryLevel].id) == parseInt(item.id)) { // check itself return
         return;
@@ -318,15 +364,15 @@ export default {
             'parent':null,
         });
         let params = {
-          'limit':10,
           'parent':this.category[this.categoryLevel - 1].id,
           'except_id':this.dataTemp.id,
         };
-        let { data } = await categoryResource.list(params);
-        if (!this.categories.hasOwnProperty(this.categoryLevel)) {
-          this.$set(this.categories,this.categoryLevel,[]);
-        }
-        this.categories[this.categoryLevel] = data;
+        let data = this.getListCategory(params).then((data) => {
+          if (!this.categories.hasOwnProperty(this.categoryLevel)) {
+            this.$set(this.categories,this.categoryLevel,[]);
+          }
+          this.categories[this.categoryLevel] = data;
+        });
       }
     }
   },

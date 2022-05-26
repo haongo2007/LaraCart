@@ -19,9 +19,9 @@ class ShopProductAttribute extends Model
         return $this->hasMany(ShopAttributePalette::class, 'attribute_id','id');
     }
 
-    public function first_palette()
+    public function activePalette()
     {
-        return $this->hasOne(ShopAttributePalette::class, 'attribute_id','id');
+        return $this->hasOne(ShopAttributePalette::class, 'attribute_id','id')->where('active',1);
     }
 
     public function Children()

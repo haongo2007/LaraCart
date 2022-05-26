@@ -1,17 +1,13 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use App\Models\Front\ShopShippingStatus;
+use App\Http\Resources\ShippingStatusCollection;
 use Validator;
 
-class ShipingStatusController extends RootAdminController
+class ShippingStatusController extends Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Index interface.
      *
@@ -19,50 +15,8 @@ class ShipingStatusController extends RootAdminController
      */
     public function index()
     {
-        $data = [
-            'title' => trans('shipping_status.admin.list'),
-            'title_action' => '<i class="fa fa-plus" aria-hidden="true"></i> ' . trans('shipping_status.admin.add_new_title'),
-            'subTitle' => '',
-            'icon' => 'fa fa-indent',
-            'urlDeleteItem' => bc_route_admin('admin_shipping_status.delete'),
-            'removeList' => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort' => 0, // 1 - Enable button sort
-            'css' => '', 
-            'js' => '',
-            'url_action' => bc_route_admin('admin_shipping_status.create'),
-        ];
-
-        $listTh = [
-            'id' => trans('shipping_status.admin.id'),
-            'name' => trans('shipping_status.admin.name'),
-            'action' => trans('shipping_status.admin.action'),
-        ];
-        $obj = new ShopShippingStatus;
-        $obj = $obj->orderBy('id', 'desc');
-        $dataTmp = $obj->paginate(20);
-
-        $dataTr = [];
-        foreach ($dataTmp as $key => $row) {
-            $dataTr[] = [
-                'id' => $row['id'],
-                'name' => $row['name'] ?? 'N/A',
-                'action' => '
-                    <a href="' . bc_route_admin('admin_shipping_status.edit', ['id' => $row['id']]) . '"><span title="' . trans('shipping_status.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-                  <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('shipping_status.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-                  ',
-            ];
-        }
-
-        $data['listTh'] = $listTh;
-        $data['dataTr'] = $dataTr;
-        $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-        $data['resultItems'] = trans('shipping_status.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-        $data['layout'] = 'index';
-        return view($this->templatePathAdmin.'screen.shipping_status')
-            ->with($data);
+        $data = ShopShippingStatus::whereIn('store_id', session('adminStoreId'))->paginate(20);
+        return ShippingStatusCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
 

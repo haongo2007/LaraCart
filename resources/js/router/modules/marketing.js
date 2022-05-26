@@ -8,7 +8,14 @@ const marketingRoutes = {
   meta: {
     title: 'marketing',
     icon: 'table',
-    roles: ['Manager'],
+    permissions: [
+      'view.email.template',
+      'view.coupon',
+      'view.flashsale',
+      'view.customer',
+      'view.seo',
+      'view.reportanalytics',
+    ],
   },
   children: [
     //email template
@@ -17,7 +24,11 @@ const marketingRoutes = {
       component: Layout,
       component: () => import('@/views/marketing/email-template/List'),
       name: 'EmailTemplateList',
-      meta: { title: 'emailTemplate',parent:'root',},
+      meta: { 
+        title: 'emailTemplate',
+        parent:'root',
+        permissions: ['view.email.template'],
+      },
     },
     //coupon & discount
     {
@@ -25,7 +36,11 @@ const marketingRoutes = {
       component: Layout,
       component: () => import('@/views/marketing/coupon-discount/List'),
       name: 'CouponList',
-      meta: { title: 'couponDiscount',parent:'root',},
+      meta: { 
+        title: 'couponDiscount',
+        parent:'root',
+        permissions: ['view.coupon'],
+      },
     },
     //product flashsale
     {
@@ -33,7 +48,11 @@ const marketingRoutes = {
       component: Layout,
       component: () => import('@/views/marketing/product-flashsale/List'),
       name: 'ProductFlashSale',
-      meta: { title: 'productFlashsale',parent:'root',},
+      meta: { 
+        title: 'productFlashsale',
+        parent:'root',
+        permissions: ['view.flashSale'],
+      },
     },
     //customer manager
     {
@@ -41,7 +60,11 @@ const marketingRoutes = {
       component: Layout,
       component: () => import('@/views/marketing/customer-manager/List'),
       name: 'CustomerList',
-      meta: { title: 'customerManager',parent:'root',},
+      meta: { 
+        title: 'customerManager',
+        parent:'root',
+        permissions: ['view.customer'],
+      },
     },
     //customer subcribe
     {
@@ -57,7 +80,11 @@ const marketingRoutes = {
       component: Layout,
       component: () => import('@/views/marketing/seo-manager/Config'),
       name: 'SeoConfig',
-      meta: { title: 'seoConfig',parent:'root',},
+      meta: { 
+        title: 'seoConfig',
+        parent:'root',
+        permissions: ['view.seo'],
+      },
     },
     //report analytics
     {
@@ -65,7 +92,11 @@ const marketingRoutes = {
       component: Layout,
       component: () => import('@/views/marketing/report-analytics/product-report/List'),
       name: 'ProductReportList',
-      meta: { title: 'productReport',parent:'root',},
+      meta: { 
+        title: 'productReport',
+        parent:'root',
+        permissions: ['view.reportanalytics'],
+      },
     },
   ],
 };

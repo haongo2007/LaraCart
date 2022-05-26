@@ -20,7 +20,7 @@ class AttributeGroupController extends Controller
      */
     public function index()
     {
-        $data = ShopAttributeGroup::orderBy('id', 'desc')->paginate(20);
+        $data = ShopAttributeGroup::whereIn('store_id', session('adminStoreId'))->paginate(20);
         return AttributeGroupCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

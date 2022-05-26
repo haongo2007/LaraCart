@@ -18,7 +18,7 @@ const configStoreRoutes = {
       meta: {
         title: 'store',
         icon: 'book-shop',
-        permissions: ['Store manager'],
+        permissions: ['view.store'],
         parent: 'root',
       },
     },
@@ -28,7 +28,7 @@ const configStoreRoutes = {
       name: 'StoreEdit',
       meta: {
         title: 'infomation',
-        permissions: ['Store manager'],
+        permissions: ['edit.store'],
         parent: 'StoreList',
       },
       hidden: true,
@@ -39,7 +39,7 @@ const configStoreRoutes = {
       name: 'StoreCreate',
       meta: {
         title: 'storeCreate',
-        permissions: ['Store manager'],
+        permissions: ['create.store'],
         parent: 'StoreList',
       },
       hidden: true,
@@ -50,7 +50,7 @@ const configStoreRoutes = {
       name: 'StoreConfig',
       meta: {
         title: 'configStore',
-        permissions: ['Store manager'],
+        permissions: ['config.store'],
         parent: 'StoreList',
       },
       hidden: true,

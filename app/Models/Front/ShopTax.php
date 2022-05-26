@@ -16,6 +16,15 @@ class ShopTax extends Model
     private static $arrayId = null;
     private static $arrayValue = null;
 
+
+    /*
+    Get store
+    */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
+    
     /**
      * Get list item
      *

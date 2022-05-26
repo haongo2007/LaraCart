@@ -17,6 +17,7 @@ class OrderStatusCollection extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'store' => $this->stores,
             'label' => $this->label
         ];
     }

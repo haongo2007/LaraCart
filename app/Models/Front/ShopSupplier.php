@@ -15,6 +15,14 @@ class ShopSupplier extends Model
     private static $getList = null;
     protected $connection = LC_CONNECTION;
 
+    /*
+    Get store
+    */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
+    
     public static function getListAll()
     {
         if (self::$getList === null) {

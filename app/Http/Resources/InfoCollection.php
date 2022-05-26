@@ -22,13 +22,13 @@ class InfoCollection extends JsonResource
             'avatar' => $this->avatar ? asset($this->avatar) : 'api/getFile?disk='.env('FILESYSTEM_DRIVER', 'local').'&path='.urlencode('avatar/default.jpg'),
             'roles' => array_map(
                 function ($role) {
-                    return $role['name'];
+                    return $role['slug'];
                 },
                 $this->roles->toArray()
             ),
             'permissions' => array_map(
                 function ($permission) {
-                    return $permission['name'];
+                    return $permission['slug'];
                 },
                 $this->allPermissions()->toArray()
             ),

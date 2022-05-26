@@ -23,7 +23,7 @@
         align="center"
         width="55"
       />
-      <el-table-column fixed label="#ID" min-width="50" align="center">
+      <el-table-column label="#ID" min-width="50" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.id }}
         </template>
@@ -40,7 +40,7 @@
 
       <el-table-column label="Image" min-width="150" align="center">
         <template slot-scope="scope">
-          <el-image :src="scope.row.image+'&w=100'">
+          <el-image :src="scope.row.image+'&w=150'" fit="cover" style="max-height: 150px;">
             <div slot="error" class="image-slot">
               <i class="el-icon-picture-outline" />
             </div>
@@ -60,21 +60,32 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Category" min-width="200">
-        <template slot-scope="{row}">
-          <el-tag v-for="item in row.categories" :key="item.id" style="margin: 2px;">
-            {{ item.descriptions_with_lang_default.title }}
-          </el-tag>
+      
+      <el-table-column align="center" label="Category" min-width="150">
+        <template slot-scope="scope">
+            <el-popover
+              placement="right-end"
+              width="200"
+              trigger="click">
+              <el-table :data="scope.row.categories">
+                <el-table-column label="Name" >
+                  <template slot-scope="scope">
+                    <el-tag> {{ scope.row.descriptions_with_lang_default.title }} </el-tag>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <el-button slot="reference">Click to view</el-button>
+            </el-popover>
         </template>
       </el-table-column>
 
-      <el-table-column label="Cost" min-width="200">
+      <el-table-column label="Cost" min-width="100">
         <template slot-scope="scope">
           {{ scope.row && scope.row.cost | toThousandFilter }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Price" min-width="150" align="center">
+      <el-table-column label="Price" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.price | toThousandFilter }}
         </template>
@@ -109,10 +120,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
+      <el-table-column :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="renderRouterEdit(row.kind,row.id)" />
+            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="renderRouterEdit(row.kind,row.id)" 
+            v-permission="['edit'+renderKind(row.kind)+'product']"/>
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
         </template>
@@ -129,10 +141,12 @@ import Pagination from '@/components/Pagination';
 import FilterSystemProduct from './components/FilterSystemProduct';
 import EventBus from '@/components/FileManager/eventBus';
 import { checkOnlyStore } from '@/utils';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 export default {
   name: 'ProductList',
   components: { Pagination, RightPanel, FilterSystemProduct },
+  directives:{ permission },
   data() {
     return {
       list: null,
@@ -156,6 +170,14 @@ export default {
     checkOnlyStore
   },
   methods: {
+    renderKind(kind){
+      let kinds = {
+            0: '.single.',
+            1: '.bundle.',
+            2: '.group.',
+          };
+      return kinds[kind];
+    },
     handleListenData(data){
       if (data.hasOwnProperty('list')) {
         this.list = data.list;

@@ -4,13 +4,16 @@ export default {
   inserted(el, binding, vnode) {
     const { value } = binding;
     const permissions = store.getters && store.getters.permissions;
+    const roles = store.getters && store.getters.roles;
 
     if (value && value instanceof Array && value.length > 0) {
       const requiredPermissions = value;
       const hasPermission = permissions.some(permission => {
         return requiredPermissions.includes(permission);
       });
-
+      if (roles.includes('administrator')) {
+        return ;
+      }
       if (!hasPermission) {
         el.parentNode && el.parentNode.removeChild(el);
       }

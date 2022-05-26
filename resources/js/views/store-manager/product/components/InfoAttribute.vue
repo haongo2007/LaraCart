@@ -25,16 +25,16 @@
             <el-header align="center">{{ attribute.name }} {{ attribute.values ? '( '+ attribute.values.length + ' )': '' }}</el-header>
             <div v-for="(value,key) in attribute.values" v-if="attribute.values" :key="key" class="box-attributes" >
               <div style="display: flex;justify-content: space-between;align-items: center;" >
-                <el-form-item label-width="80px" label="Name" style="width: 100%;margin: 15px 0px;">
-                  <el-input v-model="temp[index]['values'][key].name" />
+                <el-form-item label-width="60px" label="Name" style="width: 100%;margin: 15px 0px;">
+                  <el-input size="mini" v-model="temp[index]['values'][key].name" />
                 </el-form-item>
-                <el-form-item label-width="80px" label="Price" style="width: 100%;margin: 15px 0px;">
-                  <el-input-number v-model="temp[index]['values'][key].add_price" style="width: 100%" :controls="false" />
+                <el-form-item label-width="60px" label="Price" style="width: 100%;margin: 15px 0px;">
+                  <el-input-number size="mini" v-model="temp[index]['values'][key].add_price" style="width: 100%" :controls="false" />
                 </el-form-item>
                 <el-form-item label-width="30px" style="width: 100%;margin: 15px 0px;">
                   <el-button-group>
-                    <el-button v-if="attribute.picker" type="success" @click="handleVisibleStorage(index,key)">Pick Image</el-button>
-                    <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
+                    <el-button size="mini" v-if="attribute.picker" type="success" @click="handleVisibleStorage(index,key)">Image</el-button>
+                    <el-button size="mini" type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
                   </el-button-group>
                 </el-form-item>
               </div>
@@ -43,7 +43,8 @@
                 <div v-if="temp[index]['values'][key].palette" class="color-Palette">
                   <h4 style="margin: 10px 0px">Choose Code</h4>
                   <ul class="swatch__container">
-                    <li v-for="color in temp[index]['values'][key].palette" class="swatch__wrapper">
+                    <li @click="handleActivePal(index,key,i)" 
+                      v-for="(color,i) in temp[index]['values'][key].palette" :class="color.active==true?'active':''" class="swatch__wrapper">
                       <el-tooltip content="Top center" placement="top">
                         <div slot="content">
                           <div class="swatch__type">№ {{ color.number }}. {{ color.type }}</div>
@@ -59,16 +60,16 @@
 
               <div v-if="value.children.length > 0" v-for="(child,childKey) in value.children" :key="childKey" v-loading="loadAttributes">
                 <div style="display: flex;justify-content: space-between;">
-                  <el-form-item label-width="80px" label="Name" style="width: 100%;margin: 15px 0px;">
-                    <el-input v-model="temp[index]['values'][key]['children'][childKey].name" />
+                  <el-form-item label-width="60px" label="Name" style="width: 100%;margin: 15px 0px;">
+                    <el-input size="mini" v-model="temp[index]['values'][key]['children'][childKey].name" />
                   </el-form-item>
-                  <el-form-item label-width="80px" label="Price" style="width: 100%;margin: 15px 0px;">
-                    <el-input-number v-model="temp[index]['values'][key]['children'][childKey].add_price" style="width: 100%" :controls="false" />
+                  <el-form-item label-width="60px" label="Price" style="width: 100%;margin: 15px 0px;">
+                    <el-input-number size="mini" v-model="temp[index]['values'][key]['children'][childKey].add_price" style="width: 100%" :controls="false" />
                   </el-form-item>
                   <el-form-item label-width="30px" style="width: 100%;margin: 15px 0px;">
                     <el-button-group>
-                      <el-button v-if="attribute.children[index] && attribute.children[index].picker" type="success" @click="handleVisibleStorage(index,key,childKey)">Pick Image</el-button>
-                      <el-button type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key,childKey)" />
+                      <el-button size="mini" v-if="attribute.children[index] && attribute.children[index].picker" type="success" @click="handleVisibleStorage(index,key,childKey)">Image</el-button>
+                      <el-button size="mini" type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key,childKey)" />
                     </el-button-group>
                   </el-form-item>
                 </div>
@@ -77,7 +78,8 @@
                   <div v-if="temp[index]['values'][key]['children'][childKey].palette" class="color-Palette">
                     <h4 style="margin: 10px 0px">Choose Code</h4>
                     <ul class="swatch__container">
-                      <li v-for="color in temp[index]['values'][key]['children'][childKey].palette" class="swatch__wrapper">
+                      <li @click="handleActivePal(index,key,'children',childKey,i)" 
+                        v-for="(color,i) in temp[index]['values'][key]['children'][childKey].palette" class="swatch__wrapper" :class="color.active==true?'active':''">
                         <div :style="{ backgroundColor: color.hex }" class="swatch">
                           <el-tooltip content="Top center" placement="top">
                             <div slot="content">
@@ -200,6 +202,19 @@ export default {
         lastTemp.push(cur)
       })
       this.$emit('handleProcessTemp', { attribute: lastTemp });
+    },
+    handleActivePal(index,key,i,childKey,k){
+      if (i == 'children') {
+        this.temp[index]['values'][key][i][childKey].palette.forEach((item,key,arr) => {
+          arr[key].active = 0;
+        });
+        this.temp[index]['values'][key][i][childKey].palette[k].active = 1;
+      }else{
+        this.temp[index]['values'][key].palette.forEach((item,key,arr) => {
+          arr[key].active = 0;
+        });
+        this.temp[index]['values'][key].palette[i].active = 1;
+      }
     },
     async fetchAttributeGroup(){
       const { data } = await attributeGroupResource.list();
@@ -347,6 +362,10 @@ export default {
         const colors = [];
         var number = 0;
         for (const color in palette) {
+          let active = 0;
+          if (number == 0) {
+            active = 1;
+          }
           number = number + 1;
           const type = color;
           const typeTextColor = palette[color].getTitleTextColor();
@@ -354,7 +373,7 @@ export default {
           const hexTextColor = palette[color].getBodyTextColor();
           const name = getColorName(hex);
           const nameTextColor = palette[color].getBodyTextColor();
-          colors.push({ number, type, typeTextColor, hex, hexTextColor, name, nameTextColor });
+          colors.push({ number, type, typeTextColor, hex, hexTextColor, name, nameTextColor,active, active });
         }
         if (this.currentSelectFile.length > 2) {
           this.temp[currentSelectFile.length>0 ? currentSelectFile[0] : this.currentSelectFile[0]]['values'][currentSelectFile.length>0 ? currentSelectFile[1] :this.currentSelectFile[1]]['children'][currentSelectFile.length>0 ? currentSelectFile[2] :this.currentSelectFile[2]].palette = colors;
@@ -380,6 +399,7 @@ export default {
   padding: 0;
   display: flex;
   flex-wrap: wrap;
+  cursor: pointer;
 }
 .swatch {
   display: inline-block;
@@ -442,5 +462,8 @@ export default {
 .tree-node-children .tree-node{
   padding: 0px;
   margin: 5px 0px;
+}
+.swatch__container .active .el-tooltip{
+  box-shadow: 0px 0px 3px 2px #409eff;
 }
 </style>

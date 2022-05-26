@@ -18,6 +18,7 @@ class TaxCollection extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'value' => $this->value,
+            'store' => $this->stores,
         ];
         return $res;
     }

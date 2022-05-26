@@ -18,4 +18,8 @@ class ShopOrderStatus extends Model
         }
         return self::$listStatus;
     }
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
 }

@@ -11,6 +11,14 @@ class ShopCustomField extends Model
     protected $connection  = LC_CONNECTION;
     protected $guarded     = [];
 
+    /*
+    Get store
+    */
+    public function stores()
+    {
+        return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
+    }
+    
     public function details()
     {
         $data  = (new ShopCustomFieldDetail)->where('custom_field_id', $this->id)

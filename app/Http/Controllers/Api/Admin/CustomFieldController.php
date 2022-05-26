@@ -1,74 +1,17 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
+use App\Http\Controllers\Controller;
 use App\Models\Front\ShopCustomField;
+use App\Http\Resources\CustomFieldCollection;
 use Validator;
 
-class CustomFieldController extends RootAdminController
+class CustomFieldController extends Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
     public function index()
     {
-        $data = [
-            'title' => trans('custom_field.admin.list'),
-            'title_action' => '<i class="fa fa-plus" aria-hidden="true"></i> ' . trans('custom_field.admin.add_new_title'),
-            'subTitle' => '',
-            'icon' => 'fa fa-indent',
-            'urlDeleteItem' => bc_route_admin('admin_custom_field.delete'),
-            'removeList' => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort' => 0, // 1 - Enable button sort
-            'css' => '', 
-            'js' => '',
-            'url_action' => bc_route_admin('admin_custom_field.create'),
-        ];
-
-        $listTh = [
-            'id' => trans('custom_field.id'),
-            'type' => trans('custom_field.type'),
-            'code' => trans('custom_field.code'),
-            'name' => trans('custom_field.name'),
-            'required' => trans('custom_field.required'),
-            'option' => trans('custom_field.option'),
-            'default' => trans('custom_field.default'),
-            'status' => trans('custom_field.status'),
-            'action' => trans('custom_field.admin.action'),
-        ];
-        $obj = new ShopCustomField;
-        $obj = $obj->orderBy('id', 'desc');
-        $dataTmp = $obj->paginate(20);
-
-        $dataTr = [];
-        foreach ($dataTmp as $key => $row) {
-            $dataTr[] = [
-                'id' => $row['id'],
-                'type' => $row['type'],
-                'code' => $row['code'],
-                'name' => $row['name'],
-                'required' => $row['required'],
-                'option' => $row['option'],
-                'default' => $row['default'],
-                'status' => $row['status'] ? '<span class="badge badge-success">ON</span>' : '<span class="badge badge-danger">OFF</span>',
-                'action' => '
-                    <a href="' . bc_route_admin('admin_custom_field.edit', ['id' => $row['id']]) . '"><span title="' . trans('custom_field.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-    
-                  <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('custom_field.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-                  ',
-            ];
-        }
-
-        $data['listTh'] = $listTh;
-        $data['dataTr'] = $dataTr;
-        $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-        $data['resultItems'] = trans('custom_field.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-        $data['layout'] = 'index';
-        return view($this->templatePathAdmin.'screen.custom_field')
-            ->with($data);
+        $data = ShopCustomField::whereIn('store_id', session('adminStoreId'))->orderBy('id', 'desc')->paginate(20);
+        return CustomFieldCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
 

@@ -26,7 +26,7 @@ class ProductAttributeColorCollection extends JsonResource
             array_push($res[$group], 
             [
                 'id' => $value->id,
-                'color' => new ProductAttributePaletteCollection($value->first_palette),
+                'color' => new ProductAttributePaletteCollection($value->activePalette),
                 'name' => $value->name,
                 'price' => $value->add_price,
                 'children' => new ProductAttributeSizeCollection($value->Children),

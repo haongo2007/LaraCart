@@ -66,15 +66,21 @@ export const constantRoutes = [
     hidden: true,
   },
   {
-    path: '/404',
-    redirect: { name: 'Page404' },
-    component: () => import('@/views/error-page/404'),
+    path: '/error',
+    component: Layout,
     hidden: true,
-  },
-  {
-    path: '/401',
-    component: () => import('@/views/error-page/401'),
-    hidden: true,
+    children: [
+      {
+        path: '/404',
+        component: () => import('@/views/error-page/404'),
+        hidden: true,
+      },
+      {
+        path: '/401',
+        component: () => import('@/views/error-page/401'),
+        hidden: true,
+      },
+    ],
   },
 ];
 
