@@ -115,8 +115,9 @@
       <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="renderRouterEdit(row.kind,row.id)" />
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
+            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
+            @click="renderRouterEdit(row.kind,row.id)" v-permission="['edit.reportanalytics']" />
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" v-permission="['delete.reportanalytics']"/>
           </el-button-group>
         </template>
       </el-table-column>
@@ -132,10 +133,12 @@ import UserResource from '@/api/user';
 import RightPanel from '@/components/RightPanel';
 import FilterSystemProductReport from './components/FilterSystemProductReport';
 import EventBus from '@/components/FileManager/eventBus';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 export default {
   name: 'ProductReportList',
   components: { Pagination,FilterSystemProductReport,RightPanel },
+  directives: { permission },
   data() {
     return {
       list: [],

@@ -10,9 +10,13 @@
         <el-row :gutter="24">
           <el-col :span="12">
             <el-button-group>
-              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'OrderCreate'})" />
-              <el-button type="success" :disabled="downloadLoading" @click="handleDownload"><svg-icon icon-class="excel" /></el-button>
-              <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
+              <el-button v-permission="['create.order']" type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
+              @click="$router.push({ name: 'OrderCreate'})" />
+              <el-button v-permission="['export.order']" type="success" :disabled="downloadLoading" @click="handleDownload">
+                <svg-icon icon-class="excel" />
+              </el-button>
+              <el-button v-permission="['delete.order']" type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
+              @click="handerDeleteAll" />
             </el-button-group>
           </el-col>
         </el-row>
@@ -76,6 +80,7 @@
 
 <script>
 
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 import OrdersResource from '@/api/orders';
 import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
@@ -83,6 +88,7 @@ import EventBus from '@/components/FileManager/eventBus';
 const ordersResource = new OrdersResource();
 export default {
   name: 'FilterSystemProduct',
+  directives:{ permission },
   props: {
     dataLoading: {
       type: Boolean,

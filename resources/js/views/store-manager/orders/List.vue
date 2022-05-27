@@ -124,8 +124,10 @@
       <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="$router.push({ name: 'OrderEdit',params:{id:row.id} })" />
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
+            <el-button v-permission="['edit.order']" type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
+            @click="$router.push({ name: 'OrderEdit',params:{id:row.id} })" />
+            <el-button v-permission="['delete.order']" type="danger" size="mini" icon="el-icon-delete" 
+            @click="handleDeleting(row)" />
           </el-button-group>
         </template>
       </el-table-column>
@@ -143,12 +145,14 @@ import OrderStatusResource from '@/api/order-status';
 import Pagination from '@/components/Pagination';
 import EventBus from '@/components/FileManager/eventBus';
 import { checkOnlyStore } from '@/utils';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 const orderStatusResource = new OrderStatusResource();
 var statusMap = null;
 export default {
   name: 'OrdersList',
   components: { Pagination, RightPanel, FilterSystemOrder },
+  directives:{ permission },
   filters: {
     statusFilter(status, get) {
       const statusFilter = statusMap.filter(v => v.id === status);

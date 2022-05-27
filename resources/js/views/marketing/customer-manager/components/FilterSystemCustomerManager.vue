@@ -10,8 +10,10 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-button-group>
-              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'UserCreate'}).catch(() => {})" />
-              <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
+              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
+              @click="$router.push({ name: 'UserCreate'}).catch(() => {})" v-permission="['create.customer']" />
+              <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
+              @click="handerDeleteAll" v-permission="['delete.customer']"/>
             </el-button-group>
           </el-col>
         </el-row>
@@ -42,11 +44,13 @@
 import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
 import CustomerResource from '@/api/customer';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 const customerResource = new CustomerResource();
 
 export default {
   name: 'FilterSystemCustomerManager',
+  directives: { permission },
   props: {
     dataLoading: {
       type: Boolean,

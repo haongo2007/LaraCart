@@ -147,13 +147,6 @@ export default {
             trigger: 'blur',
           },
         ],
-        password: [
-          {
-            required: true,
-            message: 'Please input password',
-            trigger: 'change',
-          },
-        ],
         stores: [
           { validator: checkStore, trigger: 'change' }
         ],

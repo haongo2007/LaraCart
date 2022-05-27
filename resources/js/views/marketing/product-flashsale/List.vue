@@ -77,8 +77,9 @@
       <el-table-column :label="$t('table.actions')" align="center" min-width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" />
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
+            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
+            @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" v-permission="['edit.flashsale']" />
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" v-permission="['delete.flashsale']" />
           </el-button-group>
         </template>
       </el-table-column>
@@ -94,10 +95,12 @@ import UserResource from '@/api/user';
 import RightPanel from '@/components/RightPanel';
 import FilterSystemProductFlashsale from './components/FilterSystemProductFlashsale';
 import EventBus from '@/components/FileManager/eventBus';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 export default {
   name: 'ProductFlashSale',
   components: { Pagination,FilterSystemProductFlashsale,RightPanel },
+  directives: { permission },
   data() {
     return {
       list: [],

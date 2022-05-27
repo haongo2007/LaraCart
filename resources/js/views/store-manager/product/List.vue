@@ -125,7 +125,8 @@
           <el-button-group>
             <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="renderRouterEdit(row.kind,row.id)" 
             v-permission="['edit'+renderKind(row.kind)+'product']"/>
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" 
+            v-permission="['delete'+renderKind(row.kind)+'product']"/>
           </el-button-group>
         </template>
       </el-table-column>

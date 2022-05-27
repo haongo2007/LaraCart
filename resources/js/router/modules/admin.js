@@ -13,27 +13,6 @@ const adminRoutes = {
   },
   children: [
     {
-      path: '/profile',
-      component: Layout,
-      redirect: 'noredirect',
-      children: [
-        {
-          path: 'index',
-          component: () => import('@/views/users/SelfProfile'),
-          name: 'SelfProfile',
-          meta: { title: 'selfProfile', icon: 'user', parent: 'root' },
-        },
-      ],
-    },
-    /** User managements */
-    {
-      path: 'users/edit/:id(\\d+)',
-      component: () => import('@/views/users/UserProfile'),
-      name: 'UserProfile',
-      meta: { title: 'userProfile', noCache: true },
-      hidden: true,
-    },
-    {
       path: 'users',
       component: () => import('@/views/users/List'),
       name: 'UserList',

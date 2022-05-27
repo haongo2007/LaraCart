@@ -18,7 +18,7 @@ const storeManagerRoutes = {
       meta: {
         title: 'orders',
         icon: 'form',
-        permissions: ['view.orders'],
+        permissions: ['view.order'],
         parent: 'root',
       },
     },
@@ -28,7 +28,7 @@ const storeManagerRoutes = {
       name: 'OrderCreate',
       meta: {
         title: 'orderCreate',
-        permissions: ['create.orders'],
+        permissions: ['create.order'],
         parent: 'OrdersList',
       },
       hidden: true,
@@ -39,7 +39,7 @@ const storeManagerRoutes = {
       name: 'OrderEdit',
       meta: {
         title: 'orderEdit',
-        permissions: ['edit.orders'],
+        permissions: ['edit.order'],
         parent: 'OrdersList',
       },
       hidden: true,

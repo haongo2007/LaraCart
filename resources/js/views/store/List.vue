@@ -85,13 +85,13 @@
       </el-table-column>
       <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="250px" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <router-link :to="{ name: 'StoreEdit',params:{id:row.id} }">
+          <router-link :to="{ name: 'StoreEdit',params:{id:row.id} }" v-permission="['edit.store']">
             <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
           </router-link>
-          <router-link :to="{ name: 'StoreConfig',params:{id:row.id} }">
+          <router-link :to="{ name: 'StoreConfig',params:{id:row.id} }" v-permission="['config.store']">
             <el-button type="primary" size="mini" icon="el-icon-s-tools"></el-button>
           </router-link>
-          <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)"></el-button>
+          <el-button type="danger" size="mini" icon="el-icon-delete" v-permission="['delete.store']" @click="handleDeleting(row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -108,11 +108,13 @@ import RightPanel from '@/components/RightPanel';
 import FilterSystemStore from './components/FilterSystemStore';
 import EventBus from '@/components/FileManager/eventBus';
 import StoreResource from '@/api/store';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 const storeResource = new StoreResource();
 
 export default {
   name: 'StoreList',
+  directives: { permission },
   components: { Pagination, RightPanel,FilterSystemStore },
   data() {
     return {

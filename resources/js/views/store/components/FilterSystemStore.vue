@@ -9,7 +9,7 @@
       <div class="drawer-item">
         <el-row :gutter="20">
           <el-col :span="24">
-            <el-button-group>
+            <el-button-group v-permission="['create.store']">
               <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'StoreCreate'}).catch(() => {})" />
             </el-button-group>
           </el-col>
@@ -53,10 +53,12 @@
 import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
 import StoreResource from '@/api/store';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 const storeResource = new StoreResource();
 export default {
   name: 'FilterSystemStore',
+  directives: { permission },
   props: {
     dataLoading: {
       type: Boolean,

@@ -72,16 +72,13 @@
             v-model="visible[2]"
             placement="top"
             title="Phone num"
-            width="200"
+            width="400"
           >
             <el-form-item
-              prop="phone"
-              :rules="[
-                { required: true, message: 'Phone is required'},
-                { type: 'number', message: 'Phone must be a number'}
-              ]"
-            >
-              <el-input v-model="temp.phone" size="mini" placeholder="Please input" type="number" @keyup.enter.native="handleConfirm(4,'phone')" />
+              prop="phone">
+              <VuePhoneNumberInput v-model="temp.phone"/>
+
+              <!-- <el-input v-model="temp.phone" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(4,'phone')" /> -->
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
@@ -255,6 +252,8 @@
 </template>
 <script>
 import OrdersResource from '@/api/orders';
+import VuePhoneNumberInput from "vue-phone-number-input";
+import '@/components/PhoneNumberInput/css/custom.css';
 
 const ordersResource = new OrdersResource();
 const defaultForm = {
@@ -270,7 +269,10 @@ const defaultForm = {
 };
 export default {
   name: 'InfoCustomer',
-  	props: ['dataOrder', 'dataCountry'],
+  components: {
+    VuePhoneNumberInput,
+  },
+  props: ['dataOrder', 'dataCountry'],
   data() {
     return {
       visible: {},

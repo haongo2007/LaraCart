@@ -73,6 +73,15 @@
         </template>
       </el-table-column>
       <el-table-column
+        label="Attribute Price"
+        min-width="150"
+      >
+        <template slot-scope="scope">
+          <span v-if="!scope.row.is_new" v-html="methodAttributePrice(scope.row.attribute)"></span>
+          <span v-else v-html="methodAttributePrice(scope.row.groups)"></span>
+        </template>
+      </el-table-column>
+      <el-table-column
         align="center"
         label="Qty"
         min-width="50"
@@ -82,6 +91,28 @@
           <el-input-number v-else v-model.number="temp[scope.$index].qty" style="width:50px;" size="mini" :controls="false" :min="0" @focus="setCurrentIndex(scope.$index)" @change="handleChangePrice('qty',temp[scope.$index].qty)" />
         </template>
       </el-table-column>
+
+      <el-table-column
+        align="center"
+        label="Tax"
+        min-width="80"
+      >
+        <template slot-scope="scope">
+          <span v-if="!scope.row.is_new">{{ scope.row.tax }}</span>
+          <el-autocomplete
+            @focus="setCurrentIndex(scope.$index)" 
+            v-model="temp[scope.$index].tax"
+            style="width: 100%"
+            value-key="name"
+            class="inline-input"
+            :fetch-suggestions="querySearchTaxAsync"
+            placeholder="Please Input"
+            @select="handleSelectTax"
+            v-else
+          />
+        </template>
+      </el-table-column>
+
       <el-table-column
         label="Total"
         min-width="100"
@@ -91,16 +122,7 @@
           <el-input-number v-else v-model.number="temp[scope.$index].total_price" style="width:100px;" size="mini" :disabled="true" :controls="false" :min="0" />
         </template>
       </el-table-column>
-      <el-table-column
-        align="center"
-        label="Tax"
-        min-width="80"
-      >
-        <template slot-scope="scope">
-          <span v-if="!scope.row.is_new">{{ scope.row.tax }}</span>
-          <el-input-number v-else v-model.number="temp[scope.$index].tax" style="width:80px;" :controls="false" size="mini" :min="0" @focus="setCurrentIndex(scope.$index)" />
-        </template>
-      </el-table-column>
+
       <el-table-column
         label="Action"
         min-width="100"
@@ -119,6 +141,7 @@
 import ProductResource from '@/api/product';
 import OrdersResource from '@/api/orders';
 import AttributesProduct from './AttributesProduct';
+import TaxResource from '@/api/tax';
 
 const defaultForm = {
   is_new: true,
@@ -132,6 +155,7 @@ const defaultForm = {
   tax: 0,
   currency: '',
 };
+const taxResource = new TaxResource();
 const productResource = new ProductResource();
 const ordersResource = new OrdersResource();
 export default {
@@ -149,6 +173,8 @@ export default {
       counting: 0,
       dataAttribute: [],
       btnLoading: false,
+      taxs: [],
+      taxsLoading: true,
     };
   },
   created(){
@@ -209,6 +235,15 @@ export default {
     		this.temp[this.currentIndex].total_price = val * this.temp[this.currentIndex].price;
     	} else if (type == 'price'){
     		this.temp[this.currentIndex].total_price = this.temp[this.currentIndex].qty * this.temp[this.currentIndex].price;
+        if (this.temp[this.currentIndex].hasOwnProperty('groups')) {
+          let sum = 0;
+          this.temp[this.currentIndex].groups.forEach((item) => {
+            let key = Object.keys(item.text)[0];
+            item = item.text[key].split('__');
+            sum += parseInt(item[1]);
+          });
+          this.temp[this.currentIndex].total_price += sum;
+        }
     	}
     },
     handleDeleteProduct(row, is_new = false){
@@ -268,6 +303,8 @@ export default {
               }
             });
           }
+          that.currentIndex = index;
+          that.handleChangePrice('price');
         }
       });
     },
@@ -304,6 +341,59 @@ export default {
           message: 'Save canceled',
         });
       });
+    },
+    methodAttributePrice(att){
+      let result = '';
+      if (typeof att == 'object') {
+        for(let prop in att) {
+          let key = Object.keys(att[prop].text);
+          let item = att[prop].text[key].split('__');
+          result += this.dataAttributeGroup[key]+': '+item[0]+' - '+item[1]+'<br>';
+        }
+      }else if(typeof att == 'undefined'){
+        return;
+      }else{
+        let reAtt = JSON.parse(att);
+        for(let prop in reAtt) {
+          let item = reAtt[prop].split('__');
+          result += this.dataAttributeGroup[prop]+': '+item[0]+' - '+item[1]+'<br>';
+        }
+      }
+      return result;
+    },
+    cbGetTax(res){
+      const selectedTax = this.taxs.filter(tax => tax.id == this.dataProduct.tax_id);
+      if (selectedTax.length > 0) {
+        // this.temp.tax.label = selectedTax[0].name;
+        // this.temp.tax.value = this.dataProduct.tax_id;
+      }
+      this.taxsLoading = false;
+    },
+    querySearchTaxAsync(queryString, cb){
+      var taxs = this.taxs;
+      var results = queryString ? taxs.filter(this.createFilter(queryString)) : taxs;
+
+      if (results.length == 0) {
+        taxResource.list({ keyword: queryString }).then(response => {
+          this.taxs = [...this.taxs, ...response.data];
+          results = response.data;
+          if (cb){
+            cb(results);
+          } else {
+            this.cbGetTax(results);
+          }
+        })
+          .catch(err => {
+            console.log(err);
+          });
+      } else {
+        if (cb) {
+          cb(results);
+        }
+      }
+    },
+    handleSelectTax(item) {
+      this.temp[this.currentIndex].tax = item.id;
     },
   },
 };

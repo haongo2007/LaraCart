@@ -10,13 +10,18 @@
         <el-row :gutter="24">
           <el-col :span="12">
             <el-button-group>
-              <el-button v-waves type="success" :disabled="dataLoading" @click="handleDownload"><svg-icon icon-class="excel" /></el-button>
-              <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
-              <el-dropdown trigger="click" placement="top-start" split-button type="primary" @command="handleCommand" @click="$router.push({ name: 'ProductCreateSingle'})">
+              <el-button v-waves type="success" :disabled="dataLoading" @click="handleDownload" v-permission="['export.product']">
+                <svg-icon icon-class="excel" />
+              </el-button>
+              <el-button v-permission="['delete.single.product','delete.group.product','delete.bundle.product']" 
+              type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
+              <el-dropdown trigger="click" placement="top-start" split-button type="primary" 
+                @command="handleCommand" 
+                @click="$router.push({ name: 'ProductCreateSingle'})" v-permission="['create.single.product']">
                 <i class="el-icon-plus" />
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="ProductCreateBundle">Product Bundle</el-dropdown-item>
-                  <el-dropdown-item command="ProductCreateGroup">Product Group</el-dropdown-item>
+                  <el-dropdown-item command="ProductCreateBundle" v-permission="['create.bundle.product']">Product Bundle</el-dropdown-item>
+                  <el-dropdown-item command="ProductCreateGroup" v-permission="['create.group.product']">Product Group</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </el-button-group>
@@ -106,6 +111,7 @@
 
 <script>
 
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 import { parseTime, toThousandFilter } from '@/filters';
 import ProductResource from '@/api/product';
 import CategoryResource from '@/api/category';

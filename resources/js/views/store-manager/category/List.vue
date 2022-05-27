@@ -79,12 +79,12 @@
       </el-table-column>
       <el-table-column :label="$t('table.actions')" align="center" width="200" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
-          <router-link :to="{ name: 'CategoryEdit',params:{id:row.id} }">
+          <router-link :to="{ name: 'CategoryEdit',params:{id:row.id} }" v-permission="['edit.category']">
             <el-button type="primary" size="mini" icon="el-icon-edit">
               {{ $t('table.edit') }}
             </el-button>
           </router-link>
-          <el-button size="mini" type="danger" @click="handleDeleting(row)">
+          <el-button size="mini" type="danger" @click="handleDeleting(row)" v-permission="['delete.category']">
             {{ $t('table.delete') }}
           </el-button>
         </template>
@@ -104,12 +104,14 @@ import FilterSystemCategory from './components/FilterSystemCategory';
 import EventBus from '@/components/FileManager/eventBus';
 import CategoryResource from '@/api/category';
 import { checkOnlyStore } from '@/utils';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 const categoryResource = new CategoryResource();
 
 export default {
   name: 'CategoryList',
   components: { Pagination, RightPanel, FilterSystemCategory },
+  directives:{ permission },
   data() {
     return {
       list: [],

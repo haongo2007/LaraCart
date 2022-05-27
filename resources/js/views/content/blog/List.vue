@@ -63,8 +63,9 @@
       <el-table-column :label="$t('table.actions')" align="center" min-width="80" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" />
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
+            <el-button v-permission="['edit.blog']" type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
+            @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" />
+            <el-button v-permission="['delete.blog']" type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
         </template>
       </el-table-column>
@@ -80,10 +81,12 @@ import UserResource from '@/api/user';
 import RightPanel from '@/components/RightPanel';
 import FilterSystemBlog from './components/FilterSystemBlog';
 import EventBus from '@/components/FileManager/eventBus';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 export default {
   name: 'BlogList',
   components: { Pagination,FilterSystemBlog,RightPanel },
+  directives: { permission },
   data() {
     return {
       list: [],

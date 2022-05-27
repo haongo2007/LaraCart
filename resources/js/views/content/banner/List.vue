@@ -21,7 +21,7 @@
         </template>
       </el-table-column>
       
-      <el-table-column label="Store" min-width="100">
+      <el-table-column label="Store" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -40,13 +40,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Title">
+      <el-table-column align="center" label="Title" min-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Url">
+      <el-table-column align="center" label="Url" min-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.url }}</span>
         </template>
@@ -64,7 +64,7 @@
         </template>
       </el-table-column>
       
-      <el-table-column label="Type"  prop="type">
+      <el-table-column label="Type"  prop="type" min-width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.type }}</span>
         </template>
@@ -78,11 +78,12 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.actions')" align="center" min-width="80" class-name="small-padding fixed-width">
+      <el-table-column :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" />
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
+            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
+            @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" v-permission="['edit.banner']"/>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" v-permission="['delete.banner']"/>
           </el-button-group>
         </template>
       </el-table-column>
@@ -98,10 +99,12 @@ import UserResource from '@/api/user';
 import RightPanel from '@/components/RightPanel';
 import FilterSystemBanner from './components/FilterSystemBanner';
 import EventBus from '@/components/FileManager/eventBus';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 export default {
   name: 'BannerList',
   components: { Pagination,FilterSystemBanner,RightPanel },
+  directives:{ permission },
   data() {
     return {
       list: [],

@@ -1,14 +1,17 @@
 export const menuSidebar = [
   {
     path: '',
+    meta:{      
+      permissions: ['view.dashboard'],
+    },
     children: [
       {
         path: 'dashboard',
         name: 'Dashboard',
         meta: { 
-          permissions: ['view.dashboard'],
           title: 'dashboard', 
-          icon: 'dashboard' 
+          icon: 'dashboard',
+          permissions: ['view.dashboard'],
         },
       },
     ],
@@ -19,7 +22,7 @@ export const menuSidebar = [
     meta: {
       title: 'storeManager',
       icon: 'theme',
-      permissions: ['view.orders','view.product','view.category'],
+      permissions: ['view.order','view.product','view.category'],
     },
     children: [
       {
@@ -27,7 +30,7 @@ export const menuSidebar = [
         meta: {
           title: 'orders',
           icon: 'form',
-          permissions: ['view.orders'],
+          permissions: ['view.order'],
         },
       },
       // //////////////end orders

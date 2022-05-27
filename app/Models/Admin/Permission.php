@@ -23,7 +23,15 @@ class Permission extends Model
     {
         return $this->belongsToMany(Role::class, 'admin_role_permission', 'permission_id', 'role_id');
     }
-
+    /**
+     * A permissions has and belongs to many User.
+     *
+     * @return BelongsToMany
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'admin_user_permission', 'permission_id', 'user_id');
+    }
     /**
      * If request should pass through the current permission.
      *
@@ -65,6 +73,7 @@ class Permission extends Model
 
         static::deleting(function ($model) {
             $model->roles()->detach();
+            $model->users()->detach();
         });
     }
 

@@ -10,8 +10,12 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-button-group>
-              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" @click="$router.push({ name: 'CategoryCreate'}).catch(() => {})" />
-              <el-button type="success" :disabled="dataLoading" @click="handleDownload"><svg-icon icon-class="excel" /></el-button>
+              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
+              @click="$router.push({ name: 'CategoryCreate'}).catch(() => {})" v-permission="['create.category']"/>
+              <el-button type="success" :disabled="dataLoading" 
+              @click="handleDownload" v-permission="['export.category']">
+                <svg-icon icon-class="excel" />
+              </el-button>
             </el-button-group>
             <div class="el-select filter-item el-select--medium">
               <el-checkbox v-model="parent" label="ROOT" border @change="handleFilter" />
@@ -52,10 +56,12 @@
 import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
 import CategoryResource from '@/api/category';
+import permission from '@/directive/permission'; // Permission directive (v-permission)
 
 const categoryResource = new CategoryResource();
 export default {
   name: 'FilterSystemCategory',
+  directives:{ permission },
   props: {
     dataLoading: {
       type: Boolean,
