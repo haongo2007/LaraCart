@@ -69,6 +69,10 @@ class ShopLanguage extends Model
             }else{
                 $langActive = $langActive->where('store_id',$storeId);
             }
+            $check = $langActive->exists();
+            if (!$check) {
+                $langActive = $langActive->orWhere('store_id',0);
+            }
             $langActive = $langActive->get()->keyBy('code');
             self::$getListActive = $langActive;
         }

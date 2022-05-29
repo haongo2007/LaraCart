@@ -14,7 +14,24 @@ class ShopSupplier extends Model
     protected $guarded = [];
     private static $getList = null;
     protected $connection = LC_CONNECTION;
+    const ITEM_PER_PAGE = 15;
 
+
+    public function getSupplierListAdmin($searchParams='')
+    {
+        $keyword = $searchParams['keyword'] ?? '';
+        $limit = $searchParams['limit'] ?? self::ITEM_PER_PAGE;
+        
+        $supplierList = new self;
+        if ($keyword) {
+            $supplierList = $supplierList->where('name', 'like', '%' . $keyword . '%');
+        }
+        
+        $supplierList = $supplierList->whereIn('store_id', session('adminStoreId'));
+        $supplierList = $supplierList->orderBy('id', 'desc');
+        
+        return $supplierList->paginate($limit);
+    }
     /*
     Get store
     */

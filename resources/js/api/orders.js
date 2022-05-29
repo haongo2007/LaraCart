@@ -5,9 +5,9 @@ class OrdersResource extends Resource {
   constructor() {
     super('orders');
   }
-  getRelationData() {
+  getRelationData(id) {
     return request({
-      url: '/' + this.uri + '/getRelationOrder',
+      url: '/' + this.uri + '/getRelationOrder/'+id,
       method: 'get',
     });
   }

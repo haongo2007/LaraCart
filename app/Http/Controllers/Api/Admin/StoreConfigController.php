@@ -12,15 +12,13 @@ use Illuminate\Http\Request;
 
 class StoreConfigController extends Controller
 {
-    public $currencies, $languages, $timezones;
+    public $timezones;
 
     public function __construct()
     {
         foreach (timezone_identifiers_list() as $key => $value) {
             $timezones[$value] = $value;
         }
-        $this->currencies = ShopCurrency::getCodeActive();
-        $this->languages = ShopLanguage::getListActive();
         $this->timezones = $timezones;
     }
 
@@ -141,8 +139,8 @@ class StoreConfigController extends Controller
         $data['captchaConfig']                  = $captchaConfig;
         $data['customizeConfig']                = $customizeConfig;
         $data['timezones']                      = $this->timezones;
-        $data['languages']                      = $this->languages;
-        $data['currencies']                     = $this->currencies;
+        $data['languages']                      = ShopLanguage::getListActive($id);
+        $data['currencies']                     = ShopCurrency::getCodeActive($id);
         $data['adminConfig']                    = $adminConfig;
         $data['storeId']                        = $id;
         return response()->json(new JsonResponse($data), Response::HTTP_OK);

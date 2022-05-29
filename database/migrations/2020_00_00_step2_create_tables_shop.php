@@ -57,6 +57,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('code', 100)->unique();
             $table->string('name', 100);
+            $table->integer('store_id')->default(1)->index();
 
             }
         );
@@ -80,7 +81,7 @@ class CreateTablesShop extends Migration
             $table->tinyInteger('status')->default(0);
             $table->tinyInteger('rtl')->nullable()->default(0)->comment('Layout RTL');
             $table->integer('sort')->default(0);
-            $table->integer('store_id')->default(1);
+            $table->integer('store_id')->default(1)->index();
             }
         );
 
@@ -147,7 +148,7 @@ class CreateTablesShop extends Migration
             $table->string('url', 100)->nullable();
             $table->tinyInteger('status')->default(0);
             $table->integer('sort')->default(0);
-            $table->integer('store_id')->default(1);
+            $table->integer('store_id')->default(1)->index();
             }
         );
 
@@ -184,7 +185,7 @@ class CreateTablesShop extends Migration
             $table->string('thousands')->default(',');
             $table->tinyInteger('status')->default(0);
             $table->integer('sort')->default(0);
-            $table->integer('store_id')->default(1);
+            $table->integer('store_id')->default(1)->index();
             }
         );
 
@@ -222,7 +223,7 @@ class CreateTablesShop extends Migration
             $table->string('user_agent', 255)->nullable();
             $table->string('ip', 100)->nullable();
             $table->string('transaction', 100)->nullable();
-            $table->integer('store_id');
+            $table->integer('store_id')->default(1)->index();
             $table->timestamps();
             }
         );
@@ -234,7 +235,7 @@ class CreateTablesShop extends Migration
             $table->string('name', 100);
             $table->integer('price')->default(0);
             $table->integer('qty')->default(0);
-            $table->integer('store_id')->default(1);
+            $table->integer('store_id')->default(1)->index();
             $table->integer('total_price')->default(0);
             $table->integer('tax')->default(0);
             $table->string('sku', 50);
@@ -260,7 +261,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 100);
             $table->string('label', 50);
-            $table->integer('store_id');
+            $table->integer('store_id')->default(1)->index();
 
             }
         );
@@ -301,6 +302,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 100);
             $table->string('label', 50);
+            $table->integer('store_id')->default(1)->index();
 
             }
         );
@@ -399,6 +401,7 @@ class CreateTablesShop extends Migration
             $table->integer('sort')->default(0);
             $table->string('type', 50)->comment('radio,select,checkbox');
             $table->integer('picker')->default(0);
+            $table->integer('store_id')->default(1)->index();
             }
         );
 
@@ -436,6 +439,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 100);
             $table->string('label', 50);
+            $table->integer('store_id')->default(1)->index();
 
             }
         );
@@ -632,6 +636,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 100);
             $table->integer('value')->default(0);
+            $table->integer('store_id')->default(1)->index();
             }
         );
 
@@ -639,6 +644,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 50)->unique();
             $table->string('description', 100);
+            $table->integer('store_id')->default(1)->index();
 
             }
         );
@@ -647,6 +653,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 50)->unique();
             $table->string('description', 100);
+            $table->integer('store_id')->default(1)->index();
 
             }
         );
@@ -706,6 +713,7 @@ class CreateTablesShop extends Migration
             $table->integer('status')->default(1);
             $table->string('option', 50)->nullable()->comment('radio, select, input');
             $table->string('default', 250)->nullable()->comment('{"value1":"name1", "value2":"name2"}');
+            $table->integer('store_id')->default(1)->index();
             }
         );
 

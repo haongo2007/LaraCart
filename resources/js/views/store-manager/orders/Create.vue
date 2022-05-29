@@ -321,7 +321,6 @@ export default {
   },
   created() {
     this.getListCustomer();
-    this.getRelationData();
   },
   methods: {
     goBackList(){
@@ -330,16 +329,16 @@ export default {
     async getListCustomer() {
       const { data } = await customerResource.list();
       this.customers = data;
+      this.loading = false;
     },
     async getRelationData() {
-      const { data } = await ordersResource.getRelationData();
+      const { data } = await ordersResource.getRelationData(this.temp.storeId);
       this.StatusOptions = data.orderStatus;
       this.CountriesOptions = data.countries;
       this.CurrenciesOption = data.currencies;
       this.ExchangeRateOption = data.currenciesRate;
       this.ShippingOptions = data.shippingMethod;
       this.PaymentOptions = data.paymentMethod;
-      this.loading = false;
     },
     querySearchAsync(queryString, cb) {
       var customer = this.customers;
@@ -347,7 +346,7 @@ export default {
 
       if (results.length == 0) {
         customerResource.list({ keyword: queryString }).then(response => {
-          this.customers = [...this.customers, ...response.data];
+          this.customers = response.data
           results = response.data;
         })
           .catch(err => {
@@ -375,6 +374,7 @@ export default {
       this.temp.address2 = item.address2;
       this.temp.address3 = item.address3;
       this.temp.storeId = item.store.id;
+      this.getRelationData();
     },
     handleSelectCurrency(index){
       this.temp.exchange_rate = this.ExchangeRateOption[index];

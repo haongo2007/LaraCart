@@ -115,6 +115,7 @@ export default {
 <style lang="scss">
 .grid-view{
   display: flex;
+  flex-wrap: wrap;
   padding: 20px;
   .active{
     box-shadow: 0 0 3px 1px #409EFF;

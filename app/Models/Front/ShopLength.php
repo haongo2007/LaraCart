@@ -11,7 +11,24 @@ class ShopLength extends Model
     protected $connection = LC_CONNECTION;
     protected $guarded           = [];
     protected static $getList = null;
+    const ITEM_PER_PAGE = 15;
 
+
+    public function getLengthListAdmin($searchParams='')
+    {
+        $keyword = $searchParams['keyword'] ?? '';
+        $limit = $searchParams['limit'] ?? self::ITEM_PER_PAGE;
+        
+        $lengthList = new self;
+        if ($keyword) {
+            $lengthList = $lengthList->where('name', 'like', '%' . $keyword . '%');
+        }
+        
+        $lengthList = $lengthList->whereIn('store_id', session('adminStoreId'));
+        $lengthList = $lengthList->orderBy('id', 'desc');
+        
+        return $lengthList->paginate($limit);
+    }
     /*
     Get store
     */

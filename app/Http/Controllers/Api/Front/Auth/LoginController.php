@@ -42,7 +42,7 @@ class LoginController extends Controller
             if (!Hash::check($request->password, $user->password, [])) {
                 throw new \Exception('Error in Login');
             }
-
+            $user->tokens()->delete();
             $tokenResult = $user->createToken('authToken')->plainTextToken;
 
             return response()->json([

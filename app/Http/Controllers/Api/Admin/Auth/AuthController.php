@@ -27,7 +27,9 @@ class AuthController extends Controller
         $admin = Auth::guard('admin')->attempt($credentials);
         if($admin){
             $admin = User::where('email',$request->email)->firstOrFail();
-            $token = $admin->createToken('token-name',[$request->token_name])->plainTextToken;
+            $admin->tokens()->delete();
+            $token = $admin->createToken('token-name',[$request->token_name])->plainTextToken;   
+
             return response()->json(new JsonResponse(['token'=>$token] ), Response::HTTP_OK);
         }
         return response()->json(new JsonResponse([], 'Login failed'), Response::HTTP_UNAUTHORIZED);

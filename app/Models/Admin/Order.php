@@ -28,10 +28,19 @@ class Order extends ShopOrder
      * @return  [type]       [return description]
      */
     public static function getOrderAdmin($id) {
+        $storeId = session('adminStoreId');
+        if (request()->header('x-store')) {
+            $header_store = json_decode(request()->header('x-store'));
+            $storeId = $header_store ? $header_store : $storeId;
+        }
+        if (!is_array($storeId)) {
+            $storeId = [$storeId];
+        }
         return self::with(['stores','details', 'orderTotal','history' => function ($q)
         {
             $q->with('Staff:id,fullname')->orderBy('add_date','DESC');
         }])
+        ->whereIn('store_id',$storeId)
         ->where('id', $id)
         ->first();
     }

@@ -323,7 +323,7 @@ export default {
 
       if (results.length == 0) {
         brandResource.list({ keyword: queryString }).then(response => {
-          this.brands = [...this.brands, ...response.data];
+          this.brands = response.data;
           results = response.data;
           if (cb){
             cb(results);
@@ -346,7 +346,7 @@ export default {
 
       if (results.length == 0) {
         supplierResource.list({ keyword: queryString }).then(response => {
-          this.suppliers = [...this.suppliers, ...response.data];
+          this.suppliers = response.data;
           results = response.data;
           if (cb){
             cb(results);
@@ -369,7 +369,7 @@ export default {
 
       if (results.length == 0) {
         taxResource.list({ keyword: queryString }).then(response => {
-          this.taxs = [...this.taxs, ...response.data];
+          this.taxs = response.data;
           results = response.data;
           if (cb){
             cb(results);

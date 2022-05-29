@@ -124,7 +124,7 @@
 
 <script>
 import {DraggableTree} from 'vue-draggable-nested-tree'
-import AttributeGroupResource from '@/api/attribute_group';
+import AttributeGroupResource from '@/api/attribute-group';
 import FileManager from '@/components/FileManager';
 import EventBus from '@/components/FileManager/eventBus';
 import * as Vibrant from 'node-vibrant';

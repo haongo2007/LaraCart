@@ -11,7 +11,7 @@
           <el-col :span="24">
             <el-button-group>
               <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
-              @click="$router.push({ name: 'UserCreate'}).catch(() => {})" v-permission="['create.banner']"/>
+              @click="handleCreate()" v-permission="['create.banner']"/>
               <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
               @click="handerDeleteAll" v-permission="['delete.banner']"/>
             </el-button-group>
@@ -66,7 +66,7 @@ export default {
       list: null,
       total: 0,
       roles: [],
-      multiSelectRow:[]
+      multiSelectRow:[],
     };
   },
   watch: {
@@ -142,6 +142,9 @@ export default {
           message: 'Delete canceled',
         });
       });
+    },
+    handleCreate() {
+      this.$emit('handleListenCreateForm', true);
     },
   },
 };

@@ -1,17 +1,13 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
-use App\Models\Front\ShopBannerType;
+use App\Http\Controllers\Controller;
+use App\Models\Admin\BannerType;
+use App\Http\Resources\BannerTypeCollection;
 use Validator;
 
-class BannerTypeController extends RootAdminController
+class BannerTypeController extends Controller
 {
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
     /**
      * Index interface.
      *
@@ -19,52 +15,9 @@ class BannerTypeController extends RootAdminController
      */
     public function index()
     {
-        $data = [
-            'title' => trans('banner_type.admin.list'),
-            'title_action' => '<i class="fa fa-plus" aria-hidden="true"></i> ' . trans('banner_type.admin.add_new_title'),
-            'subTitle' => '',
-            'icon' => 'fa fa-indent',
-            'urlDeleteItem' => bc_route_admin('admin_banner_type.delete'),
-            'removeList' => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort' => 0, // 1 - Enable button sort
-            'css' => '', 
-            'js' => '',
-            'url_action' => bc_route_admin('admin_banner_type.create'),
-        ];
-
-        $listTh = [
-            'id' => trans('banner_type.admin.id'),
-            'code' => trans('banner_type.admin.code'),
-            'name' => trans('banner_type.admin.name'),
-            'action' => trans('banner_type.admin.action'),
-        ];
-        $obj = new ShopBannerType;
-        $obj = $obj->orderBy('id', 'desc');
-        $dataTmp = $obj->paginate(20);
-
-        $dataTr = [];
-        foreach ($dataTmp as $key => $row) {
-            $dataTr[] = [
-                'id' => $row['id'],
-                'code' => $row['code'] ?? 'N/A',
-                'name' => $row['name'] ?? 'N/A',
-                'action' => '
-                    <a href="' . bc_route_admin('admin_banner_type.edit', ['id' => $row['id']]) . '"><span title="' . trans('banner_type.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-                  <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('banner_type.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-                  ',
-            ];
-        }
-
-        $data['listTh'] = $listTh;
-        $data['dataTr'] = $dataTr;
-        $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-        $data['resultItems'] = trans('banner_type.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-        $data['layout'] = 'index';
-        return view($this->templatePathAdmin.'screen.banner_type')
-            ->with($data);
+        $dataSearch = request()->all();
+        $data = BannerType::getBannerTypeListAdmin($dataSearch);
+        return BannerTypeCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
 /**
@@ -77,7 +30,7 @@ class BannerTypeController extends RootAdminController
         $dataOrigin = request()->all();
         $validator = Validator::make($dataOrigin, [
             'name' => 'required',
-            'code' => 'required|unique:"'.ShopBannerType::class.'",code',
+            'code' => 'required|unique:"'.BannerType::class.'",code',
         ], [
             'name.required' => trans('validation.required'),
         ]);
@@ -94,7 +47,7 @@ class BannerTypeController extends RootAdminController
             'code' => $data['code'],
             'name' => $data['name'],
         ];
-        $obj = ShopBannerType::create($dataInsert);
+        $obj = BannerType::create($dataInsert);
 //
         return redirect()->route('admin_banner_type.index')->with('success', trans('banner_type.admin.create_success'));
 
@@ -105,7 +58,7 @@ class BannerTypeController extends RootAdminController
  */
 public function edit($id)
 {
-    $banner_type = ShopBannerType::find($id);
+    $banner_type = BannerType::find($id);
     if(!$banner_type) {
         return 'No data';
     }
@@ -131,7 +84,7 @@ public function edit($id)
         'name' => trans('banner_type.admin.name'),
         'action' => trans('banner_type.admin.action'),
     ];
-    $obj = new ShopBannerType;
+    $obj = new BannerType;
     $obj = $obj->orderBy('id', 'desc');
     $dataTmp = $obj->paginate(20);
 
@@ -166,9 +119,9 @@ public function edit($id)
     {
         $data = request()->all();
         $dataOrigin = request()->all();
-        $obj = ShopBannerType::find($id);
+        $obj = BannerType::find($id);
         $validator = Validator::make($dataOrigin, [
-            'code' => 'required|unique:"'.ShopBannerType::class.'",code,' . $obj->id . ',id',
+            'code' => 'required|unique:"'.BannerType::class.'",code,' . $obj->id . ',id',
             'name' => 'required',
         ], [
             'name.required' => trans('validation.required'),
@@ -204,7 +157,7 @@ public function edit($id)
         } else {
             $ids = request('ids');
             $arrID = explode(',', $ids);
-            ShopBannerType::destroy($arrID);
+            BannerType::destroy($arrID);
             return response()->json(['error' => 0, 'msg' => '']);
         }
     }

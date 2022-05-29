@@ -11,7 +11,7 @@
           value-key="name"
           placeholder="Please enter a keyword"
           @change="handleSelectCategoryMultiple($event, key)"
-          @remote-method="remoteMethod($event, key)"
+          :remote-method="remoteMethod"
           :loading="loading">
           <el-option
             v-for="item in categoryMultiple[key]"
@@ -226,7 +226,8 @@ export default {
       }
       this.$emit('handleProcessCategory', this.categoryMultipleValue);
     },
-    remoteMethod(query,key) {
+    remoteMethod(query) {
+      let key = this.categoryLevel;
       if (query !== '') {
         this.loading = true;
         setTimeout(() => {

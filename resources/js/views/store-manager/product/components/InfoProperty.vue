@@ -136,7 +136,7 @@ export default {
 
       if (results.length == 0) {
         weightResource.list({ keyword: queryString }).then(response => {
-          this.weight_units = [...this.weight_units, ...response.data];
+          this.weight_units = response.data;
           results = response.data;
           if (cb){
             cb(results);
@@ -159,7 +159,7 @@ export default {
 
       if (results.length == 0) {
         lengthResource.list({ keyword: queryString }).then(response => {
-          this.length_units = [...this.length_units, ...response.data];
+          this.length_units = response.data;
           results = response.data;
           if (cb){
             cb(results);

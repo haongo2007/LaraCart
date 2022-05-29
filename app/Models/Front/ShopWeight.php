@@ -11,7 +11,24 @@ class ShopWeight extends Model
     protected $connection = LC_CONNECTION;
     protected $guarded           = [];
     protected static $getList = null;
+    const ITEM_PER_PAGE = 15;
 
+
+    public function getWeightListAdmin($searchParams='')
+    {
+        $keyword = $searchParams['keyword'] ?? '';
+        $limit = $searchParams['limit'] ?? self::ITEM_PER_PAGE;
+        
+        $weightList = new self;
+        if ($keyword) {
+            $weightList = $weightList->where('name', 'like', '%' . $keyword . '%');
+        }
+        
+        $weightList = $weightList->whereIn('store_id', session('adminStoreId'));
+        $weightList = $weightList->orderBy('id', 'desc');
+        
+        return $weightList->paginate($limit);
+    }
     /*
     Get store
     */

@@ -100,7 +100,11 @@ export default {
       if (store_ck.length < 1) {
         Cookies.remove('store');
       } else {
-        this.currentStore = String(store_ck);
+        if(typeof store_ck == 'string' || typeof store_ck  == 'number'){
+          this.currentStore = String(store_ck);
+        }else{
+          this.currentStore = store_ck
+        }
       }
     }
   },

@@ -1,5 +1,7 @@
 export default {
   route: {
+    bannerCreate:'Create Banner',
+    bannerEdit:'Edit Banner',
     webHook:'Webhook',
     System:'System',
     seoConfig:'SEO Config',
@@ -197,6 +199,8 @@ export default {
     imageUploadTips: 'Since I was using only the vue@1 version, and it is not compatible with mockjs at the moment, I modified it myself, and if you are going to use it, it is better to use official version.',
   },
   table: {
+    target:'Target',
+    url:'Url',
     default:'Default',
     flag:'Flag',
     rtl:'RTL layout',
@@ -344,4 +348,7 @@ export default {
     'permissions':'Permissions',
     'name': 'Name',
   },
+  banner:{
+    'html':'HTML'
+  }
 };

@@ -172,7 +172,7 @@ public function createProductGroup()
         $data['category'] = is_array($data['category']) ? end($data['category']) : $data['category'];
         $data['date_promotion'] = json_decode($data['date_promotion']);
 
-        $langFirst = array_key_first(lc_language_all()->toArray()); //get first code language active
+        $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);

@@ -15,7 +15,24 @@ class ShopBrand extends Model
     protected $guarded = [];
     private static $getList = null;
     protected $connection = LC_CONNECTION;
+    const ITEM_PER_PAGE = 15;
 
+
+    public function getBrandListAdmin($searchParams='')
+    {
+        $keyword = $searchParams['keyword'] ?? '';
+        $limit = $searchParams['limit'] ?? self::ITEM_PER_PAGE;
+        
+        $brandList = new self;
+        if ($keyword) {
+            $brandList = $brandList->where('name', 'like', '%' . $keyword . '%');
+        }
+        
+        $brandList = $brandList->whereIn('store_id', session('adminStoreId'));
+        $brandList = $brandList->orderBy('id', 'desc');
+        
+        return $brandList->paginate($limit);
+    }
     /*
     Get store
     */

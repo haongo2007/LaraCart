@@ -10,7 +10,7 @@ class TaxController extends Controller
 {
     public function index()
     {
-        $data = ShopTax::whereIn('store_id', session('adminStoreId'))->paginate(20);
+        $data = (new ShopTax)->getTaxListAdmin(request()->all());
         return TaxCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

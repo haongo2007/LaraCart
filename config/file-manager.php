@@ -24,7 +24,7 @@ return [
      * List of disk names that you want to use
      * (from config/filesystems)
      */
-    'diskList' => [env('FILESYSTEM_DRIVER', 'local'),'category','product','user','public','store'],
+    'diskList' => [env('FILESYSTEM_DRIVER', 'local'),'category','product','user','public','store','banner'],
 
     /**
      * Default disk for left manager

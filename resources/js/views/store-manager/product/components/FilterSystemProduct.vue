@@ -122,7 +122,7 @@ const productResource = new ProductResource();
 const categoryResource = new CategoryResource();
 export default {
   name: 'FilterSystemProduct',
-  directives: { waves },
+  directives: { waves,permission },
   props: {
     dataLoading: {
       type: Boolean,

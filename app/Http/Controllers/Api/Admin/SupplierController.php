@@ -10,7 +10,7 @@ class SupplierController extends Controller
 {    
     public function index()
     {
-        $data = ShopSupplier::whereIn('store_id', session('adminStoreId'))->paginate(20);
+        $data = (new ShopSupplier)->getSupplierListAdmin(request()->all());
         return SupplierCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

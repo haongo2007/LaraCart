@@ -10,3 +10,5 @@
 //     Route::post('/edit/{id}', 'AdminBannerTypeController@postEdit')->name('admin_banner_type.edit');
 //     Route::post('/delete', 'AdminBannerTypeController@deleteList')->name('admin_banner_type.delete');
 // });
+
+Route::apiResource('banner-type', 'BannerTypeController');

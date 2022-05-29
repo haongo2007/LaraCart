@@ -98,10 +98,10 @@
         min-width="80"
       >
         <template slot-scope="scope">
-          <span v-if="!scope.row.is_new">{{ scope.row.tax }}</span>
+          <span v-if="!scope.row.is_new">{{ (scope.row.tax.label == '' ? scope.row.tax.value : scope.row.tax) }}</span>
           <el-autocomplete
             @focus="setCurrentIndex(scope.$index)" 
-            v-model="temp[scope.$index].tax"
+            v-model="temp[scope.$index].tax.value"
             style="width: 100%"
             value-key="name"
             class="inline-input"
@@ -152,7 +152,10 @@ const defaultForm = {
   price: 0,
   qty: 0,
   total_price: 0,
-  tax: 0,
+  tax: {
+        label: '',
+        value: '0',
+      },
   currency: '',
 };
 const taxResource = new TaxResource();
@@ -222,7 +225,7 @@ export default {
     	this.temp[index].price = item.price;
     	this.temp[index].qty = 1;
     	this.temp[index].total_price = item.price;
-    	this.temp[index].tax = item.tax;
+    	this.temp[index].tax.value = String(item.tax);
     	this.temp[index].attribute = item.attributes;
     	this.temp[index].currency = this.dataProducts.currency;
     	this.temp[index].groups = [];
@@ -361,39 +364,29 @@ export default {
       }
       return result;
     },
-    cbGetTax(res){
-      const selectedTax = this.taxs.filter(tax => tax.id == this.dataProduct.tax_id);
-      if (selectedTax.length > 0) {
-        // this.temp.tax.label = selectedTax[0].name;
-        // this.temp.tax.value = this.dataProduct.tax_id;
-      }
-      this.taxsLoading = false;
+    createTaxFilter(queryString) {
+      return (data) => {
+        return (data.name.toLowerCase().includes(queryString.toLowerCase()) === true);
+      };
     },
     querySearchTaxAsync(queryString, cb){
       var taxs = this.taxs;
-      var results = queryString ? taxs.filter(this.createFilter(queryString)) : taxs;
+      var results = queryString ? taxs.filter(this.createTaxFilter(queryString)) : taxs;
 
       if (results.length == 0) {
         taxResource.list({ keyword: queryString }).then(response => {
-          this.taxs = [...this.taxs, ...response.data];
+          this.taxs = response.data;
           results = response.data;
-          if (cb){
-            cb(results);
-          } else {
-            this.cbGetTax(results);
-          }
         })
-          .catch(err => {
-            console.log(err);
-          });
-      } else {
-        if (cb) {
-          cb(results);
-        }
-      }
+        .catch(err => {
+          console.log(err);
+        });
+      }      
+      cb(results);
     },
     handleSelectTax(item) {
-      this.temp[this.currentIndex].tax = item.id;
+      this.temp[this.currentIndex].total_price += item.value;
+      this.temp[this.currentIndex].tax.value = String(item.value);
     },
   },
 };

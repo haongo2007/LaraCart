@@ -23,6 +23,7 @@ class ShopCurrency extends Model
     protected static $getCodeActive     = null;
     protected static $checkListCurrency = [];
     protected $guarded                  = [];
+    private static $getListActive      = null;
     const ITEM_PER_PAGE = 15;
     const ACTIVE = ['1'];
 
@@ -299,11 +300,23 @@ class ShopCurrency extends Model
         return self::pluck('exchange_rate', 'code')->all();
     }
 
-    public static function getListActive()
+    public static function getListActive($storeId)
     {
-        return self::where('status', 1)
-            ->sort()
-            ->get();
+        if (self::$getListActive === null) {
+            $curActive = self::where('status', 1);
+            if (!$storeId) {
+                $curActive = $curActive->where('store_id',0);
+            }else{
+                $curActive = $curActive->where('store_id',$storeId);
+            }
+            $check = $curActive->exists();
+            if (!$check) {
+                $curActive = $curActive->orWhere('store_id',0);
+            }
+            $curActive = $curActive->get()->keyBy('code');
+            self::$getListActive = $curActive;
+        }
+        return self::$getListActive;
     }
     //Scort
     public function scopeSort($query, $sortBy = null, $sortOrder = 'asc')

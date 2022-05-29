@@ -65,7 +65,7 @@
 import Pagination from '@/components/Pagination'; 
 import EventBus from '@/components/FileManager/eventBus';
 import { checkOnlyStore } from '@/utils';
-import AttributeGroupResource from '@/api/attribute_group';
+import AttributeGroupResource from '@/api/attribute-group';
 
 const attributeGroupResource = new AttributeGroupResource();
 

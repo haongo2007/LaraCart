@@ -15,8 +15,24 @@ class ShopTax extends Model
     private static $status = null;
     private static $arrayId = null;
     private static $arrayValue = null;
+    const ITEM_PER_PAGE = 15;
 
 
+    public function getTaxListAdmin($searchParams='')
+    {
+        $keyword = $searchParams['keyword'] ?? '';
+        $limit = $searchParams['limit'] ?? self::ITEM_PER_PAGE;
+        
+        $taxList = new self;
+        if ($keyword) {
+            $taxList = $taxList->where('name', 'like', '%' . $keyword . '%');
+        }
+        
+        $taxList = $taxList->whereIn('store_id', session('adminStoreId'));
+        $taxList = $taxList->orderBy('id', 'desc');
+        
+        return $taxList->paginate($limit);
+    }
     /*
     Get store
     */

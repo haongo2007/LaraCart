@@ -16,7 +16,7 @@ class WeightController extends Controller
      */
     public function index()
     {
-        $data = ShopWeight::whereIn('store_id', session('adminStoreId'))->paginate(20);
+        $data = (new ShopWeight)->getWeightListAdmin(request()->all());
         return WeightCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

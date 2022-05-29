@@ -11,10 +11,10 @@ class ShopOrderStatus extends Model
     protected $guarded           = [];
     protected static $listStatus = null;
 
-    public static function getIdAll()
+    public static function getIdAll($storeId)
     {
         if (!self::$listStatus) {
-            self::$listStatus = self::all();
+            self::$listStatus = self::where('store_id',$storeId)->get();
         }
         return self::$listStatus;
     }

@@ -15,7 +15,7 @@ class PaymentStatusController extends Controller
      */
     public function index()
     {
-        $data = ShopPaymentStatus::whereIn('store_id', session('adminStoreId'))->paginate(20);
+        $data = (new ShopPaymentStatus)->getPaymentStatusListAdmin(request()->all());
         return PaymentStatusCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

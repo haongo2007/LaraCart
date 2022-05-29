@@ -23,24 +23,11 @@ use Validator;
 
 class OrderController extends Controller
 {
-    public $statusPayment, 
-    $statusOrder, 
-    $statusShipping, 
-    $statusOrderMap, 
-    $statusShippingMap, 
-    $statusPaymentMap, 
-    $currency, 
-    $country, 
-    $countryMap;
+    public $country;
 
     public function __construct()
     {
-        $this->statusOrder    = ShopOrderStatus::getIdAll();
-        $this->currency       = ShopCurrency::getListActive();
         $this->country        = ShopCountry::getCodeAll();
-        $this->statusPayment  = ShopPaymentStatus::getIdAll();
-        $this->statusShipping = ShopShippingStatus::getIdAll();
-
     }
 
     /**
@@ -60,7 +47,7 @@ class OrderController extends Controller
      *
      * @return Content
      */
-    public function getRelation()
+    public function getRelation($storeId)
     {
         $paymentMethodTmp = lc_get_plugin_installed('payment', $onlyActive = false);
         foreach ($paymentMethodTmp as $key => $value) {
@@ -70,13 +57,12 @@ class OrderController extends Controller
         foreach ($shippingMethodTmp as $key => $value) {
             $shippingMethod[$key] = lc_language_render($value->detail);
         }
-        $orderStatus            = $this->statusOrder;
-        $currencies             = $this->currency;
+        $orderStatus            = ShopOrderStatus::getIdAll($storeId);
         $countries              = $this->country;
         $currenciesRate         = ShopCurrency::getListRate();
 
 
-        $data['currencies']     = $currencies;
+        $data['currencies']     = ShopCurrency::getListActive($storeId);
         $data['countries']      = $countries;
         $data['orderStatus']    = $orderStatus;
         $data['currenciesRate'] = $currenciesRate;
@@ -191,7 +177,9 @@ class OrderController extends Controller
             'exchange_rate'   => $data['exchange_rate'],
             'email'           => $data['email'],
             'comment'         => $data['comment'],
-            'store_id'         => $data['storeId'],
+            'store_id'        => $data['storeId'],
+            'shipping_status' => (new ShopShippingStatus)->getFirstIdDefault($data['storeId']),
+            'payment_status'  => (new ShopPaymentStatus)->getFirstIdDefault($data['storeId']),
         ];
         $order = Order::create($dataInsert);
         Order::insertOrderTotal([
@@ -227,11 +215,12 @@ class OrderController extends Controller
         foreach ($shippingMethodTmp as $key => $value) {
             $shippingMethod[$key] = lc_language_render($value->detail);
         }
+
         $data = [
                 "order" => $order,
-                "statusOrder" => $this->statusOrder,
-                "statusPayment" => $this->statusPayment,
-                "statusShipping" => $this->statusShipping,
+                "statusOrder" => ShopOrderStatus::getIdAll($order->store_id),
+                "statusPayment" => ShopPaymentStatus::getIdAll($order->store_id),
+                "statusShipping" => ShopShippingStatus::getIdAll($order->store_id),
                 'attributesGroup' => ShopAttributeGroup::pluck('name', 'id')->all(),
                 'paymentMethod' => $paymentMethod,
                 'shippingMethod' => $shippingMethod,
@@ -319,7 +308,7 @@ class OrderController extends Controller
 
             $oldValue = $order->{$code};
             if ($code == 'status') {
-                foreach ($this->statusOrder as $key => $stt) {
+                foreach (ShopOrderStatus::getIdAll($order->store_id) as $key => $stt) {
                     if ($stt['id'] == $value) {
                         $newvalue = $stt['name'];
                     }
@@ -328,8 +317,9 @@ class OrderController extends Controller
                     }
                 }
             }
+
             if ($code == 'shipping_status') {
-                foreach ($this->statusShipping as $key => $stt) {
+                foreach (ShopShippingStatus::getIdAll($order->store_id) as $key => $stt) {
                     if ($stt['id'] == $value) {
                         $newvalue = $stt['name'];
                     }
@@ -338,8 +328,9 @@ class OrderController extends Controller
                     }
                 }
             }
+
             if ($code == 'payment_status') {
-                foreach ($this->statusPayment as $key => $stt) {
+                foreach (ShopPaymentStatus::getIdAll($order->store_id) as $key => $stt) {
                     if ($stt['id'] == $value) {
                         $newvalue = $stt['name'];
                     }
@@ -376,12 +367,20 @@ class OrderController extends Controller
         $add_price  = $request->price;
         $add_qty    = $request->qty;
         $add_att    = $request->add_att;
-        $add_tax    = $request->tax;
+        $add_tax    = $request->tax['value'];
         $orderId    = $request->order_id;
+
         $item = [];
-
         $order = Order::find($orderId);
-
+        $other_price = 0;
+        if ($request->attribute) {
+            $attribute = json_decode($request->attribute);
+            $other_price = array_reduce((array)$attribute, function($carry, $item)
+            {   
+                $price = explode('__',$item);
+                return $carry + (int) $price[1];
+            });
+        }
         //where exits id and qty > 0
         if ($addIds && $add_qty) {
             $product = Product::find($addIds);
@@ -395,7 +394,7 @@ class OrderController extends Controller
                 'name' => $product_name,
                 'qty' => $add_qty,
                 'price' => $add_price,
-                'total_price' => $add_price * $add_qty,
+                'total_price' => $add_price * $add_qty + $other_price,
                 'sku' => $product->sku,
                 'tax' => $add_tax,
                 'attribute' => $request->attribute ?? null,
