@@ -4,6 +4,8 @@ export default {
     return: 'Trở về',
   },
   route: {
+    pageCreate:'Tạo Trang',
+    pageEdit:'Sửa Trang',
     bannerCreate:'Tạo ảnh bìa',
     bannerEdit:'Sửa ảnh bìa',
     webHook:'Webhook',

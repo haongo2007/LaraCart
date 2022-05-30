@@ -24,6 +24,8 @@ class BannerCollection extends JsonResource
             'type' => $this->type,
             'status' => $this->status,
             'store' => $this->store,
+            'html' => $this->html,
+            'sort' => $this->sort,
         ];
         return $res;
     }

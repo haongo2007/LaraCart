@@ -5,6 +5,7 @@
         <filter-system-banner
           :data-loading="loading"
           :data-query="listQuery"
+          :data-loading-button-create="loadingButtonCreate"
           @handleListenData="handleListenData"
           @handleListenCreateForm="CreateForm"
         />
@@ -82,8 +83,8 @@
       <el-table-column :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
-            @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" v-permission="['edit.banner']"/>
+            <el-button :loading="loadingButtonUpdate" type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
+            @click="UpdateForm(row)" v-permission="['edit.banner']"/>
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" v-permission="['delete.banner']"/>
           </el-button-group>
         </template>
@@ -91,7 +92,7 @@
 
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="paginationInit" />
-    <el-dialog :title="dialogStatus" :visible.sync="dialogFormVisible" :before-close="handleReset">
+    <el-dialog :title="dialogStatus" :visible.sync="dialogFormVisible" :before-close="handleReset" class="dialog-custom">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 75%; margin:0 auto;">
 
         <el-form-item :label="$t('table.title')" prop="title">
@@ -133,7 +134,20 @@
         </div>
 
         <el-form-item :label="$t('banner.html')">
-          <json-editor ref="jsonEditor" v-model="temp.html" />
+          <json-editor ref="jsonEditor" v-model="temp.html" type="html" />
+        </el-form-item>
+
+        <el-form-item :label="$t('table.sort')" prop="sort">
+          <el-input type="number" v-model.number="temp.sort" :placeholder="$t('table.sort')" :min="1"/>
+        </el-form-item>
+
+        <el-form-item :label="$t('table.status')">
+          <el-switch
+            v-model="temp.status"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+            active-value="1"
+            inactive-value="0"/>
         </el-form-item>
 
       </el-form>
@@ -179,14 +193,20 @@ import permission from '@/directive/permission'; // Permission directive (v-perm
 import BannerTypeResource from '@/api/banner-type';
 import Cookies from 'js-cookie';
 import JsonEditor from '@/components/JsonEditor';
+import BannerResource from '@/api/banner';
+import reloadRedirectToList from '@/utils';
+
+const bannerResource = new BannerResource();
 
 const dataForm = {
+    id:0,
     store_id:0,
     title:'',
     url:'',
+    sort:1,
     type:'',
     target:'',
-    status:'',
+    status:'0',
     image:'',
     html:'',
 }
@@ -215,6 +235,8 @@ export default {
       listBannerType: [],
       componentStorage: '',
       dialogStorageVisible: false,
+      loadingButtonCreate:false,
+      loadingButtonUpdate:false,
     }
   },
   computed: {
@@ -226,6 +248,7 @@ export default {
   methods:{
     handleConfirm(done){
       if (this.temp.store_id > 0) {
+        this.CreateForm();
         done();
       }
     },
@@ -265,28 +288,6 @@ export default {
     resetTemp() {
       this.temp = Object.assign({},dataForm);
     },
-    async CreateForm(){
-      let store_ck = Cookies.get('store');
-      if (store_ck) {
-        store_ck = JSON.parse(store_ck);
-      }
-      if (store_ck && store_ck.length == 1) {
-        this.temp.store_id = store_ck[0];
-      }else{
-        if (this.temp.store_id == 0) {
-          this.confirmStoreDialog = true;
-          return false;
-        }
-      }
-      // reset form add;
-      let {data} = await bannerTypeResource.list({store_id:this.temp.store_id});
-      this.listBannerType = data;
-      this.dialogStatus = 'Create';
-      this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate();
-      });
-    },
     handleVisibleStorage(){
       this.$store.commit('fm/setDisks', 'banner');
       this.componentStorage = 'FileManager';
@@ -306,6 +307,99 @@ export default {
     resetImageUpload(){
       this.temp.image = '';
       this.componentStorage = '';
+    },
+    async CreateForm(){
+      this.loadingButtonCreate = true;
+      let store_ck = Cookies.get('store');
+      if (store_ck) {
+        store_ck = JSON.parse(store_ck);
+      }
+      if (store_ck && store_ck.length == 1) {
+        this.temp.store_id = store_ck[0];
+      }else{
+        if (this.temp.store_id == 0) {
+          this.confirmStoreDialog = true;
+          return false;
+        }
+      }
+      // reset form add;
+      let {data} = await bannerTypeResource.list({store_id:this.temp.store_id});
+      this.loadingButtonCreate = false;
+      this.listBannerType = data;
+      this.dialogStatus = 'Create';
+      this.dialogFormVisible = true;
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate();
+      });
+    },
+    createData(){
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const loading = this.$loading({
+            target: '.el-dialog',
+          });
+          bannerResource.store(this.temp).then((res) => {
+            if (res) {
+              loading.close();
+              this.dialogFormVisible = false;
+              this.$message({
+                type: 'success',
+                message: 'Create successfully',
+              });
+              reloadRedirectToList('BannerList');
+              this.handleReset();
+            } else {
+              this.$message({
+                type: 'error',
+                message: 'Create failed',
+              });
+              loading.close();
+            }
+          }).catch(err => {
+            loading.close();
+          });
+        }
+      });
+    },
+    async UpdateForm(row){
+      this.loadingButtonUpdate = true;
+      this.temp = Object.assign(this.temp,row);
+      this.temp.status = String(this.temp.status);
+      this.temp.store_id = row.store.id;
+      let {data} = await bannerTypeResource.list({store_id:this.temp.store_id});
+      this.listBannerType = data;
+      this.dialogStatus = 'Update';
+      this.dialogFormVisible = true;
+      this.loadingButtonUpdate = false;
+    },
+    updateData(){
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const loading = this.$loading({
+            target: '.el-dialog__body',
+          });
+          bannerResource.update(this.temp.id,this.temp).then((res) => {
+            if (res) {
+              loading.close();
+              this.dialogFormVisible = false;
+              this.$message({
+                type: 'success',
+                message: 'Update successfully',
+              });
+              reloadRedirectToList('BannerList');
+              this.handleReset();
+            } else {
+              this.$message({
+                type: 'error',
+                message: 'Update failed',
+              });
+              loading.close();
+            }
+          }).catch(err => {
+            loading.close();
+          });
+        }
+      });
     },
   }
 };

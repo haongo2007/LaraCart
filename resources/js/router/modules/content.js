@@ -34,6 +34,28 @@ const contentRoutes = {
       },
     },
     {
+      path: 'page/create',
+      component: () => import('@/views/content/page/Create'),
+      name: 'PageCreate',
+      meta: {
+        title: 'pageCreate',
+        permissions: ['create.page'],
+        parent: 'PageList',
+      },
+      hidden: true,
+    },
+    {
+      path: 'page/edit/:id(\\d+)',
+      component: () => import('@/views/content/page/Edit'),
+      name: 'PageEdit',
+      meta: {
+        title: 'pageEdit',
+        permissions: ['edit.page'],
+        parent: 'PageList',
+      },
+      hidden: true,
+    },
+    {
       path: '/blog-news',
       component: Layout,
       component: () => import('@/views/content/blog/List'),

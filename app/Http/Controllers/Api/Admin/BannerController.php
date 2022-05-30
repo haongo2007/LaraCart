@@ -6,6 +6,9 @@ use Validator;
 use App\Models\Admin\Banner;
 use App\Models\Front\ShopBannerType;
 use App\Http\Resources\BannerCollection;
+use Illuminate\Http\Response;
+use Illuminate\Http\Request;
+use App\Helper\JsonResponse;
 
 class BannerController extends Controller
 {
@@ -29,106 +32,61 @@ class BannerController extends Controller
         return BannerCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-/**
- * Form create new item in admin
- * @return [type] [description]
- */
-    public function create()
-    {
-        $data = [
-            'title' => trans('banner.admin.add_new_title'),
-            'title_description' => trans('banner.admin.add_new_des'),
-            'icon' => 'fa fa-plus',
-            'banner' => [],
-            'arrTarget' => $this->arrTarget,
-            'dataType' => $this->dataType,
-            'url_action' => bc_route_admin('admin_banner.create'),
-        ];
-        return view($this->templatePathAdmin.'Banner.add_edit')
-            ->with($data);
-    }
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+     * Post create new item in admin
+     * @return [type] [description]
+    */
+    public function store(Request $request)
     {
-        $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $data = $request->all();
+        $validator = Validator::make($data, [
             'sort' => 'numeric|min:0',
-            'email' => 'email|nullable',
+            'title' => 'required',
+            'store_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         $dataInsert = [
-            'image'    => $data['image'],
-            'url'      => $data['url'],
+            'image'    => $data['image'] ? $data['image'][0] : null,
+            'url'      => $data['url'] ?? null,
             'title'    => $data['title'],
-            'html'     => $data['html'],
+            'html'     => $data['html'] ?? null,
             'type'     => $data['type'] ?? 0,
             'target'   => $data['target'],
             'status'   => empty($data['status']) ? 0 : 1,
             'sort'     => (int) $data['sort'],
-            'store_id' => session('adminStoreId'),
+            'store_id' => $data['store_id'],
         ];
-        AdminBanner::createBannerAdmin($dataInsert);
-        return redirect()->route('admin_banner.index')->with('success', trans('banner.admin.create_success'));
-
-    }
-
-/**
- * Form edit
- */
-    public function edit($id)
-    {
-        $banner = AdminBanner::getBannerAdmin($id);
-
-        if (!$banner) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
-        }
-
-        $data = [
-            'title'             => trans('banner.admin.edit'),
-            'arrTarget'         => $this->arrTarget,
-            'dataType'          => $this->dataType,
-            'banner'            => $banner,
-            'url_action'        => bc_route_admin('admin_banner.edit', ['id' => $banner['id']]),
-        ];
-        return view($this->templatePathAdmin.'Banner.add_edit')
-            ->with($data);
+        Banner::createBannerAdmin($dataInsert);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
     /*
      * update status
      */
-    public function postEdit($id)
+    public function update(Request $request,$id)
     {
-        $banner = AdminBanner::getBannerAdmin($id);
+        $banner = Banner::getBannerAdmin($id);
         if (!$banner) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
 
-        $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $data = $request->all();
+        $validator = Validator::make($data, [
             'sort' => 'numeric|min:0',
-            'email' => 'email|nullable',
+            'title' => 'required',
+            'store_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         //Edit
         $dataUpdate = [
-            'image'    => $data['image'],
+            'image'    => is_array($data['image']) ? $data['image'][0] : $data['image'],
             'url'      => $data['url'],
             'title'    => $data['title'],
             'html'     => $data['html'],
@@ -136,12 +94,11 @@ class BannerController extends Controller
             'target'   => $data['target'],
             'status'   => empty($data['status']) ? 0 : 1,
             'sort'     => (int) $data['sort'],
-            'store_id' => session('adminStoreId'),
+            'store_id' => $data['store_id'],
 
         ];
         $banner->update($dataUpdate);
-
-        return redirect()->route('admin_banner.index')->with('success', trans('banner.admin.edit_success'));
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
 
     }
 
@@ -149,33 +106,11 @@ class BannerController extends Controller
     Delete list item
     Need mothod destroy to boot deleting in model
     */
-    public function deleteList()
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            $arrDontPermission = [];
-            foreach ($arrID as $key => $id) {
-                if(!$this->checkPermisisonItem($id)) {
-                    $arrDontPermission[] = $id;
-                }
-            }
-            if (count($arrDontPermission)) {
-                return response()->json(['error' => 1, 'msg' => trans('admin.remove_dont_permisison') . ': ' . json_encode($arrDontPermission)]);
-            }
-
-            AdminBanner::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
-    }
-
-    /**
-     * Check permisison item
-     */
-    public function checkPermisisonItem($id) {
-        return AdminBanner::getBannerAdmin($id);
+        $arrID = explode(',', $id);
+        Banner::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 }

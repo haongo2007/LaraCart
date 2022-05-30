@@ -7,8 +7,8 @@
             v-on:click="selectDirectory(directory.path)"
             class="tree-node__content">
              <div class="tree-item" v-if="directory.props.hasSubdirectories" v-on:click.stop="showSubdirectories(directory.path,directory.props.showSubdirectories)">
-                <i v-bind:class="[arrowState(index) ? 'el-icon-arrow-down' : 'el-icon-arrow-right']"></i>
                 <span class="tree-node__label"><i class="el-icon-folder"></i> {{ directory.basename }}</span>
+                <i v-bind:class="[arrowState(index) ? 'el-icon-arrow-down' : 'el-icon-arrow-right']"></i>
              </div>
              <div class="tree-item" v-else>
                 <span class="tree-node__label"><i class="el-icon-folder"></i> {{ directory.basename }}</span>

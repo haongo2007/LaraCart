@@ -9,7 +9,7 @@ require('script-loader!jsonlint');
 import CodeMirror from 'codemirror';
 import 'codemirror/addon/lint/lint.css';
 import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/rubyblue.css';
+import 'codemirror/theme/monokai.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/lint/lint';
 import 'codemirror/addon/lint/json-lint';
@@ -17,7 +17,7 @@ import 'codemirror/addon/lint/json-lint';
 export default {
   name: 'JsonEditor',
   /* eslint-disable vue/require-prop-types */
-  props: ['value'],
+  props: ['value','type'],
   data() {
     return {
       jsonEditor: false,
@@ -27,20 +27,24 @@ export default {
     value(value) {
       const editorValue = this.jsonEditor.getValue();
       if (value !== editorValue) {
-        this.jsonEditor.setValue(JSON.stringify(this.value, null, 2));
+        this.jsonEditor.setValue(this.value);
       }
     },
   },
   mounted() {
-    this.jsonEditor = CodeMirror.fromTextArea(this.$refs.textarea, {
+    let conf = {
       lineNumbers: true,
-      mode: 'application/json',
       gutters: ['CodeMirror-lint-markers'],
-      theme: 'rubyblue',
+      theme: 'monokai',
       lint: true,
-    });
-
-    this.jsonEditor.setValue(JSON.stringify(this.value, null, 2));
+    };
+    if (this.type == 'html') {
+      conf['mode'] = 'htmlmixed';
+    }else{
+      conf['mode'] = 'application/json';
+    }
+    this.jsonEditor = CodeMirror.fromTextArea(this.$refs.textarea, conf);
+    this.jsonEditor.setValue(this.value);
     this.jsonEditor.on('change', cm => {
       this.$emit('changed', cm.getValue());
       this.$emit('input', cm.getValue());

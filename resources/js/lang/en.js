@@ -1,5 +1,7 @@
 export default {
   route: {
+    pageCreate:'Create Page',
+    pageEdit:'Edit Page',
     bannerCreate:'Create Banner',
     bannerEdit:'Edit Banner',
     webHook:'Webhook',

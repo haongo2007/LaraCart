@@ -10,7 +10,7 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-button-group>
-              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
+              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" :loading="dataLoadingButtonCreate"
               @click="handleCreate()" v-permission="['create.banner']"/>
               <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
               @click="handerDeleteAll" v-permission="['delete.banner']"/>
@@ -60,6 +60,10 @@ export default {
       type: Object,
       default: false,
     },
+    dataLoadingButtonCreate:{
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     return {
@@ -78,6 +82,11 @@ export default {
     'dataQuery.page': {
       handler(newValue, oldValue) {
         this.getList(newValue);
+      },
+    },
+    'dataLoadingButtonCreate': {
+      handler(newValue, oldValue) {
+        this.loadingCreate = newValue;
       },
     },
   },
@@ -117,7 +126,7 @@ export default {
           var id = row.id;
         }
         var that = this;
-        userResource.destroy(id).then((res) => {
+        bannerResource.destroy(id).then((res) => {
           if (res) {
             if (multiple) {
               row.forEach(function(v) {

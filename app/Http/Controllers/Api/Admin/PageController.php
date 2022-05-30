@@ -9,13 +9,6 @@ use Validator;
 
 class PageController extends Controller
 {
-    public $languages;
-
-    public function __construct()
-    {
-        $this->languages = ShopLanguage::getListActive();
-    }
-
     public function index()
     {
         $dataSearch = request()->all();
@@ -23,32 +16,12 @@ class PageController extends Controller
         return PageCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-    /*
-     * Form create new item in admin
-     * @return [type] [description]
-     */
-    public function create()
-    {
-        $page = [];
-        $data = [
-            'title'             => trans('page.admin.add_new_title'),
-            'subTitle'          => '',
-            'title_description' => trans('page.admin.add_new_des'),
-            'icon'              => 'fa fa-plus',
-            'languages'         => $this->languages,
-            'page'              => $page,
-            'url_action'        => bc_route_admin('admin_page.create'),
-        ];
-
-        return view($this->templatePathAdmin.'Page.add_edit')
-            ->with($data);
-    }
 
     /*
      * Post create new item in admin
      * @return [type] [description]
      */
-    public function postCreate()
+    public function store()
     {
 
         $data = request()->all();
@@ -80,7 +53,7 @@ class PageController extends Controller
         ];
         $page = AdminPage::createPageAdmin($dataInsert);
         $dataDes = [];
-        $languages = $this->languages;
+        $languages = ShopLanguage::getListActive($data['store_id']);
         foreach ($languages as $code => $value) {
             $dataDes[] = [
                 'page_id'     => $page->id,
@@ -97,28 +70,6 @@ class PageController extends Controller
 
     }
 
-    /*
-     * Form edit
-     */
-    public function edit($id)
-    {
-        $page = AdminPage::getPageAdmin($id);
-        if (!$page) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
-        }
-
-        $data = [
-            'title' => trans('page.admin.edit'),
-            'subTitle' => '',
-            'title_description' => '',
-            'icon' => 'fa fa-edit',
-            'languages' => $this->languages,
-            'page' => $page,
-            'url_action' => bc_route_admin('admin_page.edit', ['id' => $page['id']]),
-        ];
-        return view($this->templatePathAdmin.'Page.add_edit')
-            ->with($data);
-    }
 
     /*
      * update status

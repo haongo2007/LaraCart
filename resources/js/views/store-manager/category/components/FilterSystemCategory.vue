@@ -57,6 +57,7 @@ import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
 import CategoryResource from '@/api/category';
 import permission from '@/directive/permission'; // Permission directive (v-permission)
+import reloadRedirectToList from '@/utils';
 
 const categoryResource = new CategoryResource();
 export default {
@@ -195,15 +196,7 @@ export default {
             message: 'Delete successfully',
           });
           if (index == -1) {
-            const view = this.$router.resolve({ name: 'CategoryList' }).route;
-            this.$store.dispatch('tagsView/delCachedView', view).then(() => {
-              const { fullPath } = view;
-              this.$nextTick(() => {
-                this.$router.replace({
-                  path: '/redirect' + fullPath,
-                });
-              });
-            });
+            reloadRedirectToList('CategoryList');
           } else {
             this.list.splice(index, 1);
             const total = this.total - Array(row).length;
