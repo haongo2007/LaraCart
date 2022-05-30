@@ -2,14 +2,14 @@
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
       <h3 class="title">
-        {{ $t('login.title') }}
+        {{ $t('form.title') }}
       </h3>
       <lang-select class="set-language" />
       <el-form-item prop="email">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input v-model="loginForm.email" name="email" type="text" auto-complete="on" :placeholder="$t('login.email')" />
+        <el-input v-model="loginForm.email" name="email" type="text" auto-complete="on" :placeholder="$t('form.email')" />
       </el-form-item>
       <el-form-item prop="password">
         <span class="svg-container">
@@ -20,7 +20,7 @@
           :type="pwdType"
           name="password"
           auto-complete="on"
-          placeholder="password"
+          :placeholder="$t('form.password')"
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
@@ -29,13 +29,9 @@
       </el-form-item>
       <el-form-item>
         <el-button :loading="loading" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
-          Sign in
+          {{ $t('form.title') }}
         </el-button>
       </el-form-item>
-      <div class="tips">
-        <span style="margin-right:20px;">Email: admin@laracart.dev</span>
-        <span>Password: 123456</span>
-      </div>
     </el-form>
   </div>
 </template>

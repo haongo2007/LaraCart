@@ -9,13 +9,6 @@ use Validator;
 
 class BlogsController extends Controller
 {
-    public $languages;
-
-    public function __construct()
-    {
-        $this->languages = ShopLanguage::getListActive();
-    }
-
     public function index()
     {
         $dataSearch = request()->all();
@@ -23,32 +16,11 @@ class BlogsController extends Controller
         return BlogsCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-    /**
-     * Form create new item in admin
-     * @return [type] [description]
-     */
-    public function create()
-    {
-        $news = [];
-        $data = [
-            'title'             => trans('news.admin.add_new_title'),
-            'subTitle'          => '',
-            'title_description' => trans('news.admin.add_new_des'),
-            'icon'              => 'fa fa-plus',
-            'languages'         => $this->languages,
-            'news'              => $news,
-            'url_action'        => bc_route_admin('admin_news.create'),
-        ];
-
-        return view($this->templatePathAdmin.'News.add_edit')
-            ->with($data);
-    }
-
 /**
  * Post create new item in admin
  * @return [type] [description]
  */
-    public function postCreate()
+    public function store()
     {
 
         $data = request()->all();
@@ -103,32 +75,9 @@ class BlogsController extends Controller
     }
 
     /**
-     * Form edit
-     */
-    public function edit($id)
-    {
-
-        $news = AdminNews::getNewsAdmin($id);
-        if (!$news) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
-        }
-        $data = [
-            'title'             => trans('news.admin.edit'),
-            'subTitle'          => '',
-            'title_description' => '',
-            'icon'              => 'fa fa-edit',
-            'languages'         => $this->languages,
-            'news'              => $news,
-            'url_action'        => bc_route_admin('admin_news.edit', ['id' => $news['id']]),
-        ];
-        return view($this->templatePathAdmin.'News.add_edit')
-            ->with($data);
-    }
-
-    /**
      * update status
      */
-    public function postEdit($id)
+    public function update($id)
     {
         $news = AdminNews::getNewsAdmin($id);
         if (!$news) {

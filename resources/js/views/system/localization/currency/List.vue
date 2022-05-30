@@ -1,13 +1,7 @@
 <template>
   <div class="app-container">
-    <div class="filter-container">
-      <right-panel :button-top="'10%'" :z-index="2000" :max-width="'30%'" :i-con="'funnel'">
-        <filter-system-currency
-          :data-loading="loading"
-          :data-query="listQuery"
-          @handleListenData="handleListenData"
-        />
-      </right-panel>
+    <div class="filter-container">  
+        <el-button type="primary" icon="el-icon-plus" class="filter-item" @click="createForm()" />
     </div>
     <el-table
       v-loading="loading"
@@ -104,18 +98,16 @@
 <script>
 import { statusFilter } from '@/filters';
 import { parseTime } from '@/utils';
-import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
-import RightPanel from '@/components/RightPanel';
-import FilterSystemCurrency from './components/FilterSystemCurrency';
+import Pagination from '@/components/Pagination'; 
 import EventBus from '@/components/FileManager/eventBus';
-import StoreResource from '@/api/store';
 import { checkOnlyStore } from '@/utils';
+import CurrencyResource from '@/api/currency';
 
-const storeResource = new StoreResource();
+const currencyResource = new CurrencyResource();
 
 export default {
   name: 'CurrencyList',
-  components: { Pagination, RightPanel, FilterSystemCurrency },
+  components: { Pagination },
   data() {
     return {
       list: [],
@@ -133,64 +125,24 @@ export default {
   computed: {
     checkOnlyStore
   },
+  created() {
+    this.getList();
+  },
   methods: {
-    handleChange(id, val, key){
-      const params = {};
-      params[key] = val;
-      if (val == 0) {
-        this.$confirm('this action will put your app into maintenance mode, are you sure ?', 'Warning', {
-          confirmButtonText: 'OK',
-          cancelButtonText: 'Cancel',
-          type: 'warning',
-        }).then(() => {
-          this.updateData(id, params);
-        }).catch(err => {
-          const row = this.list.findIndex((item) => item.id == id);
-          this.list[row].active = 1;
-        });
-      } else {
-        this.updateData(id, params);
-      }
-    },
-    updateData(id, params){
-      storeResource.update(id, params).then((res) => {
-        if (res) {
-          this.$message({
-            type: 'success',
-            message: 'Update successfully',
-          });
-        } else {
-          this.$message({
-            type: 'error',
-            message: 'Update failed',
-          });
-        }
-      }).catch(err => {
-        console.log(err);
-      });
-    },
-    handleListenData(data){
-      if (data.hasOwnProperty('list')) {
-        this.list = data.list;
-      }
-      if (data.hasOwnProperty('loading')) {
-        this.loading = data.loading;
-      }
-      if (data.hasOwnProperty('total')) {
-        this.total = data.total;
-      }
-      if (data.hasOwnProperty('listQuery')) {
-        this.listQuery = data.listQuery;
-      }
+    async getList() {
+      const data = await currencyResource.list(this.dataQuery);
+      this.list = data.data;
+      this.total = data.meta.total;
+      this.loading = false;
     },
     paginationInit(data){
       this.loading = true;
       this.listQuery.page = data.page;
       this.listQuery.limit = data.limit;
     },
-    handleDeleting(row){
-      EventBus.$emit('handleDeleting', row);
-    },
+    createForm(){
+
+    }
   },
 };
 </script>

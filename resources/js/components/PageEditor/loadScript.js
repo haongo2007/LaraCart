@@ -1,4 +1,4 @@
-const scriptUrl = '/js/embed.js';
+const scriptUrl = '/js/plugins/embed.js';
 const callbacks = [];
 let loaded = false;
 

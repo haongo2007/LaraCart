@@ -15,86 +15,86 @@
         align="center"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="50">
+      <el-table-column align="center" :label="$t('table.id')" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       
-      <el-table-column align="center" label="Store" max-width="150">
+      <el-table-column align="center" :label="$t('table.store')" max-width="150">
         <template slot-scope="scope">
             <el-popover
               placement="right-end"
               width="200"
               trigger="click">
               <el-table :data="scope.row.store">
-                <el-table-column label="Name" >
+                <el-table-column :label="$t('table.name')" >
                   <template slot-scope="scope">
                     {{ scope.row.descriptions[0].title }}
                   </template>
                 </el-table-column>
               </el-table>
-              <el-button slot="reference">Click to view</el-button>
+              <el-button slot="reference">{{ $t('table.detail') }}</el-button>
             </el-popover>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Avatar" min-width="80">
+      <el-table-column align="center" :label="$t('table.avatar')" min-width="80">
         <template slot-scope="scope">
           <el-avatar icon="el-icon-user-solid" :src="scope.row.avatar"></el-avatar>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Name">
+      <el-table-column align="center" :label="$t('table.name')">
         <template slot-scope="scope">
           <span>{{ scope.row.fullname }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Phone">
+      <el-table-column align="center" :label="$t('table.phone')">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Email">
+      <el-table-column align="center" :label="$t('table.email')">
         <template slot-scope="scope">
           <span>{{ scope.row.email }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Role" width="150">
+      <el-table-column align="center" :label="$t('table.role')" width="150">
         <template slot-scope="scope">
           <el-popover
             placement="left-end"
             width="200"
             trigger="click">
             <el-table :data="scope.row.roles">
-              <el-table-column label="Name" >
+              <el-table-column :label="$t('table.name')" >
                 <template slot-scope="scope">
                   <div v-html="scope.row.name"></div>
                 </template>
               </el-table-column>
             </el-table>
-            <el-button slot="reference">Click to view</el-button>
+            <el-button slot="reference">{{ $t('table.detail') }}</el-button>
           </el-popover>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Permissions" width="150">
+      <el-table-column align="center" :label="$t('table.permission')" width="150">
         <template slot-scope="scope">
           <el-popover
             placement="left-end"
             width="200"
             trigger="click">
             <el-table :data="scope.row.permissions">
-              <el-table-column label="Name" >
+              <el-table-column :label="$t('table.name')" >
                 <template slot-scope="scope">
                   <div v-html="scope.row.name"></div>
                 </template>
               </el-table-column>
             </el-table>
-            <el-button slot="reference">Click to view</el-button>
+            <el-button slot="reference">{{ $t('table.detail') }}</el-button>
           </el-popover>
         </template>
       </el-table-column>

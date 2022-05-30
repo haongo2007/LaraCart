@@ -1,24 +1,35 @@
 <template>
   <div class="app-container">
     <el-row class="el-main-form" :gutter="20" style="margin:0px;">
-      <el-col :span="12">
+      <el-col :span="8">
         <el-skeleton :rows="6" animated :loading="loading" />
-        <el-form v-show="!loading" ref="dataForm" :model="dataTemp"  class="form-container" label-width="200px">
+        <el-form v-show="!loading" ref="dataForm" :model="dataTemp"  class="form-container" label-width="100px">
 
-          <el-form-item :label="$t('table.name')" prop="fullname">
+          <el-form-item :label="$t('form.name')" prop="name">
             <el-input
               v-model="dataTemp.name"
-              placeholder="Please input"
+              :placeholder="$t('form.name')"
               clearable
             />
           </el-form-item>
 
+          <el-form-item :label="$t('form.price_tax')" prop="price">
+            <el-input
+              v-model.number="dataTemp.price"
+              :placeholder="$t('form.price_tax')"
+              clearable
+              type="number"
+            />
+          </el-form-item>
+
           <el-button class="pull-right" type="success" icon="el-icon-check" >
-            Done
+            {{ $t('form.done') }}
           </el-button>
         </el-form>
       </el-col>
-      <el-col :span="12">
+      <el-col :span="2">
+      </el-col>
+      <el-col :span="12" :offset="2">
         <el-table
           v-loading="loading"
           :data="list"
@@ -30,7 +41,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="Store" min-width="150" v-if="checkOnlyStore">
+          <el-table-column :label="$t('table.store')" min-width="150" v-if="checkOnlyStore">
             <template slot-scope="scope">
               <el-tag type="success">
                 <i class="el-icon-s-shop" />

@@ -1,5 +1,8 @@
 <template>
   <div class="app-container">
+     <div class="filter-container">  
+        <el-button type="danger" icon="el-icon-delete" class="filter-item" @click="handlerDeleteAll" :disabled="multiSelectRow.length == 0 ? true : false" />
+    </div>
     <el-table
       v-loading="loading"
       :data="list"
@@ -48,7 +51,7 @@
             width="400"
             trigger="hover">
             <div>{{ scope.row.user_agent }}</div>
-            <el-button slot="reference">Detail</el-button>
+            <el-button slot="reference">{{ $t('table.detail') }}</el-button>
           </el-popover>
         </template>
       </el-table-column>
@@ -60,7 +63,7 @@
             width="400"
             trigger="hover">
             <div>{{ JSON.parse(scope.row.input) }}</div>
-            <el-button slot="reference">Detail</el-button>
+            <el-button slot="reference">{{ $t('table.detail') }}</el-button>
           </el-popover>
         </template>
       </el-table-column>
@@ -86,6 +89,7 @@
 import { parseTime } from '@/utils';
 import Pagination from '@/components/Pagination';
 import OperationLogsResource from '@/api/operation-logs';
+import reloadRedirectToList from '@/utils';
 
 const operationLogsResource = new OperationLogsResource();
 
@@ -102,28 +106,63 @@ export default {
         limit: 20,
         sort: 'id__desc',
       },
+      multiSelectRow: [],
     };
   },
   created() {
     this.getList();
   },
   methods: {
+    handleSelectionAllChange(data){
+      this.multiSelectRow = data;
+    },
     async getList() {
       const data = await operationLogsResource.list(this.listQuery);
       this.list = data.data;
       this.total = data.meta.total;
       this.loading = false;
     },
-    handleSelectionAllChange(val){
-
-    },
     paginationInit(data){
       this.loading = true;
       this.getList(this.listQuery);
     },
-    handleDeleting(row){
-
-    }
+    handlerDeleteAll(){
+      this.handleDeleting(this.multiSelectRow, true);
+    },
+    handleDeleting(row, multiple = false) {
+      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      }).then(() => {
+        if (multiple) {
+          var id = [];
+          row.map((item) => id.push(item.id));
+        } else {
+          var id = row.id;
+        }
+        var that = this;
+        operationLogsResource.destroy(id).then((res) => {
+          if (res) {
+            if(multiple){
+              reloadRedirectToList('OperationLogsList');
+            }else{
+              const index = that.list.indexOf(row);
+              that.list.splice(index, 1);
+            }
+            this.$message({
+              type: 'success',
+              message: 'Delete successfully',
+            });
+          }
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Delete canceled',
+        });
+      });
+    },
   },
 };
 </script>

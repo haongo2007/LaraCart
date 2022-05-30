@@ -17,13 +17,13 @@
         align="center"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="50">
+      <el-table-column align="center" :label="$t('table.id')" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       
-      <el-table-column label="Store" min-width="150">
+      <el-table-column :label="$t('table.store')" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -32,7 +32,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Image" min-width="300">
+      <el-table-column align="center" :label="$t('table.image')" min-width="300">
         <template slot-scope="scope">
           <el-image :src="scope.row.image+'&w=300'" fit="cover" style="max-height: 150px;">
             <div slot="error" class="image-slot">
@@ -42,31 +42,31 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Title" min-width="150">
+      <el-table-column align="center" :label="$t('table.title')" min-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Url" min-width="150">
+      <el-table-column align="center" :label="$t('table.url')" min-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.url }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Target">
+      <el-table-column align="center" :label="$t('table.target')">
         <template slot-scope="scope">
           <span>{{ scope.row.target }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Clicked">
+      <el-table-column align="center" :label="$t('table.clicked')">
         <template slot-scope="scope">
           <span>{{ scope.row.click }}</span>
         </template>
       </el-table-column>
       
-      <el-table-column label="Type"  prop="type" min-width="100">
+      <el-table-column :label="$t('table.type')"  prop="type" min-width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.type }}</span>
         </template>
@@ -92,18 +92,18 @@
 
     </el-table>
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="paginationInit" />
-    <el-dialog :title="dialogStatus" :visible.sync="dialogFormVisible" :before-close="handleReset" class="dialog-custom">
+    <el-dialog :title="$t('form.'+dialogStatus)" :visible.sync="dialogFormVisible" :before-close="handleReset" class="dialog-custom">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="80px" style="width: 75%; margin:0 auto;">
 
-        <el-form-item :label="$t('table.title')" prop="title">
+        <el-form-item :label="$t('form.title')" prop="title">
           <el-input v-model="temp.title" />
         </el-form-item>
 
-        <el-form-item :label="$t('table.url')" prop="url">
+        <el-form-item :label="$t('form.url')" prop="url">
           <el-input v-model="temp.url" />
         </el-form-item>
 
-        <el-form-item :label="$t('table.type')" prop="type">
+        <el-form-item :label="$t('form.type')" prop="type">
           <el-select v-model="temp.type" filterable placeholder="Select">
             <el-option
               v-for="item in listBannerType"
@@ -114,14 +114,14 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="$t('table.target')" prop="target">
+        <el-form-item :label="$t('form.target')" prop="target">
           <el-select v-model="temp.target" filterable placeholder="Select">
             <el-option label="_self" value="_self"/>
             <el-option label="_blank" value="_blank"/>
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="$t('table.image')">
+        <el-form-item :label="$t('form.image')">
           <el-button size="small" type="success" @click="handleVisibleStorage()">Pick Image</el-button>
         </el-form-item>
         <div class="image-uploading">
@@ -133,15 +133,15 @@
           <i v-if="temp.image" class="el-icon-close" @click="resetImageUpload()" />
         </div>
 
-        <el-form-item :label="$t('banner.html')">
+        <el-form-item :label="$t('form.html')">
           <json-editor ref="jsonEditor" v-model="temp.html" type="html" />
         </el-form-item>
 
-        <el-form-item :label="$t('table.sort')" prop="sort">
-          <el-input type="number" v-model.number="temp.sort" :placeholder="$t('table.sort')" :min="1"/>
+        <el-form-item :label="$t('form.sort')" prop="sort">
+          <el-input type="number" v-model.number="temp.sort" :placeholder="$t('form.sort')" :min="1"/>
         </el-form-item>
 
-        <el-form-item :label="$t('table.status')">
+        <el-form-item :label="$t('form.status')">
           <el-switch
             v-model="temp.status"
             active-color="#13ce66"
@@ -153,10 +153,10 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
-          {{ $t('table.cancel') }}
+          {{ $t('form.cancel') }}
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='Create'?createData():updateData()">
-          {{ $t('table.confirm') }}
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+          {{ $t('form.confirm') }}
         </el-button>
       </div>
     </el-dialog>
@@ -326,7 +326,7 @@ export default {
       let {data} = await bannerTypeResource.list({store_id:this.temp.store_id});
       this.loadingButtonCreate = false;
       this.listBannerType = data;
-      this.dialogStatus = 'Create';
+      this.dialogStatus = 'create';
       this.dialogFormVisible = true;
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate();
@@ -368,7 +368,7 @@ export default {
       this.temp.store_id = row.store.id;
       let {data} = await bannerTypeResource.list({store_id:this.temp.store_id});
       this.listBannerType = data;
-      this.dialogStatus = 'Update';
+      this.dialogStatus = 'update';
       this.dialogFormVisible = true;
       this.loadingButtonUpdate = false;
     },

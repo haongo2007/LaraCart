@@ -15,40 +15,40 @@
         align="center"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="50">
+      <el-table-column align="center" :label="$t('table.id')" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column  label="Slug" max-width="150">
+      <el-table-column  :label="$t('table.slug')" max-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.slug }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Name" max-width="150">
+      <el-table-column :label="$t('table.name')" max-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Permissions" min-width="150">
+      <el-table-column align="center" :label="$t('table.permission')" min-width="150">
         <template slot-scope="scope">
           <el-popover
             placement="left-end"
             width="400"
             trigger="click">
             <el-table :data="scope.row.permissions">
-              <el-table-column width="50" property="id" label="id"></el-table-column>
-              <el-table-column property="name" label="name"></el-table-column>
+              <el-table-column width="50" property="id"  :label="$t('table.id')"></el-table-column>
+              <el-table-column property="name" :label="$t('table.name')" ></el-table-column>
             </el-table>
             <el-button slot="reference">Click to view permissions</el-button>
           </el-popover>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Created at" max-width="150">
+      <el-table-column align="center" :label="$t('table.created_at')" max-width="150">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>

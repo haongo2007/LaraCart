@@ -15,13 +15,13 @@
         align="center"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="50">
+      <el-table-column align="center" :label="$t('table.id')" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       
-      <el-table-column label="Store" min-width="100">
+      <el-table-column :label="$t('table.store')" min-width="100">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -30,7 +30,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Image" min-width="300">
+      <el-table-column align="center" :label="$t('table.image')" min-width="300">
         <template slot-scope="scope">
           <el-image :src="scope.row.image">
             <div slot="error" class="image-slot">
@@ -40,13 +40,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Alias">
+      <el-table-column align="center" :label="$t('table.alias')">
         <template slot-scope="scope">
           <span>{{ scope.row.alias }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Sort">
+      <el-table-column align="center" :label="$t('table.sort')">
         <template slot-scope="scope">
           <span>{{ scope.row.sort }}</span>
         </template>

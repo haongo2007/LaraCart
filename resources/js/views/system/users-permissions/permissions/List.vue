@@ -15,25 +15,25 @@
         align="center"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="50">
+      <el-table-column align="center" :label="$t('table.id')" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Slug" max-width="150">
+      <el-table-column :label="$t('table.slug')" max-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.slug }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Name" max-width="150">
+      <el-table-column :label="$t('table.name')" max-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="HTTP path" max-width="150">
+      <el-table-column :label="$t('table.http_path')" max-width="150">
         <template slot-scope="scope">
           <el-popover
             placement="left-end"
@@ -51,7 +51,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Created at" max-width="150">
+      <el-table-column align="center" :label="$t('table.created_at')" max-width="150">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>

@@ -352,5 +352,8 @@ export default {
   },
   banner:{
     'html':'HTML'
+  },
+  form:{
+    'price_tax':'Tax price',
   }
 };

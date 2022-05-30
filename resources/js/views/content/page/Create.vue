@@ -7,7 +7,7 @@
         <el-button type="success" v-on:click="exportHtml"><svg-icon icon-class="excel" /></el-button>
       </el-button-group>
     </div>
-    <el-col :span="24" style="height: 75vh;">
+    <el-col :span="24" style="height: calc(100vh - 200px);">
       <EmailEditor
         ref="emailEditor"
         v-on:load="editorLoaded"
@@ -23,7 +23,7 @@ const defaultForm = {
 };
 
 import EmailEditor from '@/components/PageEditor';
-import sample from '@/components/PageEditor/src/data/sample.json';
+import sample from '@/components/PageEditor/sample.json';
 
 export default {
   name: 'PageCreate',

@@ -44,22 +44,22 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('phone')" min-width="100px" align="center" prop="phone">
+      <el-table-column :label="$t('table.phone')" min-width="100px" align="center" prop="phone">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('email')" min-width="120px" align="center" prop="email">
+      <el-table-column :label="$t('table.email')" min-width="120px" align="center" prop="email">
         <template slot-scope="scope">
           <span>{{ scope.row.email }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('address')" min-width="150px" align="center" prop="address">
+      <el-table-column :label="$t('table.address')" min-width="150px" align="center" prop="address">
         <template slot-scope="scope">
           <span>{{ scope.row.address }}</span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('currency')" min-width="100px" align="center" prop="currency">
+      <el-table-column :label="$t('table.currency')" min-width="100px" align="center" prop="currency">
         <template slot-scope="scope">
           <span>{{ scope.row.currency }}</span>
         </template>
