@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'newCustomer'           => 'Khách hàng mới',
+    'newOrder'              => 'Đơn hàng mới',
+    'revenue'               => 'Doanh thu',
+    'newProduct'            => 'Sản phẩm mới',
     'home'                  => 'Trang chủ',
     'welcome_dasdboard'     => 'Chào mừng đến trang quản trị!',
     'online'                => 'Online',

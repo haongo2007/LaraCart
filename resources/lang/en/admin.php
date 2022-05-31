@@ -1,6 +1,10 @@
 <?php
 
 return [
+      'newCustomer'           => 'New Customers',
+      'newOrder'              => 'New Orders',
+      'revenue'               => 'Revenue',
+      'newProduct'            => 'New Products',
       'home'                  => 'Home',
       'welcome_dasdboard'     => 'Welcome to admin system!',
       'online'                => 'Online',

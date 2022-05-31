@@ -7,7 +7,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            New Customers
+            {{ $t('dashboard.newCustomer') }}
           </div>
           <count-to :start-val="0" :end-val="panelData.newCustomers" :duration="2600" class="card-panel-num" />
         </div>
@@ -20,7 +20,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Product
+            {{ $t('dashboard.newProduct') }}
           </div>
           <count-to :start-val="0" :end-val="panelData.newProduct" :duration="3000" class="card-panel-num" />
         </div>
@@ -33,7 +33,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Revenue
+            {{ $t('dashboard.revenue') }}
           </div>
           <count-to :start-val="0" :end-val="panelData.newRevenue" :duration="3200" class="card-panel-num" />
         </div>
@@ -46,7 +46,7 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Orders
+            {{ $t('dashboard.newOrders') }}
           </div>
           <count-to :start-val="0" :end-val="panelData.newOrder" :duration="3600" class="card-panel-num" />
         </div>

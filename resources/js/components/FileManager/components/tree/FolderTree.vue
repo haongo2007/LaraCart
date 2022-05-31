@@ -10,7 +10,7 @@
       </div>
       <el-dropdown style="padding: 20px;width:100%;" @command="handleCommand" trigger="click">
         <el-button type="primary" style="width: 100%">
-          Add New
+          {{ $t('form.add_new') }}
         </el-button>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="NewFolder"><i class="el-icon-folder"></i> New folder</el-dropdown-item>

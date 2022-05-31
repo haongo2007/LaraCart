@@ -1,18 +1,18 @@
 <template>
   <div class="block-tables">
     <el-form ref="dataForm" :model="temp" class="form-container">
-      <el-descriptions class="margin-top" title="Invoice" :column="1" border>
+      <el-descriptions class="margin-top" :title="$t('form.info_invoice')" :column="1" border>
         <el-descriptions-item v-for="(item,index) in dataTotal.order_total" :key="item.id">
           <template slot="label">
             <i class="el-icon-tickets" />
-            {{ item.title }}
+            {{ $t('form.'+item.title.toLowerCase()) }}
           </template>
 
           <el-popover
             v-if="['shipping','discount','received'].includes(item.code)"
             v-model="visible[index]"
             placement="top"
-            :title="item.title"
+            :title="$t('form.'+item.title.toLowerCase())"
             width="200"
           >
             <el-form-item
@@ -36,7 +36,7 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            Balance
+            {{ $t('form.balance') }}
           </template>
           {{ ( dataTotal.balance === null ? dataTotal.total : dataTotal.balance ) | toThousandFilter }}
         </el-descriptions-item>

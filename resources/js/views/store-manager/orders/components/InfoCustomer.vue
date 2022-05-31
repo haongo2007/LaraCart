@@ -1,17 +1,17 @@
 <template>
   <div class="block-tables">
     <el-form ref="dataForm" :model="temp" class="form-container">
-      <el-descriptions class="margin-top" title="Info Customer" :column="1" border>
+      <el-descriptions class="margin-top" :title="$t('form.info_customer')" :column="1" border>
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-user" />
-            First name
+            {{ $t('form.firstname') }}
           </template>
 
           <el-popover
             v-model="visible[0]"
             placement="top"
-            title="First name"
+            :title="$t('form.firstname')"
             width="200"
           >
             <el-form-item
@@ -21,12 +21,16 @@
                 { max: 100, message: 'first name max length 100 character'}
               ]"
             >
-              <el-input v-model="temp.first_name" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(1,'first_name')" />
+              <el-input v-model="temp.first_name" size="mini" :placeholder="$t('form.firstname')" @keyup.enter.native="handleConfirm(1,'first_name')" />
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(0)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(0,'first_name')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(0)">
+                  {{ $t('form.cancel') }}
+                </el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(0,'first_name')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.first_name }}</span>
@@ -36,12 +40,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-user" />
-            Last name
+            {{ $t('form.lastname') }}
           </template>
           <el-popover
             v-model="visible[1]"
             placement="top"
-            title="Last name"
+            :title="$t('form.lastname')"
             width="200"
           >
             <el-form-item
@@ -51,12 +55,16 @@
                 { max: 100, message: 'Last name max length 100 character'}
               ]"
             >
-              <el-input v-model="temp.last_name" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(2,'last_name')" />
+              <el-input v-model="temp.last_name" size="mini" :placeholder="$t('form.lastname')" @keyup.enter.native="handleConfirm(2,'last_name')" />
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'last_name')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(1)">
+                  {{ $t('form.cancel') }}
+                </el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'last_name')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.last_name }}</span>
@@ -66,12 +74,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-mobile-phone" />
-            Phone num
+            {{ $t('form.phone') }}
           </template>
           <el-popover
             v-model="visible[2]"
             placement="top"
-            title="Phone num"
+            :title="$t('form.phone')"
             width="400"
           >
             <el-form-item
@@ -82,8 +90,10 @@
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(2)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(2,'phone')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(2)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(2,'phone')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.phone }}</span>
@@ -93,7 +103,7 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            email
+            {{ $t('form.email') }}
           </template>
           {{ dataOrder.email }}
         </el-descriptions-item>
@@ -101,12 +111,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-location-outline" />
-            Country
+            {{ $t('form.country') }}
           </template>
           <el-popover
             v-model="visible[3]"
             placement="top"
-            title="Country"
+            :title="$t('form.country')"
             width="200"
           >
             <el-form-item
@@ -115,7 +125,7 @@
                 { required: true, message: 'Country is required'},
               ]"
             >
-              <el-select v-model="temp.country" placeholder="Select" filterable style="width: 100%;">
+              <el-select v-model="temp.country" :placeholder="$t('form.country')" filterable style="width: 100%;">
                 <el-option
                   v-for="(item,index) in dataCountry"
                   :key="index"
@@ -126,8 +136,10 @@
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(3)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(3,'country')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(3)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(3,'country')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.country }}</span>
@@ -137,26 +149,28 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-location-outline" />
-            Province
+            {{ $t('form.province') }}
           </template>
           <el-popover
             v-model="visible[4]"
             placement="top"
-            title="Province"
+            :title="$t('form.province')"
             width="200"
           >
             <el-form-item
               prop="address1"
               :rules="[
                 { required: true, message: 'Province is required'}
-              ]"
-            >
-              <el-input v-model="temp.address1" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(4,'address1')" />
+              ]">
+              <el-input v-model="temp.address1" size="mini" :placeholder="$t('form.province')" 
+              @keyup.enter.native="handleConfirm(4,'address1')" />
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(4)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(4,'address1')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(4)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(4,'address1')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.address1 }}</span>
@@ -166,12 +180,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-location-outline" />
-            District
+            {{ $t('form.district') }}
           </template>
           <el-popover
             v-model="visible[5]"
             placement="top"
-            title="District"
+            :title="$t('form.district')"
             width="200"
           >
             <el-form-item
@@ -180,12 +194,14 @@
                 { required: true, message: 'District is required'}
               ]"
             >
-              <el-input v-model="temp.address2" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(5,'address2')" />
+              <el-input v-model="temp.address2" size="mini" :placeholder="$t('form.district')" @keyup.enter.native="handleConfirm(5,'address2')" />
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(5)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(5,'address2')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(5)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(5,'address2')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.address2 }}</span>
@@ -195,12 +211,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-location-outline" />
-            Address
+            {{ $t('form.address') }}
           </template>
           <el-popover
             v-model="visible[6]"
             placement="top"
-            title="Address"
+            :title="$t('form.address')"
             width="200"
           >
             <el-form-item
@@ -209,12 +225,14 @@
                 { required: true, message: 'Address is required'}
               ]"
             >
-              <el-input v-model="temp.address3" size="mini" placeholder="Please input" @keyup.enter.native="handleConfirm(6,'address3')" />
+              <el-input v-model="temp.address3" size="mini" :placeholder="$t('form.address')" @keyup.enter.native="handleConfirm(6,'address3')" />
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(6)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(6,'address3')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(6)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(6,'address3')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.address3 }}</span>
@@ -224,12 +242,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            Note Order
+            {{ $t('form.note') }}
           </template>
           <el-popover
             v-model="visible[7]"
             placement="top"
-            title="Notes"
+            :title="$t('form.note')"
             width="200"
           >
             <el-form-item
@@ -239,8 +257,10 @@
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(7)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(7,'comment')">Confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(7)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(7,'comment')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ ( dataOrder.comment == null || dataOrder.comment == '' ? 'Empty' : dataOrder.comment) }}</span>

@@ -1,7 +1,7 @@
 <template>
   <div class="block-tables">
     <div class="el-descriptions__header">
-      <div class="el-descriptions__title">History Order #{{ this.$route.params.id }}</div>
+      <div class="el-descriptions__title">{{ $t('form.history_order') }} #{{ this.$route.params.id }}</div>
     </div>
     <el-table
       :data="dataHistory.filter(data => !search || data.content.toLowerCase().includes(search.toLowerCase()) || data.staff.fullname.toLowerCase().includes(search.toLowerCase()) )"
@@ -9,7 +9,7 @@
       style="width: 100%"
     >
       <el-table-column
-        label="Staff"
+        :label="$t('form.staff')"
         min-width="180"
       >
         <template slot-scope="scope">
@@ -17,7 +17,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="Content"
+        :label="$t('form.content')"
         min-width="450"
       >
         <template slot-scope="scope">
@@ -25,7 +25,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="Created at"
+        :label="$t('form.created_at')"
         min-width="150"
       >
         <template slot="header" slot-scope="scope">

@@ -8,10 +8,10 @@ export default {
       // If selected translations exists
       if (Object.prototype.hasOwnProperty.call(
         this.$store.state.fm.settings.translations,
-        this.$store.state.fm.settings.lang,
+        this.$store.state.app.language,
       )) {
         return this.$store.state.fm.settings.translations[
-          this.$store.state.fm.settings.lang
+          this.$store.state.app.language
         ];
       }
       // default translate - en

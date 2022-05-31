@@ -44,7 +44,7 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('table.phone')" min-width="100px" align="center" prop="phone">
+      <el-table-column :label="$t('table.phone')" min-width="120px" align="center" prop="phone">
         <template slot-scope="scope">
           <span>{{ scope.row.phone }}</span>
         </template>

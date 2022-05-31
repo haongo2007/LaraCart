@@ -21,7 +21,7 @@
         </template>
       </el-table-column>
       
-      <el-table-column label="Store" min-width="150">
+      <el-table-column :label="$t('table.store')" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -30,37 +30,37 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Product">
+      <el-table-column :label="$t('table.product')" min-width="250">
         <template slot-scope="scope">
           <span>{{ scope.row.product.description.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Stock">
+      <el-table-column :label="$t('table.stock')" min-width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.stock }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Sold">
+      <el-table-column :label="$t('table.sold')">
         <template slot-scope="scope">
           <span>{{ scope.row.sold }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Start Date" min-width="150">
+      <el-table-column :label="$t('table.start_date')" min-width="170">
         <template slot-scope="scope" v-if="scope.row.promotion.date_start">
           <span>{{ scope.row.promotion.date_start }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="End Date" min-width="150">
+      <el-table-column :label="$t('table.end_date')" min-width="170">
         <template slot-scope="scope" v-if="scope.row.promotion.date_end">
           <span>{{ scope.row.promotion.date_end | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Price">
+      <el-table-column :label="$t('table.money')">
         <template slot-scope="scope" >
           <span>{{ scope.row.promotion.price_promotion }}</span>
         </template>

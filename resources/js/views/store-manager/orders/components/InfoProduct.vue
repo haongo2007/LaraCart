@@ -1,7 +1,7 @@
 <template>
   <div class="block-tables">
     <div class="el-descriptions__header">
-      <div class="el-descriptions__title">Info Product</div>
+      <div class="el-descriptions__title">{{ $t('form.info_product') }}</div>
       <div class="el-descriptions__extra">
         <el-button type="primary" icon="el-icon-plus" @click="handleAddProduct()" />
       </div>
@@ -12,9 +12,9 @@
       style="width: 100%"
     >
       <el-table-column
-        label="Attributes"
+        :label="$t('table.attribute')"
         align="center"
-        min-width="70"
+        min-width="80"
       >
         <template slot-scope="scope">
           <el-popover
@@ -29,7 +29,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="Name"
+        :label="$t('table.name')"
         min-width="220"
       >
         <template slot-scope="scope">
@@ -42,14 +42,14 @@
             value-key="name"
             class="inline-input"
             :fetch-suggestions="querySearchAsync"
-            placeholder="Please Input"
+            :placeholder="$t('table.product')"
             @focus="setCurrentIndex(scope.$index)"
             @select="handleSelect"
           />
         </template>
       </el-table-column>
       <el-table-column
-        label="Sku"
+        :label="$t('table.sku')"
         min-width="100"
       >
         <template slot-scope="scope">
@@ -59,12 +59,12 @@
             v-model="temp[scope.$index].sku"
             size="mini"
             :disabled="true"
-            placeholder="Please input"
+            :placeholder="$t('table.sku')"
           />
         </template>
       </el-table-column>
       <el-table-column
-        label="Price"
+        :label="$t('table.price')"
         min-width="150"
       >
         <template slot-scope="scope">
@@ -73,7 +73,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="Attribute Price"
+        :label="$t('table.attribute_price')"
         min-width="150"
       >
         <template slot-scope="scope">
@@ -83,8 +83,8 @@
       </el-table-column>
       <el-table-column
         align="center"
-        label="Qty"
-        min-width="50"
+        :label="$t('table.qty')"
+        min-width="80"
       >
         <template slot-scope="scope">
           <span v-if="!scope.row.is_new">{{ scope.row.qty }}</span>
@@ -94,7 +94,7 @@
 
       <el-table-column
         align="center"
-        label="Tax"
+        :label="$t('table.tax')"
         min-width="80"
       >
         <template slot-scope="scope">
@@ -106,7 +106,7 @@
             value-key="name"
             class="inline-input"
             :fetch-suggestions="querySearchTaxAsync"
-            placeholder="Please Input"
+            :placeholder="$t('table.tax')"
             @select="handleSelectTax"
             v-else
           />
@@ -114,7 +114,7 @@
       </el-table-column>
 
       <el-table-column
-        label="Total"
+        :label="$t('table.total')"
         min-width="100"
       >
         <template slot-scope="scope">
@@ -124,7 +124,7 @@
       </el-table-column>
 
       <el-table-column
-        label="Action"
+        :label="$t('table.actions')"
         min-width="100"
       >
         <template slot-scope="scope">

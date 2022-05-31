@@ -3,6 +3,7 @@ import getters from './getters';
 
 // languages
 import en from '@/components/FileManager/lang/en';
+import vi from '@/components/FileManager/lang/vi';
 
 export default {
   namespaced: true,
@@ -34,6 +35,7 @@ export default {
       // Translations (/src/lang)
       translations: {
         en: Object.freeze(en),
+        vi: Object.freeze(vi),
       },
 
       // show or hide hidden files

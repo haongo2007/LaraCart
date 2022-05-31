@@ -15,13 +15,13 @@
         align="center"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="50">
+      <el-table-column align="center" :label="$t('table.id')" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       
-      <el-table-column label="Store" min-width="150">
+      <el-table-column :label="$t('table.store')" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -30,43 +30,43 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Code">
+      <el-table-column :label="$t('table.code')">
         <template slot-scope="scope">
           <span>{{ scope.row.code }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Value">
+      <el-table-column :label="$t('table.value')">
         <template slot-scope="scope">
           <span>{{ scope.row.reward }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Type">
+      <el-table-column :label="$t('table.type')">
         <template slot-scope="scope">
           <span>{{ scope.row.type }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Data" min-width="150">
+      <el-table-column :label="$t('table.data')" min-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.data }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Limit">
+      <el-table-column :label="$t('table.limit')">
         <template slot-scope="scope">
           <span>{{ scope.row.limit }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Used">
+      <el-table-column :label="$t('table.used')" min-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.used }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Require Login"  min-width="150">
+      <el-table-column :label="$t('table.login_required')"  min-width="150">
         <template slot-scope="scope">
           <span>{{ scope.row.login }}</span>
         </template>
@@ -80,7 +80,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Exprise at" min-width="195" align="center">
+      <el-table-column :label="$t('table.expries_at')" min-width="195" align="center">
         <template slot-scope="scope" v-if="scope.row.expires_at">
           <i class="el-icon-time" />
           <span>{{ scope.row.expires_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>

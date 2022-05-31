@@ -76,19 +76,19 @@ class DashboardController extends Controller
 
         $data['newCustomers']['data'] = $Customer;
         $data['newCustomers']['total'] = array_sum($Customer_total);
-        $data['newCustomers']['name'] = 'Customers '; 
+        $data['newCustomers']['name'] = trans('admin.newCustomer'); 
 
         $data['newOrder']['data'] = $Orders;
         $data['newOrder']['total'] = array_sum($Orders_total);
-        $data['newOrder']['name'] = 'Order ';
+        $data['newOrder']['name'] = trans('admin.newOrder');
 
         $data['newRevenue']['data'] = $Amount;
         $data['newRevenue']['total'] = array_sum($Amount_total);
-        $data['newRevenue']['name'] = 'Revenue ';
+        $data['newRevenue']['name'] = trans('admin.revenue');
 
         $data['newProduct']['data'] = $Product;
         $data['newProduct']['total'] = array_sum($Product_total);
-        $data['newProduct']['name'] = 'Product ';
+        $data['newProduct']['name'] = trans('admin.newProduct');
 
         $data['rangeDate'] = ['from' => $from, 'to' => $to];
         $data['companies'] = $Companies;

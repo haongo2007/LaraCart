@@ -15,13 +15,13 @@
         align="center"
         width="55"
       />
-      <el-table-column align="center" label="ID" width="50">
+      <el-table-column align="center" :label="$t('table.id')" width="50">
         <template slot-scope="scope">
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
       
-      <el-table-column label="Store" min-width="100">
+      <el-table-column :label="$t('table.store')" min-width="100">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -30,13 +30,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Name">
+      <el-table-column :label="$t('table.name')">
         <template slot-scope="scope">
           <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Group">
+      <el-table-column :label="$t('table.group')">
         <template slot-scope="scope">
           <span>{{ scope.row.group }}</span>
         </template>

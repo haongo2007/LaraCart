@@ -35,7 +35,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150" v-if="checkOnlyStore">
+      <el-table-column :label="$t('table.store')" min-width="150" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -58,7 +58,7 @@
           </el-image>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('sort')" width="110px" align="center" prop="sort">
+      <el-table-column :label="$t('table.sort')" width="110px" align="center" prop="sort">
         <template slot-scope="scope">
           <span style="color:red;">{{ scope.row.sort }}</span>
         </template>

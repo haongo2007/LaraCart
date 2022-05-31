@@ -25,13 +25,13 @@
         align="center"
         width="55"
       />
-      <el-table-column fixed label="Order #" min-width="100" align="center">
+      <el-table-column fixed :label="$t('table.id')" min-width="50" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.id | orderNoFilter }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150" v-if="checkOnlyStore">
+      <el-table-column :label="$t('table.store')" min-width="150" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -40,73 +40,73 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Customer" min-width="150">
+      <el-table-column :label="$t('table.customer')" min-width="150">
         <template slot-scope="scope">
           {{ scope.row && scope.row.first_name }} {{ scope.row && scope.row.last_name }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Country" min-width="100" align="center">
+      <el-table-column :label="$t('table.country')" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.country }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Address" min-width="250">
+      <el-table-column :label="$t('table.address')" min-width="250">
         <template slot-scope="scope">
           {{ scope.row && scope.row.address1 }} {{ scope.row && scope.row.address2 }} {{ scope.row && scope.row.address3 }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Phone" min-width="200">
+      <el-table-column :label="$t('table.phone')" min-width="200">
         <template slot-scope="scope">
           {{ scope.row && scope.row.phone | formatPhone }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Email" min-width="200">
+      <el-table-column :label="$t('table.email')" min-width="200">
         <template slot-scope="scope">
           {{ scope.row && scope.row.email }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Subtotal" min-width="150" align="center">
+      <el-table-column :label="$t('table.subtotal')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.subtotal | toThousandFilter }} {{ scope.row && scope.row.currency }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Ship fee" min-width="100" align="center">
+      <el-table-column :label="$t('table.shipfee')" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.shipping | toThousandFilter }} {{ scope.row && scope.row.currency }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Discount" min-width="150" align="center">
+      <el-table-column :label="$t('table.discount')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.discount | toThousandFilter }} {{ scope.row && scope.row.currency }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Total" min-width="150" align="center">
+      <el-table-column :label="$t('table.total')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.total | toThousandFilter }} {{ scope.row && scope.row.currency }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Pm method" min-width="100" align="center">
+      <el-table-column :label="$t('table.pm_method')" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.payment_method }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Currency" min-width="100" align="center">
+      <el-table-column :label="$t('table.currency')" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.currency + '/' +scope.row.exchange_rate }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Status" min-width="100" align="center">
+      <el-table-column :label="$t('table.status')" min-width="100" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row && scope.row.status | statusFilter('label')">
             {{ scope.row && scope.row.status | statusFilter('name') }}
@@ -114,7 +114,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Created at" min-width="195" align="center">
+      <el-table-column :label="$t('table.created_at')" min-width="195" align="center">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>

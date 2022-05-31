@@ -22,13 +22,13 @@
         align="center"
         width="55"
       />
-      <el-table-column fixed label="#ID" min-width="50" align="center">
+      <el-table-column fixed :label="$t('table.id')" min-width="50" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.id }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150">
+      <el-table-column :label="$t('table.store')" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -37,13 +37,13 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Email" min-width="150" align="center">
+      <el-table-column :label="$t('table.email')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.email }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Created at" min-width="195" align="center">
+      <el-table-column :label="$t('table.created_at')" min-width="195" align="center">
         <template slot-scope="scope" v-if="scope.row.created_at">
           <i class="el-icon-time" />
           <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>

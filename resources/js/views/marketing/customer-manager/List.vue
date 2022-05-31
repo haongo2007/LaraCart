@@ -22,13 +22,13 @@
         align="center"
         width="55"
       />
-      <el-table-column fixed label="#ID" min-width="50" align="center">
+      <el-table-column fixed :label="$t('table.id')" min-width="50" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.id }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150">
+      <el-table-column :label="$t('table.store')" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -37,49 +37,49 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Email" min-width="150" align="center">
+      <el-table-column :label="$t('table.email')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.email }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Name" min-width="250">
+      <el-table-column :label="$t('table.name')" min-width="250">
         <template slot-scope="scope">
           {{ scope.row && scope.row.first_name + scope.row.last_name }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Phone" min-width="150" align="center">
+      <el-table-column :label="$t('table.phone')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.phone }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Province" min-width="150" align="center">
+      <el-table-column :label="$t('table.province')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.address1 }}
         </template>
       </el-table-column>
 
-      <el-table-column label="District" min-width="150" align="center">
+      <el-table-column :label="$t('table.district')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.address2 }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Address" min-width="150" align="center">
+      <el-table-column :label="$t('table.address')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.address3 }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Country" min-width="150" align="center">
+      <el-table-column :label="$t('table.country')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.country }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Created at" min-width="195" align="center">
+      <el-table-column :label="$t('table.created_at')" min-width="195" align="center">
         <template slot-scope="scope" v-if="scope.row.created_at">
           <i class="el-icon-time" />
           <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>

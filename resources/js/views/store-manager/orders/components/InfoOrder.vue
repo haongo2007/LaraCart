@@ -1,16 +1,16 @@
 <template>
   <div class="block-tables">
     <el-form ref="dataForm" :model="temp" class="form-container">
-      <el-descriptions class="margin-top" title="Info Order" :column="1" border>
+      <el-descriptions class="margin-top" :title="$t('form.info_order')" :column="1" border>
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            State Order
+            {{ $t('form.state_order') }}
           </template>
           <el-popover
             v-model="visible[0]"
             placement="top"
-            title="State Order"
+            :title="$t('form.state_order')"
             width="200"
           >
             <el-form-item
@@ -30,8 +30,10 @@
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(0)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(0,'status')">confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(0)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(0,'status')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <el-tag slot="reference" :type="statusFilter(dataOrderStatus,dataOrder.status,'label')">
@@ -43,12 +45,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            State Shipping
+            {{ $t('form.state_shipping') }}
           </template>
           <el-popover
             v-model="visible[1]"
             placement="top"
-            title="State Shipping"
+            :title="$t('form.state_shipping')"
             width="200"
           >
             <el-form-item
@@ -68,8 +70,10 @@
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(1)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'shipping_status')">confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(1)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(1,'shipping_status')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <el-tag slot="reference" :type="statusFilter(dataShippingStatus,dataOrder.shipping_status,'label')">
@@ -81,12 +85,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            State Payment
+            {{ $t('form.state_payment') }}
           </template>
           <el-popover
             v-model="visible[2]"
             placement="top"
-            title="State Payment"
+            :title="$t('form.state_payment')"
             width="200"
           >
             <el-form-item
@@ -106,8 +110,10 @@
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(2)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(2,'payment_status')">confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(2)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(2,'payment_status')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <el-tag slot="reference" :type="statusFilter(dataPaymentStatus,dataOrder.payment_status,'label')">
@@ -119,12 +125,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            Shipping Method
+            {{ $t('form.shipping_method') }}
           </template>
           <el-popover
             v-model="visible[3]"
             placement="top"
-            title="Shipping Method"
+            :title="$t('form.shipping_method')"
             width="200"
           >
             <el-form-item
@@ -144,8 +150,10 @@
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(3)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(3,'shipping_method')">confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(3)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(3,'shipping_method')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.shipping_method }}</span>
@@ -155,12 +163,12 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            Payment Method
+            {{ $t('form.payment_method') }}
           </template>
           <el-popover
             v-model="visible[4]"
             placement="top"
-            title="Payment Method"
+            :title="$t('form.payment_method')"
             width="200"
           >
             <el-form-item
@@ -180,8 +188,10 @@
             </el-form-item>
             <div style="text-align: right; margin: 12px 0px 0px 0px">
               <el-button-group>
-                <el-button type="danger" size="mini" @click="handleCancel(4)">cancel</el-button>
-                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(4,'payment_method')">confirm</el-button>
+                <el-button type="danger" size="mini" @click="handleCancel(4)">{{ $t('form.cancel') }}</el-button>
+                <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(4,'payment_method')">
+                  {{ $t('form.confirm') }}
+                </el-button>
               </el-button-group>
             </div>
             <span slot="reference" class="border-edit">{{ dataOrder.payment_method }}</span>
@@ -191,7 +201,7 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            Domain
+            {{ $t('form.domain') }}
           </template>
           {{ dataOrder.domain }}
         </el-descriptions-item>
@@ -199,7 +209,7 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            Created at
+            {{ $t('form.created_at') }}
           </template>
           {{ dataOrder.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}
         </el-descriptions-item>
@@ -207,7 +217,7 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            Currency
+            {{ $t('form.currency') }}
           </template>
           {{ dataOrder.currency }}
         </el-descriptions-item>
@@ -215,7 +225,7 @@
         <el-descriptions-item>
           <template slot="label">
             <i class="el-icon-tickets" />
-            Exchange rate
+            {{ $t('form.exchange_rate') }}
           </template>
           {{ dataOrder.exchange_rate }}
         </el-descriptions-item>

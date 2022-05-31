@@ -23,13 +23,13 @@
         align="center"
         width="55"
       />
-      <el-table-column label="#ID" min-width="50" align="center">
+      <el-table-column :label="$t('table.id')" min-width="50" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.id }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150" v-if="checkOnlyStore">
+      <el-table-column :label="$t('table.store')" min-width="150" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -38,7 +38,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Image" min-width="150" align="center">
+      <el-table-column :label="$t('table.image')" min-width="150" align="center">
         <template slot-scope="scope">
           <el-image :src="scope.row.image+'&w=150'" fit="cover" style="max-height: 150px;">
             <div slot="error" class="image-slot">
@@ -48,27 +48,27 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Sku" min-width="100" align="center">
+      <el-table-column :label="$t('table.sku')" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.sku }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Name" min-width="250">
+      <el-table-column :label="$t('table.name')" min-width="250">
         <template slot-scope="scope">
           {{ scope.row && scope.row.name }}
         </template>
       </el-table-column>
 
       
-      <el-table-column align="center" label="Category" min-width="150">
+      <el-table-column align="center" :label="$t('table.category')" min-width="150">
         <template slot-scope="scope">
             <el-popover
               placement="right-end"
               width="200"
               trigger="click">
               <el-table :data="scope.row.categories">
-                <el-table-column label="Name" >
+                <el-table-column :label="$t('table.name')" >
                   <template slot-scope="scope">
                     <el-tag> {{ scope.row.descriptions_with_lang_default.title }} </el-tag>
                   </template>
@@ -79,25 +79,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Cost" min-width="100">
+      <el-table-column :label="$t('table.cost')" min-width="100">
         <template slot-scope="scope">
           {{ scope.row && scope.row.cost | toThousandFilter }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Price" min-width="100" align="center">
+      <el-table-column :label="$t('table.price')" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.price | toThousandFilter }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Type" min-width="100" align="center">
+      <el-table-column :label="$t('table.type')" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.property }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Kind" min-min-width="150" align="center">
+      <el-table-column :label="$t('table.kind')" min-min-width="150" align="center">
         <template slot-scope="{row}">
           <el-tag :type="row.kind | kindFilter">
             {{ row.kind | kindFilter(true) }}
@@ -113,7 +113,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Created at" min-width="195" align="center">
+      <el-table-column :label="$t('table.created_at')" min-width="195" align="center">
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.created_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>

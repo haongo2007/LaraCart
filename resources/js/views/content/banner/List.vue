@@ -60,7 +60,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" :label="$t('table.clicked')">
+      <el-table-column align="center" :label="$t('table.clicked')" min-width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.click }}</span>
         </template>

@@ -22,13 +22,13 @@
         align="center"
         width="55"
       />
-      <el-table-column fixed label="#ID" min-width="50" align="center">
+      <el-table-column fixed :label="$t('table.id')" min-width="50" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.id }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Store" min-width="150">
+      <el-table-column :label="$t('table.store')" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -37,7 +37,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Image" min-width="150" align="center">
+      <el-table-column :label="$t('table.image')" min-width="150" align="center">
         <template slot-scope="scope">
           <el-image :src="scope.row.image+'&w=100'">
             <div slot="error" class="image-slot">
@@ -47,56 +47,56 @@
         </template>
       </el-table-column>
 
-      <el-table-column label="Sku" min-width="100" align="center">
+      <el-table-column :label="$t('table.sku')" min-width="100" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.sku }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Name" min-width="250">
+      <el-table-column :label="$t('table.name')" min-width="250">
         <template slot-scope="scope">
           {{ scope.row && scope.row.name }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Cost" min-width="150" align="center">
+      <el-table-column :label="$t('table.cost')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.cost | toThousandFilter }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Price" min-width="150" align="center">
+      <el-table-column :label="$t('table.price')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.price | toThousandFilter }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Sold" min-width="150" align="center">
+      <el-table-column :label="$t('table.sold')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.sold }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Stock" min-width="150" align="center">
+      <el-table-column :label="$t('table.stock')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.stock }}
         </template>
       </el-table-column>
 
-      <el-table-column label="View" min-width="150" align="center">
+      <el-table-column :label="$t('table.view')" min-width="150" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.view }}
         </template>
       </el-table-column>
 
-      <el-table-column label="Last view" min-width="195" align="center">
+      <el-table-column :label="$t('table.last_view')" min-width="195" align="center">
         <template slot-scope="scope" v-if="scope.row.date_lastview">
           <i class="el-icon-time" />
           <span>{{ scope.row.date_lastview | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
 
-      <el-table-column label="Kind" min-min-width="150" align="center">
+      <el-table-column :label="$t('table.kind')" min-min-width="150" align="center">
         <template slot-scope="{row}">
           <el-tag :type="row.kind | kindFilter">
             {{ row.kind | kindFilter(true) }}

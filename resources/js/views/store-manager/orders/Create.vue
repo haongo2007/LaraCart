@@ -6,74 +6,74 @@
     <el-col :span="12" :offset="6">
       <el-skeleton :rows="6" animated :loading="loading" />
       <el-form v-show="!loading" ref="dataForm" :model="temp" :rules="rules" class="form-container" label-width="200px">
-        <el-form-item label="Select customer">
+        <el-form-item :label="$t('form.select_customer')">
           <el-autocomplete
             v-model="temp.customer"
             style="width: 100%;"
             value-key="email"
             :fetch-suggestions="querySearchAsync"
-            placeholder="Please input"
+            :placeholder="$t('form.select_customer')"
             @select="handleSelect"
           />
         </el-form-item>
 
-        <el-form-item label="Enter first name" prop="first_name">
+        <el-form-item :label="$t('form.enter_firstname')" prop="first_name">
           <el-input
             v-model="temp.first_name"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_firstname')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item label="Enter last name" prop="last_name">
+        <el-form-item :label="$t('form.enter_lastname')" prop="last_name">
           <el-input
             v-model="temp.last_name"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_lastname')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item label="Enter email" prop="email">
+        <el-form-item :label="$t('form.enter_email')" prop="email">
           <el-input
             v-model="temp.email"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_email')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item label="Enter phone number" prop="phone">
+        <el-form-item :label="$t('form.enter_phone')" prop="phone">
           <el-input
             v-model="temp.phone"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_phone')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item label="Enter Province" prop="address1">
+        <el-form-item :label="$t('form.enter_province')" prop="address1">
           <el-input
             v-model="temp.address1"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_province')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item label="Enter District" prop="address2">
+        <el-form-item :label="$t('form.enter_district')" prop="address2">
           <el-input
             v-model="temp.address2"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_district')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item label="Enter address" prop="address3">
+        <el-form-item :label="$t('form.enter_address')" prop="address3">
           <el-input
             v-model="temp.address3"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_address')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item label="Enter Country" prop="country">
+        <el-form-item :label="$t('form.select_country')" prop="country">
           <el-select v-model="temp.country" placeholder="Select" prop="country" filterable style="width: 100%;">
             <el-option
               v-for="(item,index) in CountriesOptions"
@@ -84,7 +84,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Enter Currency" prop="currency">
+        <el-form-item :label="$t('form.select_curency')" prop="currency">
           <el-select v-model="temp.currency" placeholder="Select" prop="currency" style="width: 100%;" @change="handleSelectCurrency">
             <el-option
               v-for="(item,index) in CurrenciesOption"
@@ -95,24 +95,24 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Enter exchange rate" prop="exchange_rate">
+        <el-form-item :label="$t('form.enter_exchange')" prop="exchange_rate">
           <el-input
             v-model="temp.exchange_rate"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_exchange')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item label="Enter Note">
+        <el-form-item :label="$t('form.enter_note')">
           <el-input
             v-model="temp.comment"
-            placeholder="Please input"
+            :placeholder="$t('form.enter_note')"
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 4}"
           />
         </el-form-item>
 
-        <el-form-item label="Choose Payment" prop="payment_method">
+        <el-form-item :label="$t('form.choose_payment')" prop="payment_method">
           <el-select v-model="temp.payment_method" prop="payment_method" placeholder="Select" style="width: 100%;">
             <el-option
               v-for="(item,index) in PaymentOptions"
@@ -123,7 +123,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Choose Shipping" prop="shipping_method">
+        <el-form-item :label="$t('form.choose_shipping')" prop="shipping_method">
           <el-select v-model="temp.shipping_method" prop="shipping_method" placeholder="Select" style="width: 100%;">
             <el-option
               v-for="(item,index) in ShippingOptions"
@@ -134,7 +134,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="Choose Status" prop="status">
+        <el-form-item :label="$t('form.choose_status')" prop="status">
           <el-select v-model="temp.status" placeholder="Select" prop="status" style="width: 100%;">
             <el-option
               v-for="(item,index) in StatusOptions"

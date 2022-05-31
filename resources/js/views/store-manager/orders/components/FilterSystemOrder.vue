@@ -36,8 +36,8 @@
               align="right"
               unlink-panels
               range-separator="To"
-              start-placeholder="Start date"
-              end-placeholder="End date"
+              :start-placeholder="$t('form.start_date')"
+              :end-placeholder="$t('form.end_date')"
               :picker-options="pickerOptions"
               @change="handleFilter()"
             />
@@ -45,19 +45,19 @@
         </el-row>
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-input v-model="dataQuery.customer_name" clearable placeholder="Customer" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.customer_name" clearable :placeholder="$t('form.customer')" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
           <el-col :span="12">
-            <el-input v-model="dataQuery.customer_email" clearable placeholder="Email" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.customer_email" clearable :placeholder="$t('form.email')" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
 
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-input v-model="dataQuery.order_id" clearable placeholder="Order ID" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.order_id" clearable :placeholder="$t('form.id')" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
           <el-col :span="12">
-            <el-input v-model="dataQuery.customer_phone" clearable placeholder="Phone" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.customer_phone" clearable :placeholder="$t('form.phone')" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
 
@@ -191,7 +191,7 @@ export default {
       this.$emit('handleListenData', { list: this.list, loading: false, total: this.total, listQuery: this.dataQuery });
     },
     handleDeleting(row, multiple = false) {
-      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
+      this.$confirm(this.$t('form.answer_delete'), 'Warning', {
         confirmButtonText: 'OK',
         cancelButtonText: 'Cancel',
         type: 'warning',
