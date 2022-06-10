@@ -23,7 +23,7 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="$t('table.store')" min-width="150">
+      <el-table-column :label="$t('table.store')" min-width="150"  v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -124,13 +124,13 @@
         <el-form-item :label="$t('form.image')">
           <el-button size="small" type="success" @click="handleVisibleStorage()">Pick Image</el-button>
         </el-form-item>
-        <div class="image-uploading">
+        <div class="image-uploading" style="margin-left: 80px;position: relative;margin-bottom: 22px">
+          <i v-if="temp.image" class="el-icon-close" @click="resetImageUpload()" style="position: absolute;top: 15px;right: 15px"/>
           <el-image v-if="temp.image" :src="temp.image+'&w=644'">
             <div slot="placeholder" class="image-slot">
               <i class="el-icon-loading" />
             </div>
           </el-image>
-          <i v-if="temp.image" class="el-icon-close" @click="resetImageUpload()" />
         </div>
 
         <el-form-item :label="$t('form.html')">
@@ -195,6 +195,7 @@ import Cookies from 'js-cookie';
 import JsonEditor from '@/components/JsonEditor';
 import BannerResource from '@/api/banner';
 import reloadRedirectToList from '@/utils';
+import { checkOnlyStore } from '@/utils';
 
 const bannerResource = new BannerResource();
 
@@ -240,6 +241,7 @@ export default {
     }
   },
   computed: {
+    checkOnlyStore,
     storeList(){
       const storeList = this.$store.state.user.storeList;
       return storeList;

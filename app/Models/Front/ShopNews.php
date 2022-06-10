@@ -19,6 +19,10 @@ class ShopNews extends Model
         return $this->hasMany(ShopNewsDescription::class, 'news_id', 'id');
     }
 
+    public function descriptionsWithLangDefault()
+    {
+        return $this->hasOne(ShopNewsDescription::class, 'news_id', 'id')->where('lang', lc_get_locale());
+    }
     /*
     Get store
     */

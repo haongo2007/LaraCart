@@ -123,7 +123,7 @@ export default {
 <style lang="scss">
     .view-container{
       overflow-y: scroll;
-      height: 47vh;
+      height: calc(100vh - 400px);
       padding:0px 20px;
         .table-info{
           box-shadow: 0 0 3px 1px #409EFF;

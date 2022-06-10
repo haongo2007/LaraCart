@@ -27,6 +27,9 @@ class DataStoreSeeder extends Seeder
 
         DB::connection(config('const.LC_CONNECTION'))->table('admin_config')->insertOrIgnore(
             [
+            ['group' => 'Plugins', 'code' => 'Payment', 'key' => 'Cash', 'value' => '1', 'sort' => '0', 'detail' => 'Plugins/Payment/Cash::lang.title', 'store_id' => $storeId],
+            ['group' => 'Plugins', 'code' => 'Payment', 'key' => 'BankTransfer', 'value' => '1', 'sort' => '0', 'detail' => 'Plugins/Payment/BankTransfer::lang.title', 'store_id' => $storeId],
+            ['group' => 'Plugins', 'code' => 'Shipping', 'key' => 'ShippingStandard', 'value' => '1', 'sort' => '0', 'detail' => 'lang::Shipping Standard', 'store_id' => $storeId],
             ['group' => '', 'code' => 'product_config_attribute', 'key' => 'product_brand', 'value' => '1', 'sort' => '0', 'detail' => 'lang::product.config_manager.brand', 'store_id' => $storeId],
             ['group' => '', 'code' => 'product_config_attribute_required', 'key' => 'product_brand_required', 'value' => '0', 'sort' => '0', 'detail' => '', 'store_id' => $storeId],
             ['group' => '', 'code' => 'product_config_attribute', 'key' => 'product_supplier', 'value' => '1', 'sort' => '0', 'detail' => 'lang::product.config_manager.supplier', 'store_id' => $storeId],

@@ -44,7 +44,7 @@ export default {
           {
             required: true,
             message: 'parent is required',
-            trigger: 'blur',
+            trigger: 'change',
           },
         ],
         descriptions: [],
@@ -120,16 +120,15 @@ export default {
                 },
               ]
             );
-            if (desc.hasOwnProperty(index)) {
-              if (desc[index].lang == key) {
-                that.temp.descriptions[key].title = desc[index].title;
-                that.temp.descriptions[key].description = desc[index].description;
-                that.temp.descriptions[key].keyword = (desc[index].keyword != '' ? desc[index].keyword.split(',') : []);
-              }
+            let findIndex = desc.findIndex((item) => item.lang == key);
+            if (desc[findIndex].lang == key) {
+              that.temp.descriptions[key].title = desc[findIndex].title;
+              that.temp.descriptions[key].description = desc[findIndex].description;
+              that.temp.descriptions[key].keyword = (desc[findIndex].keyword != '' ? desc[findIndex].keyword.split(',') : []);
             }
           });
           this.languages = data.data;
-          this.languages['last'] = 'Done';
+          this.languages['last'] = 'done';
           this.loading = false;
         })
         .catch(err => {

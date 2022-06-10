@@ -37,8 +37,8 @@ export function numberFormatter(num, digits) {
   return num.toString();
 }
 
-export function toThousandFilter(num) {
-  return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','));
+export function toThousandFilter(num, currency = '') {
+  return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ',')) +' '+ currency;
 }
 
 export function uppercaseFirst(string) {
@@ -80,4 +80,12 @@ export function kindFilter(kind, name) {
     return statusKindName[kind];
   }
   return statusKindLabel[kind];
+}
+
+export function changeCurrency(price, exchange_rate, currency) {
+  let result = 0;
+  if (price > 0 ) {
+    result = price * exchange_rate;
+  }
+  return toThousandFilter(result,currency);
 }

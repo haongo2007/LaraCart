@@ -11,8 +11,8 @@ class FrontController extends RootFrontController
      *
      * @return  [type]  [return description]
      */
-    public function processOrder(){
+    public function processOrder($orderID,$shippingMethod,$paymentMethod){
         
-        return (new ShopCartController)->completeOrder();
+        return (new ShopCartController)->completeOrder($orderID,$shippingMethod,$paymentMethod);
     }
 }

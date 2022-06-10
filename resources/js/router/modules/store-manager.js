@@ -50,7 +50,7 @@ const storeManagerRoutes = {
       component: () => import('@/views/store-manager/product/List'),
       name: 'ProductList',
       meta: {
-        title: 'Product',
+        title: 'product',
         icon: 'shopping',
         permissions: ['view.product'],
         parent: 'root',
@@ -128,7 +128,7 @@ const storeManagerRoutes = {
       component: () => import('@/views/store-manager/category/List'),
       name: 'CategoryList',
       meta: {
-        title: 'Category',
+        title: 'category',
         icon: 'list',
         permissions: ['view.category'],
         parent: 'root',

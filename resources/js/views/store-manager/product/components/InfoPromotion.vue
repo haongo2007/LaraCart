@@ -3,13 +3,13 @@
     <el-form ref="dataGeneralForm" :model="temp" class="form-container" label-width="150px">
       <el-row class="el-main-form">
         <el-col :span="12">
-          <el-form-item :label="$t('table.promotion_price')" prop="price_promotion">
+          <el-form-item :label="$t('form.promotion_price')" prop="price_promotion">
             <el-input-number v-model="temp.price_promotion" style="width: 100%" :controls="false" />
           </el-form-item>
         </el-col>
 
         <el-col :span="12">
-          <el-form-item :label="$t('table.sale_date')" prop="date_promotion">
+          <el-form-item :label="$t('form.sale_date')" prop="date_promotion">
             <el-date-picker
               v-model="date_promotion"
               style="width: 100%"
@@ -17,8 +17,8 @@
               align="right"
               unlink-panels
               range-separator="To"
-              start-placeholder="Start date"
-              end-placeholder="End date"
+              :start-placeholder="$t('form.start_date')"
+              :end-placeholder="$t('form.end_date')"
               :picker-options="pickerOptions"
             />
           </el-form-item>
@@ -28,10 +28,10 @@
     <el-row>
       <el-button-group class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-          Previous
+          {{ $t('form.prev') }}
         </el-button>
         <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
-          Next
+          {{ $t('form.next') }}
         </el-button>
       </el-button-group>
     </el-row>.

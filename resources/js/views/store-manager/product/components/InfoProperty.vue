@@ -3,44 +3,45 @@
     <el-form ref="dataGeneralForm" :model="temp" class="form-container" label-width="150px">
       <el-row class="el-main-form">
         <el-col :span="24">
-          <el-form-item :label="$t('table.weight_unit')" prop="weight_unit">
+
+          <el-form-item :label="$t('form.weight')" prop="weight">
+            <el-input-number v-model="temp.weight" style="width: 100%" :controls="false" />
+          </el-form-item>
+
+          <el-form-item :label="$t('form.weight_unit')" prop="weight_unit">
             <el-autocomplete
               v-model="temp.weight_class.description"
               style="width: 100%"
               value-key="description"
               class="inline-input"
               :fetch-suggestions="querySearchWeightAsync"
-              placeholder="Please Input"
+              :placeholder="$t('form.weight_unit')"
               @select="handleSelectWeight"
             />
           </el-form-item>
 
-          <el-form-item :label="$t('table.weight')" prop="weight">
-            <el-input-number v-model="temp.weight" style="width: 100%" :controls="false" />
+          <el-form-item :label="$t('form.longs')" prop="length">
+            <el-input-number v-model="temp.length" style="width: 100%" :controls="false" />
           </el-form-item>
 
-          <el-form-item :label="$t('table.length_unit')" prop="length_unit">
+          <el-form-item :label="$t('form.height')" prop="height">
+            <el-input-number v-model="temp.height" style="width: 100%" :controls="false" />
+          </el-form-item>
+
+          <el-form-item :label="$t('form.width')" prop="width">
+            <el-input-number v-model="temp.width" style="width: 100%" :controls="false" />
+          </el-form-item>
+
+          <el-form-item :label="$t('form.length_unit')" prop="length_unit">
             <el-autocomplete
               v-model="temp.length_class.description"
               style="width: 100%"
               value-key="description"
               class="inline-input"
               :fetch-suggestions="querySearchLengthAsync"
-              placeholder="Please Input"
+              :placeholder="$t('form.length_unit')"
               @select="handleSelectLength"
             />
-          </el-form-item>
-
-          <el-form-item :label="$t('table.length')" prop="length">
-            <el-input-number v-model="temp.length" style="width: 100%" :controls="false" />
-          </el-form-item>
-
-          <el-form-item :label="$t('table.height')" prop="height">
-            <el-input-number v-model="temp.height" style="width: 100%" :controls="false" />
-          </el-form-item>
-
-          <el-form-item :label="$t('table.width')" prop="width">
-            <el-input-number v-model="temp.width" style="width: 100%" :controls="false" />
           </el-form-item>
 
         </el-col>
@@ -49,10 +50,10 @@
     <el-row>
       <el-button-group class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-          Previous
+          {{ $t('form.prev') }}
         </el-button>
         <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
-          Next
+          {{ $t('form.next') }}
         </el-button>
       </el-button-group>
     </el-row>

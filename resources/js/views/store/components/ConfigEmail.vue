@@ -2,7 +2,7 @@
   <el-form ref="dataForm" class="form-config-container" style="width: 100%;">
     <el-row :gutter="20" style="margin:0px">
       <el-col :span="12" style="padding: 0;">
-        <el-descriptions class="margin-top" title="Config Mode" :column="1" border>
+        <el-descriptions class="margin-top" :title="$t('store.email_mode')" :column="1" border>
           <el-descriptions-item v-for="(item,index) in dataConfig.emailConfig.email_action" :key="index">
             <template slot="label">
               <span v-html="item.detail"></span>
@@ -19,7 +19,7 @@
         </el-descriptions>
       </el-col>
       <el-col :span="12"  style="padding: 0;">
-        <el-descriptions class="margin-top" title="Config SMTP" :column="1" border>
+        <el-descriptions class="margin-top" :title="$t('store.email_smtp')" :column="1" border>
           <el-descriptions-item v-for="(item,index) in dataConfig.emailConfig.smtp_config" :key="index" :label="item.detail">
 
             <el-popover

@@ -66,6 +66,28 @@ const contentRoutes = {
         permissions: ['view.blog'],
       },
     },
+    {
+      path: 'blog-news/create',
+      component: () => import('@/views/content/blog/Create'),
+      name: 'BlogCreate',
+      meta: {
+        title: 'blogCreate',
+        permissions: ['create.blog'],
+        parent: 'BlogList',
+      },
+      hidden: true,
+    },
+    {
+      path: 'blog-news/edit/:id(\\d+)',
+      component: () => import('@/views/content/blog/Edit'),
+      name: 'BlogEdit',
+      meta: {
+        title: 'blogEdit',
+        permissions: ['edit.blog'],
+        parent: 'BlogList',
+      },
+      hidden: true,
+    },
   ]
 }
 

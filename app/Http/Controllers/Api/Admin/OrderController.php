@@ -230,37 +230,6 @@ class OrderController extends Controller
     }
 
     /**
-     * [getInfoUser description]
-     * @param   [description]
-     * @return [type]           [description]
-     */
-    public function getInfoUser()
-    {
-        $id = request('id');
-        return AdminCustomer::getCustomerAdminJson($id);
-    }
-
-    /**
-     * [getInfoProduct description]
-     * @param   [description]
-     * @return [type]           [description]
-     */
-    public function getInfoProduct()
-    {
-        $id = request('id');
-        $orderId = request('order_id');
-        $oder = AdminOrder::getOrderAdmin($orderId);
-        $product = AdminProduct::getProductAdmin($id);
-        if (!$product) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.data_not_found_detail', ['msg' => '#product:'.$id]), 'detail' => '']);
-        }
-        $arrayReturn = $product->toArray();
-        $arrayReturn['renderAttDetails'] = $product->renderAttributeDetailsAdmin($oder->currency, $oder->exchange_rate);
-        $arrayReturn['price_final'] = $product->getFinalPrice();
-        return response()->json($arrayReturn);
-    }
-
-    /**
      * process update order
      * @return [json]           [description]
      */
@@ -361,25 +330,27 @@ class OrderController extends Controller
      * @param   [description]
      * @return [type]           [description]
      */
-    public function postAddItem(Request $request)
+    public function postAddProduct(Request $request)
     {
         $addIds     = $request->product_id;
-        $add_price  = $request->price;
-        $add_qty    = $request->qty;
+        $add_price  = (float)$request->price;
+        $add_qty    = (float)$request->qty;
         $add_att    = $request->add_att;
-        $add_tax    = $request->tax['value'];
+        $add_tax    = (float)$request->tax['value'];
         $orderId    = $request->order_id;
 
         $item = [];
         $order = Order::find($orderId);
         $other_price = 0;
         if ($request->attribute) {
-            $attribute = json_decode($request->attribute);
-            $other_price = array_reduce((array)$attribute, function($carry, $item)
-            {   
-                $price = explode('__',$item);
-                return $carry + (int) $price[1];
-            });
+            $attributes = json_decode($request->attribute);
+            foreach ($attributes as $key => $attribute) {
+                $other_price += array_reduce((array)$attribute, function($carry, $item) use ( $order)
+                {   
+                    $price = explode('__',$item);
+                    return $carry + ((int) $price[1] * $order->exchange_rate);
+                });
+            }
         }
         //where exits id and qty > 0
         if ($addIds && $add_qty) {
@@ -388,13 +359,14 @@ class OrderController extends Controller
             if (!$product) {
                 return response()->json(new JsonResponse([],trans('admin.data_not_found_detail', ['msg' => '#'.$id]) ), Response::HTTP_FORBIDDEN); 
             }
+            $total_price = ($add_price + $other_price) * $add_qty ;
             $item = array(
                 'order_id' => $orderId,
                 'product_id' => $addIds,
                 'name' => $product_name,
                 'qty' => $add_qty,
                 'price' => $add_price,
-                'total_price' => $add_price * $add_qty + $other_price,
+                'total_price' => $total_price,
                 'sku' => $product->sku,
                 'tax' => $add_tax,
                 'attribute' => $request->attribute ?? null,
@@ -442,82 +414,11 @@ class OrderController extends Controller
     }
 
     /**
-     * [postEditItem description]
-     * @param   [description]
-     * @return [type]           [description]
-     */
-    public function postEditItem()
-    {
-        try {
-            $id = request('pk');
-            $field = request('name');
-            $value = request('value');
-            $item = ShopOrderDetail::find($id);
-            $fieldOrg = $item->{$field};
-            $orderId = $item->order_id;
-            $item->{$field} = $value;
-            $item->total_price = $value * (($field == 'qty') ? $item->price : $item->qty);
-            $item->save();
-            $item = $item->fresh();
-            $order = AdminOrder::getOrderAdmin($orderId);
-            if (!$order) {
-                return response()->json(['error' => 1, 'msg' => trans('admin.data_not_found_detail', ['msg' => '#order:'.$orderId]), 'detail' => '']);
-            }
-            //Add history
-            $dataHistory = [
-                'order_id' => $orderId,
-                'content' => trans('product.edit_product') . ' #' . $id . ': ' . $field . ' from ' . $fieldOrg . ' -> ' . $value,
-                'admin_id' => Admin::user()->id,
-                'order_status_id' => $order->status,
-            ];
-            (new AdminOrder)->addOrderHistory($dataHistory);
-
-            //Update stock
-            if ($field == 'qty') {
-                $checkQty = $value - $fieldOrg;
-                //Update stock, sold
-                AdminProduct::updateStock($item->product_id, $checkQty);
-            }
-
-            //Update total price
-            AdminOrder::updateSubTotal($orderId);
-            //end update total price
-
-            //fresh order info after update
-            $orderUpdated = $order->fresh();
-
-            if ($orderUpdated->balance == 0 && $orderUpdated->total != 0) {
-                $style = 'style="color:#0e9e33;font-weight:bold;"';
-            } else
-            if ($orderUpdated->balance < 0) {
-                $style = 'style="color:#ff2f00;font-weight:bold;"';
-            } else {
-                $style = 'style="font-weight:bold;"';
-            }
-            $blance = '<tr ' . $style . ' class="data-balance"><td>' . trans('order.balance') . ':</td><td align="right">' . lc_currency_format($orderUpdated->balance) . '</td></tr>';
-            $arrayReturn = ['error' => 0, 'detail' => [
-                'total'            => lc_currency_format($orderUpdated->total),
-                'subtotal'         => lc_currency_format($orderUpdated->subtotal),
-                'tax'              => lc_currency_format($orderUpdated->tax),
-                'shipping'         => lc_currency_format($orderUpdated->shipping),
-                'discount'         => lc_currency_format($orderUpdated->discount),
-                'received'         => lc_currency_format($orderUpdated->received),
-                'item_total_price' => bc_currency_render_symbol($item->total_price, $item->currency),
-                'item_id'          => $id,
-                'balance'          => $blance,
-            ],'msg' => trans('order.admin.update_success')
-            ];
-        } catch (\Throwable $e) {
-            $arrayReturn = ['error' => 1, 'msg' => $e->getMessage()];
-        }
-        return response()->json($arrayReturn);
-    }
-    /**
      * [postDeleteItem description]
      * @param   [description]
      * @return [type]           [description]
      */
-    public function postDeleteItem(Request $request)
+    public function postDeleteProduct(Request $request)
     {
         try {
             $id = $request->id ?? 0;

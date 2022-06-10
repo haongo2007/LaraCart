@@ -3,7 +3,7 @@
     <category-detail v-if="!loading && !confirmStoreDialog" :is-edit="false" :data-temp="temp" :data-rules="rules" :data-languages="languages" />
     <el-dialog
       :show-close="false"
-      title="Please Choose store you want add category"
+      :title="$t('form.choose_store_for_category')"
       :visible.sync="confirmStoreDialog"
       :before-close="handleConfirm"
       width="30%"
@@ -122,7 +122,7 @@ export default {
             );
           });
           this.languages = data.data;
-          this.languages['last'] = 'Done';
+          this.languages['last'] = 'done';
           this.loading = false;
         })
         .catch(err => {

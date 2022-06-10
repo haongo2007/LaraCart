@@ -13,12 +13,12 @@ use App\Models\Admin\Admin;
 class ShopOrder extends Model
 {
     use ModelTrait;
-
+    
     public $table = 'shop_order';
     protected $guarded = [];
 
-    protected  $bc_order_profile = 0; // 0: all, 1: only user's order
-    public $bc_status = 1;
+    protected  $lc_order_profile = 0; // 0: all, 1: only user's order
+    public $lc_status = 1;
     
     public function details()
     {
@@ -115,13 +115,12 @@ class ShopOrder extends Model
     public function createOrder($dataOrder, $dataTotal, $arrCartDetail)
     {
         //Process escape
-        $dataOrder     = bc_clean($dataOrder);
-        $dataTotal     = bc_clean($dataTotal);
-        $arrCartDetail = bc_clean($arrCartDetail);
+        $dataOrder     = lc_clean($dataOrder);
+        $dataTotal     = lc_clean($dataTotal);
+        $arrCartDetail = lc_clean($arrCartDetail);
 
         try {
             DB::connection(config('const.LC_CONNECTION'))->beginTransaction();
-            $dataOrder['domain'] = url('/');
             $uID = $dataOrder['customer_id'];
             $currency = $dataOrder['currency'];
             $exchange_rate = $dataOrder['exchange_rate'];
@@ -134,7 +133,7 @@ class ShopOrder extends Model
             //Insert order total
             foreach ($dataTotal as $key => $row) {
                 array_walk($row, function (&$v, $k) {
-                    return $v = bc_clean($v);
+                    return $v = lc_clean($v);
                     }
                 );
                 $row['order_id'] = $orderID;
@@ -150,28 +149,27 @@ class ShopOrder extends Model
                 $product = ShopProduct::find($pID);
                 
                 //Check product flash sale over stock
-                if (function_exists('bc_product_flash_check_over') && !bc_product_flash_check_over($pID, $cartDetail['qty'])) {
+                if (function_exists('lc_product_flash_check_over') && !lc_product_flash_check_over($pID, $cartDetail['qty'])) {
                     return $return = ['error' => 1, 'msg' => trans('cart.over', ['item' => $product->sku])];
                 }
 
                 //If product out of stock
-                if (!bc_config('product_buy_out_of_stock') && $product->stock < $cartDetail['qty']) {
+                if (!lc_config('product_buy_out_of_stock') && $product->stock < $cartDetail['qty']) {
                     return $return = ['error' => 1, 'msg' => trans('cart.over', ['item' => $product->sku])];
                 }
                 //
-                $tax = (bc_tax_price($cartDetail['price'], $product->getTaxValue()) - $cartDetail['price']) *  $cartDetail['qty'];
 
                 $cartDetail['order_id'] = $orderID;
                 $cartDetail['currency'] = $currency;
                 $cartDetail['exchange_rate'] = $exchange_rate;
                 $cartDetail['sku'] = $product->sku;
-                $cartDetail['tax'] = $tax;
+                $cartDetail['tax'] = $dataOrder['tax'];
                 $cartDetail['store_id'] = $cartDetail['store_id'];
                 $this->addOrderDetail($cartDetail);
 
                 //Update stock flash sale
-                if (function_exists('bc_product_flash_update_stock')) {
-                    bc_product_flash_update_stock($pID, $cartDetail['qty']);
+                if (function_exists('lc_product_flash_update_stock')) {
+                    lc_product_flash_update_stock($pID, $cartDetail['qty']);
                 }
 
                 //Update stock and sold
@@ -180,12 +178,13 @@ class ShopOrder extends Model
             //End order detail
 
             //Add order store - MultiVendorPro
-            if (function_exists('bc_vendor_create_order')) {
-                bc_vendor_create_order($orderID);
+            if (function_exists('lc_vendor_create_order')) {
+                lc_vendor_create_order($orderID);
             }
 
             //Add history
             $dataHistory = [
+                'admin_id' => 0,
                 'order_id' => $orderID,
                 'content' => 'New order',
                 'customer_id' => $uID,
@@ -196,8 +195,8 @@ class ShopOrder extends Model
             //Process Discount
             $codeDiscount = session('Discount') ?? '';
             if ($codeDiscount) {
-                if (!empty(bc_config('Discount'))) {
-                    $moduleClass = bc_get_class_plugin_controller($code = 'Total', $key = 'Discount');
+                if (!empty(lc_config('Discount'))) {
+                    $moduleClass = lc_get_class_plugin_controller($code = 'Total', $key = 'Discount');
                     $returnModuleDiscount = (new $moduleClass)->apply($codeDiscount, $uID, $msg = 'Order #' . $orderID);
                     $arrReturnModuleDiscount = json_decode($returnModuleDiscount, true);
                     if ($arrReturnModuleDiscount['error'] == 1) {
@@ -216,7 +215,7 @@ class ShopOrder extends Model
                         } else {
                             $msg = trans('promotion.process.undefined');
                         }
-                        return redirect(bc_route('cart'))->with(['error_discount' => $msg]);
+                        return redirect(lc_route('cart'))->with(['error_discount' => $msg]);
                     }
                 }
             }
@@ -237,7 +236,6 @@ class ShopOrder extends Model
  */
     public function addOrderHistory($dataHistory)
     {
-        $dataHistory['admin_id'] = (Admin::user())?Admin::user()->id:0;
         return ShopOrderHistory::create($dataHistory);
     }
 
@@ -257,9 +255,9 @@ class ShopOrder extends Model
      * @return  new model
      */
     public function start() {
-        if($this->bc_order_profile) {
+        if($this->lc_order_profile) {
             $obj = (new ShopOrder);
-            $obj->bc_order_profile = 1;
+            $obj->lc_order_profile = 1;
             return $obj;
         } else {
             return new ShopOrder;
@@ -292,8 +290,8 @@ class ShopOrder extends Model
      * Disable only user's order mode
      */
     public function setOrderProfile() {
-        $this->bc_order_profile = 1;
-        $this->bc_status = 'all' ;
+        $this->lc_order_profile = 1;
+        $this->lc_status = 'all' ;
         return $this;
     }
 
@@ -306,7 +304,7 @@ class ShopOrder extends Model
      * Get list order new
      */
     public function getOrderNew() {
-        $this->bc_status = 1;
+        $this->lc_status = 1;
         return $this;
     }
 
@@ -314,7 +312,7 @@ class ShopOrder extends Model
      * Get list order processing
      */
     public function getOrderProcessing() {
-        $this->bc_status = 2;
+        $this->lc_status = 2;
         return $this;
     }
 
@@ -322,7 +320,7 @@ class ShopOrder extends Model
      * Get list order hold
      */
     public function getOrderHold() {
-        $this->bc_status = 3;
+        $this->lc_status = 3;
         return $this;
     }
 
@@ -330,7 +328,7 @@ class ShopOrder extends Model
      * Get list order canceld
      */
     public function getOrderCanceled() {
-        $this->bc_status = 4;
+        $this->lc_status = 4;
         return $this;
     }
 
@@ -338,7 +336,7 @@ class ShopOrder extends Model
      * Get list order done
      */
     public function getOrderDone() {
-        $this->bc_status = 5;
+        $this->lc_status = 5;
         return $this;
     }
 
@@ -346,7 +344,7 @@ class ShopOrder extends Model
      * Get list order failed
      */
     public function getOrderFailed() {
-        $this->bc_status = 6;
+        $this->lc_status = 6;
         return $this;
     }
 
@@ -355,7 +353,7 @@ class ShopOrder extends Model
      */
     public function buildQuery() {
         $customer = auth()->user();
-        if ($this->bc_order_profile == 1) {
+        if ($this->lc_order_profile == 1) {
             if(!$customer) {
                 return null;
             }
@@ -365,12 +363,12 @@ class ShopOrder extends Model
             $query = $this->with('orderTotal')->with('details');
         }
 
-        if ($this->bc_status !== 'all') {
-            $query = $query->where('status', $this->bc_status);
+        if ($this->lc_status !== 'all') {
+            $query = $query->where('status', $this->lc_status);
         }
 
-        if (count($this->bc_moreWhere)) {
-            foreach ($this->bc_moreWhere as $key => $where) {
+        if (count($this->lc_moreWhere)) {
+            foreach ($this->lc_moreWhere as $key => $where) {
                 if(count($where)) {
                     $query = $query->where($where[0], $where[1], $where[2]);
                 }
@@ -380,8 +378,8 @@ class ShopOrder extends Model
         if ($this->random) {
             $query = $query->inRandomOrder();
         } else {
-            if (is_array($this->bc_sort) && count($this->bc_sort)) {
-                foreach ($this->bc_sort as  $rowSort) {
+            if (is_array($this->lc_sort) && count($this->lc_sort)) {
+                foreach ($this->lc_sort as  $rowSort) {
                     if(is_array($rowSort) && count($rowSort) == 2) {
                         $query = $query->sort($rowSort[0], $rowSort[1]);
                     }

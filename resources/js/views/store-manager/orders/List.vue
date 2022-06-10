@@ -72,25 +72,31 @@
 
       <el-table-column :label="$t('table.subtotal')" min-width="150" align="center">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.subtotal | toThousandFilter }} {{ scope.row && scope.row.currency }}
+          {{ scope.row && scope.row.subtotal | toThousandFilter(scope.row.currency) }}
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.shipfee')" min-width="100" align="center">
+      <el-table-column :label="$t('table.shipfee')" min-width="110" align="center">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.shipping | toThousandFilter }} {{ scope.row && scope.row.currency }}
+          {{ scope.row && scope.row.shipping | toThousandFilter(scope.row.currency) }}
         </template>
       </el-table-column>
 
       <el-table-column :label="$t('table.discount')" min-width="150" align="center">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.discount | toThousandFilter }} {{ scope.row && scope.row.currency }}
+          {{ scope.row && scope.row.discount | toThousandFilter(scope.row.currency) }}
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="$t('table.tax')" min-width="100" align="center">
+        <template slot-scope="scope">
+          {{ scope.row && scope.row.tax | toThousandFilter(scope.row.currency) }}
         </template>
       </el-table-column>
 
       <el-table-column :label="$t('table.total')" min-width="150" align="center">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.total | toThousandFilter }} {{ scope.row && scope.row.currency }}
+          {{ scope.row && scope.row.total | toThousandFilter(scope.row.currency)}}
         </template>
       </el-table-column>
 
@@ -102,7 +108,7 @@
 
       <el-table-column :label="$t('table.currency')" min-width="100" align="center">
         <template slot-scope="scope">
-          {{ scope.row && scope.row.currency + '/' +scope.row.exchange_rate }}
+          {{ scope.row && scope.row.currency + '/' + (scope.row.exchange_rate ) }}
         </template>
       </el-table-column>
 

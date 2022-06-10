@@ -1,6 +1,6 @@
 <?php
-use BlackCart\Core\Mail\SendMail;
-use BlackCart\Core\Jobs\SendEmailJob;
+use App\Mail\SendMail;
+use App\Jobs\SendEmailJob;
 use Illuminate\Support\Facades\Mail;
 
 /**
@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\Mail;
  *
  * @return  mixed
  */
-function lc_send_mail($view, array $dataView = [], array $emailConfig = [], array $attach = [])
+function lc_send_mail($dataView, array $emailConfig = [], array $attach = [])
 {
     if (!empty(lc_config('email_action_mode'))) {
         if (!empty(lc_config('email_action_queue'))) {
-            dispatch(new SendEmailJob($view, $dataView,  $emailConfig, $attach));
+            dispatch(new SendEmailJob($dataView,  $emailConfig, $attach));
         } else {
-            lc_process_send_mail($view, $dataView,  $emailConfig, $attach);
+            lc_process_send_mail($dataView,  $emailConfig, $attach);
         }
     } else {
         return false;
@@ -37,14 +37,13 @@ function lc_send_mail($view, array $dataView = [], array $emailConfig = [], arra
  *
  * @return  [][][]                [return description]
  */
-function lc_process_send_mail($view, array $dataView = [], array $emailConfig = [], array $attach = []) {
+function lc_process_send_mail($dataView, array $emailConfig = [], array $attach = []) {
     try {
-
-        $status = Mail::send(new SendMail($view, $dataView, $emailConfig, $attach));
+        $status = Mail::send(new SendMail($dataView, $emailConfig, $attach));
         if ($status) {
             dd($status);
         }
     } catch (\Throwable $e) {
-        lc_report("Sendmail view:" . $view . PHP_EOL . $e->getMessage());
+        lc_report("Sendmail subject: ". $emailConfig['subject'] . PHP_EOL . $e->getMessage());
     }
 }

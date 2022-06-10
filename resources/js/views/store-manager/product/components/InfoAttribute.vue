@@ -101,7 +101,7 @@
         </el-col>
         <el-col :span="2">
           <div style="margin: 5px;">
-            <el-button :disabled="disabled_clear" type="danger" icon="el-icon-close" @click="handleClearAllAttribute()">Clear</el-button>
+            <el-button :disabled="disabled_clear" type="danger" icon="el-icon-close" @click="handleClearAllAttribute()">{{ $t('form.clear') }}</el-button>
           </div>
         </el-col>
       </el-row>
@@ -109,10 +109,10 @@
     <el-row>
       <el-button-group class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-          Previous
+          {{ $t('form.prev') }}
         </el-button>
         <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
-          Next
+          {{ $t('form.next') }}
         </el-button>
       </el-button-group>
     </el-row>

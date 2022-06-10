@@ -82,6 +82,8 @@ return [
         'phone'        => 'Phone',
         'note'         => 'Note',
         'order_detail' => 'Order detail',
+        'image'        => 'Image',
+        'attribute'    => 'Attribute',
         'sort'         => 'No.',
         'sku'          => 'SKU',
         'price'        => 'Price',

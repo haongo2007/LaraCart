@@ -84,6 +84,8 @@ return [
         'order_detail' => 'Chi tiết đặt hàng',
         'sort'         => 'Thứ tự',
         'sku'          => 'SKU',
+        'image'        => 'Hình ảnh',
+        'attribute'    => 'Thuộc tính',
         'price'        => 'Giá',
         'name'         => 'Tên',
         'qty'          => 'Số lượng',

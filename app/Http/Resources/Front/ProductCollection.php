@@ -34,6 +34,7 @@ class ProductCollection extends JsonResource
             'stock'=> $this->stock ,
             'top'=> null,
             'until' => null,
+            'tax' => $this->getTaxValue(),
             'variants' => new ProductAttributeColorCollection($this->attributesParent)
         ];
         

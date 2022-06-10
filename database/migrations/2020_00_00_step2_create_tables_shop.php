@@ -137,6 +137,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->integer('fee');
             $table->integer('shipping_free');
+            $table->integer('store_id')->default(1)->index();
             }
         );
 
@@ -725,6 +726,28 @@ class CreateTablesShop extends Migration
             }
         );
 
+
+        Schema::create('shop_discount', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('code', 50)->unique();
+            $table->integer('reward')->default(2);
+            $table->string('type', 10)->default('point')->comment('point - Point; percent - %');
+            $table->string('data', 300)->nullable();
+            $table->integer('limit')->default(1);
+            $table->integer('used')->default(0);
+            $table->integer('login')->default(0);
+            $table->integer('store_id')->default(1)->index();
+            $table->tinyInteger('status')->default(0);
+            $table->dateTime('expires_at')->nullable();
+        });
+
+        Schema::create('shop_discount_customer', function (Blueprint $table) {
+            $table->integer('customer_id');
+            $table->integer('discount_id');
+            $table->text('log')->nullable();
+            $table->timestamp('used_at')->nullable();
+            $table->primary(['customer_id', 'discount_id']);
+        });
     }
 
     /**

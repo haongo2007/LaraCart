@@ -3,7 +3,7 @@
 namespace App\Plugins\Shipping\ShippingStandard;
 
 use App\Plugins\Shipping\ShippingStandard\Models\PluginModel;
-use BlackCart\Core\Admin\Models\AdminConfig;
+use App\Models\Admin\Config;
 use App\Plugins\ConfigDefault;
 class AppConfig extends ConfigDefault
 {
@@ -25,11 +25,11 @@ class AppConfig extends ConfigDefault
     public function install()
     {
         $return = ['error' => 0, 'msg' => ''];
-        $check = AdminConfig::where('key', $this->configKey)->first();
+        $check = Config::where('key', $this->configKey)->first();
         if ($check) {
             $return = ['error' => 1, 'msg' => 'Module exist'];
         } else {
-            $process = AdminConfig::insert(
+            $process = Config::insert(
                 [
                     'group' => $this->configGroup,
                     'code' => $this->configCode,
@@ -51,7 +51,7 @@ class AppConfig extends ConfigDefault
     public function uninstall()
     {
         $return = ['error' => 0, 'msg' => ''];
-        $process = (new AdminConfig)->where('key', $this->configKey)->delete();
+        $process = (new Config)->where('key', $this->configKey)->delete();
         if (!$process) {
             $return = ['error' => 1, 'msg' => 'Error when uninstall'];
         }
@@ -61,7 +61,7 @@ class AppConfig extends ConfigDefault
     public function enable()
     {
         $return = ['error' => 0, 'msg' => ''];
-        $process = (new AdminConfig)->where('key', $this->configKey)->update(['value' => self::ON]);
+        $process = (new Config)->where('key', $this->configKey)->update(['value' => self::ON]);
         if (!$process) {
             $return = ['error' => 1, 'msg' => 'Error enable'];
         }
@@ -70,7 +70,7 @@ class AppConfig extends ConfigDefault
     public function disable()
     {
         $return = ['error' => 0, 'msg' => ''];
-        $process = (new AdminConfig)->where('key', $this->configKey)->update(['value' => self::OFF]);
+        $process = (new Config)->where('key', $this->configKey)->update(['value' => self::OFF]);
         if (!$process) {
             $return = ['error' => 1, 'msg' => 'Error disable'];
         }

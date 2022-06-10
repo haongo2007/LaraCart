@@ -309,7 +309,7 @@ class User extends Model implements AuthenticatableContract
     public static function listStore()
     {
         if (self::$listStore === null) {
-            self::$listStore = ShopStore::with('descriptionsCurrentLang','admin_custom_config')
+            self::$listStore = ShopStore::with('descriptionsCurrentLang','adminCustomConfig')
                 ->whereIn('id', self::listStoreId())
                 ->get()
                 ->keyBy('id');

@@ -7,30 +7,30 @@
       <el-skeleton :rows="6" animated :loading="loading" />
       <el-form v-show="!loading" ref="dataForm" :model="dataTemp" :rules="rules" class="form-container" label-width="200px">
 
-        <el-form-item :label="$t('user.fullname')" prop="fullname">
+        <el-form-item :label="$t('form.fullname')" prop="fullname">
           <el-input
             v-model="dataTemp.fullname"
-            placeholder="Please input"
+            :placeholder="$t('form.fullname')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item :label="$t('user.phone')" prop="phone">
+        <el-form-item :label="$t('form.phone')" prop="phone">
           <el-input
             v-model="dataTemp.phone"
-            placeholder="Please input"
+            :placeholder="$t('form.phone')"
             clearable
           />
         </el-form-item>
 
-        <el-form-item :label="$t('user.email')" prop="email">
+        <el-form-item :label="$t('form.email')" prop="email">
           <el-input
             v-model="dataTemp.email"
-            placeholder="Please input"
+            :placeholder="$t('form.email')"
             clearable
           />
         </el-form-item>
-        <el-form-item :label="$t('user.role')" prop="roles">
+        <el-form-item :label="$t('form.role')" prop="roles">
           <el-popover
             placement="right"
             width="600"
@@ -41,11 +41,11 @@
                 <el-checkbox v-for="role in roles" :label="role.id" :key="role.id">{{ role.name }}</el-checkbox>
               </div>
             </el-checkbox-group>
-            <el-button slot="reference" type="primary">Open</el-button>
+            <el-button slot="reference" type="primary">Click</el-button>
           </el-popover>
         </el-form-item>
 
-        <el-form-item :label="$t('user.permissions')" prop="permissions">
+        <el-form-item :label="$t('form.permissions')" prop="permissions">
           <el-popover
             placement="right"
             width="600"
@@ -56,24 +56,24 @@
                 <el-checkbox v-for="permission in permissions" :label="permission.id" :key="permission.id">{{ permission.name }}</el-checkbox>
               </div>
             </el-checkbox-group>
-            <el-button slot="reference" type="primary">Open</el-button>
+            <el-button slot="reference" type="primary">Click</el-button>
           </el-popover>
         </el-form-item>
 
-        <el-form-item :label="$t('user.store')" prop="stores">
+        <el-form-item :label="$t('form.store')" prop="stores">
           <el-select v-model="dataTemp.stores" multiple placeholder="Select store" style="width: 100%;">
             <el-option v-for="(item,index) in storeList" :key="item.id" :label="item.descriptions_current_lang[0].title | uppercaseFirst" :value="item.id" />
           </el-select>
         </el-form-item>
 
-        <el-form-item :label="$t('user.password')" prop="password">
+        <el-form-item :label="$t('form.password')" prop="password">
           <el-input v-model="dataTemp.password" show-password>
             <el-button @click="generatePw" slot="append" icon="el-icon-refresh"></el-button>
           </el-input>
         </el-form-item>
 
         <el-button class="pull-right" type="success" icon="el-icon-check" @click="isEdit ? updateData() : createData()">
-          Done
+          {{ $t('form.done') }}
         </el-button>
       </el-form>
     </el-col>

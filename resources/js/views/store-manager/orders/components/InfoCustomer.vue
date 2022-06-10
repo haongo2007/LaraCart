@@ -173,7 +173,7 @@
                 </el-button>
               </el-button-group>
             </div>
-            <span slot="reference" class="border-edit">{{ dataOrder.address1 }}</span>
+            <span slot="reference" class="border-edit">{{ dataOrder.address1 ? dataOrder.address1 : 'Empty' }}</span>
           </el-popover>
         </el-descriptions-item>
 
@@ -204,7 +204,7 @@
                 </el-button>
               </el-button-group>
             </div>
-            <span slot="reference" class="border-edit">{{ dataOrder.address2 }}</span>
+            <span slot="reference" class="border-edit">{{ dataOrder.address2 ? dataOrder.address2 : 'Empty'}}</span>
           </el-popover>
         </el-descriptions-item>
 
@@ -235,7 +235,7 @@
                 </el-button>
               </el-button-group>
             </div>
-            <span slot="reference" class="border-edit">{{ dataOrder.address3 }}</span>
+            <span slot="reference" class="border-edit">{{ dataOrder.address3 ? dataOrder.address3 : 'Empty' }}</span>
           </el-popover>
         </el-descriptions-item>
 

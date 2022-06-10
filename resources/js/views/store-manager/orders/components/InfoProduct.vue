@@ -23,8 +23,15 @@
             width="400"
             trigger="click"
           >
-            <attributes-product :is-new="scope.row.is_new" :data-currency="scope.row.currency" :data-atribute-group="dataAttributeGroup" :data-attribute="scope.row.attribute" @handleAttributeProduct="handleAttributeProduct" />
-            <el-button slot="reference" icon="el-icon-s-tools" size="mini" type="primary" />
+            <attributes-product 
+              :is-new="scope.row.is_new" 
+              :data-currency="scope.row.currency" 
+              :data-exchange-rate="scope.row.exchange_rate" 
+              :data-atribute-group="dataAttributeGroup" 
+              :data-attribute="scope.row.attribute" 
+              :data-product="scope.row.product_id" 
+              @handleAttributeProduct="handleAttributeProduct" />
+            <el-button slot="reference" icon="el-icon-s-tools" size="mini" type="primary" @click="setCurrentIndex(scope.$index)" />
           </el-popover>
         </template>
       </el-table-column>
@@ -68,8 +75,8 @@
         min-width="150"
       >
         <template slot-scope="scope">
-          <span v-if="!scope.row.is_new">{{ scope.row.price | toThousandFilter }}</span>
-          <el-input-number v-else v-model.number="temp[scope.$index].price" size="mini" :controls="false" :min="0" @focus="setCurrentIndex(scope.$index)" @change="handleChangePrice('price',temp[scope.$index].price)" />
+          <span v-if="!scope.row.is_new">{{ scope.row.price | toThousandFilter(scope.row.currency) }}</span>
+          <el-input-number v-else v-model.number="temp[scope.$index].price" size="mini" :controls="false" :min="0" @focus="setCurrentIndex(scope.$index)" @change="handleChangePrice(temp[scope.$index].qty)" />
         </template>
       </el-table-column>
       <el-table-column
@@ -88,7 +95,17 @@
       >
         <template slot-scope="scope">
           <span v-if="!scope.row.is_new">{{ scope.row.qty }}</span>
-          <el-input-number v-else v-model.number="temp[scope.$index].qty" style="width:50px;" size="mini" :controls="false" :min="0" @focus="setCurrentIndex(scope.$index)" @change="handleChangePrice('qty',temp[scope.$index].qty)" />
+          <el-input-number v-else v-model.number="temp[scope.$index].qty" style="width:50px;" size="mini" :controls="false" :min="0" @focus="setCurrentIndex(scope.$index)" @change="handleChangePrice(temp[scope.$index].qty)" />
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        :label="$t('table.total')"
+        min-width="100"
+      >
+        <template slot-scope="scope">
+          <span v-if="!scope.row.is_new">{{ scope.row.total_price | toThousandFilter(scope.row.currency) }}</span>
+          <el-input-number v-else v-model.number="temp[scope.$index].total_price" style="width:100px;" size="mini" :disabled="true" :controls="false" :min="0" />
         </template>
       </el-table-column>
 
@@ -98,7 +115,7 @@
         min-width="80"
       >
         <template slot-scope="scope">
-          <span v-if="!scope.row.is_new">{{ (scope.row.tax.label == '' ? scope.row.tax.value : scope.row.tax) }}</span>
+          <span v-if="!scope.row.is_new">{{ (scope.row.tax.label == '' ? scope.row.tax.value : scope.row.tax) | toThousandFilter(scope.row.currency) }}</span>
           <el-autocomplete
             @focus="setCurrentIndex(scope.$index)" 
             v-model="temp[scope.$index].tax.value"
@@ -108,21 +125,12 @@
             :fetch-suggestions="querySearchTaxAsync"
             :placeholder="$t('table.tax')"
             @select="handleSelectTax"
+            @change="handleSelectTax"
             v-else
           />
         </template>
       </el-table-column>
-
-      <el-table-column
-        :label="$t('table.total')"
-        min-width="100"
-      >
-        <template slot-scope="scope">
-          <span v-if="!scope.row.is_new">{{ scope.row.total_price | toThousandFilter }}</span>
-          <el-input-number v-else v-model.number="temp[scope.$index].total_price" style="width:100px;" size="mini" :disabled="true" :controls="false" :min="0" />
-        </template>
-      </el-table-column>
-
+      
       <el-table-column
         :label="$t('table.actions')"
         min-width="100"
@@ -142,6 +150,7 @@ import ProductResource from '@/api/product';
 import OrdersResource from '@/api/orders';
 import AttributesProduct from './AttributesProduct';
 import TaxResource from '@/api/tax';
+import { changeCurrency } from '@/filters';
 
 const defaultForm = {
   is_new: true,
@@ -189,6 +198,7 @@ export default {
   },
   methods: {
     handleAddProduct(){
+      console.log(defaultForm);
       const newval = Object.assign({}, defaultForm);
   		this.dataProducts.details.push(newval);
   		this.temp.push(newval);
@@ -201,7 +211,7 @@ export default {
 
       if (results.length == 0) {
         productResource.list({ keyword: queryString,storeId:this.dataProducts.stores.id }).then(response => {
-          this.products = [...this.products, ...response.data];
+          this.products = response.data;
           results = response.data;
 		      cb(results);
         })
@@ -219,35 +229,40 @@ export default {
     },
     handleSelect(item) {
     	const index = this.currentIndex;
-    	this.temp[index].product_id = item.id;
-    	this.temp[index].order_id = this.$route.params.id;
-    	this.temp[index].sku = item.sku;
-    	this.temp[index].price = item.price;
-    	this.temp[index].qty = 1;
-    	this.temp[index].total_price = item.price;
-    	this.temp[index].tax.value = String(item.tax);
-    	this.temp[index].attribute = item.attributes;
-    	this.temp[index].currency = this.dataProducts.currency;
-    	this.temp[index].groups = [];
+    	this.$set(this.temp[index],'product_id',item.id);
+    	this.$set(this.temp[index],'order_id', this.$route.params.id);
+    	this.$set(this.temp[index],'sku', item.sku);
+    	this.$set(this.temp[index],'price', item.price * this.dataProducts.exchange_rate);
+    	this.$set(this.temp[index],'qty', 1);
+    	this.$set(this.temp[index],'total_price', item.price * this.dataProducts.exchange_rate);
+    	this.$set(this.temp[index],'attribute', {...item.attributes});
+    	this.$set(this.temp[index],'currency', this.dataProducts.currency);
+      this.$set(this.temp[index],'exchange_rate', this.dataProducts.exchange_rate);
+    	this.$set(this.temp[index],'groups',[]);
+      this.temp[index].tax = {
+        label: '',
+        value: String( (item.price * item.tax / 100) * this.dataProducts.exchange_rate ),
+      }
     },
     setCurrentIndex(index){
     	this.currentIndex = index;
     },
-    handleChangePrice(type, val){
-    	if (type == 'qty'){
-    		this.temp[this.currentIndex].total_price = val * this.temp[this.currentIndex].price;
-    	} else if (type == 'price'){
-    		this.temp[this.currentIndex].total_price = this.temp[this.currentIndex].qty * this.temp[this.currentIndex].price;
-        if (this.temp[this.currentIndex].hasOwnProperty('groups')) {
-          let sum = 0;
-          this.temp[this.currentIndex].groups.forEach((item) => {
-            let key = Object.keys(item.text)[0];
-            item = item.text[key].split('__');
-            sum += parseInt(item[1]);
-          });
-          this.temp[this.currentIndex].total_price += sum;
-        }
-    	}
+    handleChangePrice(qty){
+      let sumVariant = 0;
+      if (this.temp[this.currentIndex].hasOwnProperty('groups')) {
+        this.temp[this.currentIndex].groups.forEach((item) => {
+          let key = Object.keys(item.text)[0];
+          item = item.text[key].split('__');
+          sumVariant += parseInt(item[1]);
+        });
+      }
+      let old_total = this.temp[this.currentIndex].total_price / this.dataProducts.exchange_rate;
+      this.temp[this.currentIndex].total_price = (( (this.temp[this.currentIndex].price / this.dataProducts.exchange_rate) + sumVariant) * qty) * this.dataProducts.exchange_rate;
+
+      if (this.temp[this.currentIndex].tax.hasOwnProperty('value') && this.temp[this.currentIndex].tax.value > 0) {
+        let tax_percent = old_total / this.temp[this.currentIndex].tax.value;
+        this.temp[this.currentIndex].tax.value = String( (this.temp[this.currentIndex].total_price * tax_percent / 100) * this.dataProducts.exchange_rate ) ;
+      }
     },
     handleDeleteProduct(row, is_new = false){
       this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
@@ -292,24 +307,21 @@ export default {
     },
     handleAttributeProduct(obj){
       const that = this;
-      this.temp.forEach(function(val, index) {
-        if (val.product_id == obj.prd) {
-          if (that.temp[index].groups.length == 0) {
+      let index = this.currentIndex;
+      if (this.temp[index].groups.length == 0) {
+        this.temp[index].groups.push(obj);
+      } else {
+        this.temp[index].groups.forEach((item,key) => {
+          if (item.group == obj.group) {
+            that.temp[index].groups.splice(key);
             that.temp[index].groups.push(obj);
-          } else {
-            that.temp[index].groups.forEach(function(v, i) {
-              if (obj.group == v.group) {
-                that.temp[index].groups.splice(i);
-                that.temp[index].groups.push(obj);
-              } else {
-                that.temp[index].groups.push(obj);
-              }
-            });
+          }else{
+            that.temp[index].groups.push(obj);
           }
-          that.currentIndex = index;
-          that.handleChangePrice('price');
-        }
-      });
+        })
+        
+      }
+      this.handleChangePrice(this.temp[index].qty);
     },
     saveProduct(index){
       this.btnLoading = true;
@@ -326,18 +338,18 @@ export default {
       this.temp[index].groups.forEach(function(val, index) {
         text = { ...text, ...val.text };
       });
-      this.temp[index].attribute = JSON.stringify(text);
+      this.temp[index].attribute = JSON.stringify([text]);
       ordersResource.addMoreItem(this.temp[index]).then((res) => {
-        if (res) {
+        if (res.success) {
 	        this.$message({
 	          type: 'success',
 	          message: 'Save successfully',
 	        });
 	        this.temp[index].id = res.data.order_detail_id;
-		      this.btnLoading = false;
         	this.$emit('handleChangeInvoice', res.data.invoice);
         	this.$emit('handleChangeHistory', res.data.history);
 	      }
+        this.btnLoading = false;
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -351,15 +363,18 @@ export default {
         for(let prop in att) {
           let key = Object.keys(att[prop].text);
           let item = att[prop].text[key].split('__');
-          result += this.dataAttributeGroup[key]+': '+item[0]+' - '+item[1]+'<br>';
+          result += this.dataAttributeGroup[key]+': '+item[0]+' - '+ changeCurrency(item[1],this.dataProducts.exchange_rate,this.dataProducts.currency)+'<br>';
         }
       }else if(typeof att == 'undefined'){
         return;
       }else{
+        att = att.replace(/&quot;/g, "\"");
         let reAtt = JSON.parse(att);
-        for(let prop in reAtt) {
-          let item = reAtt[prop].split('__');
-          result += this.dataAttributeGroup[prop]+': '+item[0]+' - '+item[1]+'<br>';
+        for(let props in reAtt){
+          for(let prop in reAtt[props]) {
+            let item = reAtt[props][prop].split('__');
+            result += this.dataAttributeGroup[prop]+': '+item[0]+'<span class="el-badge__content el-badge__content--warning">'+ changeCurrency(item[1],this.dataProducts.exchange_rate,this.dataProducts.currency) +'</span><br>';
+          }
         }
       }
       return result;
@@ -385,8 +400,13 @@ export default {
       cb(results);
     },
     handleSelectTax(item) {
-      this.temp[this.currentIndex].total_price += item.value;
-      this.temp[this.currentIndex].tax.value = String(item.value);
+      let val = item;
+      if (item.hasOwnProperty('value')) {
+        val = item.value;
+      }
+      let subtotal = this.temp[this.currentIndex].total_price;
+      let qty = this.temp[this.currentIndex].qty;
+      this.temp[this.currentIndex].tax.value = String(subtotal * val / 100);
     },
   },
 };

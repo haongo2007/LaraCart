@@ -7,7 +7,7 @@
       <el-skeleton :rows="6" animated :loading="loading" />
       <el-form v-show="!loading" ref="dataForm" :model="dataTemp" :rules="rules" class="form-container" label-width="200px">
 
-        <el-form-item :label="$t('permission.name')" prop="name">
+        <el-form-item :label="$t('form.name')" prop="name">
           <el-input
             style="width: 30%"
             v-model="dataTemp.name"
@@ -15,7 +15,7 @@
             clearable/>
         </el-form-item>
 
-        <el-form-item :label="$t('permission.slug')" prop="slug">
+        <el-form-item :label="$t('form.slug')" prop="slug">
           <el-input
             style="width: 30%"
             v-model="dataTemp.slug"
@@ -23,7 +23,7 @@
             clearable/>
         </el-form-item>
 
-        <el-form-item :label="$t('permission.path')" prop="path">
+        <el-form-item :label="$t('form.path')" prop="path">
           <div class="parent-options">
             <div class="child-options" v-for="(info,index) in path" :key="index">
               <el-checkbox v-model="checkList[index]['value']" @change="handleCheckAllChange(index)" 
@@ -41,7 +41,7 @@
         </el-form-item>
 
         <el-button class="pull-right" type="success" icon="el-icon-check" @click="isEdit ? updateData() : createData()">
-          Done
+          {{ $t('form.done') }}
         </el-button>
       </el-form>
     </el-col>

@@ -1,6 +1,6 @@
 <template>
   <el-form ref="dataForm" class="form-config-container">
-    <el-descriptions class="margin-top" title="Config Display" :column="1" border>
+    <el-descriptions class="margin-top" :title="$t('store.display_config')" :column="1" border>
       <el-descriptions-item :label="item.detail" v-for="(item,index) in dataConfig.configDisplay" :key="index">
         <el-popover
           v-model="visible[index]"

@@ -681,29 +681,34 @@ export default {
         this.temp.time_active = JSON.parse(this.temp.time_active);
       }
     }
-    let j = 0;
-    let that = this;
+    let desc = [...this.temp.descriptions];
+    let newDesc = []; 
     for(let key in this.temp.languages) {
-      let find = that.temp.descriptions.filter((item) => item.lang == key);
+      let find = desc.filter((item) => item.lang == key);
       if (find.length > 0) {
         let v = find[0];
-        that.$set(that.temp.descriptions[j],'description',{value:v.description,visible:false});
-        that.$set(that.temp.descriptions[j],'title',{value:v.title,visible:false});
-        that.$set(that.temp.descriptions[j],'keyword',{value:v.keyword,visible:false});
+        newDesc.push({
+          description : {value:v.description,visible:false},
+          title : {value:v.title,visible:false},
+          keyword : {value:v.keyword,visible:false},
+          lang : key,
+          store_id : this.temp.id,
+          maintain_content : v.maintain_content,
+          maintain_note : v.maintain_note
+        });
       }else{
-        if(!that.temp.descriptions.hasOwnProperty(j)){
-          that.$set(that.temp.descriptions,j,{});
-        }
-        that.$set(that.temp.descriptions[j],'description',{value:null,visible:false});
-        that.$set(that.temp.descriptions[j],'title',{value:null,visible:false});
-        that.$set(that.temp.descriptions[j],'keyword',{value:null,visible:false});
-        that.$set(that.temp.descriptions[j],'lang',key);
-        that.$set(that.temp.descriptions[j],'store_id',this.temp.id);
-        that.$set(that.temp.descriptions[j],'maintain_content',null);
-        that.$set(that.temp.descriptions[j],'maintain_note',null);
+        newDesc.push({
+          description : {value:'',visible:false},
+          title : {value:'',visible:false},
+          keyword : {value:'',visible:false},
+          lang : key,
+          store_id : this.temp.id,
+          maintain_content : v.maintain_content,
+          maintain_note : v.maintain_note
+        });
       }
-      j++;
     };
+    this.$set(this.temp,'descriptions',newDesc);
   },
   watch: {
     'dataQuery.limit': {

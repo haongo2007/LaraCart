@@ -14,14 +14,14 @@
               :on-change="handleChange"
             >
               <i class="el-icon-upload" />
-              <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+              <div class="el-upload__text">{{ $t('form.drop_file') }}</em></div>
 
             </el-upload>
 
             <div class="el-upload el-upload--text" @click="handleVisibleStorage()">
               <div class="el-upload-dragger">
                 <i class="el-icon-upload" />
-                <div class="el-upload__text">Click here to Open <em>Storage</em></div>
+                <div class="el-upload__text">{{ $t('form.choose_storage') }}</div>
               </div>
             </div>
           </div>
@@ -67,10 +67,10 @@
             </el-tooltip>
           </div>
           <div style="text-align: right; margin: 0">
-            <el-button size="mini" type="text" @click="visiblePopover = false">Cancel</el-button>
+            <el-button size="mini" type="text" @click="visiblePopover = false">{{ $t('form.prev') }}</el-button>
             <el-button type="primary" size="mini" @click="done()">Done</el-button>
           </div>
-          <el-button slot="reference" type="success" icon="el-icon-check">Upload</el-button>
+          <el-button slot="reference" type="success" icon="el-icon-check">{{ $t('form.upload') }}</el-button>
         </el-popover>
       </div>
     </el-row>

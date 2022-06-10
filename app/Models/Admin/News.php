@@ -41,15 +41,21 @@ class News extends ShopNews
 
         $keyword          = lc_clean($dataSearch['keyword'] ?? '');
         $sort_order       = lc_clean($dataSearch['sort_order'] ?? 'id_desc');
-        $limit      = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
+        $limit            = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
+        $storeId          = lc_clean($dataSearch['storeId'] ?? session('adminStoreId'));
+
+        if ($storeId && !is_array($storeId)) {
+            $storeId = [$storeId];
+        }
 
         $tableDescription = (new ShopNewsDescription)->getTable();
         $tableNews     = (new ShopNews)->getTable();
 
         $newsList = (new ShopNews)
             ->leftJoin($tableDescription, $tableDescription . '.news_id', $tableNews . '.id')
-            ->whereIn('store_id', session('adminStoreId'))
             ->where($tableDescription . '.lang', lc_get_locale());
+
+        $newsList = $newsList->whereIn($tableNews . '.store_id',  $storeId);
 
         if ($keyword) {
             $newsList = $newsList->where(function ($sql) use($tableDescription, $keyword){

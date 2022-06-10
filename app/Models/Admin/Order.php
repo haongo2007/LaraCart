@@ -238,17 +238,17 @@ class Order extends ShopOrder
             $order->tax = $tax;
             $total = $subTotal + $tax + $order->discount + $order->shipping;
             $balance = $total + $order->received;
-            $payment_status = 0;
-            if ($balance == $total) {
-                $payment_status = ShopOrderTotal::NOT_YET_PAY; //Not pay
-            } elseif ($balance < 0) {
-                $payment_status = ShopOrderTotal::NEED_REFUND; //Need refund
-            } elseif ($balance == 0) {
-                $payment_status = ShopOrderTotal::PAID; //Paid
-            } else {
-                $payment_status = ShopOrderTotal::PART_PAY; //Part pay
-            }
-            $order->payment_status = $payment_status;
+            // $payment_status = 0;
+            // if ($balance == $total) {
+            //     $payment_status = ShopOrderTotal::NOT_YET_PAY; //Not pay
+            // } elseif ($balance < 0) {
+            //     $payment_status = ShopOrderTotal::NEED_REFUND; //Need refund
+            // } elseif ($balance == 0) {
+            //     $payment_status = ShopOrderTotal::PAID; //Paid
+            // } else {
+            //     $payment_status = ShopOrderTotal::PART_PAY; //Part pay
+            // }
+            // $order->payment_status = $payment_status;
             $order->total = $total;
             $order->balance = $balance;
             $order->save();

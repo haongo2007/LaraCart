@@ -18,15 +18,36 @@ class ShopStoreController extends Controller
     public function getInfo()
     {
         $storeId = request()->header('x-store');
-        if (!$storeId) {
-            $domain = lc_process_domain_store(basename(request()->headers->get('referer')));
-            $arrDomain = ShopStore::getDomainPartner();
-            $storeId = array_search($domain, $arrDomain);
-        }
     	$data = [];
         $data['store'] = ShopStore::with('descriptionsCurrentLang')->find($storeId);
-        $data['languages'] = ShopLanguage::where('store_id',$storeId)->get();
-        $data['currencies'] = ShopCurrency::where('store_id',$storeId)->get();
+        $shippingMethod = [];
+        $paymentMethod = [];
+        if (!lc_config('shipping_off',$storeId)) {
+            $where = ['code' => 'Shipping','storeId' => $storeId];
+            $moduleShipping = Config::getListConfigByCode($where);
+            $sourcesShipping = lc_get_all_plugin('shipping');
+            foreach ($moduleShipping as $module) {
+                if (array_key_exists($module['key'], $sourcesShipping)) {
+                    $moduleClass = lc_get_class_plugin_config('shipping', $module['key']);
+                    $shippingMethod[$module['key']] = (new $moduleClass)->getData();
+                }
+            }
+        }
+        if (!lc_config('payment_off',$storeId)) {
+            $where = ['code' => 'Payment','storeId' => $storeId];
+            $modulePayment = Config::getListConfigByCode($where);
+            $sourcesPayment = lc_get_all_plugin('payment');
+            foreach ($modulePayment as $module) {
+                if (array_key_exists($module['key'], $sourcesPayment)) {
+                    $moduleClass = $sourcesPayment[$module['key']].'\AppConfig';
+                    $paymentMethod[$module['key']] = (new $moduleClass)->getData();
+                }
+            }   
+        }
+        $data['store']['shipping_method'] = $shippingMethod;
+        $data['store']['payment_method'] = $paymentMethod;
+        $data['languages'] = ShopLanguage::getListActive($storeId);
+        $data['currencies'] = ShopCurrency::getListActive($storeId);
         $data['slider'] = ShopBanner::where([['store_id',$storeId],['type','slider_home'],['status',1]])->get();
         $data['brands'] = ShopBrand::where([['store_id',$storeId],['status',1]])->get();
         $data['banner'] = ShopBanner::where([['store_id',$storeId],['type','banner_home'],['status',1]])->get();

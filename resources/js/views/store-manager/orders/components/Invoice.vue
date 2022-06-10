@@ -5,14 +5,14 @@
         <el-descriptions-item v-for="(item,index) in dataTotal.order_total" :key="item.id">
           <template slot="label">
             <i class="el-icon-tickets" />
-            {{ $t('form.'+item.title.toLowerCase()) }}
+            {{ $t('form.'+item.code.toLowerCase()) }}
           </template>
 
           <el-popover
             v-if="['shipping','discount','received'].includes(item.code)"
             v-model="visible[index]"
             placement="top"
-            :title="$t('form.'+item.title.toLowerCase())"
+            :title="$t('form.'+item.code.toLowerCase())"
             width="200"
           >
             <el-form-item
@@ -27,10 +27,10 @@
                 <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(index,item.code,item.id)">confirm</el-button>
               </el-button-group>
             </div>
-            <span slot="reference" class="border-edit">{{ dataTotal[item.code] | toThousandFilter }}</span>
+            <span slot="reference" class="border-edit">{{ dataTotal[item.code] | toThousandFilter(dataTotal.currency) }}</span>
           </el-popover>
 
-          <span v-else>{{ dataTotal[item.code] | toThousandFilter }}</span>
+          <span v-else>{{ dataTotal[item.code] | toThousandFilter(dataTotal.currency) }}</span>
 
         </el-descriptions-item>
         <el-descriptions-item>
@@ -38,7 +38,7 @@
             <i class="el-icon-tickets" />
             {{ $t('form.balance') }}
           </template>
-          {{ ( dataTotal.balance === null ? dataTotal.total : dataTotal.balance ) | toThousandFilter }}
+          {{ ( dataTotal.balance === null ? dataTotal.total : dataTotal.balance ) | toThousandFilter(dataTotal.currency) }}
         </el-descriptions-item>
       </el-descriptions>
     </el-form>

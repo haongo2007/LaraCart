@@ -77,7 +77,7 @@ class ProductController extends Controller
     {
         $product = (new Product)->getProductAdmin($id);
         if (!$product) {
-            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
         return response()->json(new JsonResponse($product), Response::HTTP_OK);
     }
@@ -501,7 +501,7 @@ public function createProductGroup()
     {
         $product = (new Product)->getProductAdmin($id);
         if ($product === null) {
-            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
         $data = $request->all();
         $data['descriptions'] = json_decode($data['descriptions']);
@@ -812,7 +812,9 @@ public function createProductGroup()
                                                 'active' => $childvaluepalette->active
                                             ];
                                         }
-                                        ShopAttributePalette::insert($arrDataChildPalette);
+                                        if(isset($arrDataChildPalette)){
+                                            ShopAttributePalette::insert($arrDataChildPalette);
+                                        }
                                     };
                                 }
                             }

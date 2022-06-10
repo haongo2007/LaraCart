@@ -11,7 +11,7 @@
           <el-col :span="24">
             <el-button-group>
               <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
-              @click="$router.push({ name: 'UserCreate'}).catch(() => {})" v-permission="['create.blog']" />
+              @click="$router.push({ name: 'BlogCreate'}).catch(() => {})" v-permission="['create.blog']" />
               <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
               @click="handerDeleteAll" v-permission="['delete.blog']"/>
             </el-button-group>
@@ -26,12 +26,12 @@
 
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-select v-model="dataQuery.role" multiple collapse-tags :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
-              <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
+            <el-select v-model="dataQuery.sort_order" :placeholder="$t('table.order')" style="width:100%" clearable class="filter-item" @change="handleFilter('sort_order',dataQuery.sort_order)">
+              <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" :disabled="item.active" />
             </el-select>
           </el-col>
           <el-col :span="12">
-            <el-input v-model="dataQuery.keyword" :placeholder="$t('table.keyword')" style="width: 100%;" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.keyword" :placeholder="$t('form.typing_input_blog')" style="width: 100%;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
       </div>
@@ -45,6 +45,7 @@ import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
 import BlogsResource from '@/api/blogs';
 import permission from '@/directive/permission'; // Permission directive (v-permission)
+import reloadRedirectToList from '@/utils';
 
 const blogsResource = new BlogsResource();
 export default {
@@ -65,7 +66,24 @@ export default {
       list: null,
       total: 0,
       roles: [],
-      multiSelectRow:[]
+      multiSelectRow:[],
+      sortOptions: [{
+        label: 'Id DESC',
+        key: 'id__desc',
+        active: true,
+      }, {
+        label: 'Id ASC',
+        key: 'id__asc',
+        active: false,
+      }, {
+        label: 'Title A-Z',
+        key: 'title__asc',
+        active: false,
+      }, {
+        label: 'Title Z-A',
+        key: 'title__desc',
+        active: false,
+      }],
     };
   },
   watch: {
@@ -103,7 +121,7 @@ export default {
       this.handleDeleting(this.multiSelectRow, true);
     },
     handleDeleting(row, multiple = false) {
-      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
+      this.$confirm(this.$t('form.answer_delete'), 'Warning', {
         confirmButtonText: 'OK',
         cancelButtonText: 'Cancel',
         type: 'warning',
@@ -116,13 +134,10 @@ export default {
           var id = row.id;
         }
         var that = this;
-        userResource.destroy(id).then((res) => {
+        blogsResource.destroy(id).then((res) => {
           if (res) {
             if (multiple) {
-              row.forEach(function(v) {
-                const index = that.list.indexOf(v);
-                that.list.splice(index, 1);
-              });
+              reloadRedirectToList('BlogList');
             } else {
               const index = that.list.indexOf(row);
               that.list.splice(index, 1);

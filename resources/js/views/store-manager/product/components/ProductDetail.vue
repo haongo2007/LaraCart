@@ -6,7 +6,7 @@
     <el-col class="el-content-form" :span="22" :offset="1">
       <!-- <el-skeleton :rows="20" animated/> -->
       <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
-        <el-step v-for="(step,key,index) in dataStepContent" :key="index" :title="(step.title ? step.title : step)" :icon="(step.icon ? step.icon : 'el-icon-edit')" />
+        <el-step v-for="(step,key,index) in dataStepContent" :key="index" :title="(step.title ? $t('form.'+step.title) : step)" :icon="(step.icon ? step.icon : 'el-icon-edit')" />
       </el-steps>
 
       <div v-for="(content,key,index) in dataStepContent" :key="key">
@@ -24,11 +24,11 @@
           <el-form ref="dataForm" :model="temp" :rules="dataRules" class="form-container" label-width="150px">
             <el-row class="el-main-form">
               <el-col :span="24">
-                <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
+                <el-form-item :label="$t('form.name')" :prop="'descriptions.'+key+'.title'">
                   <el-input v-model="temp.descriptions[key].title" />
                 </el-form-item>
 
-                <el-form-item :label="$t('table.tags')">
+                <el-form-item :label="$t('form.tags')">
                   <el-tag
                     v-for="tag in temp.descriptions[key].keyword"
                     :key="tag"
@@ -51,7 +51,7 @@
                   <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
                 </el-form-item>
 
-                <el-form-item :label="$t('table.description')">
+                <el-form-item :label="$t('form.description')">
                   <el-input
                     v-model="temp.descriptions[key].description"
                     :rows="2"
@@ -60,7 +60,7 @@
                   />
                 </el-form-item>
 
-                <el-form-item :label="$t('table.content')" :prop="'descriptions.'+key+'.content'">
+                <el-form-item :label="$t('form.content')" :prop="'descriptions.'+key+'.content'">
                   <Tinymce ref="editor" v-model="temp.descriptions[key].content" :height="400" :style="{'width': 'calc(100% - 2px)'}" />
                 </el-form-item>
               </el-col>
@@ -69,10 +69,10 @@
           <el-row>
             <el-button-group class="pull-right">
               <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
-                Previous
+                {{ $t('form.prev') }}
               </el-button>
               <el-button v-if="!action" type="primary" icon="el-icon-arrow-right" @click="nextStep">
-                Next
+                {{ $t('form.next') }}
               </el-button>
             </el-button-group>
           </el-row>

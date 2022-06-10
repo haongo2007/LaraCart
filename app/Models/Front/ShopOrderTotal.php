@@ -15,28 +15,21 @@ class ShopOrderTotal extends Model
     const POSITION_TOTAL_METHOD = 20;
     const POSITION_TOTAL = 100;
     const POSITION_RECEIVED = 200;
-    const NOT_YET_PAY = 1;
-    const PART_PAY = 2;
-    const PAID = 3;
-    const NEED_REFUND = 4;
 
     /**
      * Process data order total
      * @param  array      $objects  [description]
      * @return [array]    order total after process
      */
-    public static function processDataTotal(array $objects = [])
+    public static function processDataTotal(array $objects = [],$subtotal,$tax)
     {
-        $carts  = ShopCurrency::sumCart();
-        $subtotal = $carts['subTotal'];
-        $tax = $carts['subTotalWithTax'] - $carts['subTotal'];
 
         //Set subtotal
         $arraySubtotal = [
             'title' => trans('order.totals.sub_total'),
             'code' => 'subtotal',
-            'value' => $subtotal,
-            'text' => bc_currency_render_symbol($subtotal),
+            'value' => lc_currency_value($subtotal),
+            'text' => lc_currency_render($subtotal),
             'sort' => self::POSITION_SUBTOTAL,
         ];
 
@@ -45,12 +38,12 @@ class ShopOrderTotal extends Model
             'title' => trans('order.totals.tax'),
             'code' => 'tax',
             'value' => $tax,
-            'text' => bc_currency_render_symbol($tax),
+            'text' => $tax,
             'sort' => self::POSITION_TAX,
         ];
 
         // set total value
-        $total = $subtotal + $tax;
+        $total = lc_currency_value($subtotal + $tax);
         foreach ($objects as $key => $object) {
             if (is_array($object) && $object) {
                 if ($object['code'] != 'received') {
@@ -64,7 +57,7 @@ class ShopOrderTotal extends Model
             'title' => trans('order.totals.total'),
             'code' => 'total',
             'value' => $total,
-            'text' => bc_currency_render_symbol($total),
+            'text' => lc_currency_render_symbol($total),
             'sort' => self::POSITION_TOTAL,
         );
         //End total value
@@ -102,27 +95,6 @@ class ShopOrderTotal extends Model
     }
 
     /**
-     * Get shipping method
-     */
-    public static function getShippingMethod()
-    {
-        $arrShipping = [];
-        $shippingMethod = session('shippingMethod') ?? '';
-        if ($shippingMethod) {
-            $moduleClass = bc_get_class_plugin_config('Shipping', $shippingMethod);
-            $returnModuleShipping = (new $moduleClass)->getData();
-            $arrShipping = [
-                'title' => $returnModuleShipping['title'],
-                'code' => 'shipping',
-                'value' => bc_currency_value($returnModuleShipping['value']),
-                'text' => bc_currency_render($returnModuleShipping['value']),
-                'sort' => self::POSITION_SHIPPING_METHOD,
-            ];
-        }
-        return $arrShipping;
-    }
-
-    /**
      * Get payment method
      */
     public static function getPaymentMethod()
@@ -130,7 +102,7 @@ class ShopOrderTotal extends Model
         $arrPayment = [];
         $paymentMethod = session('paymentMethod') ?? '';
         if ($paymentMethod) {
-            $moduleClass = bc_get_class_plugin_config('Paypal', $paymentMethod);
+            $moduleClass = lc_get_class_plugin_config('Paypal', $paymentMethod);
             $returnModulePayment = (new $moduleClass)->getData();
             $arrPayment = [
                 'title' => $returnModulePayment['title'],
@@ -150,13 +122,13 @@ class ShopOrderTotal extends Model
         $totalMethod = session('totalMethod', []);
         if ($totalMethod && is_array($totalMethod)) {
             foreach ($totalMethod as $keyMethod => $valueMethod) {
-                $classTotalConfig = bc_get_class_plugin_config('Total', $keyMethod);
+                $classTotalConfig = lc_get_class_plugin_config('Total', $keyMethod);
                 $returnModuleTotal = (new $classTotalConfig)->getData();
                 $totalMethod[] = [
                     'title' => $returnModuleTotal['title'],
                     'code' => 'discount',
                     'value' => $returnModuleTotal['value'],
-                    'text' => bc_currency_render_symbol($returnModuleTotal['value']),
+                    'text' => lc_currency_render_symbol($returnModuleTotal['value']),
                     'sort' => self::POSITION_TOTAL_METHOD,
                 ];
             }
@@ -188,14 +160,47 @@ class ShopOrderTotal extends Model
     }
 
     /**
+     * Get shipping method
+     */
+    public static function getShippingMethod($key)
+    {
+        $arrShipping = [];
+        $shippingMethod = $key ?? '';
+        if ($shippingMethod) {
+            $moduleClass = lc_get_class_plugin_config('Shipping', $shippingMethod);
+            $moduleClass = new $moduleClass;
+            $returnModuleShipping = $moduleClass->getData();
+            $arrShipping = [
+                'title' => $moduleClass->title,
+                'code' => 'shipping',
+                'value' => lc_currency_value($returnModuleShipping['fee']),
+                'text' => lc_currency_render($returnModuleShipping['fee']),
+                'sort' => self::POSITION_SHIPPING_METHOD,
+            ];
+        }
+        return $arrShipping;
+    }
+
+    /**
+     * Get received value
+     */
+    public static function getDiscountTotal($discount)
+    {
+        return array(
+            'title' => trans('order.totals.discount'),
+            'code' => 'discount',
+            'value' => lc_currency_value($discount),
+            'text' => lc_currency_render($discount),
+            'sort' => self::POSITION_TOTAL_METHOD,
+        );
+    }
+    /**
      * Get object total for order
      */
-    public static function getObjectOrderTotal(){
+    public static function getObjectOrderTotal($shippingKey,$discount){
         $objects = array();
-        $objects[] = self::getShippingMethod();
-        foreach (self::getTotal() as  $totalMethod) {
-            $objects[] = $totalMethod;
-        }
+        $objects[] = self::getDiscountTotal($discount);
+        $objects[] = self::getShippingMethod($shippingKey);
         $objects[] = self::getReceived();
         return $objects;
     }

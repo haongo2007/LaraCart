@@ -99,31 +99,31 @@ export default {
       // /// create step form
       this.stepContent = data;
       this.stepContent['info-general'] = {
-        title: 'General',
+        title: 'general',
         icon: 'el-icon-view',
       };
       this.$set(this.componentInfo, 'info-general', '');
 
       this.stepContent['info-promotion'] = {
-        title: 'Promotion',
+        title: 'promotion',
         icon: 'el-icon-s-promotion',
       };
       this.$set(this.componentInfo, 'info-promotion', '');
 
       this.stepContent['info-attribute'] = {
-        title: 'Attribute',
+        title: 'attribute',
         icon: 'el-icon-news',
       };
       this.$set(this.componentInfo, 'info-attribute', '');
 
       this.stepContent['info-property'] = {
-        title: 'Property',
+        title: 'property',
         icon: 'el-icon-menu',
       };
       this.$set(this.componentInfo, 'info-property', '');
 
       this.stepContent['info-thumbnail'] = {
-        title: 'Thumbnail',
+        title: 'thumbnail',
         icon: 'el-icon-picture-outline',
       };
       this.$set(this.componentInfo, 'info-thumbnail', '');

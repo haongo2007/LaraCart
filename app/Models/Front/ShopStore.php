@@ -26,7 +26,7 @@ class ShopStore extends Model
         return $this->hasMany(ShopStoreDescription::class, 'store_id', 'id')->where('lang',lc_get_locale());
     }
 
-    public function admin_custom_config()
+    public function adminCustomConfig()
     {
         return $this->hasMany(Config::class, 'store_id', 'id')->where('code','admin_config');
     }
@@ -60,7 +60,6 @@ class ShopStore extends Model
     {
         return $this->hasMany(ShopPage::class, 'store_id', 'id');
     }
-
 
     protected static function boot()
     {

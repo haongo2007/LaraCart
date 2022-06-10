@@ -61,7 +61,7 @@ class DashboardController extends Controller
             $Orders[] = [$order['total_order'],$order['store_id'],$order['d']];
             $Orders_total[] = $order['total_order'];
             
-            $Amount[] = [$order['total_amount'],$order['store_id'],$order['d']];
+            $Amount[] = [round($order['total_amount']),$order['store_id'],$order['d']];
             $Amount_total[] = $order['total_amount'];
         }
 

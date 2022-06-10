@@ -16,7 +16,7 @@
 // });
 
 Route::get('/orders/getRelationOrder/{storeId}', 'OrderController@getRelation');
-Route::post('/orders/addMoreItem', 'OrderController@postAddItem');
-Route::post('/orders/deleteItem', 'OrderController@postDeleteItem');
+Route::post('/orders/addMoreItem', 'OrderController@postAddProduct');
+Route::post('/orders/deleteItem', 'OrderController@postDeleteProduct');
 Route::get('/orders/download', 'OrderController@exportExcel');
 Route::apiResource('/orders', 'OrderController');

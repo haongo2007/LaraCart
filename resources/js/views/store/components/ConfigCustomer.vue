@@ -2,7 +2,7 @@
   <el-form class="form-config-container">
     <div class="margin-top el-descriptions">
        <div class="el-descriptions__header">
-          <div class="el-descriptions__title">Config Customer</div>
+          <div class="el-descriptions__title">{{ $t('store.customer_config') }}</div>
           <div class="el-descriptions__extra"></div>
        </div>
        <div class="el-descriptions__body">

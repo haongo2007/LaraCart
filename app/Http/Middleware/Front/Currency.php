@@ -17,11 +17,11 @@ class Currency
      */
     public function handle($request, Closure $next)
     {
-        $currency = session('currency') ?? lc_store('currency');
-        if(!array_key_exists($currency, lc_currency_all_active())){
-            $currency = array_key_first(lc_currency_all_active());
+        $currentCurrency = $request->header('x-currency');
+        if(!array_key_exists($currentCurrency, lc_currency_all_active())){
+            $currentCurrency = array_key_first(lc_currency_all_active());
         }
-        ShopCurrency::setCode($currency);
+        ShopCurrency::setCode($currentCurrency);
         return $next($request);
     }
 }

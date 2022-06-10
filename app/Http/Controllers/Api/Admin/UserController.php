@@ -238,13 +238,13 @@ class UserController extends Controller
      */
     public function updateAvatar(Request $request)
     {
-        $user = Auth::user();        
-        $path = 'user/avatar/'.$user->id;
+        $user = Auth::user();   
+        $disk = 'user';     
+        $path = 'avatar/'.$user->id;
         $fileName = $request->file('avatar')->hashName();
-        $request->file('avatar')->storeAs(
-            $path,$fileName
-        );
-        $url = 'api/'.config('const.LC_ADMIN_PREFIX').'/getFile?disk='.env('FILESYSTEM_DRIVER', 'local').'&path='.urlencode($path.'/'.$fileName);
+
+        Storage::disk($disk)->put($path,$request->file('avatar'));
+        $url = 'api/'.config('const.LC_ADMIN_PREFIX').'/getFile?disk='.$disk.'&path='.urlencode($path.'/'.$fileName);
         $user->avatar = $url;
         $user->save();
         return response()->json(['data' => ['status' => 'success','avatar' => $url] ], 200);

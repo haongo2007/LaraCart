@@ -5,34 +5,34 @@
       <el-row v-show="!loading" class="el-main-form">
         <el-col :span="12">
 
-          <el-form-item :label="$t('table.cost')" prop="cost">
+          <el-form-item :label="$t('form.cost')" prop="cost">
             <el-input-number v-model="temp.cost" style="width: 100%" :controls="false" :min="1" />
           </el-form-item>
 
-          <el-form-item :label="$t('table.price')" prop="price">
+          <el-form-item :label="$t('form.price')" prop="price">
             <el-input-number v-model="temp.price" style="width: 100%" :controls="false" :min="1" />
           </el-form-item>
 
-          <el-form-item :label="$t('table.tax')" prop="tax.label">
+          <el-form-item :label="$t('form.tax')" prop="tax.label">
             <el-autocomplete
               v-model="temp.tax.label"
               style="width: 100%"
               value-key="name"
               class="inline-input"
               :fetch-suggestions="querySearchTaxAsync"
-              placeholder="Please Input"
+              :placeholder="$t('form.tax')"
               @select="handleSelectTax"
             />
           </el-form-item>
 
-          <el-form-item :label="$t('table.mi_quantity')" prop="minimum">
+          <el-form-item :label="$t('form.mi_quantity')" prop="minimum">
             <el-input-number v-model="temp.minimum" style="width: 100%" :controls="false" :min="1" />
           </el-form-item>
 
-          <el-form-item :label="$t('table.stock')" prop="stock">
+          <el-form-item :label="$t('form.stock')" prop="stock">
             <el-input
               v-model="temp.stock"
-              placeholder="Please input"
+              :placeholder="$t('form.mi_quantity')"
               clearable
             />
           </el-form-item>
@@ -40,35 +40,35 @@
         </el-col>
         <el-col :span="12">
 
-          <el-form-item :label="$t('table.brand')" prop="brand">
+          <el-form-item :label="$t('form.brand')" prop="brand">
             <el-autocomplete
               v-model="temp.brand.label"
               style="width: 100%"
               value-key="name"
               class="inline-input"
               :fetch-suggestions="querySearchBrandAsync"
-              placeholder="Please Input"
+              :placeholder="$t('form.brand')"
               @select="handleSelectBrand"
             />
           </el-form-item>
 
-          <el-form-item :label="$t('table.supplier')" prop="supplier">
+          <el-form-item :label="$t('form.supplier')" prop="supplier">
             <el-autocomplete
               v-model="temp.supplier.label"
               style="width: 100%"
               value-key="name"
               class="inline-input"
               :fetch-suggestions="querySearchSupplierAsync"
-              placeholder="Please Input"
+              :placeholder="$t('form.supplier')"
               @select="handleSelectSup"
             />
           </el-form-item>
 
-          <el-form-item :label="$t('table.sku')" prop="sku">
+          <el-form-item :label="$t('form.sku')" prop="sku">
             <el-input
               v-model="temp.sku"
               style="width: 100%"
-              placeholder="Please input"
+              :placeholder="$t('form.sku')"
               clearable
             />
           </el-form-item>
@@ -77,29 +77,29 @@
             <el-cascader v-model="temp.category" style="width: 100%" :props="cateRecurProps" clearable />
           </el-form-item> -->
 
-          <el-form-item :label="$t('table.sell_date')" prop="date_available">
+          <el-form-item :label="$t('form.sell_date')" prop="date_available">
             <el-date-picker
               v-model="date_available"
               style="width: 100%"
               type="datetime"
-              placeholder="Select date and time for available sale"
+              :placeholder="$t('form.sell_date')"
               :picker-options="pickerOptions"
               @change="handleFilterDate()"
             />
           </el-form-item>
 
-          <el-form-item :label="$t('table.url_config')" prop="alias">
+          <el-form-item :label="$t('form.url_config')" prop="alias">
             <el-input
               v-model="temp.alias"
-              placeholder="Please input"
+              :placeholder="$t('form.url_config')"
               clearable
             />
           </el-form-item>
 
         </el-col>
         <el-col :span="24">
-          <el-form-item :label="$t('table.category')" prop="category">
-            <category-multiple :store-id="dataStoreId" :data-temp-multiple="temp.category" @handleProcessCategory="handleProcessCategory" :is-multiple="true" 
+          <el-form-item :label="$t('form.category')" prop="category">
+            <category-multiple :store-id="parseInt(dataStoreId)" :data-temp-multiple="temp.category ? temp.category : []" @handleProcessCategory="handleProcessCategory" :is-multiple="true" 
             :is-edit="isEdit" />
           </el-form-item>
         </el-col>
@@ -108,10 +108,10 @@
     <el-row>
       <el-button-group class="pull-right">
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
-          Previous
+          {{ $t('form.prev') }}
         </el-button>
         <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
-          Next
+          {{ $t('form.next') }}
         </el-button>
       </el-button-group>
     </el-row>

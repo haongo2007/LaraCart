@@ -2,7 +2,7 @@
   <el-form ref="dataForm" class="form-config-container" style="width: 100%;">
     <el-row :gutter="20" style="margin:0px">
       <el-col :span="12" style="padding: 0;">
-        <el-descriptions class="margin-top" title="Config Product" :column="1" border>
+        <el-descriptions class="margin-top" :title="$t('store.product_config')" :column="1" border>
           <el-descriptions-item v-for="(item,index) in dataConfig.productConfig" :key="index" :label="item.detail">
             <el-popover
               v-if="item.key == 'product_tax'"
@@ -42,7 +42,7 @@
       <el-col :span="12"  style="padding: 0;">
         <div class="margin-top el-descriptions">
           <div class="el-descriptions__header">
-            <div class="el-descriptions__title">Config Product</div>
+            <div class="el-descriptions__title">{{$t('store.product_config')}}</div>
             <div class="el-descriptions__extra"></div>
           </div>
           <div class="el-descriptions__body">

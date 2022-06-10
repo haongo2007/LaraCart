@@ -9,23 +9,9 @@ class ShopDiscount extends Model
 {
     public $timestamps    = false;
     public $table = 'shop_discount';
-    public $table_related = 'shop_discount_customer';
     protected $connection = LC_CONNECTION;
     protected $guarded    = [];
     protected $dates      = ['expires_at'];
-
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-    }
-    public function uninstall() {
-        if (Schema::hasTable($this->table)) {
-            Schema::drop($this->table);
-        }
-        if (Schema::hasTable($this->table_related)) {
-            Schema::drop($this->table_related);
-        }
-    }
 
     /*
     Get store
@@ -44,35 +30,6 @@ class ShopDiscount extends Model
             }
         );
     }
-
-    public function install()
-    {
-        $this->uninstall();
-
-        Schema::create($this->table, function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('code', 50)->unique();
-            $table->integer('reward')->default(2);
-            $table->string('type', 10)->default('point')->comment('point - Point; percent - %');
-            $table->string('data', 300)->nullable();
-            $table->integer('limit')->default(1);
-            $table->integer('used')->default(0);
-            $table->integer('login')->default(0);
-            $table->integer('store_id')->default(1)->index();
-            $table->tinyInteger('status')->default(0);
-            $table->dateTime('expires_at')->nullable();
-        });
-
-        Schema::create($this->table_related, function (Blueprint $table) {
-            $table->integer('customer_id');
-            $table->integer('discount_id');
-            $table->text('log')->nullable();
-            $table->timestamp('used_at')->nullable();
-            $table->primary(['customer_id', 'discount_id']);
-        });
-        
-
-    }
     /**
      * Get the users who is related promocode.
      *
@@ -80,7 +37,7 @@ class ShopDiscount extends Model
      */
     public function users()
     {
-        return $this->belongsToMany(\BlackCart\Core\Front\Models\ShopCustomer::class, $this->table_related, 'discount_id','customer_id')
+        return $this->belongsToMany(ShopCustomer::class, 'shop_discount_customer', 'discount_id','customer_id')
             ->withPivot('used_at', 'log');
     }
 
@@ -119,5 +76,96 @@ class ShopDiscount extends Model
         ->first();
 
         return $promocode;
+    }
+
+    /**
+     * [check description]
+     * @param  [type]  $code       [description]
+     * @param  [type]  $uID        [description]
+     * @return [type]  $store_id   [description]
+     */
+    public function check($code, $uID = null,$store_id)
+    {
+        $uID = (int) $uID;
+        $promocode = (new self)->getPromotionByCode($code,$store_id);
+        if ($promocode === null) {
+            return false;
+        }
+        //Check user  login
+        if ($promocode->login && !$uID) {
+            return false;
+        }
+
+        if ($promocode->limit == 0 || $promocode->limit <= $promocode->used) {
+            return false;
+        }
+
+        if ($promocode->status == 0 || $promocode->isExpired()) {
+            return false;
+        }
+        if ($promocode->login) {
+            //check if this user has already used this code already
+            $arrUsers = [];
+            foreach ($promocode->users as $value) {
+                $arrUsers[] = $value->pivot->customer_id;
+            }
+            if (in_array($uID, $arrUsers)) {
+                return false;
+            }
+        }
+
+        return $promocode;
+    }
+    /**
+     * [apply description]
+     * @param  [type] $code  [description]
+     * @param  [type] $msg   [description]
+     * @return [type] $store [description]
+     */
+    public function apply($code, $uID = null, $store,$msg = '')
+    {
+        //check code valid
+        $checkCode = $this->check($code, $uID,$store);
+
+        if ($checkCode) {
+            $promocode = (new ShopDiscount)->getPromotionByCode($code,$store);
+            if($promocode) {
+                try {
+                    // increment used
+                    $promocode->used += 1;
+                    $promocode->save();
+    
+                    $promocode->users()->attach($uID, [
+                        'used_at' => Carbon::now(),
+                        'log' => $msg,
+                    ]);
+                    return true;
+                } catch (\Throwable $e) {
+                    return json_encode(['error' => 1, 'msg' => $e->getMessage()]);
+                }
+            } else {
+                return false;
+            }
+
+        } else {
+            return $checkCode;
+        }
+
+    }
+
+    public function getValue($total,$check)
+    {
+        if ($check['type'] == 'percent') {
+            $value = $total * $check['reward'] / 100;
+        } else {
+            $value = lc_currency_value($check['reward']);
+        }
+        $value = ($value > $total) ? -$total : -$value;
+        return $value;
+    }
+
+    public function createDiscount($orderID,$code,$customer_id = 0,$storeId) {
+        $msg = 'Order #'.$orderID;
+        return $this->apply($code, $customer_id,$storeId,$msg);
     }
 }

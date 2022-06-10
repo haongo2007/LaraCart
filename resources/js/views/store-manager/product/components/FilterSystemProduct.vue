@@ -20,8 +20,8 @@
                 @click="$router.push({ name: 'ProductCreateSingle'})" v-permission="['create.single.product']">
                 <i class="el-icon-plus" />
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="ProductCreateBundle" v-permission="['create.bundle.product']">Product Bundle</el-dropdown-item>
-                  <el-dropdown-item command="ProductCreateGroup" v-permission="['create.group.product']">Product Group</el-dropdown-item>
+                  <el-dropdown-item command="ProductCreateBundle" v-permission="['create.bundle.product']">{{ $t('form.product_bundle') }}</el-dropdown-item>
+                  <el-dropdown-item command="ProductCreateGroup" v-permission="['create.group.product']">{{ $t('form.product_group') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </el-button-group>
@@ -36,7 +36,7 @@
       <div class="drawer-item">
         <el-row :gutter="24">
           <el-col :span="24">
-            <el-input v-model="dataQuery.keyword" clearable placeholder="Typing for search name, Sku, Description or keyword" class="filter-item" @keyup.enter.native="handleFilter" />
+            <el-input v-model="dataQuery.keyword" clearable :placeholder="$t('form.typing_input')" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
         <el-row :gutter="24">
@@ -48,8 +48,8 @@
               align="right"
               unlink-panels
               range-separator="To"
-              start-placeholder="Created date"
-              end-placeholder="End date"
+              :start-placeholder="$t('form.start_date')"
+              :end-placeholder="$t('form.end_date')"
               :picker-options="pickerOptions"
               @change="handleFilterDate()"
             />
@@ -58,7 +58,7 @@
 
         <el-row :gutter="24">
           <el-col :span="8">
-            <el-tooltip class="item" effect="dark" content="Choose value needed filter" placement="bottom-start">
+            <el-tooltip class="item" effect="dark" :content="$t('form.choose_price_type_filter')" placement="bottom-start">
               <el-radio-group v-model="dataQuery.filter_price_by" size="mini" style="width: 100%;" @change="handleFilterPriceSlide">
                 <el-radio-button label="Cost" />
                 <el-radio-button label="Price" />
@@ -66,7 +66,7 @@
             </el-tooltip>
           </el-col>
           <el-col :span="16">
-            <el-tooltip class="item" effect="dark" content="Filter price with slider" placement="bottom-start">
+            <el-tooltip class="item" effect="dark" :content="$t('form.choose_price_range')" placement="bottom-start">
               <el-slider
                 v-model="dataQuery.price"
                 range
@@ -85,7 +85,7 @@
             <el-cascader
               v-model="dataQuery.category"
               style="width: 100%;"
-              placeholder="Category"
+              :placeholder="$t('form.category')"
               :options="listRecursive"
               :props="cateRecurProps"
               collapse-tags

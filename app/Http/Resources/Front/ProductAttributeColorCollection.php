@@ -26,6 +26,8 @@ class ProductAttributeColorCollection extends JsonResource
             array_push($res[$group], 
             [
                 'id' => $value->id,
+                'type' => $group,
+                'group_id' => $value->attribute_group_id,
                 'color' => new ProductAttributePaletteCollection($value->activePalette),
                 'name' => $value->name,
                 'price' => $value->add_price,
@@ -59,6 +61,8 @@ class ProductAttributeSizeCollection extends JsonResource
             array_push($res[$group], 
             [
                 'id' => $value->id,
+                'type' => $group,
+                'group_id' => $value->attribute_group_id,
                 'name' => $value->name,
                 'price' => $value->add_price,
                 'color' => new ProductAttributePaletteCollection($value->first_palette),

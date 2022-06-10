@@ -37,7 +37,7 @@ export const menuSidebar = [
       {
         path: 'product',
         meta: {
-          title: 'Product',
+          title: 'product',
           icon: 'shopping',
           permissions: ['view.product'],
         },
@@ -47,7 +47,7 @@ export const menuSidebar = [
         path: 'category',
         name: 'CategoryList',
         meta: {
-          title: 'Category',
+          title: 'category',
           icon: 'list',
           permissions: ['view.category'],
         },

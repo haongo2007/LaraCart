@@ -7,21 +7,21 @@
       <el-skeleton :rows="6" animated :loading="loading" />
       <el-form v-show="!loading" ref="dataForm" :model="dataTemp" :rules="rules" class="form-container" label-width="200px">
 
-        <el-form-item :label="$t('roles.name')" prop="name">
+        <el-form-item :label="$t('form.name')" prop="name">
           <el-input
             v-model="dataTemp.name"
-            placeholder="Please input"
+            :placeholder="$t('form.name')"
             clearable/>
         </el-form-item>
 
-        <el-form-item :label="$t('roles.slug')" prop="slug">
+        <el-form-item :label="$t('form.slug')" prop="slug">
           <el-input
             v-model="dataTemp.slug"
-            placeholder="Please input"
+            :placeholder="$t('form.slug')"
             clearable/>
         </el-form-item>
 
-        <el-form-item :label="$t('roles.permissions')" prop="permissions">
+        <el-form-item :label="$t('form.permissions')" prop="permissions">
           <el-popover
             placement="right"
             width="600"
@@ -32,12 +32,12 @@
                 <el-checkbox v-for="permission in permissions" :label="permission.id" :key="permission.id">{{ permission.name }}</el-checkbox>
               </div>
             </el-checkbox-group>
-            <el-button slot="reference" type="primary">Open</el-button>
+            <el-button slot="reference" type="primary">Click</el-button>
           </el-popover>
         </el-form-item>
 
         <el-button class="pull-right" type="success" icon="el-icon-check" @click="isEdit ? updateData() : createData()">
-          Done
+          {{ $t('form.done') }}
         </el-button>
       </el-form>
     </el-col>

@@ -1,0 +1,17 @@
+export default {
+    admin:'Quản trị viên',
+    captcha:'Captcha',
+    display: 'Hiển thị',
+    orders: 'Đơn hàng',
+    customer: 'Khách hàng',
+    product: 'Sản phẩm',
+    email:'Email',
+    admin_config: "Cấu hình quản trị",
+    captcha_config: "Cấu hình Captcha",
+    customer_config: "Cấu hình khách hàng",
+    display_config: "Cấu hình hiển thị",
+    orders_config: "Cấu hình đơn hàng",
+    product_config: "Cấu hình sản phẩm",
+    email_mode: "Cấu hình email",
+    email_smtp: "Cấu hình SMTP",
+}

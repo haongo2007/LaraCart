@@ -36,8 +36,9 @@ class LoginController extends Controller
                     'message' => 'Unauthorized'
                 ]);
             }
-
-            $user = ShopCustomer::where('email', $request->email)->first();
+            
+            $store_id = request()->header('x-store');
+            $user = ShopCustomer::where([['email', $request->email],['store_id',$store_id]])->first();
 
             if (!Hash::check($request->password, $user->password, [])) {
                 throw new \Exception('Error in Login');

@@ -6,17 +6,17 @@
     <el-col :span="18" :offset="3">
       <el-form ref="dataForm" :model="dataTemp" :rules="dataRules" class="form-container" label-width="150px">
         <el-steps :space="200" simple :active="active" finish-status="success" style="margin-bottom: 20px;">
-          <el-step v-for="(lang,key,index) in dataLanguages" :key="index" :title="lang" :icon="key == 'last' ? 'el-icon-picture' : 'el-icon-edit'" />
+          <el-step v-for="(lang,key,index) in dataLanguages" :key="index" :title="lang == 'done' ? $t('form.'+lang) : lang" :icon="key == 'last' ? 'el-icon-picture' : 'el-icon-edit'" />
         </el-steps>
         <div v-for="(lang,key,index) in dataLanguages" :key="key">
           <div v-if="key != 'last'" v-show="index === active">
             <el-row class="el-main-form">
               <el-col :span="24">
-                <el-form-item :label="$t('table.name')" :prop="'descriptions.'+key+'.title'">
-                  <el-input v-model="dataTemp.descriptions[key].title" />
+                <el-form-item :label="$t('form.name')" :prop="'descriptions.'+key+'.title'">
+                  <el-input v-model="dataTemp.descriptions[key].title" :placeholder="$t('form.name')" />
                 </el-form-item>
 
-                <el-form-item :label="$t('table.tags')">
+                <el-form-item :label="$t('form.tags')">
                   <el-tag
                     v-for="tag in dataTemp.descriptions[key].keyword"
                     :key="tag"
@@ -39,12 +39,12 @@
                   <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
                 </el-form-item>
 
-                <el-form-item :label="$t('table.description')">
+                <el-form-item :label="$t('form.description')">
                   <el-input
                     v-model="dataTemp.descriptions[key].description"
                     :rows="2"
                     type="textarea"
-                    placeholder="Please input"
+                    :placeholder="$t('form.description')"
                   />
                 </el-form-item>
               </el-col>
@@ -54,11 +54,11 @@
           <div v-if="key === 'last'" v-show="index === active">
             <el-row class="el-main-form">
               <el-col :span="24">
-                <el-form-item :label="$t('table.sort')" prop="sort">
+                <el-form-item :label="$t('form.sort')" prop="sort">
                   <el-input-number v-model.number="dataTemp.sort" :min="1" />
                 </el-form-item>
 
-                <el-form-item :label="$t('table.top')" prop="top">
+                <el-form-item :label="$t('form.top')" prop="top">
                   <el-tooltip :content="'Switch value: ' + dataTemp.top" placement="top">
                     <el-switch
                       v-model="dataTemp.top"
@@ -70,11 +70,11 @@
                   </el-tooltip>
                 </el-form-item>
 
-                <el-form-item :label="$t('table.category')" prop="parent" style="margin-bottom: 0px;">
+                <el-form-item :label="$t('form.category')" prop="parent" style="margin-bottom: 0px;">
                   <category-multiple @handleProcessCategory="handleProcessCategory" :is-edit="isEdit" :data-temp="dataTemp"/>
                 </el-form-item>
 
-                <el-form-item :label="$t('table.status')" prop="status">
+                <el-form-item :label="$t('form.status')" prop="status">
                   <el-tooltip :content="'Switch value: ' + dataTemp.status" placement="top">
                     <el-switch
                       v-model="dataTemp.status"
@@ -87,7 +87,7 @@
 
                 </el-form-item>
 
-                <el-form-item :label="$t('table.banner')">
+                <el-form-item :label="$t('form.banner')">
                   <el-button size="small" type="success" @click="handleVisibleStorage()">Pick Image</el-button>
                 </el-form-item>
                 <div class="image-uploading">
@@ -110,13 +110,13 @@
       <el-row>
         <el-button-group class="pull-right">
           <el-button v-if="active > 0" type="warning" icon="el-icon-arrow-left" @click="backStep">
-            Previous
+            {{ $t('form.prev') }}
           </el-button>
           <el-button v-if="!action" type="primary" icon="el-icon-arrow-right" @click="nextStep">
-            Next
+            {{ $t('form.next') }}
           </el-button>
           <el-button v-else="action" type="success" icon="el-icon-check" @click="isEdit?updateData():createData()">
-            Done
+            {{ $t('form.done') }}
           </el-button>
         </el-button-group>
       </el-row>
@@ -205,7 +205,6 @@ export default {
       }
     },
     handleProcessCategory(data){
-      console.log(data);
       this.category = data;
     },
     createData() {
@@ -251,15 +250,15 @@ export default {
       });
     },
     updateData() {
+      this.dataTemp['parent'] = this.category.length ? this.category : '0';
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.dataTemp['parent'] = this.category;
           // check last not exist remove
           let last = this.dataTemp['parent'][this.dataTemp['parent'].length - 1];
-          if(last.name == null && last.parent == null && last.id == null){
+          if(last.name == null && last.parent == null && last.hasOwnProperty('id') && last.id == null){
             this.dataTemp['parent'].splice(this.dataTemp['parent'].length - 1,this.dataTemp['parent'].length);
           }
-
+          console.log(this.dataTemp['parent']);
           const loading = this.$loading({
             target: '.el-form',
           });

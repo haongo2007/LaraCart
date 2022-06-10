@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Front\ShopLanguage;
 use App\Models\Admin\News;
 use App\Http\Resources\BlogsCollection;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 use Validator;
 
 class BlogsController extends Controller
@@ -22,18 +24,16 @@ class BlogsController extends Controller
  */
     public function store()
     {
-
         $data = request()->all();
-
-        $langFirst = array_key_first(bc_language_all()->toArray()); //get first code language active
+        $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['title'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
 
         $validator = Validator::make($data, [
             'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
             'descriptions.*.title' => 'required|string|max:200',
-            'descriptions.*.keyword' => 'nullable|string|max:200',
+            'descriptions.*.keyword' => 'nullable|array|max:200',
             'descriptions.*.description' => 'nullable|string|max:300',
             ], [
                 'alias.regex' => trans('news.alias_validate'),
@@ -41,37 +41,45 @@ class BlogsController extends Controller
             ]
         );
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
 
         $dataInsert = [
-            'image'    => $data['image'],
+            'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'sort'     => $data['sort'],
             'alias'    => $data['alias'],
             'status'   => !empty($data['status']) ? 1 : 0,
-            'store_id' => session('adminStoreId'),
+            'store_id' => $data['store_id'],
         ];
-        $news = AdminNews::createNewsAdmin($dataInsert);
+        $news = News::createNewsAdmin($dataInsert);
         $id = $news->id;
         $dataDes = [];
-        $languages = $this->languages;
+        $languages = (new ShopLanguage)->getCodeActive($data['store_id']);
         foreach ($languages as $code => $value) {
             $dataDes[] = [
                 'news_id'     => $id,
                 'lang'        => $code,
                 'title'       => $data['descriptions'][$code]['title'],
-                'keyword'     => $data['descriptions'][$code]['keyword'],
+                'keyword'     => implode(',',$data['descriptions'][$code]['keyword']),
                 'description' => $data['descriptions'][$code]['description'],
                 'content'     => $data['descriptions'][$code]['content'],
             ];
         }
-        AdminNews::insertDescriptionAdmin($dataDes);
-        bc_clear_cache('cache_news');
+        News::insertDescriptionAdmin($dataDes);
+        lc_clear_cache('cache_news');
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
+    }
+    /*
+     * show News
+     */
+    public function show($id)
+    {
+        $news = News::with('descriptions')->find($id);
+        if (!$news) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
 
-        return redirect()->route('admin_news.index')->with('success', trans('news.admin.create_success'));
-
+        return response()->json(new JsonResponse($news), Response::HTTP_OK);
     }
 
     /**
@@ -79,20 +87,20 @@ class BlogsController extends Controller
      */
     public function update($id)
     {
-        $news = AdminNews::getNewsAdmin($id);
+        $news = News::getNewsAdmin($id);
         if (!$news) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_FORBIDDEN);
         }
         $data = request()->all();
 
-        $langFirst = array_key_first(bc_language_all()->toArray()); //get first code language active
+        $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['title'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
 
         $validator = Validator::make($data, [
             'descriptions.*.title' => 'required|string|max:200',
-            'descriptions.*.keyword' => 'nullable|string|max:200',
+            'descriptions.*.keyword' => 'nullable|array|max:200',
             'descriptions.*.description' => 'nullable|string|max:300',
             'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
             ], [
@@ -102,17 +110,15 @@ class BlogsController extends Controller
         );
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
     //Edit
         $dataUpdate = [
-            'image' => $data['image'],
+            'image' => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'alias' => $data['alias'],
             'sort' => $data['sort'],
             'status' => !empty($data['status']) ? 1 : 0,
-            'store_id'    => session('adminStoreId'),
+            'store_id'  => $data['store_id'],
         ];
 
         $news->update($dataUpdate);
@@ -123,49 +129,27 @@ class BlogsController extends Controller
                 'news_id' => $id,
                 'lang' => $code,
                 'title' => $row['title'],
-                'keyword' => $row['keyword'],
+                'keyword' => implode(',',$row['keyword']),
                 'description' => $row['description'],
                 'content' => $row['content'],
             ];
         }
-        AdminNews::insertDescriptionAdmin($dataDes);
-        bc_clear_cache('cache_news');
-
-        return redirect()->route('admin_news.index')->with('success', trans('news.admin.edit_success'));
-
+        News::insertDescriptionAdmin($dataDes);
+        lc_clear_cache('cache_news');
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
     /*
     Delete list Item
     Need mothod destroy to boot deleting in model
     */
-    public function deleteList()
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            $arrDontPermission = [];
-            foreach ($arrID as $key => $id) {
-                if(!$this->checkPermisisonItem($id)) {
-                    $arrDontPermission[] = $id;
-                }
-            }
-            if (count($arrDontPermission)) {
-                return response()->json(['error' => 1, 'msg' => trans('admin.remove_dont_permisison') . ': ' . json_encode($arrDontPermission)]);
-            }
-            AdminNews::destroy($arrID);
-            bc_clear_cache('cache_news');
+        $arrID = explode(',', $id);
+        News::destroy($arrID);
+        lc_clear_cache('cache_news');
 
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
-    /**
-     * Check permisison item
-     */
-    public function checkPermisisonItem($id) {
-        return AdminNews::getNewsAdmin($id);
-    }
 }

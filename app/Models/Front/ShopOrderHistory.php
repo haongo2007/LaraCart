@@ -15,4 +15,8 @@ class ShopOrderHistory extends Model
     {
         return $this->hasOne(\App\Models\Admin\User::class, 'id','admin_id');
     }
+    public function Customer()
+    {
+        return $this->belongsTo('App\Models\Front\ShopCustomer', 'customer_id', 'id');
+    }
 }

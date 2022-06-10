@@ -34,6 +34,7 @@ class OrderCollection extends JsonResource
             'exchange_rate' => $this->exchange_rate,
             'status'        => $this->status,
             'created_at'    => $this->created_at,
+            'tax'        => $this->tax,
             'store'        => $this->stores
         ];
     }

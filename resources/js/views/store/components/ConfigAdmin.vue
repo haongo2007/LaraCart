@@ -1,6 +1,6 @@
 <template>
   <el-form ref="dataForm" :model="temp" class="form-config-container">
-    <el-descriptions class="margin-top" title="Config Admin" :column="1" border>
+    <el-descriptions class="margin-top" :title="$t('store.admin_config')" :column="1" border>
       <el-descriptions-item v-for="(item,index) in temp" :label="item.detail" :key="index">
         <el-popover
           v-if="index != 'ADMIN_LOGO'"

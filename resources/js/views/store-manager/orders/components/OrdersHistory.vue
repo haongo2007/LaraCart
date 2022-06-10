@@ -9,11 +9,11 @@
       style="width: 100%"
     >
       <el-table-column
-        :label="$t('form.staff')"
+        :label="$t('form.creator')"
         min-width="180"
       >
-        <template slot-scope="scope">
-          <span v-html="scope.row.staff.fullname" />
+        <template slot-scope="scope"  v-if="scope.row.staff" >
+          <span v-html="scope.row.staff.fullname"/>
         </template>
       </el-table-column>
       <el-table-column

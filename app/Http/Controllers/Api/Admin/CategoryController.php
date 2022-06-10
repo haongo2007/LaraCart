@@ -104,7 +104,7 @@ class CategoryController extends Controller
         $Instance = new Category();
         $category = $Instance::with('descriptions')->find($id);
         if (!$category) {
-            return response()->json(new JsonResponse([],'Resource not found'), Response::HTTP_NOT_FOUND);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
 
         return response()->json(new JsonResponse($category), Response::HTTP_OK);
@@ -118,7 +118,7 @@ class CategoryController extends Controller
         $data = $request->all();
         $category = Category::getCategoryAdmin($id);
         if (!$category) {
-            return response()->json(new JsonResponse([], 'Data not Found'), Response::HTTP_FORBIDDEN);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
         
         if ($data['parent'] && is_array($data['parent'])) {

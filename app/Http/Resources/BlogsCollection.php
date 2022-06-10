@@ -16,6 +16,7 @@ class BlogsCollection extends JsonResource
     {
         $res = [
             'id' => $this->id,
+            'name' => $this->descriptionsWithLangDefault->title,
             'image' => $this->image,
             'alias' => $this->alias,
             'sort' => $this->sort,

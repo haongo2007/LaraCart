@@ -21,7 +21,7 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="$t('table.store')" min-width="150">
+      <el-table-column :label="$t('table.store')" min-width="150" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -96,6 +96,8 @@ import RightPanel from '@/components/RightPanel';
 import FilterSystemProductFlashsale from './components/FilterSystemProductFlashsale';
 import EventBus from '@/components/FileManager/eventBus';
 import permission from '@/directive/permission'; // Permission directive (v-permission)
+import { checkOnlyStore } from '@/utils';
+
 
 export default {
   name: 'ProductFlashSale',
@@ -113,6 +115,9 @@ export default {
         role: '',
       },
     }
+  },
+  computed: {
+    checkOnlyStore,
   },
   methods:{
     handleListenData(data){

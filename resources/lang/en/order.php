@@ -66,11 +66,7 @@ return [
     'qty'                   => 'Quantity',
     'amount'                => 'Amount',
     'search'                => 'Search order',
-    'success'               => [
-        'title' =>'Order success',
-        'msg' => 'Thank you for your purchase!',
-        'order_info' => 'Your order: #:order_id',
-    ],
+    'success'               => 'Order successfully,:store_name Thank you for choosing us.',
     'send_mail'             => [
         'title'     => 'Email',
         'new_title' => 'NEW ORDER',

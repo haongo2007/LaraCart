@@ -1,6 +1,6 @@
 <template>
   <el-form class="form-config-container">
-    <el-descriptions class="margin-top" title="Config Captcha" :column="1" border>
+    <el-descriptions class="margin-top" :title="$t('store.captcha_config')" :column="1" border>
       <el-descriptions-item v-for="(item,index) in dataConfig.captcha" :key="index" :label="item.detail">
         <!-- /// captcha method -->
         <el-popover

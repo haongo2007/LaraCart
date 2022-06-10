@@ -21,7 +21,7 @@
         </template>
       </el-table-column>
       
-      <el-table-column :label="$t('table.store')" min-width="100">
+      <el-table-column :label="$t('table.store')" max-width="100" v-if="checkOnlyStore">
         <template slot-scope="scope">
           <el-tag type="success">
             <i class="el-icon-s-shop"></i>
@@ -30,13 +30,19 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" :label="$t('table.image')" min-width="300">
+      <el-table-column align="center" :label="$t('table.image')" max-width="300">
         <template slot-scope="scope">
-          <el-image :src="scope.row.image">
+          <el-image :src="scope.row.image+'&w=300'" fit="cover" style="max-height: 150px;">
             <div slot="error" class="image-slot">
               <i class="el-icon-picture-outline"></i>
             </div>
           </el-image>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" :label="$t('table.name')" min-width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.name }}</span>
         </template>
       </el-table-column>
 
@@ -64,7 +70,7 @@
         <template slot-scope="{row}">
           <el-button-group>
             <el-button v-permission="['edit.blog']" type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
-            @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" />
+            @click="$router.push({ name: 'BlogEdit',params:{id:row.id} })" />
             <el-button v-permission="['delete.blog']" type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
         </template>
@@ -82,6 +88,7 @@ import RightPanel from '@/components/RightPanel';
 import FilterSystemBlog from './components/FilterSystemBlog';
 import EventBus from '@/components/FileManager/eventBus';
 import permission from '@/directive/permission'; // Permission directive (v-permission)
+import { checkOnlyStore } from '@/utils';
 
 export default {
   name: 'BlogList',
@@ -96,9 +103,12 @@ export default {
         page: 1,
         limit: 15,
         keyword: '',
-        role: '',
+        sort_order: 'id__desc',
       },
     }
+  },
+  computed: {
+    checkOnlyStore,
   },
   methods:{
     handleListenData(data){

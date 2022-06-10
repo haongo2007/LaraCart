@@ -1,6 +1,6 @@
 <template>
   <el-form ref="dataForm" class="form-config-container">
-    <el-descriptions class="margin-top" title="Config Order" :column="1" border>
+    <el-descriptions class="margin-top" :title="$t('store.orders_config')" :column="1" border>
       <el-descriptions-item :label="item.detail" v-for="(item,index) in dataConfig.orderConfig" :key="index">
         <el-switch
           @change="handleValue(item)"

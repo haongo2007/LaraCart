@@ -1,49 +1,81 @@
 <template>
   <el-form ref="form" :model="form" label-width="120px">
-    <el-descriptions title="Attribute" direction="vertical" :column="3" border>
-      <el-descriptions-item v-for="(item,index) in dataAtributeGroup" :key="index" :label="item">
-        <span v-if="!isNew">
-          {{ dataAttributed[index].split('__')[0] }} {{ ( dataAttributed[index].split('__')[1] > 0 ? ' + '+dataAttributed[index].split('__')[1] : '') }}
-          <el-badge v-if="dataAttributed[index].split('__')[1] > 0" :value="dataCurrency" class="item" type="warning" />
-        </span>
-        <div v-else>
-          <el-radio v-for="(attb,ind) in dataAttribute" v-if="attb.attribute_group_id == index" :key="attb.id" v-model="form[item]" :label="attb.id" @change="handleUpdateModel(index,attb.id,attb.product_id,attb.add_price,attb.name)">
-            {{ attb.name }} {{ (attb.add_price ? '(+ '+attb.add_price+' '+dataCurrency +')' : '') }}
+    <div v-if="!isNew" >
+      <el-descriptions title="Attribute" direction="vertical" :column="3" border>
+        <el-descriptions-item v-for="(item,index) in dataAtributeGroup" :key="index" :label="item">
+          <div v-if="typeof dataAttribute == 'string'">
+            <span v-for="(dataAttributed,key) in dataAttributeds" :key="key">
+              {{ dataAttributed[index].split('__')[0] }}
+              <span class="el-badge__content el-badge__content--warning">
+                {{ ( dataAttributed[index].split('__')[1] > 0 ? dataAttributed[index].split('__')[1] : 0) | changeCurrency(dataExchangeRate,dataCurrency) }}
+              </span>
+            </span>
+          </div>
+          <span v-else>
+            <span class="el-badge__content el-badge__content--warning">
+              {{ dataAttributed[index].split('__')[0] }} {{ ( dataAttributed[index].split('__')[1] > 0 ? ' + '+dataAttributed[index].split('__')[1] : '') | changeCurrency(dataExchangeRate,dataCurrency) }}
+            </span>
+          </span>
+        </el-descriptions-item>
+      </el-descriptions>
+    </div>
+    <div v-else>
+      <el-descriptions title="Attribute" direction="vertical" :column="3" border>
+        <el-descriptions-item v-for="(detail,ind) in dataAttributeRemade" :key="ind" :label="ind">
+          <el-radio v-for="(attb,key) in detail" :key="attb.id" v-model="form[ind]" :label="attb.id" @change="handleUpdateModel(attb)">
+            {{ attb.name }} <span class="el-badge__content el-badge__content--warning"> {{ attb.price | changeCurrency(dataExchangeRate,dataCurrency) }} </span>
           </el-radio>
-        </div>
-
-      </el-descriptions-item>
-    </el-descriptions>
+        </el-descriptions-item>
+      </el-descriptions>
+    </div>
   </el-form>
 </template>
 <script>
 export default {
   name: 'AttributesProduct',
-  props: ['dataAttribute', 'dataAtributeGroup', 'dataCurrency', 'isNew'],
+  props: ['dataAttribute', 'dataAtributeGroup', 'dataCurrency', 'dataExchangeRate','isNew','dataProduct'],
   data() {
     return {
       form: {},
+      dataAttributeRemade:{},
     };
   },
+  watch: {
+    'dataAttribute': {
+      handler(newValue, oldValue) {
+        this.dataAttributeRemade = newValue;
+      },
+    },
+  },
   computed: {
-    dataAttributed(){
+    dataAttributeds(){
       if (this.dataAttribute) {
+        let data;
+        if (typeof this.dataAttribute == 'string') {
+          data = this.dataAttribute.replace(/&quot;/g, "\"");
+        }else{
+          data = this.dataAttribute;
+        }
         try {
-          JSON.parse(this.dataAttribute);
+          JSON.parse(data);
         } catch (e) {
             return this.dataAttribute;
         }
-        return JSON.parse(this.dataAttribute);
+        return JSON.parse(data);
       }
     },
   },
   created(){
+      this.dataAttributeRemade = this.dataAttribute;
   },
   methods: {
-    handleUpdateModel(group, attr_id, prd_id, price, name){
+    handleUpdateModel(item){
+      if (item.hasOwnProperty('children')) {
+        this.dataAttributeRemade = {...this.dataAttributeRemade,...item.children};
+      }
       var text = {};
-      text[group] = name + '__' + price;
-    	this.$emit('handleAttributeProduct', { group: group, attr: attr_id, prd: prd_id, text: text });
+      text[item.group_id] = item.name + '__' + item.price;
+    	this.$emit('handleAttributeProduct', { group: item.group_id, attr: item.id, prd: this.dataProduct, text: text });
     },
   },
 };

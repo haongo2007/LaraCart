@@ -49,7 +49,6 @@ export default {
   props: {
     storeId: {
       type: Number,
-      default: 1,
     },
     isEdit: {
       type: Boolean,

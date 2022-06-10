@@ -115,7 +115,7 @@ export default {
 <style lang="scss">
 .view-container{
   overflow-y: scroll;
-  height: 47vh;
+  height: calc(100vh - 400px);
   .grid-view{
     display: flex;
     flex-wrap: wrap;

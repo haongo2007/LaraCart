@@ -277,3 +277,15 @@ function lc_get_threesixty_image($images,$w = '',$h = '')
         'extension' => $full_path['extension'] 
     ];
 }
+/*
+Function converse api link to local link
+ */
+function lc_convert_apiLink_to_localLink($link)
+{
+    if (!$link) {
+        return false;
+    }
+    $parts = parse_url($link);
+    parse_str($parts['query'], $query);
+    return $query;
+}

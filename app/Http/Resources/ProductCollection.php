@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\StoreCollection;
+use App\Http\Resources\Front\ProductAttributeColorCollection;
 
 class ProductCollection extends JsonResource
 {
@@ -42,13 +43,13 @@ class ProductCollection extends JsonResource
             'stock' => $this->stock ,
             'store' => $this->store,
             'supplier_id' => $this->supplier_id ,
-            'attributes' => $this->attributes ,
             'tax' => $this->getTaxValue() ,
             'updated_at' => $this->updated_at ,
             'view' => $this->view ,
             'weight' => $this->weight ,
             'weight_class' => $this->weight_class ,
             'width' => $this->width ,
+            'attributes' => new ProductAttributeColorCollection($this->attributesParent)
         ];
         
         return $res;

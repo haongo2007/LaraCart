@@ -60,11 +60,7 @@ return [
     'qty'                   => 'Số lượng',
     'amount'                => 'Giá tiền',
     'search'                => 'Tìm kiếm đơn hàng',
-    'success'               => [
-        'title' => 'Đơn hàng thành công',
-        'msg' => 'Cảm ơn vì đơn hàng của bạn!',
-        'order_info' => 'Đơn hàng của bạn: #:order_id',
-    ],
+    'success'               => 'Đặt hàng thành công,:store_name Cảm ơn bạn vì đã tin tưởng lựa chọn.',
     'send_mail'             => [
         'title'     => 'Email',
         'new_title' => 'ĐƠN HÀNG MỚI',

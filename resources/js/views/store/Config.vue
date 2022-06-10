@@ -9,7 +9,7 @@
     <el-row :gutter="20" style="margin:0px 0px 20px 0px;">
       <el-col :span="24">
         <el-tabs type="card" tab-position="top">
-          <el-tab-pane v-for="(item,index) in comp" :label="index" :key="index">
+          <el-tab-pane v-for="(item,index) in comp" :label="$t('store.'+index)" :key="index">
             <components :is="item.value" :btn-Loading="btnLoading" :data-config="item.dataConfig" @handleUpdate="handleUpdate"/>
           </el-tab-pane>
         </el-tabs>
@@ -46,31 +46,31 @@ export default {
       customerConfig:{},
       btnLoading:false,
       comp:{
-        'Admin': {
+        admin: {
           'value':'',
           'dataConfig' : {}
         },
-        Captcha: {
+        captcha: {
           'value':'',
           'dataConfig' : {}
         },
-        Customer: {
+        customer: {
           'value':'',
           'dataConfig' : {}
         },
-        Display: {
+        display: {
           'value':'',
           'dataConfig' : {}
         },
-        Email: {
+        email: {
           'value':'',
           'dataConfig' : {}
         },
-        Order: {
+        orders: {
           'value':'',
           'dataConfig' : {}
         },
-        Product: {
+        product: {
           'value':'',
           'dataConfig' : {}
         },
@@ -83,31 +83,31 @@ export default {
     });
     let id = this.id = this.$route.params && this.$route.params.id;
     storeconfigResource.get(id).then(({ data } = response) => {
-      this.$set(this.comp.Admin,'value', 'ConfigAdmin');
-      this.$set(this.comp.Admin,'dataConfig',data.adminConfig);
+      this.$set(this.comp.admin,'value', 'ConfigAdmin');
+      this.$set(this.comp.admin,'dataConfig',data.adminConfig);
        
-      this.$set(this.comp.Captcha,'value','ConfigCaptcha');
-      this.$set(this.comp.Captcha,'dataConfig',{captchaInstalled:data.pluginCaptchaInstalled,captcha_page: data.captcha_page,captcha:data.captchaConfig});
+      this.$set(this.comp.captcha,'value','ConfigCaptcha');
+      this.$set(this.comp.captcha,'dataConfig',{captchaInstalled:data.pluginCaptchaInstalled,captcha_page: data.captcha_page,captcha:data.captchaConfig});
 
 
-      this.$set(this.comp.Customer,'value','ConfigCustomer');
-      this.$set(this.comp.Customer,'dataConfig',data.customerConfigs);
+      this.$set(this.comp.customer,'value','ConfigCustomer');
+      this.$set(this.comp.customer,'dataConfig',data.customerConfigs);
 
 
-      this.$set(this.comp.Display,'value','ConfigDisplay');
-      this.$set(this.comp.Display,'dataConfig',{configDisplay: data.displayConfig});
+      this.$set(this.comp.display,'value','ConfigDisplay');
+      this.$set(this.comp.display,'dataConfig',{configDisplay: data.displayConfig});
 
 
-      this.$set(this.comp.Email,'value','ConfigEmail');
-      this.$set(this.comp.Email,'dataConfig',{emailConfig: data.emailConfig,smtp_method: data.smtp_method});
+      this.$set(this.comp.email,'value','ConfigEmail');
+      this.$set(this.comp.email,'dataConfig',{emailConfig: data.emailConfig,smtp_method: data.smtp_method});
 
 
-      this.$set(this.comp.Order,'value','ConfigOrder');
-      this.$set(this.comp.Order,'dataConfig',{orderConfig: data.orderConfig});
+      this.$set(this.comp.orders,'value','ConfigOrder');
+      this.$set(this.comp.orders,'dataConfig',{orderConfig: data.orderConfig});
 
 
-      this.$set(this.comp.Product,'value','ConfigProduct');
-      this.$set(this.comp.Product,'dataConfig',{
+      this.$set(this.comp.product,'value','ConfigProduct');
+      this.$set(this.comp.product,'dataConfig',{
         productConfig: data.productConfig,
         productConfigAttribute:data.productConfigAttribute,
         taxs:data.taxs
