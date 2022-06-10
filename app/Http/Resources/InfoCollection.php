@@ -19,7 +19,7 @@ class InfoCollection extends JsonResource
             'id' => $this->id,
             'name' => $this->fullname,
             'email' => $this->email,
-            'avatar' => $this->avatar ? asset($this->avatar) : 'api/getFile?disk='.env('FILESYSTEM_DRIVER', 'local').'&path='.urlencode('avatar/default.jpg'),
+            'avatar' => $this->avatar ? asset($this->avatar) : 'api/system/getFile?disk=user&path='.urlencode('avatar/default.jpg'),
             'roles' => array_map(
                 function ($role) {
                     return $role['slug'];

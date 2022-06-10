@@ -22,12 +22,13 @@ Route::group([
     Route::post('auth/login', 'Auth\AuthController@login');
     Route::get('getFile', 'UserController@getFileFromS3');
 
-    Route::group(['middleware' => LC_ADMIN_MIDDLEWARE], function () {
+    Route::get('test',  function () {
         
-        foreach (glob(__DIR__ . '\Admin\*.php') as $filename) {
+    });
+    Route::group(['middleware' => LC_ADMIN_MIDDLEWARE], function () {
+        foreach (glob(__DIR__."/Admin/*.php") as $filename) {
             require_once $filename;
         }
-
     });
     
 });
@@ -43,7 +44,7 @@ Route::group([
     Route::post('auth/login', 'Auth\LoginController@login');
 
         
-    foreach (glob(__DIR__ . '\Front\*.php') as $filename) {
+    foreach (glob(__DIR__ . '/Front/*.php') as $filename) {
         require_once $filename;
     }
 

@@ -61,8 +61,8 @@ export default {
     };
     return {
       loginForm: {
-        email: 'admin@laracart.dev',
-        password: '123456',
+        email: '',
+        password: '',
       },
       loginRules: {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],
