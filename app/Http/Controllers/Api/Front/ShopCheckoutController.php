@@ -87,8 +87,7 @@ class ShopCheckoutController extends Controller
         $tax      = $request->priceTax;
 
         $received = 0; //sum received
-        $discount = array_sum(array_column($request->couponInUse, 'value')) ?? 0; //sum //sum discount
-
+        $discount = array_sum(array_column($request->couponInUse, 'value')); //sum //sum discount
         $variant  = array_sum(array_column($products, 'sumVariantPrice')); //sum variant
         $product  = array_sum(array_column($products, 'sum')); //sum product price
         $subtotal = $product + $variant; //sum subtotal
