@@ -31,6 +31,7 @@ class ShopProductController extends Controller
     public function index(Request $request)
     {
         $storeId = $request->header('x-store');
+        $params = $request->all();
         $params['storeId'] = $storeId;
         $products = (new ShopProduct)->getProductList($params);
         return ProductCollection::collection($products);
