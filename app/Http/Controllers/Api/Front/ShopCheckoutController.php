@@ -264,7 +264,7 @@ class ShopCheckoutController extends Controller
             if ($checkContent || $checkContentCustomer) {
                 $converted = lc_convert_apiLink_to_localLink(lc_store('logo',$data['store_id']));
                 $logo = asset('storage/'.$converted['disk'].'/'.$converted['path']);
-                $attribute_group = ShopAttributeGroup::all();
+                $attribute_group = ShopAttributeGroup::getListAll($data['store_id']);
 
                 foreach ($data['details'] as $key => $detail) {
                     $product = (new ShopProduct)->getDetail($detail['product_id']);

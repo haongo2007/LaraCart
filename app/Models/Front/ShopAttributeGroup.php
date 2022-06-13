@@ -19,10 +19,10 @@ class ShopAttributeGroup extends Model
         return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
     }
     
-    public static function getListAll()
+    public static function getListAll($storeId)
     {
         if (!self::$getListAll) {
-            self::$getListAll = self::pluck('name', 'id')->all();
+            self::$getListAll = self::pluck('name', 'id')->where('store_id',$storeId)->all();
         }
         return self::$getListAll;
     }
