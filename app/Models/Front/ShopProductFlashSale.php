@@ -1,5 +1,5 @@
 <?php
-namespace App\Plugins\Other\ProductSale\Models;
+namespace App\Models\Front;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -8,38 +8,21 @@ use Illuminate\Support\Facades\Schema;
 use App\Models\Front\ShopProduct;
 use App\Models\Front\ShopProductPromotion;
 
-class PluginModel extends Model
+class ShopProductFlashSale extends Model
 {
     public $timestamps    = false;
     public $table = 'shop_product_flash';
     protected $connection = LC_CONNECTION;
     protected $guarded    = [];
+    const ITEM_PER_PAGE = 15;
 
     public function product()
     {
         return $this->belongsTo(ShopProduct::class, 'product_id', 'id');
     }
-
-    public function uninstallExtension()
+    public function promotion()
     {
-        if (Schema::hasTable($this->table)) {
-            Schema::drop($this->table);
-        }
-        return ['error' => 0, 'msg' => 'uninstall success'];
-    }
-
-    public function installExtension()
-    {
-        $this->uninstallExtension();
-
-        Schema::create($this->table, function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('product_id')->unique();
-            $table->integer('stock');
-            $table->integer('sold');
-            $table->integer('sort');
-        });
-        return ['error' => 0, 'msg' => 'install success'];
+        return $this->belongsTo(ShopProductPromotion::class, 'product_id','product_id');
     }
 
     /**
@@ -50,7 +33,7 @@ class PluginModel extends Model
     public function getProduct($pid) {
         $select = $this->table.'.*, pr.price_promotion, pr.date_start, pr.date_end, pr.status_promotion';
         return 
-        $this->leftjoin(BC_DB_PREFIX.'shop_product_promotion as pr', 'pr.product_id', $this->table.'.product_id')
+        $this->leftjoin('shop_product_promotion as pr', 'pr.product_id', $this->table.'.product_id')
         ->selectRaw($select)
         ->where($this->table.'.id', $pid)
         ->first();
@@ -61,12 +44,19 @@ class PluginModel extends Model
      *
      * @return void
      */
-    public function getAllProductFlashSale() {
-        $select = $this->table.'.*, pr.price_promotion, pr.date_start, pr.date_end, pr.status_promotion';
-        return 
-        $this->leftjoin(BC_DB_PREFIX.'shop_product_promotion as pr', 'pr.product_id', $this->table.'.product_id')
-        ->selectRaw($select)
-        ->paginate(20);
+    public function getAllProductFlashSale(array $dataSearch,$paginate = false) {
+        $limit   = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
+        $storeId = $dataSearch['storeId'];
+        $productFlash = self::whereHas('promotion' , function ($query)
+        {
+            $query->where('date_start', '<=', date('Y-m-d'))->where('date_end', '>=', date('Y-m-d'))->where('status_promotion',1);
+        })->where('store_id',$storeId);
+        if ($paginate) {
+            $productFlash = $productFlash->paginate($limit);
+        } else {
+            $productFlash = $productFlash->limit($limit)->get();
+        }
+        return $productFlash;
     }
 
     /**
@@ -76,9 +66,9 @@ class PluginModel extends Model
      */
     public function getAllProductNotGroup() {
         return (new ShopProduct)
-            ->leftJoin(BC_DB_PREFIX . 'shop_product_description', BC_DB_PREFIX . 'shop_product_description.product_id', BC_DB_PREFIX.'shop_product.id')
-            ->where(BC_DB_PREFIX . 'shop_product_description.lang', bc_get_locale())
-            ->whereIn('kind', [BC_PRODUCT_SINGLE, BC_PRODUCT_BUILD])
+            ->leftJoin('shop_product_description', 'shop_product_description.product_id', 'shop_product.id')
+            ->where('shop_product_description.lang', bc_get_locale())
+            ->whereIn('kind', [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])
             ->get()
             ->pluck('name', 'id');
     }
@@ -91,9 +81,9 @@ class PluginModel extends Model
      */
     public function getProductFlash($limit = 8, $paginate = false) {
         $productFlash = (new ShopProduct)
-        ->select(BC_DB_PREFIX.'shop_product.*', 'pf.sold as pf_sold', 'pf.stock as pf_stock')
-        ->join(BC_DB_PREFIX.'shop_product_flash as pf', 'pf.product_id', BC_DB_PREFIX.'shop_product.id')
-        ->join(BC_DB_PREFIX.'shop_product_promotion as pr', 'pr.product_id', 'pf.product_id')
+        ->select('shop_product.*', 'pf.sold as pf_sold', 'pf.stock as pf_stock', 'pr.price_promotion as price_promotion')
+        ->join('shop_product_flash as pf', 'pf.product_id', 'shop_product.id')
+        ->join('shop_product_promotion as pr', 'pr.product_id', 'pf.product_id')
         ->where('pr.status_promotion', 1)
         ->where('pr.date_start', '<=', date('Y-m-d'))
         ->where('pr.date_end', '>=', date('Y-m-d'))

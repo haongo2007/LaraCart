@@ -49,6 +49,7 @@ class ShopProduct extends Model
     {
         return $this->belongsToMany(ShopCategory::class, ShopProductCategory::class, 'product_id', 'category_id');
     }
+
     public function store()
     {
         return $this->belongsTo(ShopStore::class, 'store_id', 'id')->with('descriptionsCurrentLang');
@@ -121,6 +122,75 @@ class ShopProduct extends Model
     }
     //End  get text description
 
+    public function getProductList($params)
+    {
+        $sortBy         = 'sort';
+        $sortOrder      = 'asc';
+        $filter_sort    = $params['filter_sort'] ?? 'id_desc';
+        $filter_keyword = $params['filter_keyword'] ?? '';
+        $filter_attribute   = $params['filter_attribute'] ?? '';
+        $filter_category    = $params['category'] ?? '';
+        $filter_brand       = $params['brand'] ?? '';
+        $price_min          = $params['minPrice'] ?? null;
+        $price_max          = $params['maxPrice'] ?? null;
+        $filter_color       = $params['color'] ?? '';
+        $filter_size        = $params['size'] ?? '';
+        $limit              = $params['perPage'] ?? lc_config('product_list');
+        $storeId            = $params['storeId'];
+        
+        $filterArrSort = [
+            'price_desc' => ['price', 'desc'],
+            'price_asc' => ['price', 'asc'],
+            'sort_desc' => ['sort', 'desc'],
+            'sort_asc' => ['sort', 'asc'],
+            'id_desc' => ['id', 'desc'],
+            'id_asc' => ['id', 'asc'],
+        ];
+
+        if (array_key_exists($filter_sort, $filterArrSort)) {
+            $sortBy = $filterArrSort[$filter_sort][0];
+            $sortOrder = $filterArrSort[$filter_sort][1];
+        }  
+        $products = new self;
+        if ($filter_keyword) {
+            $products = $products->setKeyword($filter_keyword);
+        }
+        if ($filter_keyword) {
+            $products = $products->setKeyword($filter_keyword);
+        }
+        if ($filter_attribute) {
+            $products = $products->setAttributes($filter_attribute);
+        }   
+        if ($filter_category) {
+            $categoriId = ShopCategory::select('id')->where('alias',$filter_category)->pluck('id')->first();
+            $products = $products->getProductToCategory($categoriId);
+        }
+        if ($filter_brand) {
+            $filter_brand = explode(',', $filter_brand);
+            $brandids = ShopBrand::select('id')->whereIn('alias',$filter_brand)->get()->pluck('id')->toArray();
+            $products = $products->getProductToBrand($brandids);
+        } 
+        if ($filter_color || $filter_size) {
+            $name = array_merge(explode(',', $filter_color),explode(',', $filter_size));
+            $product_id = ShopProductAttribute::select('product_id')->Where(function ($query) use($name) {
+                for ($i = 0; $i < count($name); $i++){
+                    $query->orwhere('name', 'like',  '%' . $name[$i] .'%');
+                }      
+            })->groupBy('product_id')->get()->pluck('product_id')->toArray();
+            $products = $products->getProductFromListID($product_id);
+        }    
+
+        if ($price_min && $price_max) {
+            $products = $products->setPriceBetween($price_min,$price_max);
+        }
+        $products = $products
+            ->setLimit($limit)
+            ->setPaginate()
+            ->setSort([$sortBy, $sortOrder])
+            ->setStore($storeId)
+            ->getData();
+        return $products;
+    }
     /*
     *Get final price
     */
@@ -603,7 +673,6 @@ class ShopProduct extends Model
     public function buildQuery() {
         $tableDescription = (new ShopProductDescription)->getTable();
         $tableStore = (new ShopStore)->getTable();
-
         //description
         $query = $this
             ->leftJoin($tableDescription, $tableDescription . '.product_id', $this->getTable() . '.id')
@@ -653,7 +722,7 @@ class ShopProduct extends Model
         if (count($this->lc_category)) {
             $tablePTC = (new ShopProductCategory)->getTable();
             $query = $query->leftJoin($tablePTC, $tablePTC . '.product_id', $this->getTable() . '.id');
-            $query = $query->whereIn($tablePTC . '.category_id', $this->lc_category);
+            $query = $query->whereIn($tablePTC . '.category_id', $this->lc_category)->groupBy($tablePTC . '.product_id');
         }
         $storeId = $this->lc_store_id ? $this->lc_store_id : config('app.storeId');
         //Process store

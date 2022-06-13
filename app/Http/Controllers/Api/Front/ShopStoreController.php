@@ -11,15 +11,16 @@ use App\Models\Front\ShopCurrency;
 use App\Models\Front\ShopCategory;
 use App\Models\Front\ShopBanner;
 use App\Models\Front\ShopBrand;
+use App\Models\Front\ShopProduct;
+use App\Models\Front\ShopAttributeGroup;
 use App\Http\Resources\Front\CategoryCollection;
 
 class ShopStoreController extends Controller
-{
+{   
     public function getInfo()
     {
         $storeId = request()->header('x-store');
     	$data = [];
-        $data['store'] = ShopStore::with('descriptionsCurrentLang')->find($storeId);
         $shippingMethod = [];
         $paymentMethod = [];
         if (!lc_config('shipping_off',$storeId)) {
@@ -44,14 +45,37 @@ class ShopStoreController extends Controller
                 }
             }   
         }
-        $data['store']['shipping_method'] = $shippingMethod;
-        $data['store']['payment_method'] = $paymentMethod;
-        $data['languages'] = ShopLanguage::getListActive($storeId);
-        $data['currencies'] = ShopCurrency::getListActive($storeId);
-        $data['slider'] = ShopBanner::where([['store_id',$storeId],['type','slider_home'],['status',1]])->get();
-        $data['brands'] = ShopBrand::where([['store_id',$storeId],['status',1]])->get();
-        $data['banner'] = ShopBanner::where([['store_id',$storeId],['type','banner_home'],['status',1]])->get();
-        $data['categories'] = new CategoryCollection(ShopCategory::where([['store_id',$storeId],['parent',0]])->get());
+        $maximumPrice = ShopProduct::where('store_id',$storeId)->max('price');
+
+        $attributes = ShopAttributeGroup::with(['attributeDetails' => function ($query=''){   
+            $query->with('activePalette');
+            $query->groupBy('name');
+        }])->where('store_id',$storeId)->get();
+
+        $languages = ShopLanguage::getListActive($storeId);
+        $currencies = ShopCurrency::getListActive($storeId);
+        $slider = ShopBanner::where([['store_id',$storeId],['type','slider_home'],['status',1]])->get();
+        $brands = ShopBrand::where([['store_id',$storeId],['status',1]])->get();
+        $banner = ShopBanner::where([['store_id',$storeId],['type','banner_home'],['status',1]])->get();
+        $categories = new CategoryCollection(ShopCategory::where([['store_id',$storeId],['parent',0]])->get());
+        $info = ShopStore::with('descriptionsCurrentLang')->find($storeId);
+
+        $data['shop']['info']               = $info;
+        $data['shop']['attributes']         = $attributes;
+        $data['shop']['max_price_product']  = $maximumPrice;
+        $data['shop']['categories']         = $categories;
+        $data['shop']['brands']             = $brands;
+
+        $data['localized']['currencies']    = $currencies;
+        $data['localized']['languages']     = $languages;
+
+        $data['method']['shipping']         = $shippingMethod;
+        $data['method']['payment']          = $paymentMethod;
+
+        $data['display']['slider']          = $slider;
+        $data['display']['banner']          = $banner;
+        $data['display']['product']         = Config::getListConfigByCode(['storeId' => $storeId,'code' => 'display_config','keyBy' => 'key']);
+
         return response()->json(new JsonResponse($data, ''), Response::HTTP_OK);
     }
 }

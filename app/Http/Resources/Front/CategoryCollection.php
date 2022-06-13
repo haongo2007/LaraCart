@@ -24,7 +24,8 @@ class CategoryCollection extends JsonResource
                 'top' => $value->top,
                 'alias' => $value->alias,
                 'image' => $value->image,
-                'hasChild' => !$value->Parent ? true : false
+                'hasChild' => !$value->Children->isEmpty() ? true : false,
+                'childCount' => count($value->Children),
             ];
         }
         return $res;

@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Api\Front;
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopProduct;
 use App\Models\Front\ShopCategory;
+use App\Models\Front\ShopBrand;
 use App\Models\Front\ShopProductDescription;
 use App\Models\Front\ShopAttributeGroup;
+use App\Models\Front\ShopProductAttribute;
+use App\Models\Front\ShopProductFlashSale;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Helper\JsonResponse;
 use App\Http\Resources\Front\ProductCollection;
 use App\Http\Resources\Front\ProductRelatedCollection;
+use App\Http\Resources\Front\ProductFlashSaleCollection;
 use Cache;
 
 class ShopProductController extends Controller
@@ -21,98 +25,15 @@ class ShopProductController extends Controller
     }
     
     /**
-     * Process front all products
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function allProductsProcessFront(...$params) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
-        }
-        return $this->_allProducts();
-    }
-
-    /**
      * All products
      * @return [view]
      */
-    public function index()
+    public function index(Request $request)
     {
-        $store = request()->header('x-store');
-        $sortBy = 'sort';
-        $sortOrder = 'asc';
-        $filter_sort = request('filter_sort') ?? 'id_desc';
-        $filter_price = request('filter_price') ?? '';
-        $filter_keyword = request('filter_keyword') ?? '';
-        $filter_attribute = request('filter_attribute') ?? '';
-        $filter_category = request('category') ?? '';
-        
-        $filterArrSort = [
-            'price_desc' => ['price', 'desc'],
-            'price_asc' => ['price', 'asc'],
-            'sort_desc' => ['sort', 'desc'],
-            'sort_asc' => ['sort', 'asc'],
-            'id_desc' => ['id', 'desc'],
-            'id_asc' => ['id', 'asc'],
-        ];
-        $products = (new ShopProduct);
-        $price_max = $products->max('price');
-        $filterArrPrice = [0,$price_max];
-
-        if (array_key_exists($filter_sort, $filterArrSort)) {
-            $sortBy = $filterArrSort[$filter_sort][0];
-            $sortOrder = $filterArrSort[$filter_sort][1];
-        }  
-        if ($filter_price) {
-            $filter_price = explode('-', request('filter_price'));
-            $price_min = lc_convert_price_to_origin($filter_price[0]);
-            $price_max = lc_convert_price_to_origin($filter_price[1]);
-            $products = $products->setPriceBetween($price_min,$price_max);
-        }  
-        if ($filter_keyword) {
-            $products = $products->setKeyword($filter_keyword);
-        }
-        if ($filter_keyword) {
-            $products = $products->setKeyword($filter_keyword);
-        }
-        if ($filter_attribute) {
-            $products = $products->setAttributes($filter_attribute);
-        }   
-        if ($filter_category) {
-            $categoriId = ShopCategory::select('id')->where('alias',$filter_category)->pluck('id')->first();
-            $products = $products->getProductToCategory($categoriId);
-        }     
-        $products = $products
-            ->setLimit(lc_config('product_list'))
-            ->setPaginate()
-            ->setSort([$sortBy, $sortOrder])
-            ->setStore($store)
-            ->getData();
-    
+        $storeId = $request->header('x-store');
+        $params['storeId'] = $storeId;
+        $products = (new ShopProduct)->getProductList($params);
         return ProductCollection::collection($products);
-    }
-
-    /**
-     * Process front product detail
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function show(Request $request,$alias) 
-    {
-        if (config('app.seoLang')) {
-            $lang = $request->header('x-localization');
-            $store = $request->header('x-store') ?? 10;
-            $alias = $alias ?? '';
-            lc_lang_switch($lang);
-        } else {
-            $store = $request->header('x-store') ?? 10;
-            $alias = $alias ?? '';
-        }
-        return $this->_productDetail($alias,'alias',$store);
     }
 
     /**
@@ -121,52 +42,74 @@ class ShopProductController extends Controller
      * @param   [string]  $alias      [$alias description]
      * @param   [string]  $type     [$type id or alias or sku]
      * @param   [string]  $storeId  [$storeCode description]
-     * @param   [string]  $view  [$view check detail view or quick view]
      *
      * @return  [mix]
      */
-    private function _productDetail($alias,$type, $storeId)
+    public function show(Request $request,$alias) 
     {
-        $product = (new ShopProduct)->getDetail($alias, $type, $storeId);
-        // if ($product && $product->status && (!lc_config('product_stock', $storeId) || lc_config('product_display_out_of_stock', $storeId) || $product->stock > 0)) {
-            //Update last view
-            $product->view += 1;
-            $product->date_lastview = date('Y-m-d H:i:s');
-            $product->save();
-            //End last viewed
-            
-            //Product relation by categories
-            $categories = $product->categories->keyBy('id')->toArray();
-            $arrCategoriId = array_keys($categories);
-            $productRelation = (new ShopProduct)
-                ->setStore($storeId)
-                ->getProductToCategory($arrCategoriId)
-                ->setLimit(lc_config('product_relation', $storeId))
-                ->setRandom()
-                ->getData()
-                ->where('id','<>',$product->id);
+        $storeId = $request->header('x-store');
+        $product = (new ShopProduct)->getDetail($alias, 'alias', $storeId);
+        //Update last view
+        $product->view += 1;
+        $product->date_lastview = date('Y-m-d H:i:s');
+        $product->save();
+        //End last viewed
+        
+        //Product relation by categories
+        $productRelation = (new ShopProduct)->setStore($storeId);
 
-            $prev_product = (new ShopProduct)->setStore($storeId)->getData()->where('id', '<', $product->id)->first();
-            if ($prev_product) {
-                $prev_product = new ProductCollection($prev_product);
-            }
+        $prev_product = $productRelation->getData()->where('id', '<', $product->id)->first();
+        if ($prev_product) {
+            $prev_product = new ProductCollection($prev_product);
+        }
 
-            $next_product = (new ShopProduct)->setStore($storeId)->getData()->where('id', '>', $product->id)->first();
-            if ($next_product) {
-                $next_product = new ProductCollection($next_product);
-            }
-            
-            $data['prevProduct'] = $prev_product;
-            $data['nextProduct'] = $next_product;
-            $data['product'] = new ProductCollection($product);
-            $data['relatedProducts'] = new ProductRelatedCollection($productRelation);
-            return response()->json(new JsonResponse($data), Response::HTTP_OK);
-        // } else {
-        //     return response()->json(new JsonResponse([]), Response::HTTP_OK);
-        // }
+        $next_product = $productRelation->getData()->where('id', '>', $product->id)->first();
+        if ($next_product) {
+            $next_product = new ProductCollection($next_product);
+        }
+
+        $categories = $product->categories->keyBy('id')->toArray();
+        $arrCategoriId = array_keys($categories);
+        
+        $productRelation = $productRelation
+        ->getProductToCategory($arrCategoriId)
+        ->setLimit(lc_config('product_relation', $storeId))
+        ->setRandom()
+        ->getData()
+        ->where('id','<>',$product->id);
+        $data['prevProduct'] = $prev_product;
+        $data['nextProduct'] = $next_product;
+        $data['product'] = new ProductCollection($product);
+        $data['relatedProducts'] = new ProductRelatedCollection($productRelation);
+        return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }
-    public function productDetailQuickViewProcess(Request $request)
+
+    /**
+     * Get product special
+     *
+     * @return  [mix]
+     */
+    public function special(Request $request) 
     {
-        return $this->_productDetail($request->id,'', $request->storeId,'.Common.product_detail')->render();
+        $storeId = $request->header('x-store');
+        $flash_sale = $request->flash_sale ?? false;
+        $most_buy = $request->most_buy ?? false;
+        $most_view = $request->most_view ?? false;
+        $sale = $request->sale ?? false;
+        $top = $request->top ?? false;
+        $top_rated = $request->top_rated ?? false;
+
+        $products = (new ShopProduct);
+
+        $data = [];
+        if ($flash_sale) {
+            $product_flash = (new ShopProductFlashSale)->getAllProductFlashSale(['storeId'=>$storeId]);
+            $data['flashSaleProducts'] = ProductFlashSaleCollection::collection($product_flash);
+        }
+
+        if ($top) {
+            $data['topProducts'] = [];
+        }
+        return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }
 }

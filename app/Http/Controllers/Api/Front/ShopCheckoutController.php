@@ -219,8 +219,11 @@ class ShopCheckoutController extends Controller
         }
 
         if ($request->couponInUse) {
-            $code = $request->couponInUse['code'];
-            (new ShopDiscount)->createDiscount($orderID,$code,$uID,$storeId);
+            $discountIns = (new ShopDiscount);
+            foreach ($request->couponInUse as $key => $value) {
+                $code = $value['code'];
+                $discountIns->createDiscount($orderID,$code,$uID,$storeId);
+            }
         }
 
         if ($paymentMethod) {

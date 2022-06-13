@@ -569,6 +569,14 @@ class CreateTablesShop extends Migration
             }
         );
 
+        Schema::create('shop_product_flash', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('product_id')->unique();
+            $table->integer('stock');
+            $table->integer('sold');
+            $table->integer('sort');
+            $table->integer('store_id')->default(1)->index();
+        });
         //Passport
         // Schema::create('oauth_auth_codes', function (Blueprint $table) {
         //     $table->string('id', 100)->primary();
