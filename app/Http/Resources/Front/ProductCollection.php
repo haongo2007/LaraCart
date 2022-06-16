@@ -16,13 +16,6 @@ class ProductCollection extends JsonResource
      */
     public function toArray($request)
     {
-        $ratings = $this->ratingCount();
-        $point = 0;
-        $total = $this->ratingSumpoint();
-
-        if ($ratings > 0) {
-            $point = $total / $ratings;
-        }
         $res = [
             'id'=> $this->id,
             'author'=> $this->creator,
@@ -31,8 +24,8 @@ class ProductCollection extends JsonResource
             'name'=> $this->name,
             'pictures'=> explode(',',$this->image) ,
             'price'=> $this->price,
-            'ratings'=> $point,
-            'review'=> $ratings,
+            'ratings'=> $this->rate_count == 0 ? 0 : $this->rate_point / $this->rate_count,
+            'review'=> $this->rate_count,
             'reviewList'=> new ProductRatingCollection($this->ratingList),
             'sale_price'=> $this->promotionPrice,
             'short_desc'=> $this->getText(),
@@ -43,6 +36,8 @@ class ProductCollection extends JsonResource
             'new'=> null,
             'until' => null,
             'top' => $this->top,
+            'rate_point' => $this->rate_point,
+            'rate_count' => $this->rate_count,
             'tax' => $this->getTaxValue(),
             'variants' => new ProductAttributeColorCollection($this->attributesParent)
         ];
@@ -63,16 +58,6 @@ class ProductRelatedCollection extends JsonResource
     {
         $res = [];
         foreach ($this->resource as $key => $value) {
-            $ratings = $value->rating;
-            $point = 0;
-            $total = array_sum(array_map(function ($rate) {
-                        return $rate['point'];
-            }, $ratings->toArray()));
-
-            if ($total > 0) {
-                $point = $total / count($ratings);
-            }
-
             $res[] = [
                 'id'=> $value->id ,
                 'author'=> $value->creator,
@@ -81,8 +66,8 @@ class ProductRelatedCollection extends JsonResource
                 'name'=> $value->name,
                 'pictures'=> explode(',',$value->image) ,
                 'price'=> $value->price,
-                'ratings'=> $point,
-                'review'=> count($ratings),
+                'ratings'=> $value->rate_count == 0 ? 0 : $value->rate_point / $value->rate_count,
+                'review'=> $value->rate_count,
                 'sale_price'=> $value->promotionPrice,
                 'short_desc'=> $value->getText(),
                 'slug'=> $value->alias,

@@ -56,12 +56,12 @@ if (!function_exists('lc_set_cache')) {
  *
  * @return  [type]             [return description]
  */
-    function lc_set_cache($cacheIndex , $value, $time = null)
+    function lc_set_cache($cacheIndex , $value,$storeId, $time = null)
     {
         if(empty($cacheIndex)) {
             return ;
         }
-        $seconds = $time ?? (lc_config_global('cache_time') ?? 600);
+        $seconds = $time ?? (lc_config_global('cache_time',$storeId) ?? 600);
         
         Cache::put($cacheIndex, $value, $seconds);
     }

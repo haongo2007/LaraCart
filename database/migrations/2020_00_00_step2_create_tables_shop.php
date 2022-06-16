@@ -341,7 +341,8 @@ class CreateTablesShop extends Migration
             $table->integer('store_id')->default(1)->index();
             $table->dateTime('date_lastview')->nullable();
             $table->date('date_available')->nullable();
-            $table->integer('top')->default(1)->default(0)->index();
+            $table->integer('top')->default(0)->index();
+            $table->integer('point_rate')->default(0)->index();
             $table->timestamps();
             }
         );

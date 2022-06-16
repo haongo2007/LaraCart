@@ -19,6 +19,7 @@ class ShopProduct extends Model
     public $table = 'shop_product';
     protected  $guarded = [];
     protected  $lc_top = 0; // 1: get product top
+    protected  $lc_top_rated = 0; // 1: get product top rated
     protected  $lc_kind = []; // 0:single, 1:bundle, 2:group
     protected  $lc_property = 'all'; // 0:physical, 1:download, 2:only view, 3: Service
     protected  $lc_promotion = 0; // 1: only produc promotion,
@@ -28,6 +29,9 @@ class ShopProduct extends Model
     protected  $lc_category = []; // array category id
     protected  $lc_brand = []; // array brand id
     protected  $lc_supplier = []; // array supplier id
+    protected  $lc_most_buy = 0; // get product most buy
+    protected  $lc_most_view = 0; // get product most view
+
     protected static $storeCode = null;
 
     const REVIEW_LIMIT = 15;
@@ -464,6 +468,36 @@ class ShopProduct extends Model
      *
      * @return  [type]          [return description]
      */
+    private function setProductMostBuy($id = 0) {
+        $this->lc_most_buy = $id;
+        return $this;
+    }
+    /**
+     * Set product top
+     *
+     *
+     * @return  [type]          [return description]
+     */
+    private function setProductMostView($id = 0) {
+        $this->lc_most_view = $id;
+        return $this;
+    }
+    /**
+     * Set product top rating
+     *
+     *
+     * @return  [type]          [return description]
+     */
+    private function setProductTopRated($id = 0) {
+        $this->lc_top_rated = $id;
+        return $this;
+    }
+    /**
+     * Set product top
+     *
+     *
+     * @return  [type]          [return description]
+     */
     private function setProductTop($id = 0) {
         $this->lc_top = $id;
         return $this;
@@ -708,6 +742,38 @@ class ShopProduct extends Model
         return $this;
     }
     /**
+     * Get product top rating
+     *
+     *
+     * @return  [type]          [return description]
+     */
+    public function getProductTopRated($id) {
+        $this->setProductTopRated($id);
+        return $this;
+    }
+
+    /**
+     * Get product most view
+     *
+     *
+     * @return  [type]          [return description]
+     */
+    public function getProductMostView($id) {
+        $this->setProductMostView($id);
+        return $this;
+    }
+    
+    /**
+     * Get product most buy
+     *
+     *
+     * @return  [type]          [return description]
+     */
+    public function getProductMostBuy($id) {
+        $this->setProductMostBuy($id);
+        return $this;
+    }
+    /**
      * build Query
      */
     public function buildQuery() {
@@ -814,7 +880,13 @@ class ShopProduct extends Model
 
         if ($this->lc_random) {
             $query = $query->inRandomOrder();
-        } else {
+        }elseif ($this->lc_most_view == 1) {
+            $query = $query->orderBy($this->getTable().'.view', 'desc');
+        }elseif ($this->lc_most_buy == 1) {
+            $query = $query->orderBy($this->getTable().'.sold', 'desc');
+        }elseif ($this->lc_top_rated == 1) {
+            $query = $query->orderBy($this->getTable().'.rate_point', 'desc')->orderBy($this->getTable().'.rate_count', 'desc');
+        }else {
             $ckeckSort = false;
             if (is_array($this->lc_sort) && count($this->lc_sort)) {
                 foreach ($this->lc_sort as  $rowSort) {

@@ -93,33 +93,64 @@ class ShopProductController extends Controller
     {
         $storeId = $request->header('x-store');
         $flash_sale = $request->flash_sale ?? false;
-        $most_buy = $request->most_buy ?? false;
-        $most_view = $request->most_view ?? false;
         $sale = $request->sale ?? false;
         $top = $request->top ?? false;
         $top_rated = $request->top_rated ?? false;
+        $most_view = $request->most_view ?? false;
+        $most_buy = $request->most_buy ?? false;
+        $latest = $request->latest ?? false;
 
         $instance = (new ShopProduct)->setStore($storeId);
         $data = [];
-        if ($flash_sale) {
-            $flashSaleProducts = (new ShopProductFlashSale)->getAllProductFlashSale(['storeId'=>$storeId]);
-            $data['flashSaleProducts'] = ProductFlashSaleCollection::collection($flashSaleProducts);
-        }
+        
+        if (!Cache::has($storeId.'_cache_product_special_'.lc_get_locale())) {
+            if ($flash_sale) {
+                $flashSaleProducts = (new ShopProductFlashSale)->getAllProductFlashSale(['storeId'=>$storeId]);
+                $data['flashSaleProducts'] = ProductFlashSaleCollection::collection($flashSaleProducts);
+            }
 
-        if ($sale) {
-            $saleProducts = $instance->getProductPromotion(1)->setLimit(lc_config('product_sale'))->getData();
-            $data['saleProducts'] = ProductCollection::collection($saleProducts);
-        }
+            if ($latest) {
+                $latestProducts = $instance->setLimit(lc_config('product_latest',$storeId))->getData();
+                $data['latestProducts'] = ProductCollection::collection($latestProducts);
+            }
 
-        if ($top) {
-            $topProducts = $instance->getProductPromotion(0)->getProductTop(1)->setLimit(lc_config('product_top'))->getData();
-            $data['topProducts'] = ProductCollection::collection($topProducts);
-        }
+            if ($sale) {
+                $saleProducts = $instance->getProductPromotion(1)->setLimit(lc_config('product_sale',$storeId))->getData();
+                $data['saleProducts'] = ProductCollection::collection($saleProducts);
+            }
 
-        if ($top_rated) {
-            $topRatedProducts = [];
-            $data['topRatedProducts'] = [];
+            if ($top) {
+                $topProducts = $instance->getProductPromotion(0)->getProductTop(1)->setLimit(lc_config('product_top',$storeId))->getData();
+                $data['topProducts'] = ProductCollection::collection($topProducts);
+            }
+
+            if ($top_rated) {
+                $topRatedProducts = $instance->getProductPromotion(0)
+                                             ->getProductTop(0)
+                                             ->getProductTopRated(1)
+                                             ->setLimit(lc_config('product_top_rated',$storeId))->getData();
+                $data['topRatedProducts'] = ProductCollection::collection($topRatedProducts);
+            }
+
+            if ($most_view) {
+                $mostViewProducts = $instance->getProductPromotion(0)
+                                              ->getProductTop(0)
+                                              ->getProductMostView(1)
+                                              ->setLimit(lc_config('product_most_view',$storeId))->getData();
+                $data['mostViewProducts'] = ProductCollection::collection($mostViewProducts);
+            }
+
+            if ($most_buy) {
+                $mostBuyProducts = $instance->getProductPromotion(0)
+                                              ->getProductTop(0)
+                                              ->getProductMostView(0)
+                                              ->getProductMostBuy(1)
+                                              ->setLimit(lc_config('product_most_view',$storeId))->getData();
+                $data['mostBuyProducts'] = ProductCollection::collection($mostBuyProducts);
+            }
+            lc_set_cache($storeId.'_cache_product_special_'.lc_get_locale(), $data,$storeId);
         }
+        $data = Cache::get($storeId.'_cache_product_special_'.lc_get_locale());
         return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }
     /**
@@ -148,6 +179,14 @@ class ShopProductController extends Controller
         if ($validator->fails()) {
             return response()->json(new JsonResponse([],$validator->errors()), Response::HTTP_FORBIDDEN);
         }
+        $product = ShopProduct::find($data['product_id']);
+        if (!$product) {
+            return response()->json(new JsonResponse([],'Product not found'), Response::HTTP_NOT_FOUND);
+        }
+        $rate_point = ShopRating::getPointData($product->id);
+        $product->rate_point = (int) ($rate_point ? $rate_point['total'] + $data['point'] : $data['point']);
+        $product->rate_count = (int) ($rate_point ? $rate_point['ct'] + 1 : 1);
+        $product->save();
 
         $dataInsert = [
             'id' => lc_uuid(),
