@@ -8,6 +8,7 @@ class Config extends Model
     public $table = 'admin_config';
     protected $guarded = [];
 
+    protected static $storeIDGlobal = 0;
     protected static $getAll = null;
     protected static $getAllGlobal = null;
     protected static $getAllConfigOfStore = null;
@@ -98,13 +99,11 @@ class Config extends Model
      *
      * @return  [type]  [return description]
      */
-    public static function getAllGlobal()
-
+    public static function getAllGlobal($storeId)
     {
-        if (self::$getAllGlobal === null) {
-            self::$getAllGlobal = self::where('store_id', 0)
-                ->pluck('value', 'key')
-                ->all();
+        if (self::$getAllGlobal === null && $storeId != self::$storeIDGlobal) {
+            self::$storeIDGlobal = $storeId;
+            self::$getAllGlobal = self::where('store_id', $storeId)->pluck('value','key')->all();
         }
         return self::$getAllGlobal;
     }

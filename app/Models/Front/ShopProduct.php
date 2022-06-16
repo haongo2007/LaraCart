@@ -18,6 +18,7 @@ class ShopProduct extends Model
     use ModelTrait;
     public $table = 'shop_product';
     protected  $guarded = [];
+    protected  $lc_top = 0; // 1: get product top
     protected  $lc_kind = []; // 0:single, 1:bundle, 2:group
     protected  $lc_property = 'all'; // 0:physical, 1:download, 2:only view, 3: Service
     protected  $lc_promotion = 0; // 1: only produc promotion,
@@ -29,7 +30,29 @@ class ShopProduct extends Model
     protected  $lc_supplier = []; // array supplier id
     protected static $storeCode = null;
 
+    const REVIEW_LIMIT = 15;
+
     
+    public function rating()
+    {
+        return $this->hasMany(ShopRating::class, 'product_id', 'id');
+    }
+
+    public function ratingSumpoint()
+    {
+        return $this->rating()->sum('point');
+    }
+    
+    public function ratingCount()
+    {
+        return $this->rating()->count();
+    }
+
+    public function ratingList()
+    {
+        return $this->rating()->limit(self::REVIEW_LIMIT)->orderBy('created_at','desc');
+    }
+
     public function brand()
     {
         return $this->belongsTo(ShopBrand::class, 'brand_id', 'id');
@@ -133,8 +156,8 @@ class ShopProduct extends Model
         $filter_brand       = $params['brand'] ?? '';
         $price_min          = $params['minPrice'] ?? null;
         $price_max          = $params['maxPrice'] ?? null;
-        $filter_color       = $params['color'] ?? '';
-        $filter_size        = $params['size'] ?? '';
+        $filter_color       = $params['color'] ?? null;
+        $filter_size        = $params['size'] ?? null;
         $limit              = $params['perPage'] ?? lc_config('product_list');
         $storeId            = $params['storeId'];
         
@@ -155,9 +178,6 @@ class ShopProduct extends Model
         if ($filter_keyword) {
             $products = $products->setKeyword($filter_keyword);
         }
-        if ($filter_keyword) {
-            $products = $products->setKeyword($filter_keyword);
-        }
         if ($filter_attribute) {
             $products = $products->setAttributes($filter_attribute);
         }   
@@ -171,7 +191,7 @@ class ShopProduct extends Model
             $products = $products->getProductToBrand($brandids);
         } 
         if ($filter_color || $filter_size) {
-            $name = array_merge(explode(',', $filter_color),explode(',', $filter_size));
+            $name = array_filter(array_merge(explode(',', $filter_color),explode(',', $filter_size)));
             $product_id = ShopProductAttribute::select('product_id')->Where(function ($query) use($name) {
                 for ($i = 0; $i < count($name); $i++){
                     $query->orwhere('name', 'like',  '%' . $name[$i] .'%');
@@ -437,6 +457,17 @@ class ShopProduct extends Model
     public function start() {
         return new ShopProduct;
     }
+
+    /**
+     * Set product top
+     *
+     *
+     * @return  [type]          [return description]
+     */
+    private function setProductTop($id = 0) {
+        $this->lc_top = $id;
+        return $this;
+    }
     /**
      * Set product kind
      */
@@ -504,8 +535,8 @@ class ShopProduct extends Model
      * Set product promotion 
      *
      */
-    private function setPromotion() {
-        $this->lc_promotion = 1;
+    private function setPromotion($id = 0) {
+        $this->lc_promotion = $id;
         return $this;
     }
 
@@ -647,9 +678,8 @@ class ShopProduct extends Model
     /**
      * Get product promotion
      */
-    public function getProductPromotion() {
-        $this->setLimit(10);
-        $this->setPromotion();
+    public function getProductPromotion($id) {
+        $this->setPromotion($id);
         return $this;
     }
 
@@ -666,7 +696,17 @@ class ShopProduct extends Model
         }
         return $this;
     }
-
+    
+    /**
+     * Get product top
+     *
+     *
+     * @return  [type]          [return description]
+     */
+    public function getProductTop($id) {
+        $this->setProductTop($id);
+        return $this;
+    }
     /**
      * build Query
      */
@@ -754,6 +794,10 @@ class ShopProduct extends Model
 
         if ($this->lc_category_store !== 'all') {
             $query = $query->where($this->getTable().'.category_store_id', $this->lc_category_store);
+        }
+
+        if ($this->lc_top == 1) {
+            $query = $query->where($this->getTable().'.top',$this->lc_top);
         }
 
         if (count($this->lc_supplier)) {

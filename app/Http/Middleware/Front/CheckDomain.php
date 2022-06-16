@@ -22,7 +22,7 @@ class CheckDomain
         //Check domain exist
         $domain = lc_process_domain_store(basename(request()->headers->get('referer')));
         $arrDomain = ShopStore::getDomainPartner();
-        if (!in_array($domain, $arrDomain) && lc_config_global('domain_strict')) {
+        if (!in_array($domain, $arrDomain) && lc_config_global('domain_strict',$arrDomain[$domain])) {
             return response()->json(new JsonResponse([], 'Access denied'), Response::HTTP_FORBIDDEN);
         }
         $currentStore = $request->header('x-store');

@@ -9,8 +9,10 @@ use App\Models\Front\ShopProductDescription;
 use App\Models\Front\ShopAttributeGroup;
 use App\Models\Front\ShopProductAttribute;
 use App\Models\Front\ShopProductFlashSale;
+use App\Models\Front\ShopRating;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 use App\Helper\JsonResponse;
 use App\Http\Resources\Front\ProductCollection;
 use App\Http\Resources\Front\ProductRelatedCollection;
@@ -19,11 +21,6 @@ use Cache;
 
 class ShopProductController extends Controller
 {
-    public function __construct()
-    {
-        // parent::__construct();
-    }
-    
     /**
      * All products
      * @return [view]
@@ -31,10 +28,11 @@ class ShopProductController extends Controller
     public function index(Request $request)
     {
         $storeId = $request->header('x-store');
-        $params = $request->all();
+        $params = array_filter($request->all());
         $params['storeId'] = $storeId;
         $products = (new ShopProduct)->getProductList($params);
-        return ProductCollection::collection($products);
+        $data = ProductCollection::collection($products);
+        return $data;
     }
 
     /**
@@ -49,7 +47,8 @@ class ShopProductController extends Controller
     public function show(Request $request,$alias) 
     {
         $storeId = $request->header('x-store');
-        $product = (new ShopProduct)->getDetail($alias, 'alias', $storeId);
+        $instance = (new ShopProduct);
+        $product = $instance->getDetail($alias, 'alias', $storeId);
         //Update last view
         $product->view += 1;
         $product->date_lastview = date('Y-m-d H:i:s');
@@ -57,7 +56,7 @@ class ShopProductController extends Controller
         //End last viewed
         
         //Product relation by categories
-        $productRelation = (new ShopProduct)->setStore($storeId);
+        $productRelation = $instance->setStore($storeId);
 
         $prev_product = $productRelation->getData()->where('id', '<', $product->id)->first();
         if ($prev_product) {
@@ -100,17 +99,68 @@ class ShopProductController extends Controller
         $top = $request->top ?? false;
         $top_rated = $request->top_rated ?? false;
 
-        $products = (new ShopProduct);
-
+        $instance = (new ShopProduct)->setStore($storeId);
         $data = [];
         if ($flash_sale) {
-            $product_flash = (new ShopProductFlashSale)->getAllProductFlashSale(['storeId'=>$storeId]);
-            $data['flashSaleProducts'] = ProductFlashSaleCollection::collection($product_flash);
+            $flashSaleProducts = (new ShopProductFlashSale)->getAllProductFlashSale(['storeId'=>$storeId]);
+            $data['flashSaleProducts'] = ProductFlashSaleCollection::collection($flashSaleProducts);
+        }
+
+        if ($sale) {
+            $saleProducts = $instance->getProductPromotion(1)->setLimit(lc_config('product_sale'))->getData();
+            $data['saleProducts'] = ProductCollection::collection($saleProducts);
         }
 
         if ($top) {
-            $data['topProducts'] = [];
+            $topProducts = $instance->getProductPromotion(0)->getProductTop(1)->setLimit(lc_config('product_top'))->getData();
+            $data['topProducts'] = ProductCollection::collection($topProducts);
+        }
+
+        if ($top_rated) {
+            $topRatedProducts = [];
+            $data['topRatedProducts'] = [];
         }
         return response()->json(new JsonResponse($data), Response::HTTP_OK);
+    }
+    /**
+     * Get product special
+     *
+     * @return  [mix]
+     */
+    public function rating(Request $request) 
+    {
+        $storeId = $request->header('x-store');
+        if (!$request->user()) {
+            return response()->json(new JsonResponse([],'Login is require'), Response::HTTP_FORBIDDEN);
+        }
+        $data = request()->all();
+        $validate = [
+            'product_id' => 'required',
+            'comment' => 'required|string|max:300|min:10',
+            'point' => 'required|numeric|min:1|max:5',
+        ];
+        if(lc_captcha_method() && in_array('checkout', lc_captcha_page())) {
+            $data['captcha_field'] = $data[lc_captcha_method()->getField()] ?? '';
+            $validate['captcha_field'] = ['required', 'string', new \App\Plugins\Other\GoogleCaptcha\Rules\CaptchaRule];
+        }
+        $validator = Validator::make($data, $validate);
+        
+        if ($validator->fails()) {
+            return response()->json(new JsonResponse([],$validator->errors()), Response::HTTP_FORBIDDEN);
+        }
+
+        $dataInsert = [
+            'id' => lc_uuid(),
+            'product_id' => $data['product_id'],
+            'customer_id' => $request->user()->id,
+            'name' => $request->user()->first_name.' '.$request->user()->last_name,
+            'comment' => strip_tags(str_replace("\n", "<br>", $data['comment']), '<br>'),
+            'point' => min((int)$data['point'], 5),
+            'status' => lc_config_global('ProductReview',$storeId),
+        ];
+
+        $dataInsert = lc_clean($dataInsert);
+        ShopRating::create($dataInsert);
+        return response()->json(new JsonResponse([]), Response::HTTP_OK);
     }
 }

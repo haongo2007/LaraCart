@@ -341,6 +341,7 @@ class CreateTablesShop extends Migration
             $table->integer('store_id')->default(1)->index();
             $table->dateTime('date_lastview')->nullable();
             $table->date('date_available')->nullable();
+            $table->integer('top')->default(1)->default(0)->index();
             $table->timestamps();
             }
         );
@@ -756,6 +757,18 @@ class CreateTablesShop extends Migration
             $table->timestamp('used_at')->nullable();
             $table->primary(['customer_id', 'discount_id']);
         });
+
+        Schema::create('product_rating', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->uuid('product_id');
+            $table->uuid('customer_id');
+            $table->string('name', 100);
+            $table->integer('point');
+            $table->string('comment', 300);
+            $table->integer('status')->default(0);
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+        });
     }
 
     /**
@@ -828,6 +841,9 @@ class CreateTablesShop extends Migration
         //Custom field
         Schema::dropIfExists('shop_custom_field');
         Schema::dropIfExists('shop_custom_field_detail');
+        Schema::dropIfExists('shop_discount');
+        Schema::dropIfExists('shop_discount_customer');
+        Schema::dropIfExists('product_rating');
     }
 
 }

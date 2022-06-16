@@ -1,5 +1,4 @@
 <?php
-#black-cart/Core/Front/Models/ShopPage.php
 namespace App\Models\Front;
 
 use Illuminate\Database\Eloquent\Model;

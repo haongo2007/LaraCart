@@ -95,6 +95,10 @@ class DataStoreSeeder extends Seeder
             ['group' => '', 'code' => 'display_config', 'key' => 'product_viewed', 'value' => '4', 'sort' => '0', 'detail' => 'lang::admin.viewed_product', 'store_id' => $storeId],
             ['group' => '', 'code' => 'display_config', 'key' => 'item_list', 'value' => '12', 'sort' => '0', 'detail' => 'lang::admin.item_list', 'store_id' => $storeId],
             ['group' => '', 'code' => 'display_config', 'key' => 'item_top', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.item_top', 'store_id' => $storeId],
+            ['group' => '', 'code' => 'display_config', 'key' => 'product_sale', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.sale_product', 'store_id' => $storeId],
+            ['group' => '', 'code' => 'display_config', 'key' => 'product_top_rated', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.top_rated_product', 'store_id' => $storeId],
+            ['group' => '', 'code' => 'display_config', 'key' => 'product_most_buy', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.most_buy_product', 'store_id' => $storeId],
+            ['group' => '', 'code' => 'display_config', 'key' => 'product_most_view', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.most_buy_view', 'store_id' => $storeId],
 
             ['group' => '', 'code' => 'order_config', 'key' => 'shop_allow_guest', 'value' => '1', 'sort' => '11', 'detail' => 'lang::order.admin.shop_allow_guest', 'store_id' => $storeId],
             ['group' => '', 'code' => 'order_config', 'key' => 'product_preorder', 'value' => '1', 'sort' => '18', 'detail' => 'lang::order.admin.product_preorder', 'store_id' => $storeId],
@@ -122,6 +126,7 @@ class DataStoreSeeder extends Seeder
             ['group' => '', 'code' => 'captcha_config', 'key' => 'captcha_mode', 'value' => '0', 'sort' => '20', 'detail' => 'lang::captcha.captcha_mode', 'store_id' => $storeId],
             ['group' => '', 'code' => 'captcha_config', 'key' => 'captcha_page', 'value' => '[]', 'sort' => '10', 'detail' => 'lang::captcha.captcha_page', 'store_id' => $storeId],
             ['group' => '', 'code' => 'captcha_config', 'key' => 'captcha_method', 'value' => '', 'sort' => '0', 'detail' => 'lang::captcha.captcha_method', 'store_id' => $storeId],
+            ['group' => '', 'code' => 'product_review', 'key' => 'ProductReview', 'value' => '1', 'sort' => '0', 'detail' => 'lang::admin.product_review', 'store_id' => $storeId],
             
             ]
         );

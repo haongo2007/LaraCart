@@ -71,13 +71,13 @@ if (!function_exists('lc_config_global')) {
      *
      * @return  [type]          [return description]
      */
-    function lc_config_global($key = null)
+    function lc_config_global($key = null,$storeId = 0)
     {
         //Update config
         if (is_array($key)) {
             if (count($key) == 1) {
                 foreach ($key as $k => $v) {
-                    return Config::where('store_id', 0)->where('key', $k)->update(['value' => $v]);
+                    return Config::where('store_id', $storeId)->where('key', $k)->update(['value' => $v]);
                 }
             } else {
                 return false;
@@ -87,7 +87,7 @@ if (!function_exists('lc_config_global')) {
         
         $allConfig = [];
         try {
-            $allConfig = Config::getAllGlobal();
+            $allConfig = Config::getAllGlobal($storeId);
         } catch(\Throwable $e) {
             //
         }
@@ -172,6 +172,47 @@ if (!function_exists('lc_store_active')) {
 
             default:
                 return Store::getListAllActive();
+                break;
+        }
+    }
+}
+
+
+if (!function_exists('lc_uuid')) {
+    /**
+     * Generate UUID
+     *
+     * @param   [string]  $name
+     * @param   [array]  $param
+     *
+     * @return  [type]         [return description]
+     */
+    function lc_uuid()
+    {
+        return (string)\Illuminate\Support\Str::orderedUuid();
+    }
+}
+
+if (!function_exists('lc_generate_id')) {
+    /**
+     * Generate ID
+     *
+     * @param   [type]  $type  [$type description]
+     *
+     * @return  [type]         [return description]
+     */
+    function lc_generate_id($type = null)
+    {
+        switch ($type) {
+            case 'shop_store':
+                return 'S-'.lc_token(5).'-'.lc_token(5);
+                break;
+            case 'shop_order':
+                return 'O-'.lc_token(5).'-'.lc_token(5);
+                break;
+            
+            default:
+                return lc_uuid();
                 break;
         }
     }

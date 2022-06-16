@@ -364,4 +364,8 @@ return [
     'data_notfound'          => 'Không tìm thấy dữ liệu',
     'method_not_allow'       => 'Phương thức không hợp lệ',
     'remove_dont_permisison' => 'Bạn không có quyền xóa item này',
+    'sale_product'            => 'Sản phẩm sale nhiều',
+    'top_rated_product'       => 'Sản phẩm đánh giá cao',
+    'most_buy_product'        => 'Sản phẩm mua nhiều',
+    'most_most_view'           => 'Sản phẩm xem nhiều',
 ];

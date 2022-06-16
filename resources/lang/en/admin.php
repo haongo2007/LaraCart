@@ -367,4 +367,8 @@ return [
       'data_notfound'          => 'Data not found',
       'method_not_allow'       => 'Invalid method',
       'remove_dont_permisison' => 'You do not have permission to delete this item',
+      'sale_product'            => 'Top sale',
+      'top_rated_product'       => 'Top rated',
+      'most_buy_product'        => 'Top most buy',
+      'most_most_view'           => 'Top most view',
 ];
