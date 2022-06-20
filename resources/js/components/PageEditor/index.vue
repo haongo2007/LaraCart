@@ -20,6 +20,7 @@ export default {
     tools: Object,
     appearance: Object,
     locale: String,
+    mode: String,
     minHeight: {
       type: String,
       default: '500px',
@@ -44,7 +45,6 @@ export default {
       if (this.tools) {
         options.tools = this.tools;
       }
-
       if (this.appearance) {
         options.appearance = this.appearance;
       }
@@ -57,7 +57,7 @@ export default {
       this.editor = unlayer.createEditor({
         ...options,
         id: this.id,
-        displayMode: 'email',
+        displayMode: this.mode,
         source: {
           name: 'vue-email-editor',
           version: '1.0.0',

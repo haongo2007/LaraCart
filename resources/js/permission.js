@@ -1,6 +1,6 @@
 import router from './router';
 import store from './store';
-import { Message } from 'element-ui';
+import { Message, MessageBox  } from 'element-ui';
 import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css'; // progress bar style
 import { isLogged } from '@/utils/auth';
@@ -25,6 +25,19 @@ router.beforeEach(async(to, from, next) => {
       next({ path: '/' });
       NProgress.done();
     } else {
+      if (from.name == 'PageCreate' || from.name == 'PageEdit'){
+        MessageBox.confirm('The data of the page you just edited will be deleted. Do you want to continue ?', 'Warning', {
+          confirmButtonText: 'OK',
+          cancelButtonText: 'Cancel',
+          type: 'warning',
+        }).then(() => { 
+          next();
+        }).catch(() => {
+          Message.info('Event canceled');
+          NProgress.done();
+        })
+        return false;
+      }
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0;
       if (hasRoles) {

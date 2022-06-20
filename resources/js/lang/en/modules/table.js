@@ -1,5 +1,6 @@
 export default {
     "qty": "Amount",
+    "language":"Language",
     "attribute_price": "Attribute Price",
     "attribute": "Attribute",
     "last_view": "Last View",

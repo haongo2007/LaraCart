@@ -1,4 +1,7 @@
 export default {
+    confirm_infomation_to_add_page : "Thông tin để tạo trang mới",
+    page : "Trang",
+    language:"Ngôn ngữ",
     creator:"Người tạo",
     price_tax:'Giá thuế',
     html:'HTML',

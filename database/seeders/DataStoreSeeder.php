@@ -27,6 +27,30 @@ class DataStoreSeeder extends Seeder
 
         DB::connection(config('const.LC_CONNECTION'))->table('admin_config')->insertOrIgnore(
             [
+
+            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_LOG', 'value' => 'on', 'sort' => '0', 'detail' => 'lang::env.ADMIN_LOG', 'store_id' => 0],
+            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_LOG_EXP', 'value' => '', 'sort' => '0', 'detail' => 'lang::env.ADMIN_LOG_EXP', 'store_id' => 0],
+            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_FOOTER_OFF', 'value' => '0', 'sort' => '0', 'detail' => 'lang::env.ADMIN_FOOTER_OFF', 'store_id' => 0],
+            ['group' => 'global', 'code' => 'seo_config', 'key' => 'url_seo_lang', 'value' => '0', 'sort' => '1', 'detail' => 'lang::seo.url_seo_lang', 'store_id' => 0],
+            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'LOG_SLACK_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.LOG_SLACK_WEBHOOK_URL', 'store_id' => 0],
+            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'GOOGLE_CHAT_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.GOOGLE_CHAT_WEBHOOK_URL', 'store_id' => 0],
+            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'CHATWORK_CHAT_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.CHATWORK_CHAT_WEBHOOK_URL', 'store_id' => 0],
+            ['group' => 'global', 'code' => 'api_config', 'key' => 'api_connection_required', 'value' => '1', 'sort' => '1', 'detail' => 'lang::api_connection.api_connection_required', 'store_id' => 0],
+
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_status', 'value' => '0', 'sort' => '0', 'detail' => 'lang::cache.config_manager.cache_status', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_time', 'value' => '600', 'sort' => '0', 'detail' => 'lang::cache.config_manager.cache_time', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_category', 'value' => '0', 'sort' => '3', 'detail' => 'lang::cache.config_manager.cache_category', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_product', 'value' => '0', 'sort' => '4', 'detail' => 'lang::cache.config_manager.cache_product', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_news', 'value' => '0', 'sort' => '5', 'detail' => 'lang::cache.config_manager.cache_news', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_category_cms', 'value' => '0', 'sort' => '6', 'detail' => 'lang::cache.config_manager.cache_category_cms', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_content_cms', 'value' => '0', 'sort' => '7', 'detail' => 'lang::cache.config_manager.cache_content_cms', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_page', 'value' => '0', 'sort' => '8', 'detail' => 'lang::cache.config_manager.cache_page', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_country', 'value' => '0', 'sort' => '10', 'detail' => 'lang::cache.config_manager.cache_country', 'store_id' =>  $storeId],
+
+            ['group' => 'global', 'code' => 'env_mail', 'key' => 'smtp_mode', 'value' => '', 'sort' => '0', 'detail' => 'lang::env.email.smtp_mode', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'multiple_store', 'key' => 'MultiStorePro', 'value' => '1', 'sort' => '0', 'detail' => 'lang::env.MULTI_STORE_PRO', 'store_id' =>  $storeId],
+            ['group' => 'global', 'code' => 'domain_strict', 'key' => 'domain_strict', 'value' => '1', 'sort' => '0', 'detail' => 'lang::env.DOMAIN_STRICT', 'store_id' =>  $storeId],
+
             ['group' => 'Plugins', 'code' => 'Payment', 'key' => 'Cash', 'value' => '1', 'sort' => '0', 'detail' => 'Plugins/Payment/Cash::lang.title', 'store_id' => $storeId],
             ['group' => 'Plugins', 'code' => 'Payment', 'key' => 'BankTransfer', 'value' => '1', 'sort' => '0', 'detail' => 'Plugins/Payment/BankTransfer::lang.title', 'store_id' => $storeId],
             ['group' => 'Plugins', 'code' => 'Shipping', 'key' => 'ShippingStandard', 'value' => '1', 'sort' => '0', 'detail' => 'lang::Shipping Standard', 'store_id' => $storeId],

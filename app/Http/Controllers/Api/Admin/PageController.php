@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopLanguage;
 use App\Models\Admin\Page;
+use App\Models\Front\ShopPageDescription;
 use App\Http\Resources\PageCollection;
+use App\Helper\JsonResponse;
+use Illuminate\Http\Response;
 use Validator;
 
 class PageController extends Controller
@@ -25,87 +28,102 @@ class PageController extends Controller
     {
 
         $data = request()->all();
-        $langFirst = array_key_first(bc_language_all()->toArray()); //get first code language active
-        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['title'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
+        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['title'];
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
         $validator = Validator::make($data, [
                 'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
-                'descriptions.*.title' => 'required|string|max:200',
-                'descriptions.*.keyword' => 'nullable|string|max:200',
-                'descriptions.*.description' => 'nullable|string|max:300',
+                'title' => 'required|string|max:200',
+                'keyword' => 'nullable|array',
+                'description' => 'nullable|string|max:300',
             ], [
                 'alias.regex' => trans('page.alias_validate'),
-                'descriptions.*.title.required' => trans('validation.required', ['attribute' => trans('page.title')]),
+                'title.required' => trans('validation.required', ['attribute' => trans('page.title')]),
             ]
         );
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-        $dataInsert = [
-            'image'    => $data['image'],
-            'alias'    => $data['alias'],
-            'status'   => !empty($data['status']) ? 1 : 0,
-            'store_id' => session('adminStoreId'),
-        ];
-        $page = AdminPage::createPageAdmin($dataInsert);
-        $dataDes = [];
-        $languages = ShopLanguage::getListActive($data['store_id']);
-        foreach ($languages as $code => $value) {
-            $dataDes[] = [
-                'page_id'     => $page->id,
-                'lang'        => $code,
-                'title'       => $data['descriptions'][$code]['title'],
-                'keyword'     => $data['descriptions'][$code]['keyword'],
-                'description' => $data['descriptions'][$code]['description'],
-                'content'     => $data['descriptions'][$code]['content'],
+        if ($data['page_id'] == 0) {
+            $dataInsert = [
+                'image'    => is_array($data['image']) ? $data['image'][0] : $data['image'],
+                'alias'    => $data['alias'],
+                'status'   => !empty($data['status']) ? 1 : 0,
+                'store_id' => $data['store_id'],
             ];
+            $page = Page::createPageAdmin($dataInsert);
+            $page_id = $page->id;
+        }else{
+            $page_id = $data['page_id'];
         }
-        AdminPage::insertDescriptionAdmin($dataDes);
-        bc_clear_cache('cache_page');
-        return redirect()->route('admin_page.index')->with('success', trans('page.admin.create_success'));
+        $dataDes[] = [
+            'page_id'     => $page_id,
+            'lang'        => $data['lang'],
+            'title'       => $data['title'],
+            'keyword'     => $data['keyword'] ? implode(',', $data['keyword']) : null,
+            'description' => $data['description'],
+            'content'     => $data['content'],
+            'design'     => json_encode($data['design']),
+        ];
+        Page::insertDescriptionAdmin($dataDes);
+        lc_clear_cache('cache_page');
+
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
 
     }
 
+    /*
+     * API show
+     */
+    public function show($id,$lang)
+    {
+        $page = Page::with(['descriptions' => function ($query) use ($lang)
+        {
+            $query->where('lang',$lang);
+        }])->find($id);
+        
+        if (!$page) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json(new JsonResponse($page), Response::HTTP_OK);
+    }
 
     /*
      * update status
      */
-    public function postEdit($id)
+    public function update($id)
     {
-        $page = AdminPage::getPageAdmin($id);
+        $page = Page::getPageAdmin($id);
         if (!$page) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
 
         $data = request()->all();
-        $langFirst = array_key_first(bc_language_all()->toArray()); //get first code language active
-        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions'][$langFirst]['title'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
+        $data['alias'] = !empty($data['alias'])?$data['alias']:$data['title'];
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
 
         $validator = Validator::make($data, [
-                'descriptions.*.title' => 'required|string|max:200',
-                'descriptions.*.keyword' => 'nullable|string|max:200',
-                'descriptions.*.description' => 'nullable|string|max:300',
+                'title' => 'required|string|max:200',
+                'keyword' => 'nullable|array|max:200',
+                'description' => 'nullable|string|max:300',
                 'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:100',
             ], [
                 'alias.regex' => trans('page.alias_validate'),
-                'descriptions.*.title.required' => trans('validation.required', ['attribute' => trans('page.title')]),
+                'title.required' => trans('validation.required', ['attribute' => trans('page.title')]),
             ]
         );
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         //Edit
         $dataUpdate = [
-            'image' => $data['image'],
+            'image'    => is_array($data['image']) ? $data['image'][0] : $data['image'],
             'status' => empty($data['status']) ? 0 : 1,
         ];
         if (!empty($data['alias'])) {
@@ -113,20 +131,19 @@ class PageController extends Controller
         }
         $page->update($dataUpdate);
         $page->descriptions()->delete();
-        $dataDes = [];
-        foreach ($data['descriptions'] as $code => $row) {
-            $dataDes[] = [
-                'page_id'     => $id,
-                'lang'        => $code,
-                'title'       => $row['title'],
-                'keyword'     => $row['keyword'],
-                'description' => $row['description'],
-                'content'     => $row['content'],
-            ];
-        }
-        AdminPage::insertDescriptionAdmin($dataDes);
-        bc_clear_cache('cache_page');
-        return redirect()->route('admin_page.index')->with('success', trans('page.admin.edit_success'));
+        $dataDes[] = [
+            'page_id'     => $id,
+            'lang'        => $data['lang'],
+            'title'       => $data['title'],
+            'keyword'     => $data['keyword'] ? implode(',', $data['keyword']) : null,
+            'description' => $data['description'],
+            'content'     => $data['content'],
+            'design'     => json_encode($data['design']),
+        ];
+        Page::insertDescriptionAdmin($dataDes);
+        lc_clear_cache('cache_page');
+
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
 
     }
 
@@ -134,33 +151,20 @@ class PageController extends Controller
         Delete list Item
         Need mothod destroy to boot deleting in model
     */
-    public function deleteList()
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            $arrDontPermission = [];
-            foreach ($arrID as $key => $id) {
-                if(!$this->checkPermisisonItem($id)) {
-                    $arrDontPermission[] = $id;
-                }
+        $ids = $id;
+        $arrID = explode(',', $ids);
+        foreach ($arrID as $key => $id) {
+            $val = explode('.', $id);
+            $check = ShopPageDescription::where('page_id',$val[0])->count();
+            if ($check < 2) {
+                Page::find($val[0])->delete();
+            }else{
+                ShopPageDescription::where([['page_id',$val[0]],['lang',$val[1]]])->delete();
             }
-            if (count($arrDontPermission)) {
-                return response()->json(['error' => 1, 'msg' => trans('admin.remove_dont_permisison') . ': ' . json_encode($arrDontPermission)]);
-            }
-            AdminPage::destroy($arrID);
-            bc_clear_cache('cache_page');
-            return response()->json(['error' => 0, 'msg' => '']);
         }
+        lc_clear_cache('cache_page');
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
-
-    /**
-     * Check permisison item
-     */
-    public function checkPermisisonItem($id) {
-        return AdminPage::getPageAdmin($id);
-    }
-
 }

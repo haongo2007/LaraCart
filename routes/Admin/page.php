@@ -9,4 +9,6 @@
 // });
 //=Page
 
+Route::get('page/{id}/{lang}', 'PageController@show');
+Route::delete('page', 'PageController@destroy');
 Route::apiResource('page', 'PageController');

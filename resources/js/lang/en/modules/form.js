@@ -1,4 +1,7 @@
 export default {
+    "confirm_infomation_to_add_page" : "Infomation to create new page",
+    "page" : "Page",
+    "language":"Language",
     "creator":"Creator",
     "price_tax":"Tax price",
     "html":"HTML",

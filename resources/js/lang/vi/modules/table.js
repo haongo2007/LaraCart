@@ -1,5 +1,6 @@
 export default {
     qty:'Số lượng',
+    language:"Ngôn ngữ",
     attribute_price:'Giá thuộc tính',
     attribute:'Thuộc tính',
     last_view:'Lượt xem gần nhất',

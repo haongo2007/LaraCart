@@ -20,6 +20,8 @@ class PageCollection extends JsonResource
             'image' => $this->image,
             'status' => $this->status,
             'store' => $this->store,
+            'title' => $this->title,
+            'lang' => $this->lang,
         ];
         return $res;
     }

@@ -95,58 +95,17 @@ class DataAdminSeeder extends Seeder
         DB::connection(config('const.LC_CONNECTION'))->table('admin_permission')->insert(
             [
             ['id' => '1', 'name' => 'Auth manager', 'slug' => 'auth.full', 'http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/auth/*', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '2', 'name' => 'Dashboard', 'slug' => 'dashboard', 'http_uri' => 'GET::'.config('const.LC_ADMIN_PREFIX').'', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '3', 'name' => 'Base setting', 'slug' => 'base.setting', 'http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/order_status/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/shipping_status/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/payment_status/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/supplier/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/brand/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/custom_field/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/weight_unit/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/length_unit/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/attribute_group/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/tax/*', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '4', 'name' => 'Store manager', 'slug' => 'store.full','http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/store_info/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/store_maintain/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/store_config/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/store_css/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/store_block/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/store_link/*','created_at' => date('Y-m-d H:i:s')],
-            ['id' => '5', 'name' => 'Product manager', 'slug' => 'product.full','http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/product/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/product_property/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/product_tag/*','created_at' => date('Y-m-d H:i:s')],
-            ['id' => '6', 'name' => 'Category manager', 'slug' => 'category.full','http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/category/*','created_at' => date('Y-m-d H:i:s')],
-            ['id' => '7', 'name' => 'Order manager', 'slug' => 'order.full', 'http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/order/*', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '8', 'name' => 'Upload management', 'slug' => 'upload.full', 'http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/uploads/*', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '9', 'name' => 'Extension manager', 'slug' => 'extension.full', 'http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/template/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/plugin/*', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '10', 'name' => 'Marketing manager', 'slug' => 'marketing.full', 'http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/shop_discount/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/email_template/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/customer/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/subscribe/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/seo/*', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '11', 'name' => 'Report manager', 'slug' => 'report.full', 'http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/report/*', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '12', 'name' => 'CMS manager', 'slug' => 'cms.full', 'http_uri' => 'ANY::'.config('const.LC_ADMIN_PREFIX').'/page/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/banner/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/banner_type/*, ANY::'.config('const.LC_ADMIN_PREFIX').'/cms_category/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/cms_content/*,ANY::'.config('const.LC_ADMIN_PREFIX').'/news/*', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '13', 'name' => 'Update config', 'slug' => 'change.config', 'http_uri' => 'POST::'.config('const.LC_ADMIN_PREFIX').'/store_config/update', 'created_at' => date('Y-m-d H:i:s')],
-             ]
+            ]
         );
 
         DB::connection(config('const.LC_CONNECTION'))->table('admin_role')->insert(
             [
             ['id' => '1', 'name' => 'Administrator', 'slug' => 'administrator', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '2', 'name' => 'Group only View', 'slug' => 'view.all', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '3', 'name' => 'Manager', 'slug' => 'manager', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '4', 'name' => 'CMS', 'slug' => 'cms', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '5', 'name' => 'Accountant', 'slug' => 'accountant', 'created_at' => date('Y-m-d H:i:s')],
-            ['id' => '6', 'name' => 'Marketing', 'slug' => 'maketing', 'created_at' => date('Y-m-d H:i:s')]]
         );
 
         DB::connection(config('const.LC_CONNECTION'))->table('admin_role_permission')->insert(
             [
             ['role_id' => 3, 'permission_id' => 1, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 2, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 3, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 4, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 5, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 6, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 13, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 7, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 8, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 9, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 10, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 11, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 3, 'permission_id' => 12, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 4, 'permission_id' => 1, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 4, 'permission_id' => 12, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 5, 'permission_id' => 1, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 5, 'permission_id' => 2, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 5, 'permission_id' => 7, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 5, 'permission_id' => 11, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 6, 'permission_id' => 1, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 6, 'permission_id' => 2, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 6, 'permission_id' => 8, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 6, 'permission_id' => 10, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 6, 'permission_id' => 11, 'created_at' => date('Y-m-d H:i:s')],
-            ['role_id' => 6, 'permission_id' => 12, 'created_at' => date('Y-m-d H:i:s')],
             ]
         );
         
@@ -174,41 +133,10 @@ class DataAdminSeeder extends Seeder
         if (!empty(session('infoInstall')['language_default'])) {
             $this->language_default = session('infoInstall')['language_default'];
         }
-        DB::connection(config('const.LC_CONNECTION'))->table('admin_config')->insert(
-            [
-            ['group' => 'Plugins', 'code' => 'Payment', 'key' => 'Cash', 'value' => '1', 'sort' => '0', 'detail' => 'Plugins/Payment/Cash::lang.title', 'store_id' => 0],
-            ['group' => 'Plugins', 'code' => 'Shipping', 'key' => 'ShippingStandard', 'value' => '1', 'sort' => '0', 'detail' => 'lang::Shipping Standard', 'store_id' => 0],
-
-            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_LOG', 'value' => 'on', 'sort' => '0', 'detail' => 'lang::env.ADMIN_LOG', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_LOG_EXP', 'value' => '', 'sort' => '0', 'detail' => 'lang::env.ADMIN_LOG_EXP', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_FOOTER_OFF', 'value' => '0', 'sort' => '0', 'detail' => 'lang::env.ADMIN_FOOTER_OFF', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'seo_config', 'key' => 'url_seo_lang', 'value' => '0', 'sort' => '1', 'detail' => 'lang::seo.url_seo_lang', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'LOG_SLACK_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.LOG_SLACK_WEBHOOK_URL', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'GOOGLE_CHAT_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.GOOGLE_CHAT_WEBHOOK_URL', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'CHATWORK_CHAT_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.CHATWORK_CHAT_WEBHOOK_URL', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'api_config', 'key' => 'api_connection_required', 'value' => '1', 'sort' => '1', 'detail' => 'lang::api_connection.api_connection_required', 'store_id' => 0],
-
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_status', 'value' => '0', 'sort' => '0', 'detail' => 'lang::cache.config_manager.cache_status', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_time', 'value' => '600', 'sort' => '0', 'detail' => 'lang::cache.config_manager.cache_time', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_category', 'value' => '0', 'sort' => '3', 'detail' => 'lang::cache.config_manager.cache_category', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_product', 'value' => '0', 'sort' => '4', 'detail' => 'lang::cache.config_manager.cache_product', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_news', 'value' => '0', 'sort' => '5', 'detail' => 'lang::cache.config_manager.cache_news', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_category_cms', 'value' => '0', 'sort' => '6', 'detail' => 'lang::cache.config_manager.cache_category_cms', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_content_cms', 'value' => '0', 'sort' => '7', 'detail' => 'lang::cache.config_manager.cache_content_cms', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_page', 'value' => '0', 'sort' => '8', 'detail' => 'lang::cache.config_manager.cache_page', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'cache', 'key' => 'cache_country', 'value' => '0', 'sort' => '10', 'detail' => 'lang::cache.config_manager.cache_country', 'store_id' => 0],
-
-            ['group' => 'global', 'code' => 'env_mail', 'key' => 'smtp_mode', 'value' => '', 'sort' => '0', 'detail' => 'lang::env.email.smtp_mode', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'multiple_store', 'key' => 'MultiStorePro', 'value' => '1', 'sort' => '0', 'detail' => 'lang::env.MULTI_STORE_PRO', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'domain_strict', 'key' => 'domain_strict', 'value' => '1', 'sort' => '0', 'detail' => 'lang::env.DOMAIN_STRICT', 'store_id' => 0],
-
-            
-            ]
-        );
         DB::connection(config('const.LC_CONNECTION'))->table('admin_store')->insert(
             [
                 'logo' => 'data/logo/Scart-mid.png', 
-                'template' => 'black-cart-light', 
+                'template' => 'lara-cart-light', 
                 'phone' => '0123456789', 
                 'long_phone' => 'Support: 0987654321', 
                 'email' => $this->adminEmail, 
@@ -224,10 +152,10 @@ class DataAdminSeeder extends Seeder
         
         DB::connection(config('const.LC_CONNECTION'))->table('admin_store_description')->insert(
             [
-                ['store_id' => '1', 'lang' => 'en', 'title' => 'Demo black-cart : Free Laravel eCommerce', 'description' => 'Free website shopping cart for business', 'keyword' => '', 'maintain_content' => '<center><img src="/images/maintenance.png" />
+                ['store_id' => '1', 'lang' => 'en', 'title' => 'Demo lara-cart : Free Laravel eCommerce', 'description' => 'Free website shopping cart for business', 'keyword' => '', 'maintain_content' => '<center><img src="/images/maintenance.png" />
     <h3><span style="color:#e74c3c;"><strong>Sorry! We are currently doing site maintenance!</strong></span></h3>
     </center>', 'maintain_note' => 'Website is in maintenance mode!'],
-                ['store_id' => '1', 'lang' => 'vi', 'title' => 'Demo black-cart: Mã nguồn website thương mại điện tử miễn phí', 'description' => 'Laravel shopping cart for business', 'keyword' => '', 'maintain_content' => '<center><img src="/images/maintenance.png" />
+                ['store_id' => '1', 'lang' => 'vi', 'title' => 'Demo lara-cart: Mã nguồn website thương mại điện tử miễn phí', 'description' => 'Laravel shopping cart for business', 'keyword' => '', 'maintain_content' => '<center><img src="/images/maintenance.png" />
     <h3><span style="color:#e74c3c;"><strong>Xin lỗi! Hiện tại website đang bảo trì!</strong></span></h3>
     </center>', 'maintain_note' => 'Website đang trong chế độ bảo trì!'],
             ]

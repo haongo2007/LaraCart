@@ -14,14 +14,13 @@ use App\Http\Resources\StoreCollection;
 
 class StoreController extends Controller
 {
-    public $currencies, $timezones;
+    public $timezones;
 
     public function __construct()
     {
         foreach (timezone_identifiers_list() as $key => $value) {
             $timezones[$value] = $value;
         }
-        $this->currencies = ShopCurrency::getCodeActive();
         $this->timezones = $timezones;
     }
 
@@ -40,7 +39,7 @@ class StoreController extends Controller
         }
         $store['timezones'] = $this->timezones;
         $store['languages'] = ShopLanguage::getListActive($id);
-        $store['currencies'] =$this->currencies;
+        $store['currencies'] = ShopCurrency::getListActive($id);
         return response()->json(new JsonResponse($store), Response::HTTP_OK);
     }
     

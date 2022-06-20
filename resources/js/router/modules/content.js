@@ -41,17 +41,19 @@ const contentRoutes = {
         title: 'pageCreate',
         permissions: ['create.page'],
         parent: 'PageList',
+        noCache: true
       },
       hidden: true,
     },
     {
-      path: 'page/edit/:id(\\d+)',
+      path: 'page/edit/:id(\\d+)/:lang',
       component: () => import('@/views/content/page/Edit'),
       name: 'PageEdit',
       meta: {
         title: 'pageEdit',
         permissions: ['edit.page'],
         parent: 'PageList',
+        noCache: true
       },
       hidden: true,
     },

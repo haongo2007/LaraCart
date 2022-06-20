@@ -256,7 +256,7 @@
                       <el-option
                         v-for="(item,index) in temp.currencies"
                         :key="index"
-                        :label="item"
+                        :label="item.name"
                         :value="index"
                       />
                     </el-select>
@@ -267,7 +267,7 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(6,'currency')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.currency ? temp.currencies[temp.currency] : 'Empty' }}</span>
+                  <span slot="reference" class="border-edit">{{ temp.currency ? temp.currencies[temp.currency].name : 'Empty' }}</span>
                 </el-popover>
                   <el-form-item
                     v-else
@@ -279,7 +279,7 @@
                       <el-option
                         v-for="(item,index) in samp.currencies"
                         :key="index"
-                        :label="item"
+                        :label="item.name"
                         :value="index"
                       />
                     </el-select>
@@ -652,6 +652,7 @@ export default {
     for (var i = 0; i <=11; i++) {
       this.$set(this.visible,i,false);
     }
+    let temp;
     if (!this.isEdit) {
       this.samp = Object.assign({}, this.dataInfo);
       let i = 0;
@@ -674,16 +675,18 @@ export default {
         this.$set(this.temp.descriptions,i,{lang:prop});
         i++;
       };
+      temp = this.samp;
     }else{
       this.id = this.$route.params.id;  
       this.temp = Object.assign({}, this.dataInfo);
       if (this.temp.time_active) {
         this.temp.time_active = JSON.parse(this.temp.time_active);
       }
+      temp = this.temp;
     }
     let desc = [...this.temp.descriptions];
     let newDesc = []; 
-    for(let key in this.temp.languages) {
+    for(let key in temp.languages) {
       let find = desc.filter((item) => item.lang == key);
       if (find.length > 0) {
         let v = find[0];

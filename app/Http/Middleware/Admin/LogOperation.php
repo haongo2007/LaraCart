@@ -18,7 +18,7 @@ class LogOperation
      */
     public function handle(Request $request, \Closure $next)
     {
-        if ($this->shouldLogOperation($request)) {
+        if ($this->shouldLogOperation($request) || Admin::user()->isAdministrator()) {
             $log = [
                 'user_id' => Admin::user()->id,
                 'path' => substr($request->path(), 0, 255),
@@ -45,8 +45,9 @@ class LogOperation
      */
     protected function shouldLogOperation(Request $request)
     {
-        return lc_config_global('ADMIN_LOG')
-        && !$this->inExceptArray($request)
+        $storeId = Admin::user()->stores()->first()->id ?? 0;
+        return lc_config_global('ADMIN_LOG',$storeId)
+        && !$this->inExceptArray($request,$storeId)
         && Admin::user();
     }
 
@@ -57,9 +58,9 @@ class LogOperation
      *
      * @return bool
      */
-    protected function inExceptArray($request)
+    protected function inExceptArray($request,$storeId)
     {
-        foreach (explode(',', lc_config_global('ADMIN_LOG_EXP')) as $except) {
+        foreach (explode(',', lc_config_global('ADMIN_LOG_EXP',$storeId)) as $except) {
             if ($except !== '/') {
                 $except = trim($except, '/');
             }

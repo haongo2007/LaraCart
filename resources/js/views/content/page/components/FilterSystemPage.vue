@@ -114,13 +114,14 @@ export default {
       }).then(() => {
         this.$emit('handleListenData', { loading: true });
         if (multiple) {
-          var id = [];
-          row.map((item) => id.push(item.id));
+          var params = [];
+          row.map((item) => params.push(item.id+'.'+item.lang));
         } else {
-          var id = row.id;
+          var params = row.id +'.'+ row.lang;
         }
         var that = this;
-        pageResource.destroy(id).then((res) => {
+        pageResource.destroy(params).then((res) => {
+          console.log(res);
           if (res) {
             if (multiple) {
               row.forEach(function(v) {

@@ -295,6 +295,7 @@ class CreateTablesShop extends Migration
             $table->string('keyword', 200)->nullable();
             $table->string('description', 300)->nullable();
             $table->text('content')->nullable();
+            $table->text('design')->nullable();
             $table->unique(['page_id', 'lang']);
             }
         );

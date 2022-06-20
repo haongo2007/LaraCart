@@ -16,15 +16,6 @@ class Admin
         return Auth::guard('admin')->user();
     }
 
-    public static function isLoginPage()
-    {
-        return (request()->route()->getName() == 'admin.login');
-    }
-
-    public static function isLogoutPage()
-    {
-        return (request()->route()->getName() == 'admin.logout');
-    }
     public static function getMenu()
     {
         return Menu::getListAll()->groupBy('parent_id');

@@ -94,7 +94,7 @@ if (!function_exists('lc_config_global')) {
         if ($key === null) {
             return $allConfig;
         }
-        if (!array_key_exists($key, $allConfig)) {
+        if (is_null($allConfig) || !array_key_exists($key, $allConfig)) {
             return null;
         } else {
             return trim($allConfig[$key]);

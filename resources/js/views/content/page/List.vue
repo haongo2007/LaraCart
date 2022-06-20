@@ -20,6 +20,28 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
+
+      <el-table-column :label="$t('table.language')" min-width="100px">
+        <template slot-scope="scope">
+          <el-image :src="'/data/language/flag_'+scope.row.lang+'.png'">
+            <div slot="error" class="image-slot">
+              <i class="el-icon-picture-outline" />
+            </div>
+          </el-image>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" :label="$t('table.title')">
+        <template slot-scope="scope">
+          <span>{{ scope.row.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" :label="$t('table.alias')">
+        <template slot-scope="scope">
+          <span>{{ scope.row.alias }}</span>
+        </template>
+      </el-table-column>
       
       <el-table-column :label="$t('table.store')" min-width="100" v-if="checkOnlyStore">
         <template slot-scope="scope">
@@ -30,19 +52,15 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" :label="$t('table.image')" min-width="300">
+      <el-table-column align="center" :label="$t('table.image')" min-width="150">
         <template slot-scope="scope">
-          <el-image :src="scope.row.image">
-            <div slot="error" class="image-slot">
-              <i class="el-icon-picture-outline"></i>
-            </div>
-          </el-image>
-        </template>
-      </el-table-column>
-
-      <el-table-column align="center" :label="$t('table.alias')">
-        <template slot-scope="scope">
-          <span>{{ scope.row.alias }}</span>
+            <el-popover
+              placement="right-end"
+              width="200"
+              trigger="hover">
+                <div v-bind:style="{ backgroundImage: 'url(' + scope.row.image + ')' }" class="screen-shot"></div>
+              <el-button slot="reference">Mouse on</el-button>
+            </el-popover>
         </template>
       </el-table-column>
 
@@ -58,7 +76,7 @@
         <template slot-scope="{row}">
           <el-button-group>
             <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
-            @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" v-permission="['edit.page']" />
+            @click="$router.push({ name: 'PageEdit',params:{id:row.id,lang:row.lang} })" v-permission="['edit.page']" />
             <el-button type="danger" size="mini" icon="el-icon-delete" v-permission="['delete.page']" @click="handleDeleting(row)" />
           </el-button-group>
         </template>
@@ -153,6 +171,23 @@ export default {
   }
   .clear-left {
     clear: left;
+  }
+}
+.screen-shot{
+  min-height: 16rem;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: block;
+  background-color: #f4f4f4;
+  border: .1rem solid #ebebeb;
+  margin-bottom: 1.2rem;
+  padding-top: 80.95%;
+  background-position: top;
+  transition: background-position .6s linear,box-shadow .3s;
+  &:hover {
+    box-shadow: 3px 10px 16px rgb(51 51 51 / 5%), -3px 10px 16px rgb(51 51 51 / 5%);
+    background-position: bottom;
+    transition: background-position 2s linear,box-shadow .3s;
   }
 }
 </style>

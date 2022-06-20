@@ -113,6 +113,12 @@ return [
             'root' => storage_path('app/public/blogs'),
             'url' => env('APP_URL').'/storage',
         ],
+
+        'page' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/page'),
+            'url' => env('APP_URL').'/storage',
+        ],
     ],
 
     /*

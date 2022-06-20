@@ -43,21 +43,29 @@ class Page extends ShopPage
         $keyword          = lc_clean($dataSearch['keyword'] ?? '');
         $sort_order       = lc_clean($dataSearch['sort_order'] ?? 'id_desc');
         $limit            = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
+        $exept_lang       = lc_clean($dataSearch['except_lang'] ?? null);
+        $store_id         = lc_clean($dataSearch['store_id'] ?? null);
 
         $tableDescription = (new ShopPageDescription)->getTable();
         $tablePage     = (new Page)->getTable();
 
         $pageList = (new ShopPage)
-            ->leftJoin($tableDescription, $tableDescription . '.page_id', $tablePage . '.id')
-            ->whereIn('store_id', session('adminStoreId'))
-            ->where($tableDescription . '.lang', lc_get_locale());
-
+            ->leftJoin($tableDescription, $tableDescription . '.page_id', $tablePage . '.id');
+            // ->where($tableDescription . '.lang', lc_get_locale());
+        if ($store_id) {
+            $pageList = $pageList->where('store_id', $store_id);
+        }else{            
+            $pageList = $pageList->whereIn('store_id', session('adminStoreId'));
+        }
+        if ($exept_lang) {
+            $pageList = $pageList->has('descriptions', '<', 2);
+            $pageList = $pageList->where($tableDescription . '.lang', '!=', $exept_lang);
+        }
         if ($keyword) {
             $pageList = $pageList->where(function ($sql) use($tableDescription, $keyword){
                 $sql->where($tableDescription . '.title', 'like', '%' . $keyword . '%');
             });
         }
-
         if ($sort_order && array_key_exists($sort_order, $arrSort)) {
             $field = explode('__', $sort_order)[0];
             $sort_field = explode('__', $sort_order)[1];
