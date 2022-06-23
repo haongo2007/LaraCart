@@ -7,12 +7,13 @@ use Illuminate\Support\Facades\DB;
 
 class DataStoreSeeder extends Seeder
 {
+
     /**
      * Run the database seeds.
      *
      * @return void
      */
-    public function run($storeId)
+    public function run($storeId = 1)
     {
         if (!$storeId) {
           $storeId = empty(session('lastStoreId')) ? 1 : session('lastStoreId');
@@ -28,14 +29,14 @@ class DataStoreSeeder extends Seeder
         DB::connection(config('const.LC_CONNECTION'))->table('admin_config')->insertOrIgnore(
             [
 
-            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_LOG', 'value' => 'on', 'sort' => '0', 'detail' => 'lang::env.ADMIN_LOG', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_LOG_EXP', 'value' => '', 'sort' => '0', 'detail' => 'lang::env.ADMIN_LOG_EXP', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_FOOTER_OFF', 'value' => '0', 'sort' => '0', 'detail' => 'lang::env.ADMIN_FOOTER_OFF', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'seo_config', 'key' => 'url_seo_lang', 'value' => '0', 'sort' => '1', 'detail' => 'lang::seo.url_seo_lang', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'LOG_SLACK_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.LOG_SLACK_WEBHOOK_URL', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'GOOGLE_CHAT_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.GOOGLE_CHAT_WEBHOOK_URL', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'CHATWORK_CHAT_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.CHATWORK_CHAT_WEBHOOK_URL', 'store_id' => 0],
-            ['group' => 'global', 'code' => 'api_config', 'key' => 'api_connection_required', 'value' => '1', 'sort' => '1', 'detail' => 'lang::api_connection.api_connection_required', 'store_id' => 0],
+            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_LOG', 'value' => 'on', 'sort' => '0', 'detail' => 'lang::env.ADMIN_LOG', 'store_id' => $storeId],
+            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_LOG_EXP', 'value' => '', 'sort' => '0', 'detail' => 'lang::env.ADMIN_LOG_EXP', 'store_id' => $storeId],
+            ['group' => 'global', 'code' => 'env_global', 'key' => 'ADMIN_FOOTER_OFF', 'value' => '0', 'sort' => '0', 'detail' => 'lang::env.ADMIN_FOOTER_OFF', 'store_id' => $storeId],
+            ['group' => 'global', 'code' => 'seo_config', 'key' => 'url_seo_lang', 'value' => '0', 'sort' => '1', 'detail' => 'lang::seo.url_seo_lang', 'store_id' => $storeId],
+            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'LOG_SLACK_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.LOG_SLACK_WEBHOOK_URL', 'store_id' => $storeId],
+            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'GOOGLE_CHAT_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.GOOGLE_CHAT_WEBHOOK_URL', 'store_id' => $storeId],
+            ['group' => 'global', 'code' => 'webhook_config', 'key' => 'CHATWORK_CHAT_WEBHOOK_URL', 'value' => '', 'sort' => '0', 'detail' => 'lang::config.CHATWORK_CHAT_WEBHOOK_URL', 'store_id' => $storeId],
+            ['group' => 'global', 'code' => 'api_config', 'key' => 'api_connection_required', 'value' => '1', 'sort' => '1', 'detail' => 'lang::api_connection.api_connection_required', 'store_id' => $storeId],
 
             ['group' => 'global', 'code' => 'cache', 'key' => 'cache_status', 'value' => '0', 'sort' => '0', 'detail' => 'lang::cache.config_manager.cache_status', 'store_id' =>  $storeId],
             ['group' => 'global', 'code' => 'cache', 'key' => 'cache_time', 'value' => '600', 'sort' => '0', 'detail' => 'lang::cache.config_manager.cache_time', 'store_id' =>  $storeId],

@@ -111,19 +111,19 @@ class DataProductSeeder extends Seeder
 
         DB::connection(config('const.LC_CONNECTION'))->table('shop_category')->insert(
             [
-                ['id' => '1', 'alias'=> 'electronics', 'image' => '/data/category/img-40.jpg', 'parent' => '0', 'top' => '1', 'sort' => '0', 'status' => '1'],
-                ['id' => '2', 'alias'=> 'clothing-wears', 'image' => '/data/category/img-44.jpg', 'parent' => '0', 'top' => '1', 'sort' => '0', 'status' => '1'],
-                ['id' => '3', 'alias'=> 'mobile', 'image' => '/data/category/img-42.jpg', 'parent' => '1', 'top' => '1', 'sort' => '0', 'status' => '1'],
-                ['id' => '4', 'alias'=> 'accessaries-extras', 'image' => '/data/category/img-18.jpg', 'parent' => '0', 'top' => '1', 'sort' => '0', 'status' => '1'],
-                ['id' => '5', 'alias'=> 'computers', 'image' => '/data/category/img-14.jpg', 'parent' => '1', 'top' => '1', 'sort' => '0', 'status' => '1'],
-                ['id' => '6', 'alias'=> 'tablets', 'image' => '/data/category/img-14.jpg', 'parent' => '1', 'top' => '0', 'sort' => '0', 'status' => '1'],
-                ['id' => '7', 'alias'=> 'appliances', 'image' => '/data/category/img-40.jpg', 'parent' => '1', 'top' => '0', 'sort' => '0', 'status' => '1'],
-                ['id' => '8', 'alias'=> 'men-clothing', 'image' => '/data/category/img-14.jpg', 'parent' => '2', 'top' => '0', 'sort' => '0', 'status' => '1'],
-                ['id' => '9', 'alias'=> 'women-clothing', 'image' => '/data/category/img-18.jpg', 'parent' => '2', 'top' => '1', 'sort' => '0', 'status' => '1'],
-                ['id' => '10', 'alias'=> 'kid-wear', 'image' => '/data/category/img-14.jpg', 'parent' => '2', 'top' => '0', 'sort' => '0', 'status' => '1'],
-                ['id' => '11', 'alias'=> 'mobile-accessaries', 'image' => '/data/category/img-40.jpg', 'parent' => '4', 'top' => '0', 'sort' => '0', 'status' => '1'],
-                ['id' => '12', 'alias'=> 'women-accessaries', 'image' => '/data/category/img-42.jpg', 'parent' => '4', 'top' => '0', 'sort' => '3', 'status' => '1'],
-                ['id' => '13', 'alias'=> 'men-accessaries', 'image' => '/data/category/img-40.jpg', 'parent' => '4', 'top' => '0', 'sort' => '3', 'status' => '1'],
+                ['id' => '1', 'alias'=> 'electronics', 'image' => '/data/category/img-40.jpg', 'parent' => '0', 'top' => '1', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '2', 'alias'=> 'clothing-wears', 'image' => '/data/category/img-44.jpg', 'parent' => '0', 'top' => '1', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '3', 'alias'=> 'mobile', 'image' => '/data/category/img-42.jpg', 'parent' => '1', 'top' => '1', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '4', 'alias'=> 'accessaries-extras', 'image' => '/data/category/img-18.jpg', 'parent' => '0', 'top' => '1', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '5', 'alias'=> 'computers', 'image' => '/data/category/img-14.jpg', 'parent' => '1', 'top' => '1', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '6', 'alias'=> 'tablets', 'image' => '/data/category/img-14.jpg', 'parent' => '1', 'top' => '0', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '7', 'alias'=> 'appliances', 'image' => '/data/category/img-40.jpg', 'parent' => '1', 'top' => '0', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '8', 'alias'=> 'men-clothing', 'image' => '/data/category/img-14.jpg', 'parent' => '2', 'top' => '0', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '9', 'alias'=> 'women-clothing', 'image' => '/data/category/img-18.jpg', 'parent' => '2', 'top' => '1', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '10', 'alias'=> 'kid-wear', 'image' => '/data/category/img-14.jpg', 'parent' => '2', 'top' => '0', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '11', 'alias'=> 'mobile-accessaries', 'image' => '/data/category/img-40.jpg', 'parent' => '4', 'top' => '0', 'sort' => '0', 'status' => '1', 'store_id' => '1'],
+                ['id' => '12', 'alias'=> 'women-accessaries', 'image' => '/data/category/img-42.jpg', 'parent' => '4', 'top' => '0', 'sort' => '3', 'status' => '1', 'store_id' => '1'],
+                ['id' => '13', 'alias'=> 'men-accessaries', 'image' => '/data/category/img-40.jpg', 'parent' => '4', 'top' => '0', 'sort' => '3', 'status' => '1', 'store_id' => '1'],
             ]
         );
         DB::connection(config('const.LC_CONNECTION'))->table('shop_category_description')->insert(
