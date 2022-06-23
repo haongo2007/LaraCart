@@ -11,7 +11,7 @@
           <el-col :span="24">
             <el-button-group>
               <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
-              @click="$router.push({ name: 'UserCreate'}).catch(() => {})" v-permission="['create.email.template']" />
+              @click="$router.push({ name: 'EmailTemplateCreate'}).catch(() => {})" v-permission="['create.email.template']" />
               <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
               @click="handerDeleteAll" v-permission="['delete.email.template']"/>
             </el-button-group>

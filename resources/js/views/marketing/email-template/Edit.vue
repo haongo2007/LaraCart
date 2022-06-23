@@ -1,31 +1,27 @@
 <template>
-  <page-detail v-if="loading" :is-edit="true" :data-temp="temp" :data-rules="rules"/>
+  <email-template-detail v-if="loading" :is-edit="true" :data-temp="temp" :data-rules="rules"/>
 </template>
 
 <script>
 
-import PageDetail from './components/PageDetail';
+import EmailTemplateDetail from './components/EmailTemplateDetail';
 import PageResource from '@/api/page';
 
 const pageResource = new PageResource();
 export default {
-  name: 'PageEdit',
+  name: 'EmailTemplateEdit',
   components: {
-    PageDetail,
+    EmailTemplateDetail,
   },
   data() {
     return {
       loading:false,
       temp:{
         store_id:0,
-        page_id:0,
-        lang:'',
         title:'',
-        keyword:[],
-        description:'',
+        group:'',
         content:'',
         design:{},
-        image:'',
         status:0,
       },
       rules: {
@@ -34,20 +30,6 @@ export default {
             required: true,
             message: 'Title is required',
             trigger: 'blur',
-          },
-        ],
-        lang: [
-          {
-            required: true,
-            message: 'Language is required',
-            trigger: 'change',
-          },
-        ],
-        image: [
-          {
-            required: true,
-            message: 'Image is required',
-            trigger: 'change',
           },
         ],
       },

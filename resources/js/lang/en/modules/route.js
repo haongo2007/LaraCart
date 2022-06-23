@@ -1,4 +1,5 @@
 export default {
+    "createEmailTemplate":"Create Emal Template",
     "blogEdit":'Edit blog',
     "blogCreate":'Create blog',
     "pageCreate":"Create page",

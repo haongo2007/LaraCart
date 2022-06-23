@@ -45,13 +45,17 @@ class Page extends ShopPage
         $limit            = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
         $exept_lang       = lc_clean($dataSearch['except_lang'] ?? null);
         $store_id         = lc_clean($dataSearch['store_id'] ?? null);
+        $lang             = lc_clean($dataSearch['lang'] ?? null);
 
         $tableDescription = (new ShopPageDescription)->getTable();
         $tablePage     = (new Page)->getTable();
 
         $pageList = (new ShopPage)
             ->leftJoin($tableDescription, $tableDescription . '.page_id', $tablePage . '.id');
-            // ->where($tableDescription . '.lang', lc_get_locale());
+
+        if ($lang) {
+            $pageList = $pageList->whereIn($tableDescription . '.lang', $lang);
+        }
         if ($store_id) {
             $pageList = $pageList->where('store_id', $store_id);
         }else{            

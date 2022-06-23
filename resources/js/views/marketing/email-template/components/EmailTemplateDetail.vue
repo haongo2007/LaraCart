@@ -22,7 +22,7 @@
         v-on:load="editorLoaded"
         :tools="tools"
         v-on:ready="editorReady"
-        mode="web"
+        mode="email"
       />
     </el-col>
 
@@ -41,15 +41,9 @@
             </el-radio>
           </el-form-item>
 
-          <el-form-item :label="$t('form.language')" prop="lang">
-            <el-radio-group v-model="temp.lang">
-                <el-radio-button v-for="(lang,index) in languages" :label="index" :key="index">{{ lang }}</el-radio-button>
-            </el-radio-group>
-          </el-form-item>
-
-          <el-form-item :label="$t('form.page')" prop="Page">
-            <el-select v-model="temp.page_id" :placeholder="$t('form.page')" clearable style="width: 100%" class="filter-item" @change="handSelectPage">
-              <el-option v-for="item in pageList" :key="item.id" :label="item.title" :value="item.id" />
+          <el-form-item :label="$t('form.group')" prop="group">
+            <el-select v-model="temp.group" :placeholder="$t('form.page')" clearable style="width: 100%" class="filter-item" @change="handSelectGroup">
+              <el-option v-for="item in groupList" :key="item.id" :label="item.title" :value="item.id" />
             </el-select>
           </el-form-item>
 
@@ -57,39 +51,7 @@
             <el-input v-model="temp.title" :placeholder="$t('form.name')" />
           </el-form-item>
 
-          <el-form-item :label="$t('form.tags')">
-            <el-tag
-              v-for="tag in temp.keyword"
-              :key="tag"
-              closable
-              :disable-transitions="false"
-              @close="handleClose(tag)"
-            >
-              {{ tag }}
-            </el-tag>
-
-            <el-input
-              v-if="inputTagsVisible"
-              ref="savekeywordInput"
-              v-model="dynamicTags"
-              class="input-new-tag"
-              size="mini"
-              @keyup.enter.native="handleInputConfirm"
-              @blur="handleInputConfirm"
-            />
-            <el-button v-else class="button-new-tag" size="small" @click="showTagsInput">+ New Tag</el-button>
-          </el-form-item>
-
-          <el-form-item :label="$t('form.description')">
-            <el-input
-              v-model="temp.description"
-              :rows="2"
-              type="textarea"
-              :placeholder="$t('form.description')"
-            />
-          </el-form-item>
-
-          <el-form-item :label="$t('form.status')" prop="status" v-show="temp.page_id == 0 || isEdit">
+          <el-form-item :label="$t('form.status')" prop="status">
             <el-tooltip :content="'Switch value: ' + temp.status" placement="top">
               <el-switch
                 v-model="temp.status"
@@ -101,28 +63,12 @@
             </el-tooltip>
           </el-form-item>
 
-          <el-form-item :label="$t('form.banner')" v-show="temp.page_id == 0 || isEdit">
-            <el-button size="small" type="success" @click="handleVisibleStorage()">Pick Image</el-button>
-            <div class="image-uploading pull-right">
-              <el-image v-if="temp.image" :src="temp.image">
-                <div slot="placeholder" class="image-slot">
-                  <i class="el-icon-loading" />
-                </div>
-              </el-image>
-              <i v-if="temp.image" class="el-icon-close" @click="resetImageUpload()" />
-            </div>
-          </el-form-item>
-        </div>
-
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" :loading="actionState" :disabled="actionState" @click="isEdit ? updatePage() : CreatePage()">{{ $t('form.confirm') }}</el-button>
       </span>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
-      <component :is="componentStorage" :get-file="true" />
-    </el-dialog>
   </el-row>
 </template>
 
@@ -132,45 +78,29 @@ const defaultForm = {
 };
 
 import EmailEditor from '@/components/PageEditor';
-import sample from '@/components/PageEditor/sample_web.json';
+import sample from '@/components/PageEditor/sample_email.json';
 import Cookies from 'js-cookie';
-import FileManager from '@/components/FileManager';
-import EventBus from '@/components/FileManager/eventBus';
 import PageResource from '@/api/page';
-import LanguageResource from '@/api/languages';
 import reloadRedirectToList from '@/utils';
 
 const pageResource = new PageResource();
-const languageResource = new LanguageResource();
-const pageListDefault = {
-        id: '0',
-    		title:'Create new'
-    	};
+
 export default {
-  name: 'PageDetail',
+  name: 'EmailTemplateDetail',
   props: {
     isEdit: Boolean,
     dataTemp: Object,
     dataRules: Object,
-    design: Object,
   },
   components: {
     EmailEditor,
-    FileManager,
   },
   data() {
     return {
-      dialogStorageVisible: false,
-      inputTagsVisible: false,
       confirmStoreDialog: false,
       loading:false,
       actionState:false,
-      componentStorage: '',
-      dynamicTags: '',
-      languages: [],
-      pageList:[
-      	pageListDefault
-      ],
+      groupList:[],
       temp:{},
       tools: {
         video: {
@@ -191,28 +121,10 @@ export default {
     if (store_ck && store_ck.length == 1) {
       this.temp.store_id = store_ck[0];
     }
-    EventBus.$on('getFileResponse', this.handlerGeturl);
-    if (this.isEdit) {
-        this.langList(this.temp.store_id);
-    }
   },
   watch:{
     confirmStoreDialog(newVal){
       this.loading = newVal;
-    },
-    'temp.store_id'(newVal) {
-      if (newVal && !this.isEdit) {
-        this.langList(newVal);
-      	this.temp.lang = '';
-      	this.pageList = [Object.assign({},pageListDefault)];
-      }
-    },
-    'temp.lang'(newVal) {
-      if (newVal) {
-      	const data = pageResource.list({except_lang:newVal,store_id:this.temp.store_id}).then((res)=>{
-      		this.pageList = [...res.data,Object.assign({},pageListDefault)];
-      	});
-      }
     },
 	},
   computed:{
@@ -222,14 +134,8 @@ export default {
     },
   },
   methods: {
-  	handSelectPage(item){
-  		this.temp.page_id = item;
-  	},
-  	langList(store_id){
-  		languageResource.fetchLanguagesActive(store_id)
-        .then(({data}) => {
-          this.languages = data;
-        })
+  	handSelectGroup(item){
+  		this.temp.group = item;
   	},
     updatePage(){
       this.$refs['dataForm'].validate((valid) => {
@@ -261,7 +167,6 @@ export default {
     },
     CreatePage(){
       this.$refs['dataForm'].validate((valid) => {
-      	console.log(valid);
         if (valid) {
         	this.actionState = true;
           	pageResource.store(this.temp).then((res) => {
@@ -292,7 +197,7 @@ export default {
     	done();
     },
     goBackList(){
-      this.$router.push({ name: 'PageList' });
+      this.$router.push({ name: 'EmailTemplateList' });
     },
     // called when the editor is created
     editorLoaded() {
@@ -349,46 +254,6 @@ export default {
         this.temp.content = data.html;
         this.temp.design = data.design;
       });
-    },
-    handleInputConfirm() {
-      const inputTags = this.dynamicTags;
-      if (inputTags) {
-        if (!this.temp.keyword.includes(inputTags)) {
-          this.temp.keyword.push(inputTags);
-        }
-      }
-      this.inputTagsVisible = false;
-      this.dynamicTags = '';
-    },
-    handleClose(tag) {
-      this.temp.keyword.splice(this.temp.keyword.indexOf(tag), 1);
-      this.inputTagsVisible = true;
-      this.inputTagsVisible = false;
-    },
-    showTagsInput() {
-      this.inputTagsVisible = true;
-      this.$nextTick(_ => {
-        this.$refs.savekeywordInput.$refs.input.focus();
-      });
-    },
-    handlerGeturl(data) {
-      if (data) {
-        this.temp.image = data[0];
-        this.dialogStorageClose();
-      }
-    },
-    handleVisibleStorage(){
-      this.$store.commit('fm/setDisks', 'page');
-      this.componentStorage = 'FileManager';
-      this.dialogStorageVisible = true;
-    },
-    dialogStorageClose(){
-      this.componentStorage = '';
-      this.dialogStorageVisible = false;
-    },
-    resetImageUpload(){
-      this.temp.image = '';
-      this.componentStorage = '';
     },
   },
 };

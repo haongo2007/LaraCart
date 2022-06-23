@@ -1,4 +1,8 @@
 export default {
+    "save":"Lưu",
+    "import":"Nhập",
+    "export":"Xuất",
+    "upload":"Tải lên",
     confirm_infomation_to_add_page : "Thông tin để tạo trang mới",
     page : "Trang",
     language:"Ngôn ngữ",

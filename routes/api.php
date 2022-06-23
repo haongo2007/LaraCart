@@ -22,9 +22,6 @@ Route::group([
     Route::post('auth/login', 'Auth\AuthController@login');
     Route::get('getFile', 'UserController@getFileFromS3');
 
-    Route::get('test',  function () {
-        
-    });
     Route::group(['middleware' => LC_ADMIN_MIDDLEWARE], function () {
         foreach (glob(__DIR__."/Admin/*.php") as $filename) {
             require_once $filename;

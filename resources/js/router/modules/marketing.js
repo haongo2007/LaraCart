@@ -30,6 +30,30 @@ const marketingRoutes = {
         permissions: ['view.email.template'],
       },
     },
+    {
+      path: 'email-template/create',
+      component: () => import('@/views/marketing/email-template/Create'),
+      name: 'EmailTemplateCreate',
+      meta: {
+        title: 'createEmailTemplate',
+        permissions: ['create.email.template'],
+        parent: 'EmailTemplateList',
+        noCache: true
+      },
+      hidden: true,
+    },
+    {
+      path: 'email-template/edit/:id(\\d+)',
+      component: () => import('@/views/marketing/email-template/Edit'),
+      name: 'EmailTemplateEdit',
+      meta: {
+        title: 'editEmailTemplate',
+        permissions: ['edit.email.template'],
+        parent: 'EmailTemplateList',
+        noCache: true
+      },
+      hidden: true,
+    },
     //coupon & discount
     {
       path: '/coupon-discount',

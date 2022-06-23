@@ -1,4 +1,8 @@
 export default {
+    "save":"Save",
+    "import":"Import",
+    "export":"Export",
+    "upload":"Upload",
     "confirm_infomation_to_add_page" : "Infomation to create new page",
     "page" : "Page",
     "language":"Language",

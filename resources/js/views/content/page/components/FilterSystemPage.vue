@@ -26,8 +26,8 @@
 
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-select v-model="dataQuery.role" multiple collapse-tags :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
-              <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
+            <el-select v-model="dataQuery.lang" multiple collapse-tags :placeholder="$t('table.language')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
+              <el-option v-for="(lang,index) in languages" :key="index" :label="lang" :value="index" />
             </el-select>
           </el-col>
           <el-col :span="12">
@@ -45,6 +45,9 @@ import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
 import PageResource from '@/api/page';
 import permission from '@/directive/permission'; // Permission directive (v-permission)
+import Cookies from 'js-cookie';
+import LanguageResource from '@/api/languages';
+const languageResource = new LanguageResource();
 
 const pageResource = new PageResource();
 export default {
@@ -64,7 +67,7 @@ export default {
     return {
       list: null,
       total: 0,
-      roles: [],
+      languages: [],
       multiSelectRow:[]
     };
   },
@@ -82,12 +85,28 @@ export default {
   },
   created() {
     this.getList();
+    this.langList();
     EventBus.$on('listenMultiSelectRow', data => {
       this.multiSelectRow = data;
     });
     EventBus.$on('handleDeleting', this.handleDeleting);
   },
   methods: {
+    langList(){
+      let store_ck = Cookies.get('store');
+      if (store_ck) {
+        store_ck = JSON.parse(store_ck);
+      }
+      if (store_ck && store_ck.length) {
+        store_ck = store_ck;
+      }else{
+        store_ck = Object.keys(this.$store.getters.storeList);
+      }
+      languageResource.fetchLanguagesActive(store_ck)
+        .then(({data}) => {
+          this.languages = data;
+        })
+    },
     async getList() {
       const data = await pageResource.list(this.dataQuery);
       this.list = data.data;

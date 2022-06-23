@@ -85,7 +85,11 @@ class ShopLanguage extends Model
 
         if (self::$getCodeActive === null) {
             self::$getCodeActive = self::where('status', 1);
-            $storeId = (int) $storeId;
+            if (strpos($storeId, ',') !== false) {
+                $storeId = explode(',',$storeId);
+            }else{
+                $storeId = (int) $storeId;
+            }
             if (!$storeId || $storeId == 'undefined') {
                 if ($storeId == 0) {
                     self::$getCodeActive = self::$getCodeActive->where('store_id',$storeId);
