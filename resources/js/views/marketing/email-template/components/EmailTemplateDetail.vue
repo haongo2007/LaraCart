@@ -28,45 +28,44 @@
 
     <el-dialog
       :show-close="false"
-      :title="$t('form.confirm_infomation_to_add_page')"
+      :title="$t('form.confirm_infomation_to_add_emailTemplate')"
       :visible.sync="confirmStoreDialog"
       :before-close="resetTemp"
-      width="30%"
+      width="40%"
     >
-      <el-form ref="dataForm" :model="temp" :rules="dataRules" class="form-container" label-width="150px">
+        <el-form ref="dataForm" :model="temp" :rules="dataRules" class="form-container" label-width="150px">
 
-          <el-form-item :label="$t('form.store')" prop="store_id">
-            <el-radio v-for="(item,index) in storeList" :key="index" :disabled="dataTemp.store_id ? true : false"  v-model="temp.store_id" :label="index">
-              {{ item.descriptions_current_lang[0].title }}
-            </el-radio>
-          </el-form-item>
+            <el-form-item :label="$t('form.store')" prop="store_id">
+              <el-radio v-for="(item,index) in storeList" :key="index" v-model="temp.store_id" :label="index">
+                {{ item.descriptions_current_lang[0].title }}
+              </el-radio>
+            </el-form-item>
 
-          <el-form-item :label="$t('form.group')" prop="group">
-            <el-select v-model="temp.group" :placeholder="$t('form.page')" clearable style="width: 100%" class="filter-item" @change="handSelectGroup">
-              <el-option v-for="item in groupList" :key="item.id" :label="item.title" :value="item.id" />
-            </el-select>
-          </el-form-item>
+            <el-form-item :label="$t('form.group')" prop="group">
+              <el-select v-model="temp.group" :placeholder="$t('form.group')" clearable style="width: 100%" class="filter-item" @change="handSelectGroup">
+                <el-option v-for="(item,index) in groupList" :key="index" :label="item.title" :value="index" />
+              </el-select>
+            </el-form-item>
 
-          <el-form-item :label="$t('form.name')" prop="title">
-            <el-input v-model="temp.title" :placeholder="$t('form.name')" />
-          </el-form-item>
+            <el-form-item :label="$t('form.name')" prop="name">
+              <el-input v-model="temp.name" :placeholder="$t('form.name')" />
+            </el-form-item>
 
-          <el-form-item :label="$t('form.status')" prop="status">
-            <el-tooltip :content="'Switch value: ' + temp.status" placement="top">
-              <el-switch
-                v-model="temp.status"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
-                active-value="1"
-                inactive-value="0"
-              />
-            </el-tooltip>
-          </el-form-item>
-
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" :loading="actionState" :disabled="actionState" @click="isEdit ? updatePage() : CreatePage()">{{ $t('form.confirm') }}</el-button>
-      </span>
+            <el-form-item :label="$t('form.status')" prop="status">
+              <el-tooltip :content="'Switch value: ' + temp.status" placement="top">
+                <el-switch
+                  v-model="temp.status"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                  active-value="1"
+                  inactive-value="0"
+                />
+              </el-tooltip>
+            </el-form-item>
+            <el-form-item >
+              <el-button type="primary" :loading="actionState" :disabled="actionState" @click="isEdit ? update() : create()">{{ $t('form.confirm') }}</el-button>
+            </el-form-item>
+        </el-form>
     </el-dialog>
 
   </el-row>
@@ -79,11 +78,10 @@ const defaultForm = {
 
 import EmailEditor from '@/components/PageEditor';
 import sample from '@/components/PageEditor/sample_email.json';
-import Cookies from 'js-cookie';
-import PageResource from '@/api/page';
+import EmailTemplateResource from '@/api/email-template';
 import reloadRedirectToList from '@/utils';
 
-const pageResource = new PageResource();
+const emailTemplateResource = new EmailTemplateResource();
 
 export default {
   name: 'EmailTemplateDetail',
@@ -101,6 +99,7 @@ export default {
       loading:false,
       actionState:false,
       groupList:[],
+      currentVariable:[],
       temp:{},
       tools: {
         video: {
@@ -114,13 +113,7 @@ export default {
   },
   created() {
   	this.temp = Object.assign({},this.dataTemp);
-    let store_ck = Cookies.get('store');
-    if (store_ck) {
-      store_ck = JSON.parse(store_ck);
-    }
-    if (store_ck && store_ck.length == 1) {
-      this.temp.store_id = store_ck[0];
-    }
+    this.fetchGroup();
   },
   watch:{
     confirmStoreDialog(newVal){
@@ -134,23 +127,38 @@ export default {
     },
   },
   methods: {
+    async fetchGroup(){
+      const {data} = await emailTemplateResource.getGroups();
+      this.groupList = data;
+    },
   	handSelectGroup(item){
-  		this.temp.group = item;
+      this.$notify.closeAll();
+  		this.currentVariable = this.groupList[item].required;
+      let content = this.currentVariable.map((item) => {
+        return '<p>'+item+'</p>';
+      })
+      content = content.join('');
+      this.$notify.warning({
+        title: 'Warning',
+        message: content,  
+        position: 'bottom-left',
+        dangerouslyUseHTMLString: true,
+        duration: 0
+      });
   	},
-    updatePage(){
+    update(){
       this.$refs['dataForm'].validate((valid) => {
-      	console.log(valid);
         if (valid) {
         	this.actionState = true;
-          	pageResource.update(this.temp.page_id,this.temp).then((res) => {
+          	emailTemplateResource.update(this.temp.id,this.temp).then((res) => {
 	            if (res) {
 								this.$message({
 									type: 'success',
 									message: 'Update successfully',
 								});
-								const view = this.$router.resolve({ name: 'PageEdit' }).route;
+								const view = this.$router.resolve({ name: 'EmailTemplateEdit' }).route;
 								this.$store.dispatch('tagsView/delCachedView', view);
-								reloadRedirectToList('PageList');
+								reloadRedirectToList('EmailTemplateList');
 	      				this.confirmStoreDialog = false;
 	            } else {
 	              this.$message({
@@ -165,19 +173,19 @@ export default {
         }
       });
     },
-    CreatePage(){
+    create(){
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
         	this.actionState = true;
-          	pageResource.store(this.temp).then((res) => {
+          	emailTemplateResource.store(this.temp).then((res) => {
 	            if (res) {
 					this.$message({
 						type: 'success',
 						message: 'Create successfully',
 					});
-					const view = this.$router.resolve({ name: 'PageCreate' }).route;
+					const view = this.$router.resolve({ name: 'EmailTemplateCreate' }).route;
 					this.$store.dispatch('tagsView/delCachedView', view);
-					reloadRedirectToList('PageList');
+					reloadRedirectToList('EmailTemplateList');
 	      			this.confirmStoreDialog = false;
 	            } else {
 	              this.$message({
@@ -194,6 +202,7 @@ export default {
     },
     resetTemp(done){
     	this.temp = Object.assign({},this.dataTemp);
+      this.actionState = false;
     	done();
     },
     goBackList(){
@@ -280,5 +289,8 @@ export default {
     top: 10px;
     right: 10px;
     cursor: pointer;
+  }
+  .el-notification{
+    width: unset!important;
   }
 </style>

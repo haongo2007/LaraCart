@@ -46,6 +46,8 @@ export default {
       let data,data_config = '';
       if (store_ck) {
         store_ck = JSON.parse(store_ck);
+      }else{
+        store_ck = Object.keys(this.$store.state.user.storeList)[0];
       }
       if (store_ck && store_ck.length == 0) {
         let index = Object.keys(this.$store.state.user.storeList);
@@ -60,11 +62,11 @@ export default {
     },
     logo_admin(){
       let logo_config = this.renderAdminSignature('ADMIN_LOGO');
-      this.logo = logo_config ? logo_config : '/svg/logo.svg'
+      this.logo = logo_config ? logo_config : '/default.png'
     },
     name_admin(){
       let name_config = this.renderAdminSignature('ADMIN_NAME');
-      this.names = name_config ? name_config : 'LaraCart Admin';
+      this.names = name_config ? name_config : 'HighLigh Admin';
     } 
   }
 };

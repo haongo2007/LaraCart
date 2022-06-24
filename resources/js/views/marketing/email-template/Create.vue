@@ -5,6 +5,7 @@
 <script>
 
 import EmailTemplateDetail from './components/EmailTemplateDetail';
+import Cookies from 'js-cookie';
 export default {
   name: 'EmailTemplateCreate',
   components: {
@@ -13,18 +14,26 @@ export default {
   data() {
     return {
       temp:{
+        id:null,
         store_id:0,
-        title:'',
+        name:'',
         group:'',
         content:'',
         design:{},
         status:0,
       },
       rules: {
-        title: [
+        name: [
           {
             required: true,
-            message: 'Title is required',
+            message: 'Name is required',
+            trigger: 'blur',
+          },
+        ],
+        group: [
+          {
+            required: true,
+            message: 'Group is required',
             trigger: 'blur',
           },
         ],
@@ -32,6 +41,15 @@ export default {
     };
   },
   created() {
+    let store_ck = Cookies.get('store');
+    if (store_ck) {
+      store_ck = JSON.parse(store_ck);
+    }
+    if (store_ck && store_ck.length == 1) {
+      this.temp.store_id = store_ck[0];
+    }else{
+      this.temp.store_id = Object.keys(this.$store.getters.storeList)[0];
+    }
   },
   methods: {
   }

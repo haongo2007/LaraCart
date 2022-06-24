@@ -2,16 +2,14 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Front\ShopEmailTemplate;
 use App\Models\Admin\EmailTemplate;
 use App\Http\Resources\EmailTemplateCollection;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 use Validator;
 
 class EmailTemplateController extends Controller
 {
-    public function __construct()
-    {
-    }
     public function index()
     {
         $dataSearch = request()->all();
@@ -20,83 +18,46 @@ class EmailTemplateController extends Controller
     }
 
     /**
-     * Form create new item in admin
+     * Groups view to choose variable detail
      * @return [type] [description]
      */
-    public function create()
+    public function groups()
     {
-        $data = [
-            'title' => trans('email_template.admin.add_new_title'),
-            'subTitle' => '',
-            'title_description' => trans('email_template.admin.add_new_des'),
-            'icon' => 'fa fa-plus',
-            'arrayGroup' => $this->arrayGroup(),
-            'ET' => [],
-            'url_action' => bc_route_admin('admin_email_template.create'),
-        ];
-        return view($this->templatePathAdmin.'EmailTemplate.add_edit')
-            ->with($data);
+        $data = $this->arrayGroup();
+        return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }
-
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+     * Post create new item in admin
+     * @return [type] [description]
+    */
+    public function store()
     {
         $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $validator = Validator::make($data, [
             'name' => 'required',
             'group' => 'required',
-            'text' => 'required',
+            'content' => 'required',
         ]);
 
         if ($validator->fails()) {
-            // dd($validator->messages());
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         $dataInsert = [
             'name'     => $data['name'],
             'group'    => $data['group'],
-            'text'     => $data['text'],
+            'content'     => $data['content'],
+            'design'     => json_encode($data['design']),
             'status'   => !empty($data['status']) ? 1 : 0,
-            'store_id' => session('adminStoreId'),
+            'store_id' => $data['store_id'],
         ];
-        ShopEmailTemplate::createEmailTemplateAdmin($dataInsert);
-
-        return redirect()->route('admin_email_template.index')->with('success', trans('email_template.admin.create_success'));
-
-    }
-
-    /**
-     * Form edit
-     */
-    public function edit($id)
-    {
-        $emailTemplate = AdminEmailTemplate::getEmailTemplateAdmin($id);
-        if (!$emailTemplate) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
-        }
-        $data = [
-            'title' => trans('email_template.admin.edit'),
-            'subTitle' => '',
-            'title_description' => '',
-            'icon' => 'fa fa-edit',
-            'ET' => $emailTemplate,
-            'arrayGroup' => $this->arrayGroup(),
-            'url_action' => bc_route_admin('admin_email_template.edit', ['id' => $emailTemplate['id']]),
-        ];
-        return view($this->templatePathAdmin.'EmailTemplate.add_edit')
-            ->with($data);
+        EmailTemplate::createEmailTemplateAdmin($dataInsert);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 /**
  * update status
  */
-    public function postEdit($id)
+    public function update($id)
     {
         $emailTemplate = AdminEmailTemplate::getEmailTemplateAdmin($id);
         if (!$emailTemplate) {
@@ -154,101 +115,101 @@ class EmailTemplateController extends Controller
         }
     }
 
-    /**
-     * Get list variables support for email template
-     *
-     * @return json
-     */
-    public function listVariable()
-    {
-        $key = request('key');
-        $list = [];
-        switch ($key) {
-            case 'order_success_to_customer':
-            case 'order_success_to_admin':
-                $list = [
-                    '$title',
-                    '$orderID',
-                    '$toname',
-                    '$firstName',
-                    '$lastName',
-                    '$address',
-                    '$address1',
-                    '$address2',
-                    '$address3',
-                    '$email',
-                    '$phone',
-                    '$comment',
-                    '$orderDetail',
-                    '$subtotal',
-                    '$shipping',
-                    '$discount',
-                    '$total',
-                ];
-                break;
-
-            case 'forgot_password':
-                $list = [
-                    '$title',
-                    '$reason_sednmail',
-                    '$note_sendmail',
-                    '$note_access_link',
-                    '$reset_link',
-                    '$reset_button',
-                ];
-                break;
-
-            case 'customer_verify':
-                $list = [
-                    '$title',
-                    '$reason_sednmail',
-                    '$note_sendmail',
-                    '$note_access_link',
-                    '$url_verify',
-                    '$button',
-                ];
-                break;
-
-            case 'contact_to_admin':
-                $list = [
-                    '$title',
-                    '$name',
-                    '$email',
-                    '$phone',
-                    '$content',
-                ];
-                break;
-            case 'welcome_customer':
-                    $list = [
-                        '$title',
-                        '$first_name',
-                        '$last_name',
-                        '$email',
-                        '$phone',
-                        '$password',
-                        '$address1',
-                        '$address2',
-                        '$address3',
-                        '$country',
-                    ];
-                    break;
-            default:
-                # code...
-                break;
-        }
-        return response()->json($list);
-    }
-
-    public function arrayGroup()
-    {
-        return  [
-            'order_success_to_admin' => trans('email.email_action.order_success_to_admin'),
-            'order_success_to_customer' => trans('email.email_action.order_success_to_cutomer'),
-            'forgot_password' => trans('email.email_action.forgot_password'),
-            'customer_verify' => trans('email.email_action.customer_verify'),
-            'welcome_customer' => trans('email.email_action.welcome_customer'),
-            'contact_to_admin' => trans('email.email_action.contact_to_admin'),
-            'other' => trans('email.email_action.other'),
+    public function arrayGroup(){
+        return [
+            'order_success_to_admin' => [
+                'title'   => trans('email.email_action.order_success_to_admin'),
+                'required'  =>  [
+                                    trans('email.order.mean_logo'),
+                                    trans('email.order.mean_title'),
+                                    trans('email.order.mean_orderID'),
+                                    trans('email.order.mean_toname'),
+                                    trans('email.order.mean_address'),
+                                    trans('email.order.mean_email'),
+                                    trans('email.order.mean_phone'),
+                                    trans('email.order.mean_comment'),
+                                    trans('email.order.mean_orderDetail'),
+                                    trans('email.order.mean_subtotal'),
+                                    trans('email.order.mean_shipping_fee'),
+                                    trans('email.order.mean_discount'),
+                                    trans('email.order.mean_total'),
+                                    trans('email.order.mean_tax'),
+                                    trans('email.order.mean_payment'),
+                                    trans('email.order.mean_shipping'),
+                                    trans('email.order.mean_currency'),
+                                    trans('email.order.mean_invoice_date'),
+                                ]
+            ],
+            'order_success_to_customer' => [
+                'title'   => trans('email.email_action.order_success_to_cutomer'),
+                'required'  =>  [
+                                    trans('email.order.mean_logo'),
+                                    trans('email.order.mean_title'),
+                                    trans('email.order.mean_orderID'),
+                                    trans('email.order.mean_toname'),
+                                    trans('email.order.mean_address'),
+                                    trans('email.order.mean_email'),
+                                    trans('email.order.mean_phone'),
+                                    trans('email.order.mean_comment'),
+                                    trans('email.order.mean_orderDetail'),
+                                    trans('email.order.mean_subtotal'),
+                                    trans('email.order.mean_shipping_fee'),
+                                    trans('email.order.mean_discount'),
+                                    trans('email.order.mean_total'),
+                                    trans('email.order.mean_tax'),
+                                    trans('email.order.mean_payment'),
+                                    trans('email.order.mean_shipping'),
+                                    trans('email.order.mean_currency'),
+                                    trans('email.order.mean_invoice_date'),
+                                ]
+            ],
+            'forgot_password' => [
+                'title'   => trans('email.email_action.forgot_password'),
+                'required'  =>  [
+                                    trans('email.forgot_password.mean_title'),
+                                    trans('email.forgot_password.mean_reason_sednmail'),
+                                    trans('email.forgot_password.mean_note_sendmail'),
+                                    trans('email.forgot_password.mean_note_access_link'),
+                                    trans('email.forgot_password.mean_reset_link'),
+                                    trans('email.forgot_password.mean_reset_button'),
+                                ]
+            ],
+            'customer_verify' => [
+                'title'   => trans('email.email_action.customer_verify'),
+                'required'  =>  [
+                                    trans('email.customer_verify.mean_title'),
+                                    trans('email.customer_verify.mean_reason_sednmail'),
+                                    trans('email.customer_verify.mean_note_sendmail'),
+                                    trans('email.customer_verify.mean_note_access_link'),
+                                    trans('email.customer_verify.mean_url_verify'),
+                                    trans('email.customer_verify.mean_button'),
+                                ]
+            ],
+            'welcome_customer' => [
+                'title'   => trans('email.email_action.welcome_customer'),
+                'required'  =>  [
+                                    trans('email.welcome_customer.mean_title'),
+                                    trans('email.welcome_customer.mean_first_name'),
+                                    trans('email.welcome_customer.mean_last_name'),
+                                    trans('email.welcome_customer.mean_email'),
+                                    trans('email.welcome_customer.mean_phone'),
+                                    trans('email.welcome_customer.mean_password'),
+                                    trans('email.welcome_customer.mean_address1'),
+                                    trans('email.welcome_customer.mean_address2'),
+                                    trans('email.welcome_customer.mean_address3'),
+                                    trans('email.welcome_customer.mean_country'),
+                                ]
+            ],
+            'contact_to_admin' => [
+                'title'   => trans('email.email_action.contact_to_admin'),
+                'required'  =>  [
+                                    trans('email.contact_to_admin.mean_title'),
+                                    trans('email.contact_to_admin.mean_name'),
+                                    trans('email.contact_to_admin.mean_email'),
+                                    trans('email.contact_to_admin.mean_phone'),
+                                    trans('email.contact_to_admin.mean_content'),
+                                ]
+            ]
         ];
     }
 

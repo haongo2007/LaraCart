@@ -9,4 +9,5 @@
 //     Route::get('/list_variable', 'AdminEmailTemplateController@listVariable')->name('admin_email_template.list_variable');
 // });
 
+Route::get('email-template/groups', 'EmailTemplateController@groups');
 Route::apiResource('email-template', 'EmailTemplateController');

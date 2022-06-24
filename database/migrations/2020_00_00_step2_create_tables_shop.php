@@ -67,7 +67,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 50);
             $table->string('group', 50);
-            $table->text('text');
+            $table->text('content');
             $table->integer('store_id')->default(1)->index();
             $table->tinyInteger('status')->default(0);
             }

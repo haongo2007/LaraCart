@@ -30,7 +30,7 @@
     "driver.js": "^0.9.7",
     "dropzone": "^5.7.1",
     "echarts": "^5.0",
-    "element-ui": "^2.15.7",
+    "element-ui": "^2.15.6",
     "file-loader": "^6.0.0",
     "file-saver": "^2.0.2",
     "fuse.js": "^3.6.1",

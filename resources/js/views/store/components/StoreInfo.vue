@@ -696,8 +696,8 @@ export default {
           keyword : {value:v.keyword,visible:false},
           lang : key,
           store_id : this.temp.id,
-          maintain_content : v.maintain_content,
-          maintain_note : v.maintain_note
+          maintain_content : v.maintain_content ? v.maintain_content : '',
+          maintain_note : v.maintain_note ? v.maintain_note : ''
         });
       }else{
         newDesc.push({
@@ -706,8 +706,8 @@ export default {
           keyword : {value:'',visible:false},
           lang : key,
           store_id : this.temp.id,
-          maintain_content : v.maintain_content,
-          maintain_note : v.maintain_note
+          maintain_content : '',
+          maintain_note : ''
         });
       }
     };

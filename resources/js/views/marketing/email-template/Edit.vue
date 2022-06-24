@@ -17,18 +17,19 @@ export default {
     return {
       loading:false,
       temp:{
+        id:null,
         store_id:0,
-        title:'',
+        name:'',
         group:'',
         content:'',
         design:{},
         status:0,
       },
       rules: {
-        title: [
+        name: [
           {
             required: true,
-            message: 'Title is required',
+            message: 'Name is required',
             trigger: 'blur',
           },
         ],
@@ -38,15 +39,13 @@ export default {
   created() {
     const params = this.$route.params;
     pageResource.get(params).then(({ data } = response) => {
-      this.temp.page_id = data.id;
+      this.temp.id = data.id;
       this.temp.design = JSON.parse(data.descriptions[0].design);
       this.temp.store_id = String(data.store_id);
-      this.temp.image = data.image;
-      this.temp.lang = data.descriptions[0].lang;
-      this.temp.title = data.descriptions[0].title;
-      this.temp.keyword = data.descriptions[0].keyword ? data.descriptions[0].keyword.split(',') : [];
-      this.temp.description = data.descriptions[0].description;
+      this.temp.name = data.descriptions[0].name;
       this.temp.status = String(data.status);
+      this.temp.group = data.group;
+      this.temp.design = data.design;
       this.loading = true;
     })
     .catch(err => {
