@@ -403,7 +403,6 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('name', 100);
             $table->tinyInteger('status')->default(0);
-            $table->integer('sort')->default(0);
             $table->string('type', 50)->comment('radio,select,checkbox');
             $table->integer('picker')->default(0);
             $table->integer('store_id')->default(1)->index();
@@ -656,7 +655,7 @@ class CreateTablesShop extends Migration
 
         Schema::create('shop_weight', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 50)->unique();
+            $table->string('name', 50);
             $table->string('description', 100);
             $table->integer('store_id')->default(1)->index();
 
@@ -665,7 +664,7 @@ class CreateTablesShop extends Migration
 
         Schema::create('shop_length', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 50)->unique();
+            $table->string('name', 50);
             $table->string('description', 100);
             $table->integer('store_id')->default(1)->index();
 

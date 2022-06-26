@@ -48,7 +48,10 @@ const mutations = {
     state.storeList = store;
   },
   SET_STORE_CURRENT: (state, store) => {
-    state.currentStore = typeof store == 'object' ? store[0] : store;
+    if (typeof store == 'string') {
+      store = JSON.parse(store);
+    }
+    state.currentStore = store.length == 1 ? store[0] : null;
     Cookies.set('store', store);
   },
   RESET_STORE (state) {

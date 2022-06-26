@@ -54,67 +54,67 @@ class EmailTemplateController extends Controller
         return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
+    /*
+    show item
+    */
+    public function show($id)
+    {
+        $email_temp = EmailTemplate::find($id);
+        if (!$email_temp) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
+        return response()->json(new JsonResponse($email_temp), Response::HTTP_OK);
+    }
 /**
  * update status
  */
     public function update($id)
     {
-        $emailTemplate = AdminEmailTemplate::getEmailTemplateAdmin($id);
+        $emailTemplate = EmailTemplate::getEmailTemplateAdmin($id);
         if (!$emailTemplate) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
         $data = request()->all();
         $dataOrigin = request()->all();
         $validator = Validator::make($dataOrigin, [
             'name' => 'required',
             'group' => 'required',
-            'text' => 'required',
+            'content' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         //Edit
         $dataUpdate = [
             'name'     => $data['name'],
             'group'    => $data['group'],
-            'text'     => $data['text'],
+            'content'     => $data['content'],
+            'design'     => json_encode($data['design']),
             'status'   => !empty($data['status']) ? 1 : 0,
-            'store_id' => session('adminStoreId'),
+            'store_id' => $data['store_id'],
         ];
         $emailTemplate->update($dataUpdate);
 
-        return redirect()->route('admin_email_template.index')->with('success', trans('email_template.admin.edit_success'));
-
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
     /*
     Delete list item
     Need mothod destroy to boot deleting in model
     */
-    public function deleteList()
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            $arrDontPermission = [];
-            foreach ($arrID as $key => $id) {
-                if(!$this->checkPermisisonItem($id)) {
-                    $arrDontPermission[] = $id;
-                }
-            }
-            if (count($arrDontPermission)) {
-                return response()->json(['error' => 1, 'msg' => trans('admin.remove_dont_permisison') . ': ' . json_encode($arrDontPermission)]);
-            }
-            ShopEmailTemplate::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
+        $arrID = explode(',', $id);
+        foreach ($arrID as $key => $id) {
+            EmailTemplate::find($id)->delete();
         }
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
+    /*
+    Helper sample group
+    */
     public function arrayGroup(){
         return [
             'order_success_to_admin' => [
@@ -211,12 +211,5 @@ class EmailTemplateController extends Controller
                                 ]
             ]
         ];
-    }
-
-    /**
-     * Check permisison item
-     */
-    public function checkPermisisonItem($id) {
-        return AdminEmailTemplate::getEmailTemplateAdmin($id);
     }
 }

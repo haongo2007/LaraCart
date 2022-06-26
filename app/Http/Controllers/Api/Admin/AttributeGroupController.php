@@ -4,35 +4,31 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopAttributeGroup;
 use App\Http\Resources\AttributeGroupCollection;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 use Validator;
 
 class AttributeGroupController extends Controller
 {
-    public function __construct()
-    {
-        // parent::__construct();
-    }
-
     /**
-     * Index interface.
-     *
-     * @return Content
-     */
+    * Index interface.
+    *
+    * @return Content
+    */
     public function index()
     {
         $data = ShopAttributeGroup::whereIn('store_id', session('adminStoreId'))->paginate(20);
         return AttributeGroupCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+    * Post create new item in admin
+    * @return [type] [description]
+    */
+    public function store()
     {
         $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $validator = Validator::make($data, [
             'name' => 'required',
             'type' => 'required',
         ], [
@@ -40,129 +36,59 @@ class AttributeGroupController extends Controller
         ]);
 
         if ($validator->fails()) {
-            // dd($validator->messages());
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Create new order
         $dataInsert = [
-            'name' => $data['name'],
-            'type' => $data['type'],
+            'name'      => $data['name'],
+            'type'      => $data['type'],
+            'status'    => !empty($data['status']) ? 1 : 0,
+            'store_id'  => $data['store_id'],
         ];
-        $obj = ShopAttributeGroup::create($dataInsert);
-//
-        return redirect()->route('admin_attribute_group.index')->with('success', trans('attribute_group.admin.create_success'));
+        $attGroup = ShopAttributeGroup::create($dataInsert);
+
+        return response()->json(new JsonResponse(['id' => $attGroup->id]), Response::HTTP_OK);
 
     }
 
-/**
- * Form edit
- */
-
-public function edit($id)
-{
-    $attribute_group = ShopAttributeGroup::find($id);
-    if(!$attribute_group) {
-        return 'No data';
-    }
-    $data = [
-        'title' => trans('attribute_group.admin.list'),
-        'title_action' => '<i class="fa fa-edit" aria-hidden="true"></i> ' . trans('attribute_group.admin.edit'),
-        'subTitle' => '',
-        'icon' => 'fa fa-indent',
-        'urlDeleteItem' => bc_route_admin('admin_attribute_group.delete'),
-        'removeList' => 0, // 1 - Enable function delete list item
-        'buttonRefresh' => 0, // 1 - Enable button refresh
-        'buttonSort' => 0, // 1 - Enable button sort
-        'css' => '', 
-        'js' => '',
-        'url_action' => bc_route_admin('admin_attribute_group.edit', ['id' => $attribute_group['id']]),
-        'attribute_group' => $attribute_group,
-        'id' => $id,
-    ];
-
-    $listTh = [
-        'id' => trans('attribute_group.id'),
-        'name' => trans('attribute_group.name'),
-        'type' => trans('attribute_group.type'),
-        'action' => trans('attribute_group.admin.action'),
-    ];
-    $obj = new ShopAttributeGroup;
-    $obj = $obj->orderBy('id', 'desc');
-    $dataTmp = $obj->paginate(20);
-
-
-    $dataTr = [];
-    foreach ($dataTmp as $key => $row) {
-        $dataTr[] = [
-            'id' => $row['id'],
-            'name' => $row['name'],
-            'type' => $row['type'],
-            'action' => '
-                <a href="' . bc_route_admin('admin_attribute_group.edit', ['id' => $row['id']]) . '"><span title="' . trans('attribute_group.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-              <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('attribute_group.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-              ',
-        ];
-    }
-
-    $data['listTh'] = $listTh;
-    $data['dataTr'] = $dataTr;
-    $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-    $data['resultItems'] = trans('attribute_group.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-    $data['layout'] = 'edit';
-    return view($this->templatePathAdmin.'screen.attribute_group')
-        ->with($data);
-}
-
-
-/**
- * update status
- */
-    public function postEdit($id)
+    /**
+    * update status
+    */
+    public function update($id)
     {
         $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $validator = Validator::make($data, [
             'name' => 'required',
         ], [
             'name.required' => trans('validation.required'),
         ]);
 
         if ($validator->fails()) {
-            // dd($validator->messages());
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Edit
+        $attrGroup = ShopAttributeGroup::find($id);
+        if (!$attrGroup) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
         $dataUpdate = [
-            'name' => $data['name'],
-            'type' => $data['type'],
+            'name'      => $data['name'],
+            'type'      => $data['type'],
+            'status'    => !empty($data['status']) ? 1 : 0,
+            'store_id'  => $data['store_id'],
         ];
-        $obj = ShopAttributeGroup::find($id);
-        $obj->update($dataUpdate);
-//
-        return redirect()->back()->with('success', trans('attribute_group.admin.edit_success'));
+        $attrGroup->update($dataUpdate);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
 
     }
 
-/*
-Delete list item
-Need mothod destroy to boot deleting in model
- */
-    public function deleteList()
+    /*
+    Delete list item
+    Need mothod destroy to boot deleting in model
+    */
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            ShopAttributeGroup::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $id);
+        ShopAttributeGroup::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 }

@@ -67,6 +67,7 @@ return [
     'amount'                => 'Amount',
     'search'                => 'Search order',
     'success'               => 'Order successfully,:store_name Thank you for choosing us.',
+    'order_comment'        => 'Customer notes',
     'send_mail'             => [
         'title'     => 'Email',
         'new_title' => 'NEW ORDER',

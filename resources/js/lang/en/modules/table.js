@@ -1,4 +1,8 @@
 export default {
+    "label":'Nhãn',
+    "customer_new":'New Customer',
+    "product_utstock":'Product Out of stock',
+    "order_new":'New Order',
     "qty": "Amount",
     "language":"Language",
     "attribute_price": "Attribute Price",

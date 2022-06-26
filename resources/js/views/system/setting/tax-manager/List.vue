@@ -5,6 +5,12 @@
         <el-skeleton :rows="6" animated :loading="loading" />
         <el-form v-show="!loading" ref="dataForm" :model="dataTemp"  class="form-container" label-width="100px">
 
+          <el-form-item :label="$t('form.store')" prop="store_id" v-if="checkOnlyStore">
+            <el-radio v-for="(item,index) in storeList" :key="index" v-model="dataTemp.store_id" :label="index" @change="handleChangeStore(index)">
+              {{ item.descriptions_current_lang[0].title }}
+            </el-radio>
+          </el-form-item>
+
           <el-form-item :label="$t('form.name')" prop="name">
             <el-input
               v-model="dataTemp.name"
@@ -13,18 +19,24 @@
             />
           </el-form-item>
 
-          <el-form-item :label="$t('form.price_tax')" prop="price">
+          <el-form-item :label="$t('form.price_tax')" prop="value">
             <el-input
-              v-model.number="dataTemp.price"
+              v-model.number="dataTemp.value"
               :placeholder="$t('form.price_tax')"
               clearable
               type="number"
             />
           </el-form-item>
 
-          <el-button class="pull-right" type="success" icon="el-icon-check" >
-            {{ $t('form.done') }}
-          </el-button>
+          <el-button-group class="pull-right">
+            <el-button type="danger" icon="el-icon-close" @click="handleCancel" v-if="dataTemp.id > 0">
+              {{ $t('form.cancel') }}
+            </el-button>
+
+            <el-button type="success" icon="el-icon-check" @click="dataTemp.id == 0 ? create() : update()">
+              {{ $t('form.done') }}
+            </el-button>
+          </el-button-group>
         </el-form>
       </el-col>
       <el-col :span="2">
@@ -64,9 +76,7 @@
 
           <el-table-column fixed="right" :label="$t('table.actions')" align="center" min-width="150px" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
-              <router-link :to="{ name: 'StoreEdit',params:{id:row.id} }">
-                <el-button type="primary" size="mini" icon="el-icon-edit" />
-              </router-link>
+              <el-button type="primary" size="mini" icon="el-icon-edit" @click="handleUpdate(row)" />
               <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
             </template>
           </el-table-column>
@@ -80,24 +90,26 @@
 
 <script>
 import Pagination from '@/components/Pagination'; 
-import EventBus from '@/components/FileManager/eventBus';
 import { checkOnlyStore } from '@/utils';
 import TaxResource from '@/api/tax';
 
 const taxResource = new TaxResource();
 
-
+const defaultTemp = {
+    id:0,
+    name:'',
+    value:'',
+    store_id:'',
+}
 export default {
-  name: 'BrandList',
+  name: 'TaxList',
   components: { Pagination },
   data() {
     return {
       list: [],
       total: 0,
       loading: true,
-      dataTemp:{
-        name:'',
-      },
+      dataTemp:Object.assign({},defaultTemp),
       listQuery: {
         page: 1,
         limit: 20,
@@ -105,12 +117,63 @@ export default {
     };
   },
   computed: {
-    checkOnlyStore
+    checkOnlyStore,
+    storeList(){
+      const storeList = this.$store.state.user.storeList;
+      return storeList;
+    },
   },
   created() {
     this.getList();
+    if (this.checkOnlyStore == false) {
+      this.dataTemp.store_id = this.$store.state.user.currentStore;
+    }
   },
   methods: {
+    create(){
+      this.loading = true;
+      taxResource.store(this.dataTemp).then((res) => {
+        if (res.success) {
+          this.dataTemp.id = res.data.id;
+          this.list = [this.dataTemp,...this.list];
+          this.$message({
+            type: 'success',
+            message: 'Create successfully',
+          });
+        }
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      })
+    },
+    update(){
+      this.loading = true;
+      taxResource.update(this.dataTemp.id,this.dataTemp).then((res) => {
+        if (res.success) {
+          const index = this.list.findIndex((item) => item.id == this.dataTemp.id);
+          if (index > -1) {
+            this.$set(this.list,index,this.dataTemp);
+          }
+          this.$message({
+            type: 'success',
+            message: 'Update successfully',
+          });
+        }
+        this.loading = false;
+      }).catch(() => {
+        this.loading = false;
+      })
+    },
+    handleCancel(){
+      this.dataTemp = Object.assign({},defaultTemp);
+    },
+    handleChangeStore(index){
+      this.dataTemp.store = this.storeList[index];
+    },
+    handleUpdate(row){
+      this.dataTemp = Object.assign({},row);
+      this.dataTemp.store_id = String(row.store.id);
+    },
     async getList() {
       const data = await taxResource.list();
       this.list = data.data;
@@ -123,7 +186,27 @@ export default {
       this.listQuery.limit = data.limit;
     },
     handleDeleting(row){
-      EventBus.$emit('handleDeleting', row);
+      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      }).then(() => {
+        taxResource.destroy(row.id).then((res) => {
+          if (res) {
+            const index = this.list.indexOf(row);
+            this.list.splice(index, 1);
+            this.$message({
+              type: 'success',
+              message: 'Delete successfully',
+            });
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Delete canceled',
+        });
+      });
     },
   },
 };

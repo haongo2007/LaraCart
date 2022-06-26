@@ -61,6 +61,7 @@ return [
     'amount'                => 'Giá tiền',
     'search'                => 'Tìm kiếm đơn hàng',
     'success'               => 'Đặt hàng thành công,:store_name Cảm ơn bạn vì đã tin tưởng lựa chọn.',
+    'order_comment'        => 'Ghi chú của khách hàng',
     'send_mail'             => [
         'title'     => 'Email',
         'new_title' => 'ĐƠN HÀNG MỚI',

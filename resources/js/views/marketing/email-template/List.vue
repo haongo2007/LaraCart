@@ -54,7 +54,7 @@
         <template slot-scope="{row}">
           <el-button-group>
             <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
-            @click="$router.push({ name: 'UserEdit',params:{id:row.id} })" v-permission="['edit.email.template']" />
+            @click="$router.push({ name: 'EmailTemplateEdit',params:{id:row.id} })" v-permission="['edit.email.template']" />
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" v-permission="['delete.email.template']" />
           </el-button-group>
         </template>
@@ -87,7 +87,7 @@ export default {
         page: 1,
         limit: 15,
         keyword: '',
-        role: '',
+        status: '',
       },
     }
   },

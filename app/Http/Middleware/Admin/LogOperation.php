@@ -5,7 +5,7 @@ namespace App\Http\Middleware\Admin;
 use App\Models\Admin\Admin;
 use App\Models\Admin\Log;
 use Illuminate\Http\Request;
-
+use Location;
 class LogOperation
 {
     /**
@@ -18,20 +18,22 @@ class LogOperation
      */
     public function handle(Request $request, \Closure $next)
     {
-        if ($this->shouldLogOperation($request) || Admin::user()->isAdministrator()) {
-            $log = [
-                'user_id' => Admin::user()->id,
-                'path' => substr($request->path(), 0, 255),
-                'method' => $request->method(),
-                'ip' => $request->getClientIp(),
-                'user_agent' => $request->header('User-Agent'),
-                'input' => json_encode($request->input()),
-            ];
+        if (Location::get($request->ip())) {
+            if ($this->shouldLogOperation($request) || Admin::user()->isAdministrator()) {
+                $log = [
+                    'user_id' => Admin::user()->id,
+                    'path' => substr($request->path(), 0, 255),
+                    'method' => $request->method(),
+                    'ip' => $request->getClientIp(),
+                    'user_agent' => $request->header('User-Agent'),
+                    'input' => json_encode($request->input()),
+                ];
 
-            try {
-                Log::create($log);
-            } catch (\Exception $exception) {
-                // pass
+                try {
+                    Log::create($log);
+                } catch (\Exception $exception) {
+                    // pass
+                }
             }
         }
 

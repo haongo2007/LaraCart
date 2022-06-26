@@ -5,9 +5,9 @@
 <script>
 
 import EmailTemplateDetail from './components/EmailTemplateDetail';
-import PageResource from '@/api/page';
+import EmailTemplateResource from '@/api/email-template';
 
-const pageResource = new PageResource();
+const emailTemplateResource = new EmailTemplateResource();
 export default {
   name: 'EmailTemplateEdit',
   components: {
@@ -37,15 +37,14 @@ export default {
     };
   },
   created() {
-    const params = this.$route.params;
-    pageResource.get(params).then(({ data } = response) => {
+    const id = this.$route.params && this.$route.params.id;
+    emailTemplateResource.get(id).then(({ data } = response) => {
       this.temp.id = data.id;
-      this.temp.design = JSON.parse(data.descriptions[0].design);
+      this.temp.design = JSON.parse(data.design);
       this.temp.store_id = String(data.store_id);
-      this.temp.name = data.descriptions[0].name;
+      this.temp.name = data.name;
       this.temp.status = String(data.status);
       this.temp.group = data.group;
-      this.temp.design = data.design;
       this.loading = true;
     })
     .catch(err => {

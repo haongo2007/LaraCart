@@ -1,4 +1,8 @@
 export default {
+    label:'Nhãn',
+    customer_new:'Khách hàng mới',
+    product_utstock:'Sản phẩm hết hàng',
+    order_new:'Đơn hàng mới',
     qty:'Số lượng',
     language:"Ngôn ngữ",
     attribute_price:'Giá thuộc tính',

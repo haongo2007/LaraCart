@@ -28,7 +28,7 @@
 
     <el-dialog
       :show-close="false"
-      :title="$t('form.confirm_infomation_to_add_page')"
+      :title="isEdit ? $t('form.confirm_infomation_to_edit_page') : $t('form.confirm_infomation_to_add_page')"
       :visible.sync="confirmStoreDialog"
       :before-close="resetTemp"
       width="30%"

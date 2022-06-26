@@ -25,12 +25,17 @@
       <div class="drawer-item">
 
         <el-row :gutter="24">
-          <el-col :span="12">
-            <el-select v-model="dataQuery.role" multiple collapse-tags :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
-              <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
+          <el-col :span="8">
+            <el-select v-model="dataQuery.sort" :placeholder="$t('table.order')" style="width:100%" clearable class="filter-item" @change="handleFilter('sort',dataQuery.sort)">
+              <el-option v-for="item in sortOptions" :key="item.key" :label="item.label" :value="item.key" :disabled="item.active" />
             </el-select>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="8">
+            <el-select v-model="dataQuery.status" :placeholder="$t('table.status')" style="width: 100%" class="filter-item" clearable multiple @change="handleFilter('filter',dataQuery.status)">
+              <el-option v-for="item in statusOptions" :key="item.key" :label="item.label" :value="item.key" />
+            </el-select>
+          </el-col>
+          <el-col :span="8">
             <el-input v-model="dataQuery.keyword" :placeholder="$t('table.keyword')" style="width: 100%;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
@@ -66,7 +71,33 @@ export default {
       list: null,
       total: 0,
       roles: [],
-      multiSelectRow:[]
+      multiSelectRow:[],
+      statusOptions:[{
+        label: 'Deactive',
+        key: '0',
+        active: false,
+      }, {
+        label: 'Active',
+        key: '1',
+        active: true,
+      }],
+      sortOptions: [{
+        label: 'Id DESC',
+        key: 'id__desc',
+        active: false,
+      }, {
+        label: 'Id ASC',
+        key: 'id__asc',
+        active: false,
+      }, {
+        label: 'Name A-Z',
+        key: 'name__asc',
+        active: false,
+      }, {
+        label: 'Name Z-A',
+        key: 'name__desc',
+        active: false,
+      }],
     };
   },
   watch: {
@@ -97,6 +128,15 @@ export default {
       this.$emit('handleListenData', { list: this.list, loading: false, total: this.total, listQuery: this.dataQuery });
     },
     handleFilter(type, e) {
+      if (type === 'filter' && e) {
+        this.statusOptions.filter(function(elem){
+          if (elem.key === e){
+            elem.active = true;
+          } else {
+            elem.active = false;
+          }
+        });
+      }
       this.dataQuery.page = 1;
       this.getList();
     },

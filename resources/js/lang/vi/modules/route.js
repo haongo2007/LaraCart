@@ -1,4 +1,5 @@
 export default {
+    "editEmailTemplate":"Sửa email mẫu",
     "createEmailTemplate":"Tạo mẫu email",
     "blogEdit":"Sửa bài viết",
     "blogCreate":"Tạo bài viết",

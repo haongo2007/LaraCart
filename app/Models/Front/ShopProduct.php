@@ -31,6 +31,7 @@ class ShopProduct extends Model
     protected  $lc_supplier = []; // array supplier id
     protected  $lc_most_buy = 0; // get product most buy
     protected  $lc_most_view = 0; // get product most view
+    protected  $lc_out_stock = 0; // get product out stock
 
     protected static $storeCode = null;
 
@@ -463,6 +464,16 @@ class ShopProduct extends Model
     }
 
     /**
+     * Set product out of stock
+     *
+     *
+     * @return  [type]          [return description]
+     */
+    private function setOutStock($id = 0) {
+        $this->lc_out_stock = $id;
+        return $this;
+    }
+    /**
      * Set product top
      *
      *
@@ -651,6 +662,14 @@ class ShopProduct extends Model
      */
     public function getProductToCategory($arrCategory) {
         $this->setCategory($arrCategory);
+        return $this;
+    }
+    /**
+     * Get product to array Catgory
+     * @param   [array|int]  $arrCategory 
+     */
+    public function getProductOutStock($id) {
+        $this->setOutStock($id);
         return $this;
     }
 
@@ -864,6 +883,10 @@ class ShopProduct extends Model
 
         if ($this->lc_top == 1) {
             $query = $query->where($this->getTable().'.top',$this->lc_top);
+        }
+
+        if ($this->lc_out_stock == 1) {
+            $query = $query->where($this->getTable().'.stock',0);
         }
 
         if (count($this->lc_supplier)) {

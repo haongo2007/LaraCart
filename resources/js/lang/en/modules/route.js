@@ -1,5 +1,6 @@
 export default {
-    "createEmailTemplate":"Create Emal Template",
+    "editEmailTemplate":"Edit Email Template",
+    "createEmailTemplate":"Create Email Template",
     "blogEdit":'Edit blog',
     "blogCreate":'Create blog',
     "pageCreate":"Create page",

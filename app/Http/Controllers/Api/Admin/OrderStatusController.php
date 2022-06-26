@@ -30,137 +30,68 @@ class OrderStatusController extends Controller
     }
 
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+    * Post create new item in admin
+    * @return [type] [description]
+    */
+    public function store()
     {
         $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $validator = Validator::make($data, [
             'name' => 'required',
         ], [
             'name.required' => trans('validation.required'),
         ]);
 
         if ($validator->fails()) {
-            // dd($validator->messages());
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         $dataInsert = [
             'name' => $data['name'],
+            'label' => $data['label'],
+            'store_id' => $data['store_id'],
         ];
-        $obj = ShopOrderStatus::create($dataInsert);
-//
-        return redirect()->route('admin_order_status.edit', ['id' => $obj['id']])->with('success', trans('order_status.admin.create_success'));
-
+        $orderStt = ShopOrderStatus::create($dataInsert);
+        return response()->json(new JsonResponse(['id'=>$orderStt->id]), Response::HTTP_OK);
     }
 
-/**
- * Form edit
- */
-public function edit($id)
-{
-    $order_status = ShopOrderStatus::find($id);
-    if(!$order_status) {
-        return 'No data';
-    }
-    $data = [
-        'title' => trans('order_status.admin.list'),
-        'title_action' => '<i class="fa fa-edit" aria-hidden="true"></i> ' . trans('order_status.admin.edit'),
-        'subTitle' => '',
-        'icon' => 'fa fa-indent',
-        'urlDeleteItem' => bc_route_admin('admin_order_status.delete'),
-        'removeList' => 0, // 1 - Enable function delete list item
-        'buttonRefresh' => 0, // 1 - Enable button refresh
-        'buttonSort' => 0, // 1 - Enable button sort
-        'css' => '', 
-        'js' => '',
-        'url_action' => bc_route_admin('admin_order_status.edit', ['id' => $order_status['id']]),
-        'order_status' => $order_status,
-        'id' => $id,
-    ];
-
-    $listTh = [
-        'id' => trans('order_status.admin.id'),
-        'name' => trans('order_status.admin.name'),
-        'action' => trans('order_status.admin.action'),
-    ];
-    $obj = new ShopOrderStatus;
-    $obj = $obj->orderBy('id', 'desc');
-    $dataTmp = $obj->paginate(20);
-
-    $dataTr = [];
-    foreach ($dataTmp as $key => $row) {
-        $dataTr[] = [
-            'id' => $row['id'],
-            'name' => $row['name'] ?? 'N/A',
-            'action' => '
-                <a href="' . bc_route_admin('admin_order_status.edit', ['id' => $row['id']]) . '"><span title="' . trans('order_status.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-              <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('order_status.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-              ',
-        ];
-    }
-
-    $data['listTh'] = $listTh;
-    $data['dataTr'] = $dataTr;
-    $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-    $data['resultItems'] = trans('order_status.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-    $data['layout'] = 'edit';
-    return view($this->templatePathAdmin.'Odrer.order_status')
-        ->with($data);
-}
-
-
-/**
- * update status
- */
-    public function postEdit($id)
+    /**
+    * update status
+    */
+    public function update($id)
     {
         $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
+        $validator = Validator::make($data, [
             'name' => 'required',
         ], [
             'name.required' => trans('validation.required'),
         ]);
 
         if ($validator->fails()) {
-            // dd($validator->messages());
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Edit
+        $orderStt = ShopOrderStatus::find($id);
+        if (!$orderStt) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
         $dataUpdate = [
             'name' => $data['name'],
+            'label' => $data['label'],
+            'store_id' => $data['store_id'],
         ];
-        $obj = ShopOrderStatus::find($id);
-        $obj->update($dataUpdate);
-//
-        return redirect()->back()->with('success', trans('order_status.admin.edit_success'));
-
+        $orderStt->update($dataUpdate);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
-/*
-Delete list item
-Need mothod destroy to boot deleting in model
- */
-    public function deleteList()
+    /*
+    Delete list item
+    Need mothod destroy to boot deleting in model
+    */
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            ShopOrderStatus::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $id);
+        ShopOrderStatus::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 }

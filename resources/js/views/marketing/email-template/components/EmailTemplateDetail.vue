@@ -28,7 +28,7 @@
 
     <el-dialog
       :show-close="false"
-      :title="$t('form.confirm_infomation_to_add_emailTemplate')"
+      :title="isEdit ? $t('form.confirm_infomation_to_edit_emailTemplate') : $t('form.confirm_infomation_to_add_emailTemplate')"
       :visible.sync="confirmStoreDialog"
       :before-close="resetTemp"
       width="40%"
@@ -152,14 +152,15 @@ export default {
         	this.actionState = true;
           	emailTemplateResource.update(this.temp.id,this.temp).then((res) => {
 	            if (res) {
-								this.$message({
-									type: 'success',
-									message: 'Update successfully',
-								});
-								const view = this.$router.resolve({ name: 'EmailTemplateEdit' }).route;
-								this.$store.dispatch('tagsView/delCachedView', view);
-								reloadRedirectToList('EmailTemplateList');
-	      				this.confirmStoreDialog = false;
+								  this.$message({
+  									type: 'success',
+  									message: 'Update successfully',
+  								});
+  								const view = this.$router.resolve({ name: 'EmailTemplateEdit' }).route;
+  								this.$store.dispatch('tagsView/delCachedView', view);
+  								reloadRedirectToList('EmailTemplateList');
+  	      				this.confirmStoreDialog = false;
+                  this.$notify.closeAll();
 	            } else {
 	              this.$message({
 	                type: 'error',
@@ -179,13 +180,14 @@ export default {
         	this.actionState = true;
           	emailTemplateResource.store(this.temp).then((res) => {
 	            if (res) {
-					this.$message({
-						type: 'success',
-						message: 'Create successfully',
-					});
-					const view = this.$router.resolve({ name: 'EmailTemplateCreate' }).route;
-					this.$store.dispatch('tagsView/delCachedView', view);
-					reloadRedirectToList('EmailTemplateList');
+      					this.$message({
+      						type: 'success',
+      						message: 'Create successfully',
+      					});
+      					const view = this.$router.resolve({ name: 'EmailTemplateCreate' }).route;
+      					this.$store.dispatch('tagsView/delCachedView', view);
+      					reloadRedirectToList('EmailTemplateList');
+                this.$notify.closeAll();
 	      			this.confirmStoreDialog = false;
 	            } else {
 	              this.$message({

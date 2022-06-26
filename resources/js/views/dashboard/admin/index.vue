@@ -33,17 +33,20 @@
       <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
         <transaction-table />
       </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;">
-        <customer-table />
+      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;background:#fff;height: 530px" >
+        <order-area-statistics :data-label="lineChartLabel"/>
       </el-col>
     </el-row>
 
     <el-row :gutter="8">
-      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;">
+      <el-col :xs="{span: 24}" :sm="{span: 8}" :md="{span: 8}" :lg="{span: 8}" :xl="{span: 8}" style="margin-bottom:30px;">
         <todo-list />
       </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 12}" :xl="{span: 12}" style="margin-bottom:30px;">
-        <box-card />
+      <el-col :xs="{span: 24}" :sm="{span: 8}" :md="{span: 8}" :lg="{span: 8}" :xl="{span: 8}" style="margin-bottom:30px;">
+        <product-out-stock />
+      </el-col>
+      <el-col :xs="{span: 24}" :sm="{span: 8}" :md="{span: 8}" :lg="{span: 8}" :xl="{span: 8}" style="margin-bottom:30px;">
+        <customer-table />
       </el-col>
     </el-row>
   </div>
@@ -59,8 +62,10 @@ import PieChart from './components/PieChart';
 import BarChart from './components/BarChart';
 import TransactionTable from './components/TransactionTable';
 import CustomerTable from './components/CustomerTable';
+import ProductOutStock from './components/ProductOutStock';
 import TodoList from './components/TodoList';
-import BoxCard from './components/BoxCard';
+// import BoxCard from './components/BoxCard';
+import OrderAreaStatistics from './components/OrderAreaStatistics';
 import { overView } from '@/api/dashboard';
 
 export default {
@@ -74,9 +79,10 @@ export default {
     BarChart,
     TransactionTable,
     TodoList,
-    BoxCard,
+    OrderAreaStatistics,
     FilterData,
-    CustomerTable
+    CustomerTable,
+    ProductOutStock
   },
   data() {
     return {
@@ -84,6 +90,7 @@ export default {
       lineChartData: {},
       panelData: {},
       filterData: {},
+      lineChartLabel:{},
       RunLineChart: '',
       RunFilterData: '',
       loading: true,
@@ -97,7 +104,6 @@ export default {
   methods: {
     handleSetLineChartData(type) {
       this.lineChartData = this.lineChartDataList[type];
-      this.lineChartData.label = this.lineChartDataList.label;
     },
     handleInitLineChartData(query) {
       this.fetchData(query);
@@ -111,9 +117,8 @@ export default {
       this.panelData = panelData;
       this.lineChartDataList = data;
       this.lineChartData = data.newCustomers;
-      this.lineChartData.label = data.label;
       this.lineChartData.companies = data.companies;
-      this.lineChartLabel = data.label;
+      this.lineChartLabel = data.companies;
       this.filterData = data.rangeDate;
       this.loading = false;
       this.height_chart = 'auto';

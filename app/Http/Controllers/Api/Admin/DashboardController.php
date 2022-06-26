@@ -38,7 +38,6 @@ class DashboardController extends Controller
         $Companies = ShopStoreDescription::select('store_id','title')->where('lang',lc_get_locale())->whereIn('store_id',$storeId)->get()
         ->pluck('store_id','title')->toArray();
         $data = [];
-        // $rangDays = CarbonPeriod::create($from, $to);
 
         $Header = ["value","Company","Date"];
         $Customer  = [];
@@ -49,14 +48,14 @@ class DashboardController extends Controller
         $Orders_total = [];
         $Amount_total = [];
         $Product_total = [];
-        // $from = $rangDays->getStartDate()->format('Y-m-d');
-        // $to = $rangDays->getEndDate()->format('Y-m-d');
-
+        // new customer
         foreach($newVisitis as $k => $visited){
             $Customer[] = [$visited['total_customer'],$visited['store_id'],$visited['d']];
             $Customer_total[] = $visited['total_customer'];
         }
+        // end
 
+        // new order and total amount
         foreach($newOrder as $k => $order){
             $Orders[] = [$order['total_order'],$order['store_id'],$order['d']];
             $Orders_total[] = $order['total_order'];
@@ -64,11 +63,15 @@ class DashboardController extends Controller
             $Amount[] = [round($order['total_amount']),$order['store_id'],$order['d']];
             $Amount_total[] = $order['total_amount'];
         }
+        // end
 
+        // new product
         foreach($newProduct as $k => $product){
             $Product[] = [$product['total_product'],$product['store_id'],$product['d']];
             $Product_total[] = $product['total_product'];
         }
+        // end
+
         $Customer = array_merge([$Header],$Customer);
         $Orders = array_merge([$Header],$Orders);
         $Product = array_merge([$Header],$Product);
@@ -90,10 +93,52 @@ class DashboardController extends Controller
         $data['newProduct']['total'] = array_sum($Product_total);
         $data['newProduct']['name'] = trans('admin.newProduct');
 
+        // label chart store name
         $data['rangeDate'] = ['from' => $from, 'to' => $to];
         $data['companies'] = $Companies;
+        // end
+
 
         return response()->json(new JsonResponse($data),Response::HTTP_OK);
+    }
+    /**
+     *  order from country
+     *
+     * @return  [type]  [return description]
+     */
+    public function orderAreaStatistics()
+    {
+        if (session('adminStoreId')) {
+            $storeId = session('adminStoreId');
+        }else{
+            $storeId = array_keys(Store::getStoreActive());
+        }
+        $dataCountries = Order::getCountryInYear($storeId);
+        $data   = [];
+        foreach ($dataCountries as $key => $country) {
+            if($key <= 3) {
+                $countryName = $country->country ?? $key ;
+                $data[] =  [
+                    'name' => $countryName,
+                    'order' => $country->count,
+                    'amount' => round($country->total_amount),
+                    'currency' => $country->currency,
+                    'store_id' => $country->store_id,
+                ];
+            }
+        }
+        return response()->json(new JsonResponse(['items' => $data]));
+    }
+
+    /**
+     * Order overview
+     *
+     * @return  [type]  [return description]
+     */
+    public function productOutStock()
+    {
+        $data = (new Product)->getProductOutStock(1)->getData();
+        return response()->json(new JsonResponse(['items' => $data]));
     }
 
     /**

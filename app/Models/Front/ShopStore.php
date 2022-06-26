@@ -3,6 +3,7 @@ namespace App\Models\Front;
 
 use App\Models\Admin\Config;
 use App\Models\Admin\UserStore;
+use App\Models\Admin\EmailTemplate;
 use Illuminate\Database\Eloquent\Model;
 class ShopStore extends Model
 {
@@ -79,6 +80,7 @@ class ShopStore extends Model
             $store->languages()->delete();
             Config::where('store_id', $store->id)->delete();
             UserStore::where('store_id', $store->id)->delete();
+            EmailTemplate::where('store_id', $store->id)->delete();
         });
     }
 

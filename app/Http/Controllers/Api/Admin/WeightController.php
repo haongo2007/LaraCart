@@ -4,159 +4,95 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopWeight;
 use App\Http\Resources\WeightCollection;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
+use Illuminate\Validation\Rule;
 use Validator;
 
 class WeightController extends Controller
 {
 
     /**
-     * Index interface.
-     *
-     * @return Content
-     */
+    * Index interface.
+    *
+    * @return Content
+    */
     public function index()
     {
         $data = (new ShopWeight)->getWeightListAdmin(request()->all());
         return WeightCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+    * Post create new item in admin
+    * @return [type] [description]
+    */
+    public function store()
     {
         $data = request()->all();
-        $dataOrigin = request()->all();
-        $validator = Validator::make($dataOrigin, [
-            'name' => 'required|unique:"'.ShopWeight::class.'",name',
+        $validator = Validator::make($data, [
+            'name' => [
+                'required',
+                Rule::unique(ShopWeight::class)->where(function ($query) use ($data) {
+                    return $query->where('store_id', $data['store_id'])->where('name',$data['name']);
+                })],
             'description' => 'required',
         ], [
             'name.required' => trans('validation.required'),
         ]);
 
         if ($validator->fails()) {
-            // dd($validator->messages());
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Create new order
+
         $dataInsert = [
+            'store_id' => $data['store_id'],
             'name' => $data['name'],
             'description' => $data['description'],
         ];
-        $obj = ShopWeight::create($dataInsert);
-//
-        return redirect()->route('admin_weight_unit.index')->with('success', trans('weight.admin.create_success'));
-
+        $weighUnit = ShopWeight::create($dataInsert);
+        return response()->json(new JsonResponse(['id'=>$weighUnit->id]), Response::HTTP_OK);
     }
 
-/**
- * Form edit
- */
-public function edit($id)
-{
-    $weight = ShopWeight::find($id);
-    if(!$weight) {
-        return 'No data';
-    }
-    $data = [
-        'title' => trans('weight.admin.list'),
-        'title_action' => '<i class="fa fa-edit" aria-hidden="true"></i> ' . trans('weight.admin.edit'),
-        'subTitle' => '',
-        'icon' => 'fa fa-indent',
-        'urlDeleteItem' => bc_route_admin('admin_weight_unit.delete'),
-        'removeList' => 0, // 1 - Enable function delete list item
-        'buttonRefresh' => 0, // 1 - Enable button refresh
-        'buttonSort' => 0, // 1 - Enable button sort
-        'css' => '', 
-        'js' => '',
-        'url_action' => bc_route_admin('admin_weight_unit.edit', ['id' => $weight['id']]),
-        'weight' => $weight,
-        'id' => $id,
-    ];
-
-    $listTh = [
-        'id' => trans('weight.id'),
-        'name' => trans('weight.name'),
-        'description' => trans('weight.description'),
-        'action' => trans('weight.admin.action'),
-    ];
-    $obj = new ShopWeight;
-    $obj = $obj->orderBy('id', 'desc');
-    $dataTmp = $obj->paginate(20);
-
-    $dataTr = [];
-    foreach ($dataTmp as $key => $row) {
-        $dataTr[] = [
-            'id' => $row['id'],
-            'name' => $row['name'],
-            'description' => $row['description'],
-            'action' => '
-                <a href="' . bc_route_admin('admin_weight_unit.edit', ['id' => $row['id']]) . '"><span title="' . trans('weight.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-            <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('weight.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-            ',
-        ];
-    }
-
-    $data['listTh'] = $listTh;
-    $data['dataTr'] = $dataTr;
-    $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-    $data['resultItems'] = trans('weight.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-    $data['layout'] = 'edit';
-    return view($this->templatePathAdmin.'screen.weight')
-        ->with($data);
-}
-
-/**
- * update status
- */
-    public function postEdit($id)
+    /**
+    * update status
+    */
+    public function update($id)
     {
         $data = request()->all();
-        $dataOrigin = request()->all();
-        $obj = ShopWeight::find($id);
-        $validator = Validator::make($dataOrigin, [
-            'name' => 'required|unique:"'.ShopWeight::class.'",name,' . $obj->id . ',id',
+        $weighUnit = ShopWeight::find($id);
+        $validator = Validator::make($data, [
+            'name' => 'required|unique:"'.ShopWeight::class.'",name,' . $weighUnit->id . ',id',
             'description' => 'required',
         ], [
             'name.required' => trans('validation.required'),
         ]);
 
         if ($validator->fails()) {
-            // dd($validator->messages());
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Edit
+        if (!$weighUnit) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
         $dataUpdate = [
+            'store_id' => $data['store_id'],
             'name' => $data['name'],
             'description' => $data['description'],
         ];
-        $obj->update($dataUpdate);
-
-//
-        return redirect()->back()->with('success', trans('weight.admin.edit_success'));
+        $weighUnit->update($dataUpdate);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
 
     }
 
-/*
-Delete list item
-Need mothod destroy to boot deleting in model
- */
-    public function deleteList()
-    {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            ShopWeight::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+    /*
+    Delete list item
+    Need mothod destroy to boot deleting in model
+    */
+    public function destroy($id)
+    {   
+        $arrID = explode(',', $id);
+        ShopWeight::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 }

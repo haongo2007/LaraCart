@@ -285,10 +285,11 @@ class Order extends ShopOrder
      *
      * @return  [type]  [return description]
     */
-    public static function getCountryInYear() {
-        return self::selectRaw('country, count(id) as count, sum(total) as amount,currency',)
+    public static function getCountryInYear($storeId) {
+        return self::selectRaw('country, count(id) as count, sum(total/exchange_rate) as total_amount,currency,store_id',)
         ->whereRaw('DATE(created_at) >=  DATE_SUB(DATE(NOW()), INTERVAL 12 MONTH)')
-        ->groupBy('country')
+        ->whereIn('store_id',$storeId)
+        ->groupBy('country','store_id')
         ->orderBy('count', 'desc')
         ->get();
     }

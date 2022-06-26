@@ -15,3 +15,17 @@ export function orders(query) {
     params: query,
   });
 }
+
+export function productOutStock() {
+  return request({
+    url: '/dashboard/productOutStock',
+    method: 'get',
+  });
+}
+
+export function ordersAmountCountry() {
+  return request({
+    url: '/dashboard/orderCountry',
+    method: 'get',
+  });
+}
