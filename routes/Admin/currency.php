@@ -9,4 +9,4 @@
 // });
 
 
-    Route::apiResource('currency', 'CurrencyController')->only('index');
+    Route::apiResource('currency', 'CurrencyController')->except(['create','edit','show']);

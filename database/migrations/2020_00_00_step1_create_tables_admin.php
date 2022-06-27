@@ -20,9 +20,9 @@ class CreateTablesAdmin extends Migration
         
         Schema::create( 'admin_user', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('username', 100)->unique();
+            $table->string('fullname', 100)->unique();
             $table->string('password', 60);
-            $table->string('fullname', 100);
+            $table->string('name', 100);
             $table->string('phone', 50);
             $table->string('email', 150)->unique();
             $table->string('avatar', 255)->nullable();

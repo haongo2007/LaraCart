@@ -1,4 +1,9 @@
 export default {
+    "first_symbol":"Kí hiệu ở đầu",
+    "code":"Mã",
+    "symbol":"Kí hiệu",
+    "precision":"Số chữ số thập phân",
+    "thousands":"Ngăn cách phần nghìn",
     "rtl":"Rtl",
     "label":"Nhãn",
     "group":"Nhóm",

@@ -84,7 +84,7 @@ class LanguageController extends Controller
         $dataUpdate = [
             'icon' => $data['icon'],
             'name' => $data['name'],
-            'code' => $data['code'],
+            'code' => strtolower($data['code']),
             'rtl' => empty($data['rtl']) ? 0 : 1,
             'status' => empty($data['status']) ? 0 : 1,
             'sort' => $data['sort'],

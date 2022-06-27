@@ -13,7 +13,7 @@ class DataAdminSeeder extends Seeder
     public $adminPassword = '$2y$10$FzFvAwMul4ur2WazAKaix.hKEd96mK6nnlT1nhiOhygAD3eNxBPk2';
     public $adminEmail = 'admin@laracart.dev';
     public $timezone_default = 'Asia/Ho_Chi_Minh';
-    public $language_default = 'en';
+    public $language_default = 'us';
     public $store_id = 1;
 
     /**
@@ -123,7 +123,7 @@ class DataAdminSeeder extends Seeder
             $this->adminEmail = session('infoInstall')['admin_email'];
         }
         DB::connection(config('const.LC_CONNECTION'))->table('admin_user')->insert(
-            ['id' => '1', 'username' => $this->adminUser, 'password' => $this->adminPassword, 'email' => $this->adminEmail, 'name' => 'Administrator', 'avatar' => '/admin/avatar/user.jpg', 'created_at' => date('Y-m-d H:i:s')]
+            ['id' => '1', 'fullname' => $this->adminUser, 'password' => $this->adminPassword, 'email' => $this->adminEmail, 'name' => 'Administrator', 'avatar' => '/admin/avatar/user.jpg', 'created_at' => date('Y-m-d H:i:s')]
         );
         
         
@@ -152,10 +152,10 @@ class DataAdminSeeder extends Seeder
         
         DB::connection(config('const.LC_CONNECTION'))->table('admin_store_description')->insert(
             [
-                ['store_id' => $this->store_id, 'lang' => 'en', 'title' => 'Demo lara-cart : Free Laravel eCommerce', 'description' => 'Free website shopping cart for business', 'keyword' => '', 'maintain_content' => '<center><img src="/images/maintenance.png" />
+                ['store_id' => $this->store_id, 'lang' => 'us', 'title' => 'Demo lara-cart : Free Laravel eCommerce', 'description' => 'Free website shopping cart for business', 'keyword' => '', 'maintain_content' => '<center><img src="/images/maintenance.png" />
     <h3><span style="color:#e74c3c;"><strong>Sorry! We are currently doing site maintenance!</strong></span></h3>
     </center>', 'maintain_note' => 'Website is in maintenance mode!'],
-                ['store_id' => $this->store_id, 'lang' => 'vi', 'title' => 'Demo lara-cart: Mã nguồn website thương mại điện tử miễn phí', 'description' => 'Laravel shopping cart for business', 'keyword' => '', 'maintain_content' => '<center><img src="/images/maintenance.png" />
+                ['store_id' => $this->store_id, 'lang' => 'vn', 'title' => 'Demo lara-cart: Mã nguồn website thương mại điện tử miễn phí', 'description' => 'Laravel shopping cart for business', 'keyword' => '', 'maintain_content' => '<center><img src="/images/maintenance.png" />
     <h3><span style="color:#e74c3c;"><strong>Xin lỗi! Hiện tại website đang bảo trì!</strong></span></h3>
     </center>', 'maintain_note' => 'Website đang trong chế độ bảo trì!'],
             ]

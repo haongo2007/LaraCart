@@ -99,6 +99,10 @@ class ShopLanguage extends Model
             }else{
                 self::$getCodeActive = self::$getCodeActive->where('store_id',$storeId);
             }
+            $check = self::$getCodeActive->exists();
+            if (!$check) {
+                self::$getCodeActive = self::$getCodeActive->orWhere('store_id',0);
+            }
             self::$getCodeActive = self::$getCodeActive->pluck('name', 'code')->all();
         }
         return self::$getCodeActive;

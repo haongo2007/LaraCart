@@ -22,7 +22,8 @@ class DataStoreSeeder extends Seeder
 
         DB::connection(config('const.LC_CONNECTION'))->table('shop_language')->insert(
             [
-                ['name' => 'English', 'code' => 'en', 'icon' => '/data/language/flag_uk.png', 'status' => '1', 'rtl' => '0', 'sort' => '1', 'store_id' => $storeId],
+                ['name' => 'English', 'code' => 'us', 'icon' => '/svg/flags/us.svg', 'status' => '1', 'rtl' => '0', 'sort' => '1', 'store_id' => $storeId],
+                ['name' => 'English', 'code' => 'us', 'icon' => '/svg/flags/us.svg', 'status' => '1', 'rtl' => '0', 'sort' => '1', 'store_id' => 0],
             ]
         );
 
@@ -158,7 +159,7 @@ class DataStoreSeeder extends Seeder
 
         DB::connection(config('const.LC_CONNECTION'))->table('shop_email_template')->insert(
           [
-              ['name' => 'Reset password', 'group' => 'forgot_password', 'text' => '
+              ['name' => 'Reset password', 'group' => 'forgot_password', 'content' => '
 <h1 style="font-family:Avenir,Helvetica,sans-serif;box-sizing:border-box;color:#2f3133;font-size:19px;font-weight:bold;margin-top:0;text-align:left">{{$title}}</h1>
 <p style="font-family:Avenir,Helvetica,sans-serif;box-sizing:border-box;color:#74787e;font-size:16px;line-height:1.5em;margin-top:0;text-align:left">{{$reason_sendmail}}</p>
 <table class="action" align="center" width="100%" cellpadding="0" cellspacing="0" style="font-family:Avenir,Helvetica,sans-serif;box-sizing:border-box;margin:30px auto;padding:0;text-align:center;width:100%">
@@ -195,7 +196,7 @@ class DataStoreSeeder extends Seeder
 </tbody>
 </table>', 'status' => '1', 'store_id' => $storeId],
 
-['name' => 'Customer verification', 'group' => 'customer_verify', 'text' => '
+['name' => 'Customer verification', 'group' => 'customer_verify', 'content' => '
 <h1 style="font-family:Avenir,Helvetica,sans-serif;box-sizing:border-box;color:#2f3133;font-size:19px;font-weight:bold;margin-top:0;text-align:left">{{$title}}</h1>
 <p style="font-family:Avenir,Helvetica,sans-serif;box-sizing:border-box;color:#74787e;font-size:16px;line-height:1.5em;margin-top:0;text-align:left">{{$reason_sendmail}}</p>
 <table class="action" align="center" width="100%" cellpadding="0" cellspacing="0" style="font-family:Avenir,Helvetica,sans-serif;box-sizing:border-box;margin:30px auto;padding:0;text-align:center;width:100%">
@@ -232,10 +233,10 @@ class DataStoreSeeder extends Seeder
 </tbody>
 </table>', 'status' => '1', 'store_id' => $storeId],
 
-              ['name' => 'Welcome new customer', 'group' => 'welcome_customer', 'text' => '
+              ['name' => 'Welcome new customer', 'group' => 'welcome_customer', 'content' => '
 <h1 style="font-family:Avenir,Helvetica,sans-serif;box-sizing:border-box;color:#2f3133;font-size:19px;font-weight:bold;margin-top:0;text-align:center">{{$title}}</h1>
 <p style="text-align:center;">Welcome to my site!</p>', 'status' => '1', 'store_id' => $storeId],
-              ['name' => 'Send form contact to admin', 'group' => 'contact_to_admin', 'text' => '
+              ['name' => 'Send form contact to admin', 'group' => 'contact_to_admin', 'content' => '
 <table class="inner-body" align="center" cellpadding="0" cellspacing="0">
 <tr>
 <td>
@@ -253,7 +254,7 @@ class DataStoreSeeder extends Seeder
 </tr>
 </table>', 'status' => '1', 'store_id' => $storeId],
 
-              ['name' => 'New order to admin', 'group' => 'order_success_to_admin', 'text' => '
+              ['name' => 'New order to admin', 'group' => 'order_success_to_admin', 'content' => '
 <table class="inner-body" align="center" cellpadding="0" cellspacing="0">
   <tr>
       <td>
@@ -293,7 +294,7 @@ class DataStoreSeeder extends Seeder
   </tr>
 </table>', 'status' => '1', 'store_id' => $storeId],
 
-              ['name' => 'New order to customr', 'group' => 'order_success_to_customer', 'text' => '
+              ['name' => 'New order to customr', 'group' => 'order_success_to_customer', 'content' => '
 <table class="inner-body" align="center" cellpadding="0" cellspacing="0">
 <tr>
   <td>

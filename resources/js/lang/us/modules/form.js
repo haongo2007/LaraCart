@@ -1,4 +1,9 @@
 export default {
+    "first_symbol":"Symbol First",
+    "code":"Code",
+    "symbol":"Symbol",
+    "precision":"Precision",
+    "thousands":"Thousands separator",
     "rtl":"Rtl",
     "label":"Label",
     "group":"Group",
