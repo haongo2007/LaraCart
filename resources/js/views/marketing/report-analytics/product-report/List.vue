@@ -15,13 +15,7 @@
       border
       fit
       highlight-current-row
-      style="width: 100%"
-      @selection-change="handleSelectionAllChange">
-      <el-table-column
-        type="selection"
-        align="center"
-        width="55"
-      />
+      style="width: 100%">
       <el-table-column fixed :label="$t('table.id')" min-width="50" align="center">
         <template slot-scope="scope">
           {{ scope.row && scope.row.id }}
@@ -175,9 +169,6 @@ export default {
       this.loading = true;
       this.listQuery.page = data.page;
       this.listQuery.limit = data.limit;
-    },
-    handleSelectionAllChange(val){
-      EventBus.$emit('listenMultiSelectRow', val);
     },
     handleDeleting(row){
       EventBus.$emit('handleDeleting', row);

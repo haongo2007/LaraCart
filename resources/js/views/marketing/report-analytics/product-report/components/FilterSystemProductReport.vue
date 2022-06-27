@@ -10,10 +10,9 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-button-group>
-              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
-              @click="$router.push({ name: 'UserCreate'}).catch(() => {})" v-permission="['create.reportanalytics']" />
-              <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
-              @click="handerDeleteAll" v-permission="['delete.reportanalytics']" />
+              <el-button type="success" @click="handleDownload" :disabled="downloadLoading" class="filter-item" v-permission="['export.reportanalytics']">
+                <svg-icon icon-class="excel" />
+              </el-button>
             </el-button-group>
           </el-col>
         </el-row>
@@ -23,14 +22,8 @@
         {{ $t('table.filter') }}
       </h3>
       <div class="drawer-item">
-
         <el-row :gutter="24">
-          <el-col :span="12">
-            <el-select v-model="dataQuery.role" multiple collapse-tags :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
-              <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
-            </el-select>
-          </el-col>
-          <el-col :span="12">
+          <el-col :span="24">
             <el-input v-model="dataQuery.keyword" :placeholder="$t('table.keyword')" style="width: 100%;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
@@ -63,6 +56,7 @@ export default {
   },
   data() {
     return {
+      downloadLoading:false,
       list: null,
       total: 0,
       roles: [],
@@ -83,9 +77,6 @@ export default {
   },
   created() {
     this.getList();
-    EventBus.$on('listenMultiSelectRow', data => {
-      this.multiSelectRow = data;
-    });
     EventBus.$on('handleDeleting', this.handleDeleting);
   },
   methods: {
@@ -100,48 +91,31 @@ export default {
       this.dataQuery.page = 1;
       this.getList();
     },
-    handerDeleteAll(){
-      this.handleDeleting(this.multiSelectRow, true);
-    },
-    handleDeleting(row, multiple = false) {
-      this.$confirm('This will permanently delete the row. Continue?', 'Warning', {
-        confirmButtonText: 'OK',
-        cancelButtonText: 'Cancel',
-        type: 'warning',
-      }).then(() => {
-        this.$emit('handleListenData', { loading: true });
-        if (multiple) {
-          var id = [];
-          row.map((item) => id.push(item.id));
-        } else {
-          var id = row.id;
-        }
-        var that = this;
-        reportesource.destroy(id).then((res) => {
-          if (res) {
-            if (multiple) {
-              row.forEach(function(v) {
-                const index = that.list.indexOf(v);
-                that.list.splice(index, 1);
-              });
-            } else {
-              const index = that.list.indexOf(row);
-              that.list.splice(index, 1);
-            }
-            this.$message({
-              type: 'success',
-              message: 'Delete successfully',
-            });
-            const total = this.total - Array(row).length;
-            this.$emit('handleListenData', { list: this.list, loading: false, total: total });
-          }
+    handleDownload() {
+      this.downloadLoading = true;
+      this.$emit('handleListenData', { loading: true });
+      import('@/vendor/Export2Excel').then(excel => {
+        const tHeader = ['ID', 'Store', 'SKU', 'Name', 'Cost', 'Price', 'Sold', 'Stock', 'View', 'last View', 'Kind', 'Status'];
+        const filterVal = ['id', 'first_name', 'sku', 'name', 'cost', 'price', 'sold', 'stock', 'view', 'last_view', 'kind', 'status'];
+        const data = this.formatJson(filterVal, this.list);
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: 'Product-list-' + parseTime(new Date(), '{y}-{m}-{d}'),
         });
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: 'Delete canceled',
-        });
+        this.$emit('handleListenData', { loading: false });
+        this.downloadLoading = false;
       });
+    },
+    formatJson(filterVal, jsonData) {
+      const getValue = (object, keys) => keys.split('.').reduce((o, k) => (o || {})[k], object);
+      return jsonData.map(v => filterVal.map(j => {
+        if (j === 'created_at') {
+          return parseTime(v[j]);
+        } else {
+          return getValue(v, j);
+        }
+      }));
     },
   },
 };

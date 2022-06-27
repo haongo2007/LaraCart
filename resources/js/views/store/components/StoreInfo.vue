@@ -218,7 +218,9 @@
                       <el-button type="primary" size="mini" :loading="btnLoading" @click="handleConfirm(5,'language')">Confirm</el-button>
                     </el-button-group>
                   </div>
-                  <span slot="reference" class="border-edit">{{ temp.language ? temp.languages[temp.language].name : 'Empty' }}</span>
+                  <span slot="reference" class="border-edit">
+                    {{ temp.language && temp.languages.hasOwnProperty(temp.language) ? temp.languages[temp.language].name : 'Empty' }}
+                  </span>
                 </el-popover>
                 <el-form-item
                   v-else
@@ -488,7 +490,7 @@
                 </template>
                 <div v-for="(item,index) in temp.descriptions">
                   <div v-if="isEdit">
-                    <svg-icon :icon-class="'flag-'+item.lang" style="width:2em"/>
+                    <el-image style="width:2em;" :src="'/svg/flags/'+item.lang+'.svg'" fit="contain"></el-image>
                     <el-popover
                       @hide="handleCancel(index+'.'+'title.visible',index+'.'+'title.value')"
                       v-model="item.title.visible"
@@ -526,7 +528,7 @@
                 </template>
                 <div v-for="(item,index) in temp.descriptions">
                   <div v-if="isEdit">
-                    <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
+                    <el-image style="width:2em;" :src="'/svg/flags/'+item.lang+'.svg'" fit="contain"></el-image>
                     <el-popover
                       @hide="handleCancel(index+'.'+'keyword.visible',index+'.'+'keyword.value')"
                       v-model="item.keyword.visible"
@@ -564,7 +566,7 @@
                 </template>
                 <div v-for="(item,index) in temp.descriptions">
                   <div v-if="isEdit">
-                    <svg-icon :icon-class="'flag-'+item.lang" style="width:2em" />
+                    <el-image style="width:2em;" :src="'/svg/flags/'+item.lang+'.svg'" fit="contain"></el-image>
                     <el-popover
                       @hide="handleCancel(index+'.'+'description.visible',index+'.'+'description.value')"
                       v-model="item.description.visible"

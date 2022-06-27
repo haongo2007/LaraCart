@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopCurrency;
 use Validator;
+use App\Helper\JsonResponse;
+use Illuminate\Http\Response;
 use App\Http\Resources\CurrencyCollection;
 
 class CurrencyController extends Controller
@@ -21,32 +23,13 @@ class CurrencyController extends Controller
         return CurrencyCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-/**
- * Form create new item in admin
- * @return [type] [description]
- */
-    public function create()
-    {
-        $data = [
-            'title' => trans('currency.admin.add_new_title'),
-            'subTitle' => '',
-            'title_description' => trans('currency.admin.add_new_des'),
-            'icon' => 'fa fa-plus',
-            'currency' => [],
-            'url_action' => bc_route_admin('admin_currency.create'),
-        ];
-        return view($this->templatePathAdmin.'screen.currency')
-            ->with($data);
-    }
-
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+    * Post create new item in admin
+    * @return [type] [description]
+    */
+    public function store()
     {
         $data = request()->all();
-        $dataOrigin = request()->all();
         $validator = Validator::make($data, [
             'symbol' => 'required',
             'exchange_rate' => 'required|numeric|gt:0',
@@ -59,9 +42,7 @@ class CurrencyController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
 
         $dataInsert = [
@@ -75,41 +56,21 @@ class CurrencyController extends Controller
             'status' => empty($data['status']) ? 0 : 1,
             'sort' => (int) $data['sort'],
         ];
-        ShopCurrency::create($dataInsert);
+        $currency = ShopCurrency::create($dataInsert);
 
-        return redirect()->route('admin_currency.index')->with('success', trans('currency.admin.create_success'));
-
+        return response()->json(new JsonResponse(['id'=>$currency->id]), Response::HTTP_OK);
     }
 
-/**
- * Form edit
- */
-    public function edit($id)
+    /**
+    * update status
+    */
+    public function update($id)
     {
         $currency = ShopCurrency::find($id);
-        if ($currency === null) {
-            return 'no data';
+        if (!$currency) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
-        $data = [
-            'title' => trans('currency.admin.edit'),
-            'subTitle' => '',
-            'title_description' => '',
-            'icon' => 'fa fa-edit',
-            'currency' => $currency,
-            'url_action' => bc_route_admin('admin_currency.edit', ['id' => $currency['id']]),
-        ];
-        return view($this->templatePathAdmin.'screen.currency')
-            ->with($data);
-    }
-
-/**
- * update status
- */
-    public function postEdit($id)
-    {
-        $currency = ShopCurrency::find($id);
         $data = request()->all();
-        $dataOrigin = request()->all();
         $validator = Validator::make($data, [
             'symbol' => 'required',
             'exchange_rate' => 'required|numeric|gt:0',
@@ -122,11 +83,8 @@ class CurrencyController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Edit
 
         $dataUpdate = [
             'name' => $data['name'],
@@ -137,41 +95,24 @@ class CurrencyController extends Controller
             'symbol_first' => $data['symbol_first'],
             'thousands' => $data['thousands'],
             'sort' => (int) $data['sort'],
+            'status' => empty($data['status']) ? 0 : 1,
 
         ];
 
-        //Check status before change
-        $check = ShopCurrency::where('status', 1)->where('code', '<>', $data['code'])->count();
-        if ($check) {
-            $dataUpdate['status'] = empty($data['status']) ? 0 : 1;
-        } else {
-            $dataUpdate['status'] = 1;
-        }
-        //End check status
+        $currency->update($dataUpdate);
 
-        $obj = ShopCurrency::find($id);
-        $obj->update($dataUpdate);
-
-//
-        return redirect()->route('admin_currency.index')->with('success', trans('currency.admin.edit_success'));
-
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
-
-/*
-Delete list item
-Need mothod destroy to boot deleting in model
- */
-    public function deleteList()
+    /*
+    Delete list item
+    Need mothod destroy to boot deleting in model
+    */
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            $arrID = array_diff($arrID, BC_GUARD_CURRENCY);
-            ShopCurrency::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $id);
+        $arrID = array_diff($arrID, LC_GUARD_CURRENCY);
+        ShopCurrency::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 }

@@ -76,7 +76,7 @@ class CreateTablesShop extends Migration
         Schema::create('shop_language', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 100);
-            $table->string('code', 50)->unique();
+            $table->string('code', 50);
             $table->string('icon', 100)->nullable();
             $table->tinyInteger('status')->default(0);
             $table->tinyInteger('rtl')->nullable()->default(0)->comment('Layout RTL');

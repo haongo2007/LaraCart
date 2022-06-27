@@ -5,6 +5,13 @@ class CountryResource extends Resource {
   constructor() {
     super('country');
   }
+
+  getFlags(code) {
+    return request({
+      url: '/' + this.uri + '/flags/'+code,
+      method: 'get',
+    });
+  }
 }
 
 export { CountryResource as default };

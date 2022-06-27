@@ -24,7 +24,7 @@ Route::group([
 
     Route::group(['middleware' => LC_ADMIN_MIDDLEWARE], function () {
         foreach (glob(__DIR__."/Admin/*.php") as $filename) {
-            require_once $filename;
+            require $filename;
         }
     });
     

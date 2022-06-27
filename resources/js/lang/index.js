@@ -3,18 +3,18 @@ import VueI18n from 'vue-i18n';
 import Cookies from 'js-cookie';
 import elementEnLocale from 'element-ui/lib/locale/lang/en'; // element-ui lang
 import elementViLocale from 'element-ui/lib/locale/lang/vi';// element-ui lang
-import enLocale from './en';
-import viLocale from './vi';
+import usLocale from './us';
+import vnLocale from './vn';
 
 Vue.use(VueI18n);
 
 const messages = {
-  en: {
-    ...enLocale,
+  us: {
+    ...usLocale,
     ...elementEnLocale,
   },
-  vi: {
-    ...viLocale,
+  vn: {
+    ...vnLocale,
     ...elementViLocale,
   },
 };
@@ -33,11 +33,11 @@ export function getLanguage() {
       return locale;
     }
   }
-  return 'en';
+  return 'us';
 }
 const i18n = new VueI18n({
   // set locale
-  // options: en | ru | vi | zh
+  // options: us | ru | vn | zh
   locale: getLanguage(),
   // set locale messages
   messages,
