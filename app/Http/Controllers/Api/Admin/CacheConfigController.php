@@ -1,27 +1,12 @@
 <?php
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\RootAdminController;
-use BlackCart\Core\Admin\Models\AdminConfig;
-class CacheConfigController extends RootAdminController
-{
-    public function __construct()
-    {
-        parent::__construct();
-    }
-    public function index()
-    {
-        $data = [
-            'title' => trans('cache.config_manager.title'),
-            'subTitle' => '',
-            'icon' => 'fa fa-indent',        ];
-        $configs = AdminConfig::getListConfigByCode(['code' => 'cache']);
-        $data['configs'] = $configs;
-        $data['urlUpdateConfigGlobal'] = bc_route_admin('admin_config_global.update');
-        return view($this->templatePathAdmin.'screen.cache_config')
-            ->with($data);
-    }
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 
+class CacheConfigController extends Controller
+{
     /**
      * Clear cache
      *
@@ -29,9 +14,8 @@ class CacheConfigController extends RootAdminController
      */
     public function clearCache() {
         $action = request('action');
-        $response = bc_clear_cache($action);
-        return response()->json(
-            $response
-        );
+        $storeId = request('store_id');
+        $response = lc_clear_cache($action,$storeId);
+        return response()->json(new JsonResponse($response), Response::HTTP_OK);
     }
 }

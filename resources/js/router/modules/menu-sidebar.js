@@ -390,40 +390,6 @@ export const menuSidebar = [
         ]
       },
       {
-        path: '/admin-global',
-        alwaysShow: true,
-        meta: { title: 'adminGlobal',icon:'el-icon-s-claim'},
-        children:[
-          // {
-          //   path: '/admin-global/menu',
-          //   meta: { 
-          //     title: 'menu',
-          //     icon:'el-icon-menu'
-          //   },
-          // },
-          // {
-          //   path: '/admin-global/env-config',
-          //   meta: { 
-          //     title: 'enviromentConfig',
-          //     icon:'el-icon-s-tools'},
-          // },
-          {
-            path: '/admin-global/backup-db',
-            meta: { 
-              title: 'backupDatabase',
-              icon:'el-icon-refresh'
-            },
-          },
-          {
-            path: '/admin-global/cache-manager',
-            meta: { 
-              title: 'cacheManager',
-              icon:'el-icon-refresh-left'
-            },
-          },
-        ]
-      },
-      {
         path: '/errors-logs',
         alwaysShow: true,
         meta: { 

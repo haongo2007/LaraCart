@@ -104,6 +104,13 @@ class StoreConfigController extends Controller
         $customizeConfig = Config::getListConfigByCode($configCustomizeQuery);
 
         
+        $configCacheQuery = [
+            'code' => 'cache',
+            'storeId' => $id,
+            'keyBy' => 'key',
+        ];
+
+        $cacheConfig = Config::getListConfigByCode($configCacheQuery);
 
         $emailConfigQuery = [
             'code' => ['smtp_config', 'email_action'],
@@ -138,6 +145,7 @@ class StoreConfigController extends Controller
         $data['orderConfig']                    = $orderConfig;
         $data['captchaConfig']                  = $captchaConfig;
         $data['customizeConfig']                = $customizeConfig;
+        $data['cacheConfig']                    = $cacheConfig;
         $data['timezones']                      = $this->timezones;
         $data['languages']                      = ShopLanguage::getListActive($id);
         $data['currencies']                     = ShopCurrency::getCodeActive($id);
@@ -151,7 +159,6 @@ class StoreConfigController extends Controller
     public function update(Request $request,$id)
     {
         $data = $request->all();
-
         if (!$id) {
             return response()->json(new JsonResponse([],'Store not found'), Response::HTTP_NOT_FOUND);
         }

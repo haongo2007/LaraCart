@@ -15,12 +15,10 @@ class ShopLanguage extends Model
     private static $getArrayLanguages = null;
     private static $getCodeActive = null;
     const ITEM_PER_PAGE = 15;
-    const ACTIVE = ['1'];
 
     public function getLanguageListAdmin(array $dataSearch)
     {
         $limit = Arr::get($dataSearch, 'limit', self::ITEM_PER_PAGE);
-        $status= Arr::get($dataSearch, 'status', self::ACTIVE);
         $title = Arr::get($dataSearch, 'name', '');
         $code = Arr::get($dataSearch, 'code', []);
         $languageList     = (new ShopLanguage);
@@ -30,10 +28,6 @@ class ShopLanguage extends Model
         }
         if(is_array($code) && count($code) > 1) {
             $languageList = $languageList->whereIn('code', $code);
-        }
-
-        if (!is_null($status) && is_array($status)) {
-            $languageList = $languageList->whereIn('status',$status);
         }
         
         $languageList = $languageList->whereIn('store_id', session('adminStoreId'));

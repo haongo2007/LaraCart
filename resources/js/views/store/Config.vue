@@ -27,6 +27,7 @@ import ConfigDisplay from './components/ConfigDisplay';
 import ConfigEmail from './components/ConfigEmail';
 import ConfigOrder from './components/ConfigOrder';
 import ConfigProduct from './components/ConfigProduct';
+import ConfigCache from './components/ConfigCache';
 
 const storeconfigResource = new StoreConfigResource();
 export default {
@@ -39,6 +40,7 @@ export default {
     ConfigEmail,
     ConfigOrder,
     ConfigProduct,
+    ConfigCache
   },
   data(){
     return {
@@ -71,6 +73,10 @@ export default {
           'dataConfig' : {}
         },
         product: {
+          'value':'',
+          'dataConfig' : {}
+        },
+        cache: {
           'value':'',
           'dataConfig' : {}
         },
@@ -112,6 +118,9 @@ export default {
         productConfigAttribute:data.productConfigAttribute,
         taxs:data.taxs
       });
+
+      this.$set(this.comp.cache,'value','ConfigCache');
+      this.$set(this.comp.cache,'dataConfig',{cacheConfig: data.cacheConfig,store_id:data.storeId});
 
       loading.close();
     }).catch(err => {

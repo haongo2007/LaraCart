@@ -14,25 +14,27 @@ if (!function_exists('lc_clear_cache')) {
     function lc_clear_cache($typeCache = 'cache_all', $storeId = null)
     {
         try {
-            $storeI = $storeId ?? session('adminStoreId');
+            $storeId = $storeId ?? session('adminStoreId');
             if($typeCache == 'cache_all') {
                 Cache::flush();
             } else {
                 $arrCacheLocal = [];
                 $arrLang = ShopLanguage::getCodeAll();
                 foreach ($arrLang as $code => $name) {
-                    $arrCacheLocal['cache_category'][] = 'cache_category_'.$code;
-                    $arrCacheLocal['cache_product'][] = 'cache_product_'.$code;
-                    $arrCacheLocal['cache_news'][] = 'cache_news_'.$code;
-                    $arrCacheLocal['cache_category_cms'][] = 'cache_category_cms_'.$code;
-                    $arrCacheLocal['cache_content_cms'][] = 'cache_content_cms_'.$code;
-                    $arrCacheLocal['cache_page'][] = 'cache_page_'.$code;
+                    $arrCacheLocal['cache_category'][]      = 'cache_category_'.$code;
+                    $arrCacheLocal['cache_product'][]       = 'cache_product_'.$code;
+                    $arrCacheLocal['cache_product'][]       = 'cache_product_special_'.$code;
+                    $arrCacheLocal['cache_news'][]          = 'cache_news_'.$code;
+                    $arrCacheLocal['cache_category_cms'][]  = 'cache_category_cms_'.$code;
+                    $arrCacheLocal['cache_content_cms'][]   = 'cache_content_cms_'.$code;
+                    $arrCacheLocal['cache_page'][]          = 'cache_page_'.$code;
+                    $arrCacheLocal['cache_country'][]       = 'cache_page_'.$code;
                 }
                 Cache::forget($typeCache);
                 if (!empty($arrCacheLocal[$typeCache])) {
                     foreach ($arrCacheLocal[$typeCache] as  $cacheIndex) {
                         Cache::forget($cacheIndex);
-                        Cache::forget($storeI.'_'.$cacheIndex);
+                        Cache::forget($storeId.'_'.$cacheIndex);
                     }
                 }
             }

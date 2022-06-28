@@ -236,6 +236,7 @@ export default {
       this.temp.sort = row.sort;
       this.temp.name = row.name;
       this.temp.icon = await countryResource.getFlags(row.code);
+      this.handleChangeStore(this.temp.store_id);
     },
     async handleSelect(item){
       let data = await countryResource.getFlags(item.toLowerCase());

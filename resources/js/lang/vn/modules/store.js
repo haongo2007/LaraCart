@@ -14,4 +14,7 @@ export default {
     product_config: "Cấu hình sản phẩm",
     email_mode: "Cấu hình email",
     email_smtp: "Cấu hình SMTP",
+    cache: "Bộ nhớ đệm",
+    cache_config: "Cấu hình bộ nhớ đệm",
+    clear: "Làm mới"
 }

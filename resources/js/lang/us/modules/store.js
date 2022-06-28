@@ -13,5 +13,8 @@ export default {
     "orders_config": "Order Configuration",
     "product_config": "Product Configuration",
     "email_mode": "Email Configuration",
-    "email_smtp": "SMTP Configuration"
+    "email_smtp": "SMTP Configuration",
+    "cache": "Cache",
+    "cache_config": "Cache Config",
+    "clear": "Clear"
 }

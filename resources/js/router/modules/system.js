@@ -250,13 +250,6 @@ const systemRoutes = {
     //   name: 'OrdersList',
     //   meta: { title: 'backupDatabase', parent: 'root' },
     // },
-    // {
-    //   path: '/admin-global/cache-manager',
-    //   component: Layout,
-    //   component: () => import('@/views/store-manager/orders/List'),
-    //   name: 'OrdersList',
-    //   meta: { title: 'cacheManager', parent: 'root' },
-    // },
     // errors logs
     {
       path: '/errors-logs/operationLogs',
