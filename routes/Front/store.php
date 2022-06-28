@@ -1,4 +1,6 @@
 <?php
 
-Route::get('store/getInfo', 'ShopStoreController@getInfo');
-Route::get('store/getConfig', 'ShopStoreController@getConfig');
+Route::group(['prefix' => 'store'], function () {
+	Route::get('/getInfo', 'ShopStoreController@getInfo');
+	Route::get('/getConfig', 'ShopStoreController@getConfig');
+});

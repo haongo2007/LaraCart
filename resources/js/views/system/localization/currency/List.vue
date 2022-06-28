@@ -253,7 +253,7 @@ export default {
       currencyResource.store(this.temp).then((res) => {    
         if (res.success) {
           this.temp.id = res.data.id;
-          this.list = [this.temp,...this.list];
+          this.list = [...this.temp,...this.list];
           this.$message({
             type: 'success',
             message: 'Create successfully',
@@ -276,7 +276,7 @@ export default {
         if (res.success) {
           const index = this.list.findIndex((item) => item.id == this.temp.id);
           if (index > -1) {
-            this.$set(this.list,index,this.temp);
+            this.$set(this.list,index,{...this.temp});
           }
           this.$message({
             type: 'success',

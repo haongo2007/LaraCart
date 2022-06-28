@@ -7,6 +7,7 @@ use Validator;
 use App\Helper\JsonResponse;
 use Illuminate\Http\Response;
 use App\Http\Resources\CurrencyCollection;
+use Illuminate\Validation\Rule;
 
 class CurrencyController extends Controller
 {
@@ -38,7 +39,10 @@ class CurrencyController extends Controller
             'thousands' => 'required',
             'sort' => 'numeric|min:0',
             'name' => 'required|string|max:100',
-            'code' => 'required|unique:"'.ShopCurrency::class.'",code',
+            'code' => ['required',
+            Rule::unique(ShopCurrency::class)->where(function ($query) use ($data) {
+                return $query->where('store_id', $data['store_id'])->where('code',strtolower($data['code']));
+            })],
         ]);
 
         if ($validator->fails()) {
@@ -46,6 +50,7 @@ class CurrencyController extends Controller
         }
 
         $dataInsert = [
+            'store_id' => $data['store_id'],
             'name' => $data['name'],
             'code' => $data['code'],
             'symbol' => $data['symbol'],

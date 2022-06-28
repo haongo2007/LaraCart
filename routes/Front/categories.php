@@ -1,3 +1,4 @@
-<?php 
-
-Route::get('categories/{parentId}', 'ShopCategoryController@getListChild');
+<?php
+Route::group(['prefix' => 'categories'], function () {
+	Route::get('/{parentId}', 'ShopCategoryController@getListChild');
+});

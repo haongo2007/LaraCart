@@ -113,7 +113,7 @@ class ShopLanguage extends Model
     protected static function boot() {
         parent::boot();
         static::deleting(function ($model) {
-            if (in_array($model->id, BC_GUARD_LANGUAGE)) {
+            if (in_array($model->id, LC_GUARD_LANGUAGE)) {
                 return false;
             }
         });

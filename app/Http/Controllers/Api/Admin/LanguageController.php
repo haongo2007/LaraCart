@@ -6,6 +6,7 @@ use App\Models\Front\ShopLanguage;
 use App\Helper\JsonResponse;
 use Illuminate\Http\Response;
 use App\Http\Resources\LanguageCollection;
+use Illuminate\Validation\Rule;
 use Session;
 use Validator;
 
@@ -42,7 +43,10 @@ class LanguageController extends Controller
             'sort' => 'numeric|min:0',
             'status' => 'numeric|min:0',
             'name' => 'required|string|max:100',
-            'code' => 'required|unique:"'.ShopLanguage::class.'",code',
+            'code' => ['required',
+            Rule::unique(ShopLanguage::class)->where(function ($query) use ($data) {
+                return $query->where('store_id', $data['store_id'])->where('code',strtolower($data['code']));
+            })],
         ]);
 
         if ($validator->fails()) {
@@ -56,6 +60,7 @@ class LanguageController extends Controller
             'rtl' => empty($data['rtl']) ? 0 : 1,
             'status' => empty($data['status']) ? 0 : 1,
             'sort' => (int) $data['sort'],
+            'store_id' => $data['store_id'],
         ];
         $lang = ShopLanguage::create($dataInsert);
         return response()->json(new JsonResponse(['id'=>$lang->id]), Response::HTTP_OK);

@@ -1,4 +1,5 @@
 <?php 
-
-Route::get('checkout/info', 'ShopCheckoutController@getInfo');
-Route::post('checkout/store', 'ShopCheckoutController@store');
+Route::group(['prefix' => 'checkout'], function () {
+Route::get('/info', 'ShopCheckoutController@getInfo');
+Route::post('/store', 'ShopCheckoutController@store');
+});
