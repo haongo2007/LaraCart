@@ -141,6 +141,7 @@ class DataAdminSeeder extends Seeder
                 'long_phone' => 'Support: 0987654321', 
                 'email' => $this->adminEmail, 
                 'time_active' => '', 
+                'partner' => 1,
                 'address' => '123st - abc - xyz', 
                 'timezone' => $this->timezone_default, 
                 'language' => $this->language_default, 
