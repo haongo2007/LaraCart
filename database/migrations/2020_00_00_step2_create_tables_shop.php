@@ -179,7 +179,7 @@ class CreateTablesShop extends Migration
         Schema::create('shop_currency', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 100);
-            $table->string('code', 10)->unique();
+            $table->string('code', 10);
             $table->string('symbol', 10);
             $table->float('exchange_rate');
             $table->tinyInteger('precision')->default(2);
