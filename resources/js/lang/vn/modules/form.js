@@ -1,4 +1,9 @@
 export default {
+    "male":"Đàn ông",
+    "female":"Phụ nữ",
+    "other":"Khác",
+    "birthday":"Sinh nhật",
+    "sex":"Giới tính",
     "first_symbol":"Kí hiệu ở đầu",
     "code":"Mã",
     "symbol":"Kí hiệu",
@@ -100,6 +105,7 @@ export default {
     choose_price_type_filter:'Lọc theo loại giá',
     choose_price_range:'Lọc theo giá',
     category:'Danh mục',
+    "choose_store_for_customer":"Vui lòng chọn cửa hàng bạn muốn thêm khách hàng",
     choose_store_for_product:'Vui lòng chọn cửa hàng bạn muốn thêm sản phẩm',
     choose_store_for_category:'Vui lòng chọn cửa hàng bạn muốn thêm danh mục',
     tags:'Thẻ',

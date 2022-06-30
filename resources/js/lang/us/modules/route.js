@@ -1,4 +1,6 @@
 export default {
+    "editCustomer":"Edit Customer",
+    "createCustomer":"Create Customer",
     "editEmailTemplate":"Edit Email Template",
     "createEmailTemplate":"Create Email Template",
     "blogEdit":'Edit blog',

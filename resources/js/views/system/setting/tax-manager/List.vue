@@ -39,9 +39,7 @@
           </el-button-group>
         </el-form>
       </el-col>
-      <el-col :span="2">
-      </el-col>
-      <el-col :span="12" :offset="2">
+      <el-col :span="12" :offset="4">
         <el-table
           v-loading="loading"
           :data="list"

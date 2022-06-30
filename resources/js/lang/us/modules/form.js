@@ -1,4 +1,9 @@
 export default {
+    "male":"Male",
+    "female":"Female",
+    "other":"Other",
+    "birthday":"Birthday",
+    "sex":"Sex",
     "first_symbol":"Symbol First",
     "code":"Code",
     "symbol":"Symbol",
@@ -99,6 +104,7 @@ export default {
     "choose_price_type_filter":"Filter by price type",
     "choose_price_range":"Filter by price",
     "category":"Category",
+    "choose_store_for_customer":"Please select the store you want to add the customer",
     "choose_store_for_product":"Please select the store you want to add the product",
     "choose_store_for_category":"Please select the store you want to add a catalog",
     "tags":"Tags",

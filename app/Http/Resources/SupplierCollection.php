@@ -19,7 +19,9 @@ class SupplierCollection extends JsonResource
             'name' => $this->name,
             'phone' => $this->phone,
             'email' => $this->email,
-            'status' => $this->image,
+            'address' => $this->address,
+            'image' => $this->image,
+            'status' => $this->status,
             'store' => $this->stores,
         ];
         return $res;

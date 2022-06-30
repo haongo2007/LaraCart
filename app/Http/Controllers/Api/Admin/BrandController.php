@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopBrand;
 use App\Http\Resources\BrandCollection;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 use Validator;
 
 class BrandController extends Controller
@@ -15,19 +17,20 @@ class BrandController extends Controller
     }
 
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+    * Post create new item in admin
+    * @return [type] [description]
+    */
+    public function store()
     {
         $data = request()->all();
 
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['name'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
 
         $validator = Validator::make($data, [
+            'store_id' => 'required',
             'name' => 'required|string|max:100',
             'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|unique:"'.ShopBrand::class.'",alias|string|max:100',
             'image' => 'required',
@@ -39,100 +42,38 @@ class BrandController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         $dataInsert = [
-            'image' => $data['image'],
+            'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'name' => $data['name'],
             'alias' => $data['alias'],
             'url' => $data['url'],
             'sort' => (int) $data['sort'],
+            'store_id' => (int) $data['store_id'],
             'status' => (!empty($data['status']) ? 1 : 0),
         ];
-        $obj = ShopBrand::create($dataInsert);
+        $brand = ShopBrand::create($dataInsert);
 
-        return redirect()->route('admin_brand.index')->with('success', trans('brand.admin.create_success'));
-
+        return response()->json(new JsonResponse(['id' => $brand->id]), Response::HTTP_OK);
     }
 
-/**
- * Form edit
- */
-public function edit($id)
-{
-    $brand = ShopBrand::find($id);
-    if(!$brand) {
-        return 'No data';
-    }
-    $data = [
-        'title' => trans('brand.admin.list'),
-        'title_action' => '<i class="fa fa-edit" aria-hidden="true"></i> ' . trans('brand.admin.edit'),
-        'subTitle' => '',
-        'icon' => 'fa fa-indent',
-        'urlDeleteItem' => bc_route_admin('admin_brand.delete'),
-        'removeList' => 0, // 1 - Enable function delete list item
-        'buttonRefresh' => 0, // 1 - Enable button refresh
-        'buttonSort' => 0, // 1 - Enable button sort
-        'css' => '', 
-        'js' => '',
-        'url_action' => bc_route_admin('admin_brand.edit', ['id' => $brand['id']]),
-        'brand' => $brand,
-        'id' => $id,
-    ];
-
-    $listTh = [
-        'id' => trans('brand.id'),
-        'name' => trans('brand.name'),
-        'image' => trans('brand.image'),
-        'sort' => trans('brand.sort'),
-        'status' => trans('brand.status'),
-        'action' => trans('brand.admin.action'),
-    ];
-    $obj = new ShopBrand;
-    $obj = $obj->orderBy('id', 'desc');
-    $dataTmp = $obj->paginate(20);
-
-    $dataTr = [];
-    foreach ($dataTmp as $key => $row) {
-        $dataTr[] = [
-            'id' => $row['id'],
-            'name' => $row['name'],
-            'image' => bc_image_render($row->getThumb(), '50px','',$row['name']),
-            'sort' => $row['sort'],
-            'status' => $row['status'] ? '<span class="badge badge-success">ON</span>' : '<span class="badge badge-danger">OFF</span>',
-            'action' => '
-                <a href="' . bc_route_admin('admin_brand.edit', ['id' => $row['id']]) . '"><span title="' . trans('brand.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-              <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('brand.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-              ',
-        ];
-    }
-
-    $data['listTh'] = $listTh;
-    $data['dataTr'] = $dataTr;
-    $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-    $data['resultItems'] = trans('brand.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-    $data['layout'] = 'edit';
-    return view($this->templatePathAdmin.'screen.brand')
-        ->with($data);
-}
-
-
-/**
- * update status
- */
-    public function postEdit($id)
+    /**
+    * update status
+    */
+    public function update($id)
     {
         $brand = ShopBrand::find($id);
+        if (!$brand) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
         $data = request()->all();
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['name'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
 
         $validator = Validator::make($data, [
+            'store_id' => 'required',
             'name' => 'required|string|max:100',
             'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|unique:"'.ShopBrand::class.'",alias,' . $brand->id . ',id|string|max:100',
             'image' => 'required',
@@ -143,43 +84,34 @@ public function edit($id)
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Edit
 
         $dataUpdate = [
-            'image' => $data['image'],
+            'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'name' => $data['name'],
             'alias' => $data['alias'],
-            'url' => $data['url'],
+            'store_id' => (int) $data['store_id'],
+            'url' => $data['url'] ?? null,
             'sort' => (int) $data['sort'],
             'status' => (!empty($data['status']) ? 1 : 0),
 
         ];
 
         $brand->update($dataUpdate);
-
-//
-        return redirect()->back()->with('success', trans('brand.admin.edit_success'));
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
 
     }
 
-/*
-Delete list item
-Need mothod destroy to boot deleting in model
- */
-    public function deleteList()
+    /*
+    Delete list item
+    Need mothod destroy to boot deleting in model
+    */
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            ShopBrand::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $id);
+        ShopBrand::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 }

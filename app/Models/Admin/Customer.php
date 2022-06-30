@@ -12,6 +12,8 @@ class Customer extends ShopCustomer
     protected static $getListTitleAdmin = null;
     protected static $getListCustomerGroupByParentAdmin = null;
     private static $getList = null;
+
+
     /**
      * Get customer detail in admin
      *

@@ -21,5 +21,6 @@ return [
         'cache_page'             => 'Cache Page',
         'cache_store'            => 'Cache Store',
         'cache_country'          => 'Cache Country',
+        'cache_config'           => 'Cache Config'
     ]
 ];

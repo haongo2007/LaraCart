@@ -27,7 +27,7 @@ const marketingRoutes = {
       meta: { 
         title: 'emailTemplate',
         parent:'root',
-        permissions: ['view.email.template'],
+        permissions: ['view.email_template'],
       },
     },
     {
@@ -36,7 +36,7 @@ const marketingRoutes = {
       name: 'EmailTemplateCreate',
       meta: {
         title: 'createEmailTemplate',
-        permissions: ['create.email.template'],
+        permissions: ['create.email_template'],
         parent: 'EmailTemplateList',
         noCache: true
       },
@@ -48,7 +48,7 @@ const marketingRoutes = {
       name: 'EmailTemplateEdit',
       meta: {
         title: 'editEmailTemplate',
-        permissions: ['edit.email.template'],
+        permissions: ['edit.email_template'],
         parent: 'EmailTemplateList',
         noCache: true
       },
@@ -89,6 +89,28 @@ const marketingRoutes = {
         parent:'root',
         permissions: ['view.customer'],
       },
+    },
+    {
+      path: 'customer-manager/create',
+      component: () => import('@/views/marketing/customer-manager/Create'),
+      name: 'CustomerCreate',
+      meta: {
+        title: 'createCustomer',
+        permissions: ['create.customer'],
+        parent: 'CustomerList',
+      },
+      hidden: true,
+    },
+    {
+      path: 'customer-manager/edit/:id(\\d+)',
+      component: () => import('@/views/marketing/customer-manager/Edit'),
+      name: 'CustomerEdit',
+      meta: {
+        title: 'editCustomer',
+        permissions: ['edit.customer'],
+        parent: 'CustomerList',
+      },
+      hidden: true,
     },
     //customer subcribe
     {

@@ -63,8 +63,15 @@ if (!function_exists('lc_set_cache')) {
         if(empty($cacheIndex)) {
             return ;
         }
-        $seconds = $time ?? (lc_config_global('cache_time',$storeId) ?? 600);
-        
-        Cache::put($cacheIndex, $value, $seconds);
+        if (is_array($storeId)) {
+            foreach($storeId as $id){
+                $seconds = $time ?? (lc_config_global('cache_time',$id) ?? 600);
+                Cache::put($cacheIndex, $value, $seconds);
+            }
+        }else{
+            $seconds = $time ?? (lc_config_global('cache_time',$storeId) ?? 600);
+            
+            Cache::put($cacheIndex, $value, $seconds);
+        }
     }
 }

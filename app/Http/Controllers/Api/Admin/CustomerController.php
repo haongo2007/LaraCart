@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 use App\Models\Front\ShopCountry;
 use App\Models\Front\ShopLanguage;
 use App\Models\Admin\Customer;
@@ -9,17 +11,12 @@ use App\Models\Front\ShopCustomField;
 use App\Models\Front\ShopCustomFieldDetail;
 use App\Http\Controllers\Api\Front\Auth\AuthTrait;
 use App\Http\Resources\CustomerCollection;
+use Carbon\Carbon;
 use Validator;
 
 class CustomerController extends Controller
 {
     use AuthTrait;
-    public $countries;
-
-    public function __construct()
-    {
-        $this->countries = ShopCountry::getListAll();
-    }
 
     public function index()
     {
@@ -28,45 +25,34 @@ class CustomerController extends Controller
         return CustomerCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-/**
- * Form create new item in admin
- * @return [type] [description]
- */
-    public function create()
+    /**
+    * Form show new item in admin
+    * @return [type] [description]
+    */
+    public function show($id)
     {
         $data = [
-            'title'             => trans('customer.admin.add_new_title'),
-            'subTitle'          => '',
-            'title_description' => trans('customer.admin.add_new_des'),
-            'icon'              => 'fa fa-plus',
-            'countries'         => (new ShopCountry)->getCodeAll(),
-            'customer'          => [],
-            'url_action'        => bc_route_admin('admin_customer.create'),
             'customFields'         => (new ShopCustomField)->getCustomField($type = 'customer'),
-
+            'customer'          => (new Customer)->getCustomerAdmin($id),
         ];
 
-        return view($this->templatePathAdmin.'Customer.add_edit')
-            ->with($data);
+        return response()->json(new JsonResponse($data), Response::HTTP_OK);
     }
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+    * Post create new item in admin
+    * @return [type] [description]
+    */
+    public function store()
     {
-        $data = request()->all();
+        $data = request()->all(); 
         $data['status'] = empty($data['status']) ? 0 : 1;
-        $data['store_id'] = session('adminStoreId');
         $dataMapping = $this->mappingValidator($data);
         $validator =  Validator::make($data, $dataMapping['validate'], $dataMapping['messages']);
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-        $customer = AdminCustomer::createCustomer($dataMapping['dataInsert']);
+        $customer = Customer::createCustomer($dataMapping['dataInsert']);
 
         //Insert custom fields
         if (!empty($data['fields'])) {
@@ -85,67 +71,37 @@ class CustomerController extends Controller
                 (new ShopCustomFieldDetail)->insert($dataField);
             }
         }
-
-        return redirect()->route('admin_customer.index')->with('success', trans('customer.admin.create_success'));
-
+        return response()->json(new JsonResponse([]), Response::HTTP_OK);
     }
-
-/**
- * Form edit
- */
-    public function edit($id)
-    {
-        $customer = (new AdminCustomer)->getCustomerAdmin($id);
-        if (!$customer) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
-        }
-        $data = [
-            'title' => trans('customer.admin.edit'),
-            'subTitle' => '',
-            'title_description' => '',
-            'icon' => 'fa fa-edit',
-            'customer' => $customer,
-            'countries' => (new ShopCountry)->getCodeAll(),
-            'addresses' => $customer->addresses,
-            'url_action' => bc_route_admin('admin_customer.edit', ['id' => $customer['id']]),
-            'customFields'  => (new ShopCustomField)->getCustomField($type = 'customer'),
-        ];
-        return view($this->templatePathAdmin.'Customer.add_edit')
-            ->with($data);
-    }
-
     /**
      * update status
      */
-    public function postEdit($id)
+    public function update($id)
     {
         $data = request()->all();
-        $customer = (new AdminCustomer)->getCustomerAdmin($id);
+        $customer = (new Customer)->getCustomerAdmin($id);
         if (!$customer) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
 
         $data['status'] = empty($data['status']) ? 0 : 1;
-        $data['store_id'] = session('adminStoreId');
         $data['id'] = $id;
         $dataMapping = $this->mappingValidatorEdit($data);
 
         $validator =  Validator::make($data, $dataMapping['validate'], $dataMapping['messages']);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-        AdminCustomer::updateInfo($dataMapping['dataUpdate'], $id);
+        Customer::updateInfo($dataMapping['dataUpdate'], $id);
 
         //Update custom field
         if (!empty($data['fields'])) {
             (new ShopCustomFieldDetail)
-                ->join(BC_DB_PREFIX.'shop_custom_field', BC_DB_PREFIX.'shop_custom_field.id', BC_DB_PREFIX.'shop_custom_field_detail.custom_field_id')
+                ->join('shop_custom_field', 'shop_custom_field.id', 'shop_custom_field_detail.custom_field_id')
                 ->select('code', 'name', 'text')
-                ->where(BC_DB_PREFIX.'shop_custom_field_detail.rel_id', $customer->id)
-                ->where(BC_DB_PREFIX.'shop_custom_field.type', 'customer')
+                ->where('shop_custom_field_detail.rel_id', $customer->id)
+                ->where('shop_custom_field.type', 'customer')
                 ->delete();
 
             $dataField = [];
@@ -163,34 +119,18 @@ class CustomerController extends Controller
                 (new ShopCustomFieldDetail)->insert($dataField);
             }
         }
-
-        return redirect()->route('admin_customer.index')->with('success', trans('customer.admin.edit_success'));
-
+        return response()->json(new JsonResponse([]), Response::HTTP_OK);
     }
 
     /*
     Delete list Item
     Need mothod destroy to boot deleting in model
     */
-    public function deleteList()
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            $arrDontPermission = [];
-            foreach ($arrID as $key => $id) {
-                if(!$this->checkPermisisonItem($id)) {
-                    $arrDontPermission[] = $id;
-                }
-            }
-            if (count($arrDontPermission)) {
-                return response()->json(['error' => 1, 'msg' => trans('admin.remove_dont_permisison') . ': ' . json_encode($arrDontPermission)]);
-            }
-            AdminCustomer::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $id);
+        Customer::destroy($arrID);
+        return response()->json(new JsonResponse([]), Response::HTTP_OK);
     }
 
 
@@ -198,26 +138,10 @@ class CustomerController extends Controller
      * Render address detail
      * @return [view]
      */
-    public function updateAddress($id)
+    public function showAddress($id)
     {
-        $address =  AdminCustomer::getAddress($id);
-        if ($address) {
-            $title = trans('account.address_detail').' #'.$address->id;
-        } else {
-            $title = trans('account.address_detail_notfound');
-        }
-        return view($this->templatePathAdmin.'Customer.edit_address')
-        ->with(
-            [
-            'title'       => $title,
-            'address'     => $address,
-            'customer'    => (new AdminCustomer)->getCustomerAdmin($address->customer_id),
-            'countries'   => ShopCountry::getCodeAll(),
-            'layout_page' => 'shop_profile',
-            'url_action'  => bc_route_admin('admin_customer.update_address', ['id' => $id]),
-            ]
-        );
-
+        $address =  Customer::getAddress($id);
+        return response()->json(new JsonResponse(['data' => $address]), Response::HTTP_OK);
     }
 
     /**
@@ -226,10 +150,10 @@ class CustomerController extends Controller
      *
      * @return  [redirect] 
      */
-    public function postUpdateAddress($id)
+    public function updateAddress($id)
     {
         $data = request()->all();
-        $address =  AdminCustomer::getAddress($id);
+        $address =  Customer::getAddress($id);
         $dataUpdate = [
             'first_name' => $data['first_name'],
             'address1' => $data['address1'],
@@ -238,8 +162,8 @@ class CustomerController extends Controller
             'first_name' => 'required|string|max:100',
         ];
         
-        if (bc_config_admin('customer_lastname')) {
-            if (bc_config_admin('customer_lastname_required')) {
+        if (lc_config_admin('customer_lastname')) {
+            if (lc_config_admin('customer_lastname_required')) {
                 $validate['last_name'] = 'required|string|max:100';
             } else {
                 $validate['last_name'] = 'nullable|string|max:100';
@@ -247,8 +171,8 @@ class CustomerController extends Controller
             $dataUpdate['last_name'] = $data['last_name']??'';
         }
 
-        if (bc_config_admin('customer_address1')) {
-            if (bc_config_admin('customer_address1_required')) {
+        if (lc_config_admin('customer_address1')) {
+            if (lc_config_admin('customer_address1_required')) {
                 $validate['address1'] = 'required|string|max:100';
             } else {
                 $validate['address1'] = 'nullable|string|max:100';
@@ -256,8 +180,8 @@ class CustomerController extends Controller
             $dataUpdate['address1'] = $data['address1']??'';
         }
 
-        if (bc_config_admin('customer_address2')) {
-            if (bc_config_admin('customer_address2_required')) {
+        if (lc_config_admin('customer_address2')) {
+            if (lc_config_admin('customer_address2_required')) {
                 $validate['address2'] = 'required|string|max:100';
             } else {
                 $validate['address2'] = 'nullable|string|max:100';
@@ -265,8 +189,8 @@ class CustomerController extends Controller
             $dataUpdate['address2'] = $data['address2']??'';
         }
 
-        if (bc_config_admin('customer_address3')) {
-            if (bc_config_admin('customer_address3_required')) {
+        if (lc_config_admin('customer_address3')) {
+            if (lc_config_admin('customer_address3_required')) {
                 $validate['address3'] = 'required|string|max:100';
             } else {
                 $validate['address3'] = 'nullable|string|max:100';
@@ -274,8 +198,8 @@ class CustomerController extends Controller
             $dataUpdate['address3'] = $data['address3']??'';
         }
 
-        if (bc_config_admin('customer_phone')) {
-            if (bc_config_admin('customer_phone_required')) {
+        if (lc_config_admin('customer_phone')) {
+            if (lc_config_admin('customer_phone_required')) {
                 $validate['phone'] = 'required|regex:/^0[^0][0-9\-]{7,13}$/';
             } else {
                 $validate['phone'] = 'nullable|regex:/^0[^0][0-9\-]{7,13}$/';
@@ -283,9 +207,9 @@ class CustomerController extends Controller
             $dataUpdate['phone'] = $data['phone']??'';
         }
 
-        if (bc_config_admin('customer_country')) {
+        if (lc_config_admin('customer_country')) {
             $arraycountry = (new ShopCountry)->pluck('code')->toArray();
-            if (bc_config_admin('customer_country_required')) {
+            if (lc_config_admin('customer_country_required')) {
                 $validate['country'] = 'required|string|min:2|in:'. implode(',', $arraycountry);
             } else {
                 $validate['country'] = 'nullable|string|min:2|in:'. implode(',', $arraycountry);
@@ -294,8 +218,8 @@ class CustomerController extends Controller
             $dataUpdate['country'] = $data['country']??'';
         }
 
-        if (bc_config_admin('customer_postcode')) {
-            if (bc_config_admin('customer_postcode_required')) {
+        if (lc_config_admin('customer_postcode')) {
+            if (lc_config_admin('customer_postcode_required')) {
                 $validate['postcode'] = 'required|min:5';
             } else {
                 $validate['postcode'] = 'nullable|min:5';
@@ -303,8 +227,8 @@ class CustomerController extends Controller
             $dataUpdate['postcode'] = $data['postcode']??'';
         }
 
-        if (bc_config_admin('customer_name_kana')) {
-            if (bc_config_admin('customer_name_kana_required')) {
+        if (lc_config_admin('customer_name_kana')) {
+            if (lc_config_admin('customer_name_kana_required')) {
                 $validate['first_name_kana'] = 'required|string|max:100';
                 $validate['last_name_kana'] = 'required|string|max:100';
             } else {
@@ -334,24 +258,23 @@ class CustomerController extends Controller
             'last_name.max'       => trans('validation.max',['attribute'=> trans('account.last_name')]),
         ];
 
-        $v = Validator::make(
+        $validator = Validator::make(
             $dataUpdate, 
             $validate, 
             $messages
         );
-        if ($v->fails()) {
-            return redirect()->back()->withErrors($v->errors());
+        if ($validator->fails()) {
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
 
-        $address->update(bc_clean($dataUpdate));
+        $address->update(lc_clean($dataUpdate));
 
         if (!empty($data['default'])) {
-            $customer = (new AdminCustomer)->getCustomerAdmin($address->customer_id);
+            $customer = (new Customer)->getCustomerAdmin($address->customer_id);
             $customer->address_id = $id;
             $customer->save();
         }
-        return redirect()->route('admin_customer.edit', ['id' => $address->customer_id])
-            ->with(['success' => trans('account.update_success')]);
+        return response()->json(new JsonResponse(['id' => $address->customer_id]), Response::HTTP_OK);
     }
 
     /**
@@ -361,15 +284,8 @@ class CustomerController extends Controller
      */
     public function deleteAddress() {
         $id = request('id');
-        AdminCustomer::deleteAddress($id);
-        return json_encode(['error' => 0, 'msg' => trans('account.delete_address_success')]);
-    }
-
-    /**
-     * Check permisison item
-     */
-    public function checkPermisisonItem($id) {
-        return (new AdminCustomer)->getCustomerAdmin($id);
+        Customer::deleteAddress($id);
+        return response()->json(new JsonResponse([]), Response::HTTP_OK);
     }
 
 }

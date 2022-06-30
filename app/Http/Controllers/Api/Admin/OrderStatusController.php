@@ -23,9 +23,7 @@ class OrderStatusController extends Controller
      */
     public function index()
     {
-        $data = new ShopOrderStatus;
-        $data = $data->orderBy('id', 'desc');
-        $data = $data->paginate(20);
+        $data = (new ShopOrderStatus)->getOrderStatusListAdmin(request()->all());
         return OrderStatusCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

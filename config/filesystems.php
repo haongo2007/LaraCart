@@ -102,9 +102,15 @@ return [
             'url' => env('APP_URL').'/storage',
         ],
 
-        'brands' => [
+        'brand' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/brands'),
+            'root' => storage_path('app/public/brand'),
+            'url' => env('APP_URL').'/storage',
+        ],
+        
+        'supplier' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/supplier'),
             'url' => env('APP_URL').'/storage',
         ],
         

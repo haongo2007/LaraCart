@@ -3,6 +3,8 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopSupplier;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 use App\Http\Resources\SupplierCollection;
 use Validator;
 
@@ -14,19 +16,20 @@ class SupplierController extends Controller
         return SupplierCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 
-/**
- * Post create new item in admin
- * @return [type] [description]
- */
-    public function postCreate()
+    /**
+    * Post create new item in admin
+    * @return [type] [description]
+    */
+    public function store()
     {
         $data = request()->all();
 
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['name'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
 
         $validator = Validator::make($data, [
+            'store_id' => 'required',
             'image' => 'required',
             'sort' => 'numeric|min:0',
             'name' => 'required|string|max:100',
@@ -39,104 +42,45 @@ class SupplierController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
 
         $dataInsert = [
-            'image' => $data['image'],
+            'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'name' => $data['name'],
             'alias' => $data['alias'],
-            'url' => $data['url'],
+            'url' => $data['url']??null,
             'email' => $data['email'],
             'address' => $data['address'],
             'phone' => $data['phone'],
             'sort' => (int) $data['sort'],
+            'store_id' => (int) $data['store_id'],
+            'status' => (int) $data['status'] ?? 0,
         ];
-        $obj = ShopSupplier::create($dataInsert);
+        $supplier = ShopSupplier::create($dataInsert);
 
-        return redirect()->route('admin_supplier.index')->with('success', trans('supplier.admin.create_success'));
+        return response()->json(new JsonResponse(['id' => $supplier->id]), Response::HTTP_OK);
 
     }
 
-/**
- * Form edit
- */
-public function edit($id)
-{
-    $supplier = ShopSupplier::find($id);
-    if(!$supplier) {
-        return 'No data';
-    }
-    $data = [
-        'title' => trans('supplier.admin.list'),
-        'title_action' => '<i class="fa fa-edit" aria-hidden="true"></i> ' . trans('supplier.admin.edit'),
-        'subTitle' => '',
-        'icon' => 'fa fa-indent',
-        'urlDeleteItem' => bc_route_admin('admin_supplier.delete'),
-        'removeList' => 0, // 1 - Enable function delete list item
-        'buttonRefresh' => 0, // 1 - Enable button refresh
-        'buttonSort' => 0, // 1 - Enable button sort
-        'css' => '', 
-        'js' => '',
-        'url_action' => bc_route_admin('admin_supplier.edit', ['id' => $supplier['id']]),
-        'supplier' => $supplier,
-        'id' => $id,
-    ];
 
-    $listTh = [
-        'id' => trans('supplier.id'),
-        'name' => trans('supplier.name'),
-        'image' => trans('supplier.image'),
-        'email' => trans('supplier.email'),
-        'sort' => trans('supplier.sort'),
-        'action' => trans('supplier.admin.action'),
-    ];
-
-    $obj = new ShopSupplier;
-    $obj = $obj->orderBy('id', 'desc');
-    $dataTmp = $obj->paginate(20);
-
-    $dataTr = [];
-    foreach ($dataTmp as $key => $row) {
-        $dataTr[] = [
-            'id' => $row['id'],
-            'name' => $row['name'],
-            'image' => bc_image_render($row->getThumb(), '50px', '50px', $row['name']),
-            'email' => $row['email'],
-            'sort' => $row['sort'],
-            'action' => '
-                <a href="' . bc_route_admin('admin_supplier.edit', ['id' => $row['id']]) . '"><span title="' . trans('supplier.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-
-                <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans('supplier.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-                ',
-        ];
-    }
-
-    $data['listTh'] = $listTh;
-    $data['dataTr'] = $dataTr;
-    $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'Component.pagination');
-    $data['resultItems'] = trans('supplier.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-    $data['layout'] = 'edit';
-    return view($this->templatePathAdmin.'screen.supplier')
-        ->with($data);
-}
-
-/**
- * update status
- */
-    public function postEdit($id)
+    /**
+    * update status
+    */
+    public function update($id)
     {
         $supplier = ShopSupplier::find($id);
+        if (!$supplier) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
         $data = request()->all();
 
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['name'];
-        $data['alias'] = bc_word_format_url($data['alias']);
-        $data['alias'] = bc_word_limit($data['alias'], 100);
+        $data['alias'] = lc_word_format_url($data['alias']);
+        $data['alias'] = lc_word_limit($data['alias'], 100);
 
         $validator = Validator::make($data, [
+            'store_id' => 'required',
             'image' => 'required',
             'sort' => 'numeric|min:0',
             'name' => 'required|string|max:100',
@@ -149,45 +93,36 @@ public function edit($id)
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-//Edit
 
         $dataUpdate = [
-            'image' => $data['image'],
+            'image'    => is_array($data['image']) ? implode(',',$data['image']) : $data['image'],
             'name' => $data['name'],
             'alias' => $data['alias'],
             'email' => $data['email'],
             'phone' => $data['phone'],
-            'url' => $data['url'],
+            'url' => $data['url']??null,
             'address' => $data['address'],
             'sort' => (int) $data['sort'],
+            'store_id' => (int) $data['store_id'],
+            'status' => (int) $data['status'] ?? 0,
 
         ];
         
         $supplier->update($dataUpdate);
 
-//
-        return redirect()->back()->with('success', trans('supplier.admin.edit_success'));
-
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
-/*
-Delete list item
-Need mothod destroy to boot deleting in model
- */
-    public function deleteList()
+    /*
+    Delete list item
+    Need mothod destroy to boot deleting in model
+    */
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => trans('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            ShopSupplier::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $id);
+        ShopSupplier::destroy($arrID);
     }
 
 }

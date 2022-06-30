@@ -17,7 +17,10 @@ class BrandCollection extends JsonResource
         $res = [
             'id' => $this->id,
             'name' => $this->name,
-            'status' => $this->image,
+            'alias' => $this->alias,
+            'image' => $this->image,
+            'status' => $this->status,
+            'sort' => $this->sort,
             'store' => $this->stores,
         ];
         return $res;

@@ -17,7 +17,7 @@ class ShippingStatusController extends Controller
      */
     public function index()
     {
-        $data = ShopShippingStatus::whereIn('store_id', session('adminStoreId'))->paginate(20);
+        $data = (new ShopShippingStatus)->getShippingStatusListAdmin(request()->all());
         return ShippingStatusCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

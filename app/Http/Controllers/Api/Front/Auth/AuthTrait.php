@@ -39,8 +39,8 @@ trait AuthTrait
         //Dont update id
         unset($data['id']);
 
-        if (bc_config('customer_lastname')) {
-            if (bc_config('customer_lastname_required')) {
+        if (lc_config('customer_lastname',$data['store_id'])) {
+            if (lc_config('customer_lastname_required',$data['store_id'])) {
                 $validate['last_name'] = config('validation.customer.last_name_required', 'required|string|max:100');
             } else {
                 $validate['last_name'] = config('validation.customer.last_name_null', 'nullable|string|max:100');
@@ -49,8 +49,8 @@ trait AuthTrait
                 $dataUpdate['last_name'] = $data['last_name'];
             }
         }
-        if (bc_config('customer_address1')) {
-            if (bc_config('customer_address1_required')) {
+        if (lc_config('customer_address1',$data['store_id'])) {
+            if (lc_config('customer_address1_required',$data['store_id'])) {
                 $validate['address1'] = config('validation.customer.address1_required', 'required|string|max:100');
             } else {
                 $validate['address1'] = config('validation.customer.address1_null', 'nullable|string|max:100');
@@ -60,8 +60,8 @@ trait AuthTrait
             }
         }
 
-        if (bc_config('customer_address2')) {
-            if (bc_config('customer_address2_required')) {
+        if (lc_config('customer_address2',$data['store_id'])) {
+            if (lc_config('customer_address2_required',$data['store_id'])) {
                 $validate['address2'] = config('validation.customer.address2_required', 'required|string|max:100');
             } else {
                 $validate['address2'] = config('validation.customer.address2_null', 'nullable|string|max:100');
@@ -71,8 +71,8 @@ trait AuthTrait
             }
         }
 
-        if (bc_config('customer_address3')) {
-            if (bc_config('customer_address3_required')) {
+        if (lc_config('customer_address3',$data['store_id'])) {
+            if (lc_config('customer_address3_required',$data['store_id'])) {
                 $validate['address3'] = config('validation.customer.address3_required', 'required|string|max:100');
             } else {
                 $validate['address3'] = config('validation.customer.address3_null', 'nullable|string|max:100');
@@ -83,8 +83,8 @@ trait AuthTrait
         }
 
 
-        if (bc_config('customer_phone')) {
-            if (bc_config('customer_phone_required')) {
+        if (lc_config('customer_phone',$data['store_id'])) {
+            if (lc_config('customer_phone_required',$data['store_id'])) {
                 $validate['phone'] = config('validation.customer.phone_required', 'required|regex:/^[0-9\-]{8,14}$/');
             } else {
                 $validate['phone'] = config('validation.customer.phone_null', 'nullable|regex:/^[0-9\-]{8,14}$/');
@@ -94,9 +94,9 @@ trait AuthTrait
             }
         }
 
-        if (bc_config('customer_country')) {
+        if (lc_config('customer_country',$data['store_id'])) {
             $arraycountry = (new ShopCountry)->pluck('code')->toArray();
-            if (bc_config('customer_country_required')) {
+            if (lc_config('customer_country_required',$data['store_id'])) {
                 $validate['country'] = config('validation.customer.country_required', 'required|string|min:2').'|in:'. implode(',', $arraycountry);
             } else {
                 $validate['country'] = config('validation.customer.country_null', 'nullable|string|min:2').'|in:'. implode(',', $arraycountry);
@@ -106,8 +106,8 @@ trait AuthTrait
             }
         }
 
-        if (bc_config('customer_postcode')) {
-            if (bc_config('customer_postcode_required')) {
+        if (lc_config('customer_postcode',$data['store_id'])) {
+            if (lc_config('customer_postcode_required',$data['store_id'])) {
                 $validate['postcode'] = config('validation.customer.postcode_required', 'required|min:5');
             } else {
                 $validate['postcode'] = config('validation.customer.postcode_null', 'nullable|min:5');
@@ -117,8 +117,8 @@ trait AuthTrait
             }
         }
 
-        if (bc_config('customer_company')) {
-            if (bc_config('customer_company_required')) {
+        if (lc_config('customer_company',$data['store_id'])) {
+            if (lc_config('customer_company_required',$data['store_id'])) {
                 $validate['company'] = config('validation.customer.company_required', 'required|string|max:100');
             } else {
                 $validate['company'] = config('validation.customer.company_null', 'nullable|string|max:100');
@@ -128,8 +128,8 @@ trait AuthTrait
             }
         }   
 
-        if (bc_config('customer_sex')) {
-            if (bc_config('customer_sex_required')) {
+        if (lc_config('customer_sex',$data['store_id'])) {
+            if (lc_config('customer_sex_required',$data['store_id'])) {
                 $validate['sex'] = config('validation.customer.sex_required', 'required|integer|max:10');
             } else {
                 $validate['sex'] = config('validation.customer.sex_null', 'nullable|integer|max:10');
@@ -139,8 +139,8 @@ trait AuthTrait
             }
         }   
 
-        if (bc_config('customer_birthday')) {
-            if (bc_config('customer_birthday_required')) {
+        if (lc_config('customer_birthday',$data['store_id'])) {
+            if (lc_config('customer_birthday_required',$data['store_id'])) {
                 $validate['birthday'] = config('validation.customer.birthday_required', 'required|date|date_format:Y-m-d');
             } else {
                 $validate['birthday'] = config('validation.customer.birthday_null', 'nullable|date|date_format:Y-m-d');
@@ -150,8 +150,8 @@ trait AuthTrait
             }
         } 
 
-        if (bc_config('customer_group')) {
-            if (bc_config('customer_group_required')) {
+        if (lc_config('customer_group',$data['store_id'])) {
+            if (lc_config('customer_group_required',$data['store_id'])) {
                 $validate['group'] = config('validation.customer.group_required', 'required|integer|max:10');
             } else {
                 $validate['group'] = config('validation.customer.group_null', 'nullable|integer|max:10');
@@ -161,8 +161,8 @@ trait AuthTrait
             }
         }
 
-        if (bc_config('customer_name_kana')) {
-            if (bc_config('customer_name_kana_required')) {
+        if (lc_config('customer_name_kana',$data['store_id'])) {
+            if (lc_config('customer_name_kana_required',$data['store_id'])) {
                 $validate['first_name_kana'] = config('validation.customer.name_kana_required', 'required|string|max:100');
                 $validate['last_name_kana'] = config('validation.customer.name_kana_required', 'required|string|max:100');
             } else {
@@ -235,31 +235,31 @@ trait AuthTrait
             }
         }
 
-        if (bc_config('customer_lastname')) {
-            if (bc_config('customer_lastname_required')) {
+        if (lc_config('customer_lastname',$data['store_id'])) {
+            if (lc_config('customer_lastname_required',$data['store_id'])) {
                 $validate['last_name'] = config('validation.customer.last_name_required', 'required|string|max:100');
             } else {
                 $validate['last_name'] = config('validation.customer.last_name_null', 'nullable|string|max:100');
             }
         }
-        if (bc_config('customer_address1')) {
-            if (bc_config('customer_address1_required')) {
+        if (lc_config('customer_address1',$data['store_id'])) {
+            if (lc_config('customer_address1_required',$data['store_id'])) {
                 $validate['address1'] = config('validation.customer.address1_required', 'required|string|max:100');
             } else {
                 $validate['address1'] = config('validation.customer.address1_null', 'nullable|string|max:100');
             }
         }
 
-        if (bc_config('customer_address2')) {
-            if (bc_config('customer_address2_required')) {
+        if (lc_config('customer_address2',$data['store_id'])) {
+            if (lc_config('customer_address2_required',$data['store_id'])) {
                 $validate['address2'] = config('validation.customer.address2_required', 'required|string|max:100');
             } else {
                 $validate['address2'] = config('validation.customer.address2_null', 'nullable|string|max:100');
             }
         }
 
-        if (bc_config('customer_address3')) {
-            if (bc_config('customer_address3_required')) {
+        if (lc_config('customer_address3',$data['store_id'])) {
+            if (lc_config('customer_address3_required',$data['store_id'])) {
                 $validate['address3'] = config('validation.customer.address3_required', 'required|string|max:100');
             } else {
                 $validate['address3'] = config('validation.customer.address3_null', 'nullable|string|max:100');
@@ -267,60 +267,60 @@ trait AuthTrait
         }
 
 
-        if (bc_config('customer_phone')) {
-            if (bc_config('customer_phone_required')) {
+        if (lc_config('customer_phone',$data['store_id'])) {
+            if (lc_config('customer_phone_required',$data['store_id'])) {
                 $validate['phone'] = config('validation.customer.phone_required', 'required|regex:/^[0-9\-]{8,14}$/');
             } else {
                 $validate['phone'] = config('validation.customer.phone_null', 'nullable|regex:/^[0-9\-]{8,14}$/');
             }
         }
-        if (bc_config('customer_country')) {
+        if (lc_config('customer_country',$data['store_id'])) {
             $arraycountry = (new ShopCountry)->pluck('code')->toArray();
-            if (bc_config('customer_country_required')) {
+            if (lc_config('customer_country_required',$data['store_id'])) {
                 $validate['country'] = config('validation.customer.country_required', 'required|string|min:2').'|in:'. implode(',', $arraycountry);
             } else {
                 $validate['country'] = config('validation.customer.country_null', 'nullable|string|min:2').'|in:'. implode(',', $arraycountry);
             }
         }
 
-        if (bc_config('customer_postcode')) {
-            if (bc_config('customer_postcode_required')) {
+        if (lc_config('customer_postcode',$data['store_id'])) {
+            if (lc_config('customer_postcode_required',$data['store_id'])) {
                 $validate['postcode'] = config('validation.customer.postcode_required', 'required|min:5');
             } else {
                 $validate['postcode'] = config('validation.customer.postcode_null', 'nullable|min:5');
             }
         }
-        if (bc_config('customer_company')) {
-            if (bc_config('customer_company_required')) {
+        if (lc_config('customer_company',$data['store_id'])) {
+            if (lc_config('customer_company_required',$data['store_id'])) {
                 $validate['company'] = config('validation.customer.company_required', 'required|string|max:100');
             } else {
                 $validate['company'] = config('validation.customer.company_null', 'nullable|string|max:100');
             }
         }   
-        if (bc_config('customer_sex')) {
-            if (bc_config('customer_sex_required')) {
+        if (lc_config('customer_sex',$data['store_id'])) {
+            if (lc_config('customer_sex_required',$data['store_id'])) {
                 $validate['sex'] = config('validation.customer.sex_required', 'required|integer|max:10');
             } else {
                 $validate['sex'] = config('validation.customer.sex_null', 'nullable|integer|max:10');
             }
         }   
-        if (bc_config('customer_birthday')) {
-            if (bc_config('customer_birthday_required')) {
+        if (lc_config('customer_birthday',$data['store_id'])) {
+            if (lc_config('customer_birthday_required',$data['store_id'])) {
                 $validate['birthday'] = config('validation.customer.birthday_required', 'required|date|date_format:Y-m-d');
             } else {
                 $validate['birthday'] = config('validation.customer.birthday_null', 'nullable|date|date_format:Y-m-d');
             }
         } 
-        if (bc_config('customer_group')) {
-            if (bc_config('customer_group_required')) {
+        if (lc_config('customer_group',$data['store_id'])) {
+            if (lc_config('customer_group_required',$data['store_id'])) {
                 $validate['group'] = config('validation.customer.group_required', 'required|integer|max:10');
             } else {
                 $validate['group'] = config('validation.customer.group_null', 'nullable|integer|max:10');
             }
         }
 
-        if (bc_config('customer_name_kana')) {
-            if (bc_config('customer_name_kana_required')) {
+        if (lc_config('customer_name_kana',$data['store_id'])) {
+            if (lc_config('customer_name_kana_required',$data['store_id'])) {
                 $validate['first_name_kana'] = config('validation.customer.name_kana_required', 'required|string|max:100');
                 $validate['last_name_kana'] = config('validation.customer.name_kana_required', 'required|string|max:100');
             } else {
@@ -383,69 +383,69 @@ trait AuthTrait
         if (isset($data['status'])) {
             $dataInsert['status']  = $data['status'];
         }
-        if (bc_config('customer_lastname')) {
+        if (lc_config('customer_lastname',$data['store_id'])) {
             if (!empty($data['last_name'])) {
                 $dataInsert['last_name'] = $data['last_name'];
             }
         }
-        if (bc_config('customer_firstname_kana')) {
+        if (lc_config('customer_firstname_kana',$data['store_id'])) {
             if (!empty($data['first_name_kana'])) {
                 $dataInsert['first_name_kana'] = $data['first_name_kana'];
             }
         }
-        if (bc_config('customer_lastname_kana')) {
+        if (lc_config('customer_lastname_kana',$data['store_id'])) {
             if (!empty($data['last_name_kana'])) {
                 $dataInsert['last_name_kana'] = $data['last_name_kana'];
             }
         }
-        if (bc_config('customer_address1')) {
+        if (lc_config('customer_address1',$data['store_id'])) {
             if (!empty($data['address1'])) {
                 $dataInsert['address1'] = $data['address1'];
             }
         }
-        if (bc_config('customer_address2')) {
+        if (lc_config('customer_address2',$data['store_id'])) {
             if (!empty($data['address2'])) {
                 $dataInsert['address2'] = $data['address2'];
             }
         }
 
-        if (bc_config('customer_address3')) {
+        if (lc_config('customer_address3',$data['store_id'])) {
             if (!empty($data['address3'])) {
                 $dataInsert['address3'] = $data['address3'];
             }
         }
 
-        if (bc_config('customer_phone')) {
+        if (lc_config('customer_phone',$data['store_id'])) {
             if (!empty($data['phone'])) {
                 $dataInsert['phone'] = $data['phone'];
             }
         }
-        if (bc_config('customer_country')) {
+        if (lc_config('customer_country',$data['store_id'])) {
             if (!empty($data['country'])) {
                 $dataInsert['country'] = $data['country'];
             }
         }
-        if (bc_config('customer_postcode')) {
+        if (lc_config('customer_postcode',$data['store_id'])) {
             if (!empty($data['postcode'])) {
                 $dataInsert['postcode'] = $data['postcode'];
             }
         }
-        if (bc_config('customer_company')) {
+        if (lc_config('customer_company',$data['store_id'])) {
             if (!empty($data['company'])) {
                 $dataInsert['company'] = $data['company'];
             }
         }   
-        if (bc_config('customer_sex')) {
+        if (lc_config('customer_sex',$data['store_id'])) {
             if (!empty($data['sex'])) {
                 $dataInsert['sex'] = $data['sex'];
             }
         }   
-        if (bc_config('customer_birthday')) {
+        if (lc_config('customer_birthday',$data['store_id'])) {
             if (!empty($data['birthday'])) {
                 $dataInsert['birthday'] = $data['birthday'];
             }
         } 
-        if (bc_config('customer_group')) {
+        if (lc_config('customer_group',$data['store_id'])) {
             if (!empty($data['group'])) {
                 $dataInsert['group'] = $data['group'];
             }

@@ -1,4 +1,6 @@
 export default {
+    "editCustomer":"Sửa khách hàng",
+    "createCustomer":"Thêm khách hàng",
     "editEmailTemplate":"Sửa email mẫu",
     "createEmailTemplate":"Tạo mẫu email",
     "blogEdit":"Sửa bài viết",

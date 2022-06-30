@@ -102,8 +102,12 @@ export default {
       } else {
         if(typeof store_ck == 'string' || typeof store_ck  == 'number'){
           this.currentStore = String(store_ck);
+          this.$store.dispatch('user/ChangeStore', this.currentStore);
         }else{
-          this.currentStore = store_ck
+          this.currentStore = store_ck;
+          if (this.currentStore.length == 1) {
+            this.$store.dispatch('user/ChangeStore', this.currentStore);
+          }
         }
       }
     }

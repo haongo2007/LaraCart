@@ -26,7 +26,7 @@ class ShopCountry extends Model
                 if (self::$getCodeAll === null) {
                     self::$getCodeAll = self::pluck('name', 'code')->all();
                 }
-                bc_set_cache('cache_country', self::$getCodeAll);
+                lc_set_cache('cache_country', self::$getCodeAll);
             }
             return Cache::get('cache_country');
         } else {

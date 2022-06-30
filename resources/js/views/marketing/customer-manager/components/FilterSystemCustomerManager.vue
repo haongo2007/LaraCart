@@ -11,7 +11,7 @@
           <el-col :span="24">
             <el-button-group>
               <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
-              @click="$router.push({ name: 'UserCreate'}).catch(() => {})" v-permission="['create.customer']" />
+              @click="$router.push({ name: 'CustomerCreate'}).catch(() => {})" v-permission="['create.customer']" />
               <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
               @click="handerDeleteAll" v-permission="['delete.customer']"/>
             </el-button-group>
@@ -25,12 +25,7 @@
       <div class="drawer-item">
 
         <el-row :gutter="24">
-          <el-col :span="12">
-            <el-select v-model="dataQuery.role" multiple collapse-tags :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
-              <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
-            </el-select>
-          </el-col>
-          <el-col :span="12">
+          <el-col :span="24">
             <el-input v-model="dataQuery.keyword" :placeholder="$t('table.keyword')" style="width: 100%;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>
@@ -65,7 +60,6 @@ export default {
     return {
       list: null,
       total: 0,
-      roles: [],
       multiSelectRow:[]
     };
   },

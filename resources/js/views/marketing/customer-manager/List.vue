@@ -98,7 +98,7 @@
         <template slot-scope="{row}">
           <el-button-group>
             <el-button type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
-            @click="renderRouterEdit(row.kind,row.id)" v-permission="['edit.customer']" />
+            @click="$router.push({ name: 'CustomerEdit',params:{id:row.id} })" v-permission="['edit.customer']" />
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" v-permission="['delete.customer']" />
           </el-button-group>
         </template>

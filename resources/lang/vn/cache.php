@@ -21,5 +21,6 @@ return [
         'cache_page'             => 'Cache Trang viết',
         'cache_store'            => 'Cache Cửa hàng',
         'cache_country'          => 'Cache Quốc gia',
+        'cache_config'           => 'Cache Cấu hình'
     ]
 ];
