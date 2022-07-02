@@ -221,72 +221,70 @@ export default {
       const that = this;
       const values = [];
       
-      if (Object.keys(this.dataProduct).length == 0) { // add
+      if (Object.keys(this.dataProduct).length > 0 && (this.dataProduct.hasOwnProperty('attributes_parent') && this.dataProduct.attributes_parent.length > 0)) {// edit
+        let attributes_parent = {};
+        console.log(this.dataProduct);
+        data.forEach(function(v, i) {
+          if (!attributes_parent.hasOwnProperty(v.id)) {
+            attributes_parent[v.id] = [];
+          }
+          let foundGroup = that.dataProduct.attributes_parent.filter((item) => item.attribute_group_id == v.id);
+          if (foundGroup.length > 0) {
+            attributes_parent[v.id].values = foundGroup;
+            attributes_parent[v.id].picker = v.picker;
+            attributes_parent[v.id].name = v.name;
+            attributes_parent[v.id].id = v.id;
+          }
+          if (Object.keys(attributes_parent[v.id]).length == 0) {
+            delete attributes_parent[v.id];
+          }
+        });
+        let y = 0;
+        for(let attribute in attributes_parent){
+          let id = attributes_parent[attribute].id;
+          let name = attributes_parent[attribute].name;
+          let picker = attributes_parent[attribute].picker;
+          let value = attributes_parent[attribute].values;
+
+          let index_group = data.findIndex((item) => item.id == id);
+          this.$set(this.temp,y,data[index_group]);
+          this.$set(this.temp[y], 'values', []);
+          // filter value
+
+          value.forEach(function (v,i) {
+
+            if (v.images) {
+                let files = v.images.split(',');
+                v['files'] = files;
+            }
+
+            if (v.children.length > 0) {
+              v.children.forEach(function(vchild, ichild) {
+
+                let index_group_child = data.findIndex((item) => item.id == vchild.attribute_group_id);
+                if (index_group_child >= 0) {
+                  that.$set(that.temp[y],'children', []);
+                  that.temp[y]['children'].push(data[index_group_child]);
+                  that.disabledChild = false;
+                }
+
+                if (vchild.images) {
+                  let files = vchild.images.split(',');
+                  v['children'][ichild]['files'] = files;
+                }
+              })
+
+            }
+            that.attNum++;
+          });
+          this.temp[y]['values'] = value;
+          y++;
+        }
+      }else{
         data.forEach(function(v, i) {
           that.$set(that.temp, i, v);
           that.$set(that.temp[i], 'values', []);
         });
-      }else{// edit
-        if (this.dataProduct.attributes_parent) {
-          let attributes_parent = {};
-
-          data.forEach(function(v, i) {
-            if (!attributes_parent.hasOwnProperty(v.id)) {
-              attributes_parent[v.id] = [];
-            }
-            let foundGroup = that.dataProduct.attributes_parent.filter((item) => item.attribute_group_id == v.id);
-            if (foundGroup.length > 0) {
-              attributes_parent[v.id].values = foundGroup;
-              attributes_parent[v.id].picker = v.picker;
-              attributes_parent[v.id].name = v.name;
-              attributes_parent[v.id].id = v.id;
-            }
-            if (Object.keys(attributes_parent[v.id]).length == 0) {
-              delete attributes_parent[v.id];
-            }
-          });
-          let y = 0;
-          for(let attribute in attributes_parent){
-            let id = attributes_parent[attribute].id;
-            let name = attributes_parent[attribute].name;
-            let picker = attributes_parent[attribute].picker;
-            let value = attributes_parent[attribute].values;
-
-            let index_group = data.findIndex((item) => item.id == id);
-            this.$set(this.temp,y,data[index_group]);
-            this.$set(this.temp[y], 'values', []);
-            // filter value
-
-            value.forEach(function (v,i) {
-
-              if (v.images) {
-                  let files = v.images.split(',');
-                  v['files'] = files;
-              }
-
-              if (v.children.length > 0) {
-                v.children.forEach(function(vchild, ichild) {
-
-                  let index_group_child = data.findIndex((item) => item.id == vchild.attribute_group_id);
-                  if (index_group_child >= 0) {
-                    that.$set(that.temp[y],'children', []);
-                    that.temp[y]['children'].push(data[index_group_child]);
-                    that.disabledChild = false;
-                  }
-
-                  if (vchild.images) {
-                    let files = vchild.images.split(',');
-                    v['children'][ichild]['files'] = files;
-                  }
-                })
-
-              }
-              that.attNum++;
-            });
-            this.temp[y]['values'] = value;
-            y++;
-          }
-        }
       }
       this.loadAttributes = false;
     },
