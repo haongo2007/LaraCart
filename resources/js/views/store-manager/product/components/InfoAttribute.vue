@@ -38,7 +38,7 @@
                   </el-button-group>
                 </el-form-item>
               </div>
-              <div v-if="temp[index]['values'][key].images != ''" v-loading="loadFiles">
+              <div v-if="temp[index]['values'][key].images || temp[index]['values'][key].files" v-loading="loadFiles">
                 <lightbox :cells="3" :items="temp[index]['values'][key].files" />
                 <div v-if="temp[index]['values'][key].palette" class="color-Palette">
                   <h4 style="margin: 10px 0px">Choose Code</h4>
@@ -259,7 +259,7 @@ export default {
 
             value.forEach(function (v,i) {
 
-              if (v.images != '') {
+              if (v.images) {
                   let files = v.images.split(',');
                   v['files'] = files;
               }
@@ -274,7 +274,7 @@ export default {
                     that.disabledChild = false;
                   }
 
-                  if (vchild.images != '') {
+                  if (vchild.images) {
                     let files = vchild.images.split(',');
                     v['children'][ichild]['files'] = files;
                   }
