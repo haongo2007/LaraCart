@@ -32,6 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if($this->app->environment('production')) {
+            \URL::forceScheme('https');
+        }
         if (!file_exists(public_path('install.php')) && file_exists(base_path('.env'))) {
             foreach (glob(app_path() . '/Helpers/*.php') as $filename) {
                 require_once $filename;
