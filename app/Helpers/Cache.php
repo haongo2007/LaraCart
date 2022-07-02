@@ -70,7 +70,6 @@ if (!function_exists('lc_set_cache')) {
             }
         }else{
             $seconds = $time ?? (lc_config_global('cache_time',$storeId) ?? 600);
-            
             Cache::put($cacheIndex, $value, $seconds);
         }
     }

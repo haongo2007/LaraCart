@@ -371,4 +371,5 @@ return [
       'top_rated_product'       => 'Top rated',
       'most_buy_product'        => 'Top most buy',
       'most_most_view'           => 'Top most view',
+      'product_latest'           => 'Latest product',
 ];

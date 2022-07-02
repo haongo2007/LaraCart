@@ -368,4 +368,5 @@ return [
     'top_rated_product'       => 'Sản phẩm đánh giá cao',
     'most_buy_product'        => 'Sản phẩm mua nhiều',
     'most_most_view'           => 'Sản phẩm xem nhiều',
+    'product_latest'           => 'Sản phẩm mới nhất',
 ];

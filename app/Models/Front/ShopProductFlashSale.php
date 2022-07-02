@@ -47,10 +47,13 @@ class ShopProductFlashSale extends Model
     public function getAllProductFlashSale(array $dataSearch) {
         $limit   = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
         $storeId = $dataSearch['store_id'] ?? session('adminStoreId');
-        $productFlash = self::whereHas('promotion' , function ($query)
+        if (!is_array($storeId)) {
+            $storeId = [$storeId];
+        }
+        $productFlash = self::whereIn('store_id',$storeId)->whereHas('promotion' , function ($query)
         {
             $query->where('date_start', '<=', date('Y-m-d'))->where('date_end', '>=', date('Y-m-d'))->where('status_promotion',1);
-        })->whereIn('store_id',$storeId);
+        });
         $productFlash = $productFlash->paginate($limit);
         return $productFlash;
     }

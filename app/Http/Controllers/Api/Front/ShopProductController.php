@@ -102,13 +102,12 @@ class ShopProductController extends Controller
 
         $instance = (new ShopProduct)->setStore($storeId);
         $data = [];
-        
+
         if (!Cache::has($storeId.'_cache_product_special_'.lc_get_locale())) {
             if ($flash_sale) {
-                $flashSaleProducts = (new ShopProductFlashSale)->getAllProductFlashSale(['storeId'=>$storeId]);
+                $flashSaleProducts = (new ShopProductFlashSale)->getAllProductFlashSale(['store_id'=>$storeId]);
                 $data['flashSaleProducts'] = ProductFlashSaleCollection::collection($flashSaleProducts);
             }
-
             if ($latest) {
                 $latestProducts = $instance->setLimit(lc_config('product_latest',$storeId))->getData();
                 $data['latestProducts'] = ProductCollection::collection($latestProducts);
