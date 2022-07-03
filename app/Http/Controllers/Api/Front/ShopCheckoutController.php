@@ -255,9 +255,9 @@ class ShopCheckoutController extends Controller
         if (method_exists($classShippingConfig, 'endApp')) {
             (new $classShippingConfig)->endApp();
         }
+        $data = ShopOrder::with('details')->find($orderID)->toArray();
 
-        if (lc_config('order_success_to_admin') || lc_config('order_success_to_customer')) {
-            $data = ShopOrder::with('details')->find($orderID)->toArray();
+        if (lc_config('order_success_to_admin',$data['store_id']) || lc_config('order_success_to_customer',$data['store_id'])) {
             $checkContent = (new ShopEmailTemplate)->where('group', 'order_success_to_admin')->where('status', 1)->where('store_id', $data['store_id'])->first();
             $checkContentCustomer = (new ShopEmailTemplate)->where('group', 'order_success_to_customer')->where('status', 1)->where('store_id', $data['store_id'])->first();
             if ($checkContent || $checkContentCustomer) {
@@ -363,8 +363,8 @@ class ShopCheckoutController extends Controller
                 ];
 
                 // Send mail order success to admin 
-                if (lc_config('order_success_to_admin') && $checkContent) {
-                    $content = $checkContent->text;
+                if (lc_config('order_success_to_admin',$data['store_id']) && $checkContent) {
+                    $content = $checkContent->content;
                     $content = preg_replace($dataFind, $dataReplace, $content);
                     $config = [
                         'to' => lc_store('email',$data['store_id']),
@@ -374,8 +374,8 @@ class ShopCheckoutController extends Controller
                 }
 
                 // Send mail order success to customer
-                if (lc_config('order_success_to_customer') && $checkContentCustomer) {
-                    $contentCustomer = $checkContentCustomer->text;
+                if (lc_config('order_success_to_customer',$data['store_id']) && $checkContentCustomer) {
+                    $contentCustomer = $checkContentCustomer->content;
                     $contentCustomer = preg_replace($dataFind, $dataReplace, $contentCustomer);
                     
                     $config = [
@@ -400,9 +400,9 @@ class ShopCheckoutController extends Controller
                     lc_send_mail($contentCustomer, $config, $attach);
                 }
             }
-            $response['message'] = trans('order.success',['store_name'=> lc_store('title',$data['store_id'])]);
-            return response()->json(new JsonResponse($response), Response::HTTP_OK);
         }
+        $response['message'] = trans('order.success',['store_name'=> lc_store('title',$data['store_id'])]);
+        return response()->json(new JsonResponse($response), Response::HTTP_OK);
     }
 
 

@@ -21,9 +21,9 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.language')" min-width="100px">
+      <el-table-column :label="$t('table.language')" min-width="50px">
         <template slot-scope="scope">
-          <el-image :src="'/data/language/flag_'+scope.row.lang+'.png'">
+          <el-image :src="'/svg/flags/'+scope.row.lang+'.svg'">
             <div slot="error" class="image-slot">
               <i class="el-icon-picture-outline" />
             </div>
