@@ -319,11 +319,11 @@ class CreateTablesShop extends Migration
             $table->string('jan', 20)->nullable()->comment('jan code');
             $table->string('isbn', 20)->nullable()->comment('isbn code');
             $table->string('mpn', 64)->nullable()->comment('mpn code');
-            $table->string('image', 255)->nullable();
+            $table->text('image')->nullable();
             $table->integer('brand_id')->nullable()->default(0)->index();
             $table->integer('supplier_id')->nullable()->default(0)->index();
-            $table->integer('price')->nullable()->default(0);
-            $table->integer('cost')->nullable()->nullable()->default(0);
+            $table->float('price')->nullable()->default(0);
+            $table->float('cost')->nullable()->default(0);
             $table->integer('stock')->nullable()->default(0);
             $table->integer('sold')->nullable()->default(0);
             $table->integer('minimum')->nullable()->default(0);
@@ -347,6 +347,7 @@ class CreateTablesShop extends Migration
             $table->integer('top')->default(0)->index();
             $table->integer('rate_point')->default(0)->index();
             $table->integer('rate_count')->default(0)->index();
+            $table->string('currency', 55);
             $table->timestamps();
             }
         );
@@ -416,7 +417,7 @@ class CreateTablesShop extends Migration
             $table->string('name', 100);
             $table->integer('attribute_group_id');
             $table->integer('product_id');
-            $table->integer('add_price')->default(0);
+            $table->float('add_price')->default(0);
             $table->text('images')->nullable();
             $table->integer('parent')->default(0);
             $table->integer('sort')->default(0);

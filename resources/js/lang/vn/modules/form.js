@@ -1,4 +1,5 @@
 export default {
+    "confirm_enter_price_above_currency":"Vui lòng nhập giá tiền theo tỷ giá tiền tệ trên",
     "male":"Đàn ông",
     "female":"Phụ nữ",
     "other":"Khác",

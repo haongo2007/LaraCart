@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form ref="dataAttributeForm" class="form-container" label-width="150px">
+    <el-form ref="dataAttributeForm" class="form-container attribute_form" label-width="150px" label-position="top">
       <el-row v-show="!loadAttributes" class="el-main-form">
         <el-col :span="2">
           <div v-loading="loadAttributes" width="200px">
@@ -25,13 +25,13 @@
             <el-header align="center">{{ attribute.name }} {{ attribute.values ? '( '+ attribute.values.length + ' )': '' }}</el-header>
             <div v-for="(value,key) in attribute.values" v-if="attribute.values" :key="key" class="box-attributes" >
               <div style="display: flex;justify-content: space-between;align-items: center;" >
-                <el-form-item label-width="60px" label="Name" style="width: 100%;margin: 15px 0px;">
+                <el-form-item label-width="60px" label="Name" style="width: 100%;">
                   <el-input size="mini" v-model="temp[index]['values'][key].name" />
                 </el-form-item>
-                <el-form-item label-width="60px" label="Price" style="width: 100%;margin: 15px 0px;">
+                <el-form-item label-width="60px" label="More Price" style="width: 100%;">
                   <el-input-number size="mini" v-model="temp[index]['values'][key].add_price" style="width: 100%" :controls="false" />
                 </el-form-item>
-                <el-form-item label-width="30px" style="width: 100%;margin: 15px 0px;">
+                <el-form-item label-width="30px" label="Action" style="width: 100%;">
                   <el-button-group>
                     <el-button size="mini" v-if="attribute.picker" type="success" @click="handleVisibleStorage(index,key)">Image</el-button>
                     <el-button size="mini" type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key)" />
@@ -63,10 +63,10 @@
                   <el-form-item label-width="60px" label="Name" style="width: 100%;margin: 15px 0px;">
                     <el-input size="mini" v-model="temp[index]['values'][key]['children'][childKey].name" />
                   </el-form-item>
-                  <el-form-item label-width="60px" label="Price" style="width: 100%;margin: 15px 0px;">
+                  <el-form-item label-width="60px" label="More Price" style="width: 100%;margin: 15px 0px;">
                     <el-input-number size="mini" v-model="temp[index]['values'][key]['children'][childKey].add_price" style="width: 100%" :controls="false" />
                   </el-form-item>
-                  <el-form-item label-width="30px" style="width: 100%;margin: 15px 0px;">
+                  <el-form-item label-width="30px" label="Action" style="width: 100%;margin: 15px 0px;">
                     <el-button-group>
                       <el-button size="mini" v-if="attribute.children[index] && attribute.children[index].picker" type="success" @click="handleVisibleStorage(index,key,childKey)">Image</el-button>
                       <el-button size="mini" type="danger" icon="el-icon-close" @click="handleClearAttribute(index,key,childKey)" />
@@ -111,7 +111,7 @@
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
           {{ $t('form.prev') }}
         </el-button>
-        <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+        <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep" :disabled="loadAttributes">
           {{ $t('form.next') }}
         </el-button>
       </el-button-group>
@@ -223,7 +223,7 @@ export default {
       
       if (Object.keys(this.dataProduct).length > 0 && (this.dataProduct.hasOwnProperty('attributes_parent') && this.dataProduct.attributes_parent.length > 0)) {// edit
         let attributes_parent = {};
-        console.log(this.dataProduct);
+        let currency = this.dataProduct.currency;
         data.forEach(function(v, i) {
           if (!attributes_parent.hasOwnProperty(v.id)) {
             attributes_parent[v.id] = [];
@@ -252,7 +252,9 @@ export default {
           // filter value
 
           value.forEach(function (v,i) {
-
+            if (currency != null) {
+              v['add_price'] = Math.round(v['add_price'] * currency.exchange_rate);            
+            }
             if (v.images) {
                 let files = v.images.split(',');
                 v['files'] = files;
@@ -463,5 +465,13 @@ export default {
 }
 .swatch__container .active .el-tooltip{
   box-shadow: 0px 0px 3px 2px #409eff;
+}
+.attribute_form .el-form-item__label{
+  padding: 0;
+  line-height: 22px;
+}
+.attribute_form .el-form-item{
+  margin-bottom: 0;
+  padding: 0 10px;
 }
 </style>

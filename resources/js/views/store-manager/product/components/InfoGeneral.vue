@@ -5,6 +5,26 @@
       <el-row v-show="!loading" class="el-main-form">
         <el-col :span="12">
 
+          <el-form-item :label="$t('form.currency')" prop="currency">
+            <el-autocomplete
+              v-model="temp.currency.label"
+              style="width: 100%"
+              value-key="name"
+              class="inline-input"
+              :fetch-suggestions="querySearchCurrencyAsync"
+              :placeholder="$t('form.currency')"
+              @select="handleSelectCurrency"
+            />
+          </el-form-item>
+  
+          <el-form-item v-if="temp.currency.value > 0">
+            <el-alert
+                show-icon
+                :title="$t('form.confirm_enter_price_above_currency')"
+                type="warning">
+            </el-alert>
+          </el-form-item>
+  
           <el-form-item :label="$t('form.cost')" prop="cost">
             <el-input-number v-model="temp.cost" style="width: 100%" :controls="false" :min="1" />
           </el-form-item>
@@ -110,7 +130,7 @@
         <el-button type="warning" icon="el-icon-arrow-left" @click="backStep">
           {{ $t('form.prev') }}
         </el-button>
-        <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep">
+        <el-button type="primary" icon="el-icon-arrow-right" @click="nextStep" :disabled="loading">
           {{ $t('form.next') }}
         </el-button>
       </el-button-group>
@@ -121,6 +141,7 @@
 <script>
 import { parseTime } from '@/filters';
 import CategoryResource from '@/api/category';
+import CurrencyResource from '@/api/currency';
 import BrandResource from '@/api/brand';
 import SupplierResource from '@/api/supplier';
 import TaxResource from '@/api/tax';
@@ -130,6 +151,7 @@ const categoryResource = new CategoryResource();
 const brandResource = new BrandResource();
 const supplierResource = new SupplierResource();
 const taxResource = new TaxResource();
+const currencyResource = new CurrencyResource();
 
 const category_parent = 0;
 
@@ -158,6 +180,10 @@ export default {
           label: '',
           value: 0,
         },
+        currency: {
+          label: '',
+          value: 0,
+        },
         date_available: '',
         stock: 0,
         alias: '',
@@ -169,6 +195,7 @@ export default {
       brands: [],
       suppliers: [],
       taxs: [],
+      currencies:[],
       // cateRecurProps: {
       //   checkStrictly: true,
       //   multiple: true,
@@ -210,24 +237,31 @@ export default {
         }],
       },
       rules: {
+        currency: [
+          {
+            required: true,
+            message: 'Currency is required',
+            trigger: 'blur',
+          },
+        ],
         cost: [
           {
             required: true,
-            message: 'cost is required',
+            message: 'Cost is required',
             trigger: 'blur',
           },
         ],
         price: [
           {
             required: true,
-            message: 'price is required',
+            message: 'Price is required',
             trigger: 'change',
           },
         ],
         sku: [
           {
             required: true,
-            message: 'sku is required',
+            message: 'SKU is required',
             trigger: 'blur',
           },
         ],
@@ -248,6 +282,9 @@ export default {
       if (this.dataProduct.tax_id) {
         this.querySearchTaxAsync();
       }
+      if (this.dataProduct.currency) {
+        this.querySearchCurrencyAsync();
+      }
       if (this.dataProduct.categories) {
         let categories = [];
         this.dataProduct.categories.forEach(function(v, i) {
@@ -257,13 +294,13 @@ export default {
 
         this.temp.category = categories;
       }
-      this.temp.price = this.dataProduct.price;
-      this.temp.cost = this.dataProduct.cost;
       this.temp.minimum = this.dataProduct.minimum;
       this.temp.date_available = this.dataProduct.date_available ? parseTime(this.dataProduct.date_available.toString(), '{d}-{m}-{y} {h}:{i}:{s}') : '';
       this.date_available = this.dataProduct.date_available ? parseTime(this.dataProduct.date_available.toString(), '{y}-{m}-{d} {h}:{i}:{s}') : '';
       this.temp.stock = this.dataProduct.stock;
       this.temp.alias = this.dataProduct.alias;
+      this.temp.price = this.dataProduct.price;
+      this.temp.cost = this.dataProduct.cost;
     } else {
       this.loading = false;
     }
@@ -292,6 +329,16 @@ export default {
       if (selectedTax.length > 0) {
         this.temp.tax.label = selectedTax[0].name;
         this.temp.tax.value = this.dataProduct.tax_id;
+      }
+      this.loading = false;
+    },
+    cbGetCurrency(res){
+      const selectedCurrency = this.currencies.filter(cur => cur.id == this.dataProduct.currency.id);
+      if (selectedCurrency.length > 0) {
+        this.temp.currency.label = selectedCurrency[0].name;
+        this.temp.currency.value = this.dataProduct.currency.id;
+        this.$set(this.temp,'price', Math.round(this.temp.price * selectedCurrency[0].exchange_rate));
+        this.$set(this.temp,'cost', Math.round(this.temp.cost * selectedCurrency[0].exchange_rate));
       }
       this.loading = false;
     },
@@ -386,6 +433,29 @@ export default {
         }
       }
     },
+    querySearchCurrencyAsync(queryString, cb){
+      var currencies = this.currencies;
+      var results = queryString ? currencies.filter(this.createFilter(queryString)) : currencies;
+
+      if (results.length == 0) {
+        currencyResource.list({ keyword: queryString }).then(response => {
+          this.currencies = response.data;
+          results = response.data;
+          if (cb){
+            cb(results);
+          } else {
+            this.cbGetCurrency(results);
+          }
+        })
+          .catch(err => {
+            console.log(err);
+          });
+      } else {
+        if (cb) {
+          cb(results);
+        }
+      }
+    },
     createFilter(queryString) {
       return (data) => {
         return (data.name.toLowerCase().includes(queryString.toLowerCase()) === true);
@@ -403,6 +473,9 @@ export default {
     handleFilterDate(){
       this.temp.date_available = parseTime(this.date_available.toString(), '{d}-{m}-{y} {h}:{i}:{s}');
     },
+    handleSelectCurrency(item){
+      this.temp.currency.value = item.id;
+    }
   },
 };
 </script>

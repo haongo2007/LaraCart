@@ -11,6 +11,7 @@
               action="/"
               accept="image/jpeg,image/gif,image/png"
               :auto-upload="false"
+              multiple
               :on-change="handleChange"
             >
               <i class="el-icon-upload" />
@@ -26,11 +27,10 @@
             </div>
           </div>
           <div class="image-uploading">
-            <el-image v-for="(item,index) in fileUrl" :key="index" :style="'width:'+ item.width+'px; height:'+ item.height+'px'" :src="item.value" fit="cover">
-              <div slot="error" class="image-slot">
-                <i class="el-icon-picture-outline" />
+              <div class="block" v-for="(item,index) in temp.images" :key="index">
+                  <i class="el-icon-close cl-remv-img" @click="removeImage(index)"></i>
+                  <el-avatar shape="square" style="width: auto;height: 200px;" fit="cover" :src="(typeof item === 'string' ? item : renderBlog(item))" v-if=""></el-avatar>
               </div>
-            </el-image>
           </div>
 
           <el-dialog :visible.sync="dialogStorageVisible" width="80%" @close="dialogStorageClose()">
@@ -89,28 +89,15 @@ export default {
   data() {
     return {
       temp: {
-        image: '',
+        images: [
+          'https://via.placeholder.com/350x350',
+          'https://via.placeholder.com/450x350',
+          'https://via.placeholder.com/550x350',
+        ],
         sort: 1,
         status: '1',
       },
       visiblePopover: false,
-      fileUrl: [
-        {
-          value: 'https://via.placeholder.com/350x350',
-          height: 350,
-          width: 350,
-        },
-        {
-          value: 'https://via.placeholder.com/450x350',
-          height: 350,
-          width: 450,
-        },
-        {
-          value: 'https://via.placeholder.com/550x350',
-          height: 350,
-          width: 550,
-        },
-      ],
       dialogStorageVisible: false,
       componentUpload: '',
     };
@@ -118,11 +105,7 @@ export default {
   created() {
     if (Object.keys(this.dataProduct).length > 0) {
       if (this.dataProduct.image){
-        this.temp.image = this.dataProduct.image;
-        this.fileUrl = [];
-        this.fileUrl.push({ value: this.temp.image + '&w=350', height: 350, width: 350 });
-        this.fileUrl.push({ value: this.temp.image + '&w=450', height: 350, width: 450 });
-        this.fileUrl.push({ value: this.temp.image + '&w=550', height: 350, width: 550 });
+        this.temp.images = this.dataProduct.image.split(',');
       }
       if (this.dataProduct.sort){
         this.temp.sort = parseInt(this.dataProduct.sort);
@@ -133,6 +116,9 @@ export default {
     }
   },
   methods: {
+    renderBlog(obj){
+      return URL.createObjectURL(obj);
+    },
     backStep() {
       const active = this.dataActive - 1;
       this.$emit('handleProcessActive', active);
@@ -144,21 +130,12 @@ export default {
     },
     handlerGeturl(data) {
       if (data) {
-        this.fileUrl = [];
-        this.fileUrl.push({ value: data + '&w=350', height: 350, width: 350 });
-        this.fileUrl.push({ value: data + '&w=450', height: 350, width: 450 });
-        this.fileUrl.push({ value: data + '&w=550', height: 350, width: 550 });
-
-        this.temp.image = data;
+        this.temp.images = [...this.temp.images,...data];
         this.dialogStorageClose();
       }
     },
     handleChange(file) {
-      this.temp.image = file.raw;
-      this.fileUrl = [];
-      this.fileUrl.push({ value: URL.createObjectURL(file.raw), height: 350, width: 350 });
-      this.fileUrl.push({ value: URL.createObjectURL(file.raw), height: 350, width: 450 });
-      this.fileUrl.push({ value: URL.createObjectURL(file.raw), height: 350, width: 550 });
+      this.temp.images.push(file.raw);
     },
     handleVisibleStorage(){
       EventBus.$on('getFileResponse', this.handlerGeturl);
@@ -171,11 +148,9 @@ export default {
       this.componentUpload = '';
       this.dialogStorageVisible = false;
     },
-    resetImageUpload(){
-      this.temp.image = '';
-      this.componentUpload = '';
-      this.fileUrl = '';
-    },
+    removeImage(index){
+      this.temp.images.splice(index,1);
+    }
   },
 };
 </script>
@@ -183,8 +158,29 @@ export default {
   .image-uploading{
     margin: 20px 0px 20px 0px;
     display: flex;
-    justify-content: space-around;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
     align-items: center;
+  }
+  .image-uploading .block{
+    position: relative;
+  }
+  .image-uploading .block:hover .cl-remv-img{
+    display: flex;
+  }
+  .cl-remv-img{
+    position: absolute;
+    z-index: 11;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: none;
+    background: #60626654;
+    color: #fff;
+    font-size: 30px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
   .el-main-form{
     height: calc(100vh - 320px);

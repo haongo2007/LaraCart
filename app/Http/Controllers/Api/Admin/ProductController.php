@@ -167,28 +167,35 @@ public function createProductGroup()
         $data['brand'] = json_decode($data['brand']);
         $data['supplier'] = json_decode($data['supplier']);
         $data['tax'] = json_decode($data['tax']);
+        $data['currency'] = json_decode($data['currency']);
         $data['attribute'] = json_decode($data['attribute']);
         $data['category'] = json_decode($data['category']);
-        $data['category'] = is_array($data['category']) ? end($data['category']) : $data['category'];
+        array_walk_recursive($data['category'], function ($value, $key) use (&$category){
+            $category[] = $value;
+        }, $category);
+        
+        $category        = array_unique($category) ?? [];
+        
         $data['date_promotion'] = json_decode($data['date_promotion']);
 
         $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
         $data['alias'] = !empty($data['alias'])?$data['alias']:$data['descriptions']->$langFirst->title;
         $data['alias'] = lc_word_format_url($data['alias']);
         $data['alias'] = lc_word_limit($data['alias'], 100);
-
         switch ($data['kind']) {
             case LC_PRODUCT_SINGLE: // product single
                 $arrValidation = [
                     'kind'                       => 'required',
+                    'currency'                   => 'required',
                     'sort'                       => 'numeric|min:0',
                     'minimum'                    => 'numeric|min:0',
-                    'descriptions.*.title'        => 'required|string|max:100',
+                    'descriptions.*.title'       => 'required|string|max:100',
                     'descriptions.*.keyword'     => 'nullable|string|max:100',
                     'descriptions.*.description' => 'nullable|string|max:100',
                     'descriptions.*.content'     => 'required|string',
                     'category'                   => 'required|not_in:0',
-                    'image'                      => 'required',
+                    'images'                     => 'required_without:files',
+                    'files'                      => 'required_without:images',
                     'store_id'                   => 'required',
                     // 'sub_image'                  => 'required',
                     // 'type_show_image_desc'       => 'required',
@@ -279,30 +286,44 @@ public function createProductGroup()
         if ($validator->fails()) {
             return response()->json(new JsonResponse([],$validator->messages()), Response::HTTP_BAD_REQUEST);
         }
-        $category        = $data['category'] ?? null;
         $attribute       = $data['attribute'] ?? [];
         $descriptions    = $data['descriptions'];
         $productInGroup  = $data['productInGroup'] ?? [];
         $productBuild    = $data['hotSpots'] ?? [];
         /* UPLOAD IMAGE */
-        if($request->hasFile('image')){
-            $path = 'public/product/';
-            $fileName = $request->file('image')->hashName();
-            $request->file('image')->storeAs(
-                $path,$fileName
-            );
-            $data['image'] = LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName;
+        if(isset($data['files'])){
+            $data['files'] = is_array($data['files']) ? $data['files'] : [$data['files']];
+            foreach ($data['files'] as $key => $image) {
+                if($request->hasFile('files.'.$key)){
+                    $path = 'public/product/';
+                    $fileName = $request->file('files.'.$key)->hashName();
+                    $request->file('files.'.$key)->storeAs(
+                        $path,$fileName
+                    );
+                    if ($data['images'] && is_array($data['images'])) {
+                        array_push($data['images'], LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName);
+                    }else{
+                        $data['images'] = [LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName];
+                    }
+                }
+            }
         }
         // $subImages       = $data['sub_image'] ?? '';
         // $type_show_image_desc = $data['type_show_image_desc'] ?? '';
         // $downloadPath    = $data['download_path'] ?? '';
+
+        $currency = ShopCurrency::find($data['currency']->value);
+
+        $cost = $data['cost'] / $currency->exchange_rate;
+        $price = $data['price'] / $currency->exchange_rate;
+
         $dataInsert = [
             'brand_id'       => $data['brand']->value ?? 0,
             'supplier_id'    => $data['supplier']->value ?? 0,
             'category_store_id' => $data['category_store_id'] ?? 0,
-            'price'          => $data['price'] ?? 0,
             'sku'            => $data['sku'],
-            'cost'           => $data['cost'] ?? 0,
+            'cost'           => $cost ?? 0,
+            'price'          => $price ?? 0,
             'stock'          => $data['stock'] ?? 0,
             'weight_class'   => $data['weight_class'] ?? '',
             'length_class'   => $data['length_class'] ?? '',
@@ -313,11 +334,12 @@ public function createProductGroup()
             'kind'           => $data['kind'] ?? LC_PRODUCT_SINGLE,
             'alias'          => $data['alias'],
             'property'       => $data['property'] ?? LC_PROPERTY_PHYSICAL,
-            'image'          => $data['image'] ?? '',
+            'image'          => (is_array($data['images']) ? implode(',',$data['images']) : $data['images'] ) ?? $product->image,
             'tax_id'         => $data['tax']->value ?? 0,
             'status'         => (!empty($data['status']) ? 1 : 0),
             'sort'           => (int) $data['sort'],
             'minimum'        => (int) ($data['minimum'] ?? 0),
+            'currency'       => $data['currency']->value,
             'store_id'       => $data['store_id'],
         ];
 
@@ -373,9 +395,10 @@ public function createProductGroup()
                             if (isset($value->files)) {
                                 $images = implode(',', $value->files);
                             }
+                            $add_price = $value->add_price / $currency->exchange_rate;
                             $arrDataAtt =  [
                                                 'name' => $value->name, 
-                                                'add_price' => $value->add_price,
+                                                'add_price' => $add_price,
                                                 'attribute_group_id' => $rowGroup->id,
                                                 'images' => $images,
                                                 'product_id' => $product->id,
@@ -390,9 +413,10 @@ public function createProductGroup()
                                     if (isset($valuechildren->files)) {
                                         $images = implode(',', $valuechildren->files);
                                     }
+                                    $add_price = $valuechildren->add_price / $currency->exchange_rate;
                                     $arrDataChildren =  [
                                                 'name' => $valuechildren->name, 
-                                                'add_price' => $valuechildren->add_price,
+                                                'add_price' => $add_price,
                                                 'attribute_group_id' => $rowGroup->child_id,
                                                 'images' => $images,
                                                 'product_id' => $product->id,
@@ -508,14 +532,18 @@ public function createProductGroup()
         $data['brand'] = json_decode($data['brand']);
         $data['supplier'] = json_decode($data['supplier']);
         $data['tax'] = json_decode($data['tax']);
+        $data['currency'] = json_decode($data['currency']);
         $data['attribute'] = json_decode($data['attribute']);
         $data['length_class'] = json_decode($data['length_class'])->value ?? $product->length_class;
         $data['weight_class'] = json_decode($data['weight_class'])->value ?? $product->weight_class;
         /// detach category
         $data['category'] = json_decode($data['category']);
+
         array_walk_recursive($data['category'], function ($value, $key) use (&$category){
             $category[] = $value;
         }, $category);
+
+        $category        = array_unique($category) ?? [];
 
         $data['date_promotion'] = json_decode($data['date_promotion']);
 
@@ -534,7 +562,9 @@ public function createProductGroup()
                     'descriptions.*.description' => 'nullable|string|max:300',
                     'descriptions.*.content' => 'required|string',
                     'category' => 'required',
-                    'image' => 'required',
+                    'currency' => 'required',
+                    'images' => 'required_without:files',
+                    'files' => 'required_without:images',
                     'sku' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|unique:shop_product,sku,'.$id,
                     'alias' => 'required|regex:/(^([0-9A-Za-z\-_]+)$)/|string|max:120|unique:shop_product,alias,'.$id,
                 ];
@@ -619,7 +649,6 @@ public function createProductGroup()
         }
         //Edit
 
-        $category        = array_unique($category) ?? [];
         $attribute       = $data['attribute'] ?? [];
         $productInGroup  = $data['productInGroup'] ?? [];
         $descriptions    = $data['descriptions'];
@@ -628,22 +657,38 @@ public function createProductGroup()
         // $type_show_image_desc = $data['type_show_image_desc'] ?? '';
         $downloadPath    = $data['download_path'] ?? '';
         /* UPLOAD IMAGE */
-        if($request->hasFile('image')){
-            $path = 'public/product/';
-            $fileName = $request->file('image')->hashName();
-            $request->file('image')->storeAs(
-                $path,$fileName
-            );
-            $data['image'] = LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName;
+
+        
+        if(isset($data['files'])){
+            $data['files'] = is_array($data['files']) ? $data['files'] : [$data['files']];
+            foreach ($data['files'] as $key => $image) {
+                if($request->hasFile('files.'.$key)){
+                    $path = 'public/product/';
+                    $fileName = $request->file('files.'.$key)->hashName();
+                    $request->file('files.'.$key)->storeAs(
+                        $path,$fileName
+                    );
+                    if ($data['images'] && is_array($data['images'])) {
+                        array_push($data['images'], LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName);
+                    }else{
+                        $data['images'] = [LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName];
+                    }
+                }
+            }
         }
+        
+        $currency = ShopCurrency::find($data['currency']->value);
+        $cost = $data['cost'] / $currency->exchange_rate;
+        $price = $data['price'] / $currency->exchange_rate;
+
         $dataUpdate = [
-            'image'        => $data['image'] ?? $product->image,
+            'image'        => (is_array($data['images']) ? implode(',',$data['images']) : $data['images'] ) ?? $product->image,
             'tax_id'       => $data['tax']->value ?? $product->tax_id,
             'brand_id'       => $data['brand']->value ?? $product->brand_id,
             'supplier_id'    => $data['supplier']->value ?? $product->supplier_id,
             'category_store_id'     => $data['category_store_id'] ?? 0,
-            'price'        => $data['price'] ?? $product->price,
-            'cost'         => $data['cost'] ?? $product->cost,
+            'price'        => $price ?? $product->price,
+            'cost'         => $cost ?? $product->cost,
             'stock'        => $data['stock'] ?? $product->stock,
             'weight_class' => $data['weight_class'],
             'length_class' => $data['length_class'],
@@ -657,6 +702,7 @@ public function createProductGroup()
             'status'       => (!empty($data['status']) ? 1 : 0),
             'sort'         => (int) $data['sort'],
             'minimum'      => (int) ($data['minimum'] ?? 0),
+            'currency'     => $data['currency']->value ?? $product->currency,
             'store_id'     => $product->store_id,
         ];
 
@@ -771,9 +817,10 @@ public function createProductGroup()
                             if (isset($value->files)) {
                                 $images = implode(',', $value->files);
                             }
+                            $add_price = $value->add_price / $currency->exchange_rate;
                             $arrDataAtt =  [
                                                 'name' => $value->name, 
-                                                'add_price' => $value->add_price,
+                                                'add_price' => $add_price,
                                                 'attribute_group_id' => $rowGroup->id,
                                                 'images' => $images,
                                                 'product_id' => $product->id,
@@ -788,9 +835,10 @@ public function createProductGroup()
                                     if (isset($valuechildren->files)) {
                                         $images = implode(',', $valuechildren->files);
                                     }
+                                    $add_price = $valuechildren->add_price / $currency->exchange_rate;
                                     $arrDataChildren =  [
                                                 'name' => $valuechildren->name, 
-                                                'add_price' => $valuechildren->add_price,
+                                                'add_price' => $add_price,
                                                 'attribute_group_id' => $rowGroup->child_id,
                                                 'images' => $images,
                                                 'product_id' => $product->id,

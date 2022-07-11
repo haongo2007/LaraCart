@@ -73,6 +73,11 @@ class ShopProduct extends Model
         return $this->belongsTo(ShopSupplier::class, 'supplier_id', 'id');
     }
 
+    public function currency()
+    {
+        return $this->hasOne(ShopCurrency::class, 'id', 'currency');
+    }
+
     public function categories()
     {
         return $this->belongsToMany(ShopCategory::class, ShopProductCategory::class, 'product_id', 'category_id');

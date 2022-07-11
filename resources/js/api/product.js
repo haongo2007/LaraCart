@@ -12,7 +12,6 @@ class ProductResource extends Resource {
       method: 'get',
     });
   }
-
   
   update(id, resource) {
     return request({

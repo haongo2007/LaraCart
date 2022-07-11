@@ -189,9 +189,17 @@ export default {
       });
       let form_data = new FormData();
       for (var key in this.temp) {
-        if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
+        if (key == 'images') {
+          for(let props in this.temp[key]){
+            if (typeof this.temp[key][props] == 'object' ) {
+              form_data.append('files[]', this.temp[key][props]);
+            }else{
+              form_data.append('images[]', this.temp[key][props]);
+            }
+          }
+        }else if(typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array'){
           form_data.append(key, JSON.stringify(this.temp[key]));
-        } else {
+        }else{
           form_data.append(key, this.temp[key]);
         }
       }
@@ -222,9 +230,17 @@ export default {
       });
       let form_data = new FormData();
       for (var key in this.temp) {
-        if ((typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array') && key != 'image') {
+        if (key == 'images') {
+          for(let props in this.temp[key]){
+            if (typeof this.temp[key][props] == 'object' ) {
+              form_data.append('files[]', this.temp[key][props]);
+            }else{
+              form_data.append('images[]', this.temp[key][props]);
+            }
+          }
+        }else if(typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array'){
           form_data.append(key, JSON.stringify(this.temp[key]));
-        } else {
+        }else{
           form_data.append(key, this.temp[key]);
         }
       }

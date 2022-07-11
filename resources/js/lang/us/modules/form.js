@@ -1,4 +1,5 @@
 export default {
+    "confirm_enter_price_above_currency":"Please enter the price of the above currency",
     "male":"Male",
     "female":"Female",
     "other":"Other",

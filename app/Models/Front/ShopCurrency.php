@@ -25,6 +25,7 @@ class ShopCurrency extends Model
     protected $guarded                  = [];
     private static $getListActive      = null;
     const ITEM_PER_PAGE = 15;
+    const STATUS = [1];
 
 
     public function getCurrencyListAdmin($searchParams='')
@@ -32,6 +33,7 @@ class ShopCurrency extends Model
         $sort_order = $searchParams['sort_order'] ?? 'id_desc';
         $keyword = $searchParams['keyword'] ?? '';
         $limit = $searchParams['limit'] ?? self::ITEM_PER_PAGE;
+        $status = $searchParams['status'] ?? self::STATUS;
         $arrSort = [
             'id__desc' => trans('currency.admin.sort_order.id_desc'),
             'id__asc' => trans('currency.admin.sort_order.id_asc'),
@@ -45,7 +47,11 @@ class ShopCurrency extends Model
                 $sql->where('code', 'like', '%' . $keyword . '%')->orWhere('name', 'like', '%' . $keyword . '%');
             });
         }
-        
+
+        if ($status) {
+            $currencyList = $currencyList->whereIn('status',$status);
+        }
+
         $currencyList = $currencyList->whereIn('store_id', session('adminStoreId'));
 
         if ($sort_order && array_key_exists($sort_order, $arrSort)) {
