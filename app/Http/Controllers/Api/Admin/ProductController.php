@@ -300,7 +300,7 @@ public function createProductGroup()
                     $request->file('files.'.$key)->storeAs(
                         $path,$fileName
                     );
-                    if ($data['images'] && is_array($data['images'])) {
+                    if (isset($data['images']) && is_array($data['images'])) {
                         array_push($data['images'], LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName);
                     }else{
                         $data['images'] = [LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName];
@@ -668,7 +668,7 @@ public function createProductGroup()
                     $request->file('files.'.$key)->storeAs(
                         $path,$fileName
                     );
-                    if ($data['images'] && is_array($data['images'])) {
+                    if (isset($data['images']) && is_array($data['images'])) {
                         array_push($data['images'], LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName);
                     }else{
                         $data['images'] = [LC_ADMIN_AUTH.'/'.LC_ADMIN_PREFIX.'/getFile?disk=product&path='.$fileName];
