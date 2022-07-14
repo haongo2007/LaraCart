@@ -386,7 +386,7 @@ export default {
       }).catch(() => {
         this.$message({
           type: 'danger',
-          message: 'Delete error',
+          message: 'Update failed',
         });
       });
     },

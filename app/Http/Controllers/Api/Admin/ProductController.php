@@ -79,6 +79,11 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
+        $descriptions = $product->descriptions->keyBy(function ($item) {
+            return $item['lang'];
+        });
+        unset($product->descriptions);
+        $product->descriptions = $descriptions;
         return response()->json(new JsonResponse($product), Response::HTTP_OK);
     }
 

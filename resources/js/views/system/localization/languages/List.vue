@@ -250,16 +250,17 @@ export default {
       languageResource.store(this.temp).then((res) => {    
         if (res.success) {
           this.temp.id = res.data.id;
-          this.list = [...this.temp,...this.list];
+          this.list.push(this.temp);
           this.$message({
             type: 'success',
             message: 'Create successfully',
           });
         }
+        this.dialogFormVisible = false;
         this.loading = false;    
         loading.close();
-        this.dialogFormVisible = false;
       }).catch(() => {
+        this.dialogFormVisible = false;
         this.loading = false;    
         loading.close();
       })

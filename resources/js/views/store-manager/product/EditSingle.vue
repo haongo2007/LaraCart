@@ -43,7 +43,6 @@ export default {
       this.product = data;
 
       this.fetchLanguages(data.store_id);
-      console.log(this.temp);
     }).catch(err => {
       console.log(err);
     });
@@ -64,11 +63,11 @@ export default {
       const data = Object.assign({}, this.languages);
       Object.keys(data).forEach(function(key, index) {
         that.$set(that.temp.descriptions, key, {});
-        if (that.product.descriptions.hasOwnProperty(index)) {
-          that.$set(that.temp.descriptions[key], 'description', that.product.descriptions[index].description);
-          that.$set(that.temp.descriptions[key], 'title', that.product.descriptions[index].name);
-          that.$set(that.temp.descriptions[key], 'keyword', that.product.descriptions[index].keyword !== '' ? that.product.descriptions[index].keyword.split(',') : []);
-          that.$set(that.temp.descriptions[key], 'content', that.product.descriptions[index].content);
+        if (that.product.descriptions.hasOwnProperty(key)) {
+          that.$set(that.temp.descriptions[key], 'description', that.product.descriptions[key].description);
+          that.$set(that.temp.descriptions[key], 'title', that.product.descriptions[key].name);
+          that.$set(that.temp.descriptions[key], 'keyword', that.product.descriptions[key].keyword !== '' ? that.product.descriptions[key].keyword.split(',') : []);
+          that.$set(that.temp.descriptions[key], 'content', that.product.descriptions[key].content);
         }
 
         that.$set(that.rules.descriptions, key, []);
