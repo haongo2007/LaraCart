@@ -177,7 +177,7 @@ return [
         // Package get location from ip
         Stevebauman\Location\LocationServiceProvider::class,
 
-        
+
         App\Providers\RouteServiceProvider::class,
 
     ],

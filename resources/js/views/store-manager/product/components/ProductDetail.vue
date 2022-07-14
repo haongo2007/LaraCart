@@ -12,12 +12,14 @@
       <div v-for="(content,key,index) in dataStepContent" :key="key">
 
         <div v-if="dataComponentInfo.hasOwnProperty(key)" v-show="index === active">
-          <component  :is="dataComponentInfo[key]" 
-                      :data-product="product" 
-                      :data-active="active" 
-                      :data-store-id="dataTemp.store_id" 
-                      @handleProcessTemp="handleProcessTemp" 
-                      @handleProcessActive="handleProcessActive" />
+          <component
+            :is="dataComponentInfo[key]"
+            :data-product="product"
+            :data-active="active"
+            :data-store-id="dataTemp.store_id"
+            @handleProcessTemp="handleProcessTemp"
+            @handleProcessActive="handleProcessActive"
+          />
         </div>
 
         <div v-else v-show="index === active">
@@ -177,8 +179,9 @@ export default {
           }
         });
       } else {
+        // eslint-disable-next-line no-undef
         const stepNum = _.size(this.dataStepContent) - 1;
-        if (++this.active == stepNum){
+        if (++this.active === stepNum){
           this.action = true;
         }
       }
@@ -187,19 +190,20 @@ export default {
       const loading = this.$loading({
         target: '.el-row',
       });
-      let form_data = new FormData();
+      const form_data = new FormData();
       for (var key in this.temp) {
-        if (key == 'images') {
-          for(let props in this.temp[key]){
-            if (typeof this.temp[key][props] == 'object' ) {
+        if (key === 'images') {
+          for (const props in this.temp[key]){
+            if (typeof this.temp[key][props] === 'object') {
               form_data.append('files[]', this.temp[key][props]);
-            }else{
+            } else {
               form_data.append('images[]', this.temp[key][props]);
             }
           }
-        }else if(typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array'){
+          // eslint-disable-next-line valid-typeof
+        } else if (typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array'){
           form_data.append(key, JSON.stringify(this.temp[key]));
-        }else{
+        } else {
           form_data.append(key, this.temp[key]);
         }
       }
@@ -220,6 +224,7 @@ export default {
           });
           loading.close();
         }
+        // eslint-disable-next-line handle-callback-err
       }).catch(err => {
         loading.close();
       });
@@ -228,19 +233,20 @@ export default {
       const loading = this.$loading({
         target: '.el-row',
       });
-      let form_data = new FormData();
+      const form_data = new FormData();
       for (var key in this.temp) {
-        if (key == 'images') {
-          for(let props in this.temp[key]){
-            if (typeof this.temp[key][props] == 'object' ) {
+        if (key === 'images') {
+          for (const props in this.temp[key]){
+            if (typeof this.temp[key][props] === 'object') {
               form_data.append('files[]', this.temp[key][props]);
-            }else{
+            } else {
               form_data.append('images[]', this.temp[key][props]);
             }
           }
-        }else if(typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array'){
+          // eslint-disable-next-line valid-typeof
+        } else if (typeof this.temp[key] === 'object' || typeof this.temp[key] === 'array'){
           form_data.append(key, JSON.stringify(this.temp[key]));
-        }else{
+        } else {
           form_data.append(key, this.temp[key]);
         }
       }
@@ -253,6 +259,7 @@ export default {
         });
 
         reloadRedirectToList('ProductList');
+        // eslint-disable-next-line handle-callback-err
       }).catch(err => {
         loading.close();
       });
@@ -279,7 +286,7 @@ export default {
       this.dynamicTags = '';
     },
     handleProcessActive(data){
-      if (this.active == data) {
+      if (this.active === data) {
         if (this.isEdit){
           this.updateData();
         } else {

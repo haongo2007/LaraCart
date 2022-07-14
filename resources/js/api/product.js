@@ -12,7 +12,13 @@ class ProductResource extends Resource {
       method: 'get',
     });
   }
-  
+  updateTop(id, params) {
+    return request({
+      url: '/' + this.uri + '/updateTop/' + id,
+      method: 'post',
+      data: params,
+    });
+  }
   update(id, resource) {
     return request({
       url: '/' + this.uri + '/' + id,

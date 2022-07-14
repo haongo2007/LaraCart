@@ -12,4 +12,5 @@
 //     Route::post('/import', 'AdminProductController@postImport')->name('admin_product.import');
 // });
 Route::get('product/getMaxPriceProduct/{type?}','ProductController@getMaxPriceProduct');
+Route::post('product/updateTop/{id?}','ProductController@updateTopProduct');
 Route::apiResource('product', 'ProductController');

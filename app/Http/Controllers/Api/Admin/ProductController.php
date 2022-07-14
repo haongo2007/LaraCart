@@ -68,7 +68,7 @@ class ProductController extends Controller
         $max = Product::gettableProduct()->max($type);
         $data = ['max' => $max];
         return response()->json(new JsonResponse($data), Response::HTTP_OK);
-    }   
+    }
 
     /*
      * API show
@@ -104,7 +104,7 @@ public function createProductBuild()
         'attributeGroup'       => $this->attributeGroup,
         'listProductSingle'    => $listProductSingle,
         'listWeight'           => $this->listWeight,
-        'listLength'           => $this->listLength, 
+        'listLength'           => $this->listLength,
     ];
     return view($this->templatePathAdmin.'Product.add')
         ->with($data);
@@ -147,7 +147,7 @@ public function createProductGroup()
         'listProductSingle'    => $listProductSingle,
         'htmlSelectGroup'      => $htmlSelectGroup,
         'listWeight'           => $this->listWeight,
-        'listLength'           => $this->listLength, 
+        'listLength'           => $this->listLength,
     ];
 
     return view($this->templatePathAdmin.'Product.add')
@@ -173,9 +173,9 @@ public function createProductGroup()
         array_walk_recursive($data['category'], function ($value, $key) use (&$category){
             $category[] = $value;
         }, $category);
-        
+
         $category        = array_unique($category) ?? [];
-        
+
         $data['date_promotion'] = json_decode($data['date_promotion']);
 
         $langFirst = array_key_first(lc_language_all($data['store_id'])->toArray()); //get first code language active
@@ -214,7 +214,7 @@ public function createProductGroup()
                 }
 
                 $arrValidation = $this->validateAttribute($arrValidation,$data['store_id']);
-                
+
                 $arrMsg = [
                     'descriptions.*.title.required'    => trans('validation.required', ['attribute' => trans('product.name')]),
                     'descriptions.*.content.required' => trans('validation.required', ['attribute' => trans('product.content')]),
@@ -397,7 +397,7 @@ public function createProductGroup()
                             }
                             $add_price = $value->add_price / $currency->exchange_rate;
                             $arrDataAtt =  [
-                                                'name' => $value->name, 
+                                                'name' => $value->name,
                                                 'add_price' => $add_price,
                                                 'attribute_group_id' => $rowGroup->id,
                                                 'images' => $images,
@@ -415,7 +415,7 @@ public function createProductGroup()
                                     }
                                     $add_price = $valuechildren->add_price / $currency->exchange_rate;
                                     $arrDataChildren =  [
-                                                'name' => $valuechildren->name, 
+                                                'name' => $valuechildren->name,
                                                 'add_price' => $add_price,
                                                 'attribute_group_id' => $rowGroup->child_id,
                                                 'images' => $images,
@@ -605,7 +605,7 @@ public function createProductGroup()
                 ];
 
                 $arrValidation = $this->validateAttribute($arrValidation,$product->store_id);
-                
+
                 $arrMsg = [
                     'descriptions.*.name.required' => trans('validation.required', ['attribute' => trans('product.name')]),
                     'category.required'            => trans('validation.required', ['attribute' => trans('product.category')]),
@@ -658,7 +658,7 @@ public function createProductGroup()
         $downloadPath    = $data['download_path'] ?? '';
         /* UPLOAD IMAGE */
 
-        
+
         if(isset($data['files'])){
             $data['files'] = is_array($data['files']) ? $data['files'] : [$data['files']];
             foreach ($data['files'] as $key => $image) {
@@ -676,7 +676,7 @@ public function createProductGroup()
                 }
             }
         }
-        
+
         $currency = ShopCurrency::find($data['currency']->value);
         $cost = $data['cost'] / $currency->exchange_rate;
         $price = $data['price'] / $currency->exchange_rate;
@@ -757,8 +757,8 @@ public function createProductGroup()
                 'product_id'  => $product->id,
                 'lang'        => $code,
                 'name'        => $descriptions->$code->title,
-                'keyword'     => implode(',',$descriptions->$code->keyword),
-                'description' => $descriptions->$code->description,
+                'keyword'     => property_exists($descriptions->$code,'keyword') ? implode(',',$descriptions->$code->keyword) : '',
+                'description' => $descriptions->$code->description ?? null,
                 'content'     => $descriptions->$code->content ?? '',
             ];
         }
@@ -819,7 +819,7 @@ public function createProductGroup()
                             }
                             $add_price = $value->add_price / $currency->exchange_rate;
                             $arrDataAtt =  [
-                                                'name' => $value->name, 
+                                                'name' => $value->name,
                                                 'add_price' => $add_price,
                                                 'attribute_group_id' => $rowGroup->id,
                                                 'images' => $images,
@@ -837,7 +837,7 @@ public function createProductGroup()
                                     }
                                     $add_price = $valuechildren->add_price / $currency->exchange_rate;
                                     $arrDataChildren =  [
-                                                'name' => $valuechildren->name, 
+                                                'name' => $valuechildren->name,
                                                 'add_price' => $add_price,
                                                 'attribute_group_id' => $rowGroup->child_id,
                                                 'images' => $images,
@@ -898,7 +898,8 @@ public function createProductGroup()
         }
 
         lc_clear_cache('cache_product');
-        return response()->json(new JsonResponse([],trans('product.admin.edit_success')), Response::HTTP_OK);
+
+        return response()->json(new JsonResponse(['message' => trans('product.admin.edit_success')]), Response::HTTP_OK);
     }
 
     /*
@@ -1033,5 +1034,19 @@ public function createProductGroup()
      */
     public function checkPermisisonItem($id) {
         return (new Product)->getProductAdmin($id);
+    }
+    /**
+     * update top product
+     */
+    public function updateTopProduct(Request $request,$id)
+    {
+        $product = (new Product)->getProductAdmin($id);
+        if ($product === null) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
+        $product->top = $request->top;
+        $product->save();
+
+        return response()->json(new JsonResponse(['message' => trans('product.admin.edit_success')]), Response::HTTP_OK);
     }
 }

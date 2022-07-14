@@ -1,18 +1,9 @@
 <?php
 namespace App\Models\Front;
 
-use App\Models\Front\ShopAttributeGroup;
-use App\Models\Front\ShopCategory;
-use App\Models\Front\ShopProductCategory;
-use App\Models\Front\ShopProductDescription;
-use App\Models\Front\ShopProductGroup;
-use App\Models\Front\ShopProductPromotion;
-use App\Models\Front\ShopTax;
-use App\Models\Front\ShopStore;
-use App\Models\Front\ShopCustomFieldDetail;
 use App\Models\Admin\User;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Front\ModelTrait;
+
 class ShopProduct extends Model
 {
     use ModelTrait;
@@ -23,8 +14,8 @@ class ShopProduct extends Model
     protected  $lc_kind = []; // 0:single, 1:bundle, 2:group
     protected  $lc_property = 'all'; // 0:physical, 1:download, 2:only view, 3: Service
     protected  $lc_promotion = 0; // 1: only produc promotion,
-    protected  $lc_store_id = 0; 
-    protected  $lc_category_store = 'all'; 
+    protected  $lc_store_id = 0;
+    protected  $lc_category_store = 'all';
     protected  $lc_array_ID = []; // array ID product
     protected  $lc_category = []; // array category id
     protected  $lc_brand = []; // array brand id
@@ -37,7 +28,7 @@ class ShopProduct extends Model
 
     const REVIEW_LIMIT = 15;
 
-    
+
     public function rating()
     {
         return $this->hasMany(ShopRating::class, 'product_id', 'id');
@@ -47,7 +38,7 @@ class ShopProduct extends Model
     {
         return $this->rating()->sum('point');
     }
-    
+
     public function ratingCount()
     {
         return $this->rating()->count();
@@ -107,7 +98,6 @@ class ShopProduct extends Model
     {
         return $this->hasMany(ShopProductDescription::class, 'product_id', 'id');
     }
-
     public function promotionPrice()
     {
         return $this->hasOne(ShopProductPromotion::class, 'product_id', 'id');
@@ -134,7 +124,7 @@ class ShopProduct extends Model
         return $this->categories()->with('descriptionsWithLangDefault');
     }
     // end get category description
-    //Function get text description 
+    //Function get text description
     public function getText() {
         return $this->descriptions()->where('lang', lc_get_locale())->first();
     }
@@ -170,7 +160,7 @@ class ShopProduct extends Model
         $filter_size        = $params['size'] ?? null;
         $limit              = $params['perPage'] ?? lc_config('product_list');
         $storeId            = $params['storeId'];
-        
+
         $filterArrSort = [
             'price_desc' => ['price', 'desc'],
             'price_asc' => ['price', 'asc'],
@@ -183,14 +173,14 @@ class ShopProduct extends Model
         if (array_key_exists($filter_sort, $filterArrSort)) {
             $sortBy = $filterArrSort[$filter_sort][0];
             $sortOrder = $filterArrSort[$filter_sort][1];
-        }  
+        }
         $products = new self;
         if ($filter_keyword) {
             $products = $products->setKeyword($filter_keyword);
         }
         if ($filter_attribute) {
             $products = $products->setAttributes($filter_attribute);
-        }   
+        }
         if ($filter_category) {
             $categoriId = ShopCategory::select('id')->where('alias',$filter_category)->pluck('id')->first();
             $products = $products->getProductToCategory($categoriId);
@@ -199,16 +189,16 @@ class ShopProduct extends Model
             $filter_brand = explode(',', $filter_brand);
             $brandids = ShopBrand::select('id')->whereIn('alias',$filter_brand)->get()->pluck('id')->toArray();
             $products = $products->getProductToBrand($brandids);
-        } 
+        }
         if ($filter_color || $filter_size) {
             $name = array_filter(array_merge(explode(',', $filter_color),explode(',', $filter_size)));
             $product_id = ShopProductAttribute::select('product_id')->Where(function ($query) use($name) {
                 for ($i = 0; $i < count($name); $i++){
                     $query->orwhere('name', 'like',  '%' . $name[$i] .'%');
-                }      
+                }
             })->groupBy('product_id')->get()->pluck('product_id')->toArray();
             $products = $products->getProductFromListID($product_id);
-        }    
+        }
 
         if ($price_min && $price_max) {
             $products = $products->setPriceBetween($price_min,$price_max);
@@ -255,7 +245,7 @@ class ShopProduct extends Model
         $price = $this->price;
         $priceFinal = $this->getFinalPrice();
         // Process with tax
-        return  view('templates.'.lc_store('template').'.common.show_price', 
+        return  view('templates.'.lc_store('template').'.common.show_price',
             [
                 'price' => $price,
                 'priceFinal' => $priceFinal,
@@ -277,7 +267,7 @@ class ShopProduct extends Model
             return null;
         }
         $tableDescription = (new ShopProductDescription)->getTable();
-        // $dataSelect = $this->getTable().'.*, '.$tableDescription.'.*'; 
+        // $dataSelect = $this->getTable().'.*, '.$tableDescription.'.*';
         $storeId = empty($storeId) ? config('app.storeId') : $storeId;
 
         if (config('app.storeId') != LC_ID_ROOT) {
@@ -291,8 +281,8 @@ class ShopProduct extends Model
             ->where($this->getTable() . '.store_id', $storeId)
             ->where($tableDescription . '.lang', lc_get_locale());
 
-        if (empty($type)) {            
-            $product = $product->where($this->getTable().'.id', (int)$key);  
+        if (empty($type)) {
+            $product = $product->where($this->getTable().'.id', (int)$key);
         } elseif ($type == 'alias') {
             $product = $product->where($this->getTable().'.alias', $key);
         } elseif ($type == 'sku') {
@@ -302,11 +292,11 @@ class ShopProduct extends Model
         }
 
         $product = $product->where($this->getTable().'.status', 1);
-        
+
         $product = $product
             ->with('images')
             ->with('store')
-            ->with('promotionPrice');        
+            ->with('promotionPrice');
         $product = $product->first();
         return $product;
     }
@@ -376,7 +366,7 @@ class ShopProduct extends Model
 
     public function renderAttributeDetails()
     {
-        return  view('templates.'.lc_store('template').'.common.render_attribute', 
+        return  view('templates.'.lc_store('template').'.common.render_attribute',
             [
                 'details' => $this->attributes()->get()->groupBy('attribute_group_id'),
                 'groups' => ShopAttributeGroup::getListType()->toArray(),
@@ -405,8 +395,8 @@ class ShopProduct extends Model
             return false;
         }
         if ($this->status &&
-            (lc_config('product_preorder', $this->store_id) == 1 || $this->date_available === null || date('Y-m-d H:i:s') >= $this->date_available) 
-            && (lc_config('product_buy_out_of_stock', $this->store_id) || $this->stock || empty(lc_config('product_stock', $this->store_id))) 
+            (lc_config('product_preorder', $this->store_id) == 1 || $this->date_available === null || date('Y-m-d H:i:s') >= $this->date_available)
+            && (lc_config('product_buy_out_of_stock', $this->store_id) || $this->stock || empty(lc_config('product_stock', $this->store_id)))
             && $this->kind != LC_PRODUCT_GROUP
         ) {
             return true;
@@ -543,9 +533,9 @@ class ShopProduct extends Model
     }
 
     /**
-     * Set array category 
+     * Set array category
      *
-     * @param   [array|int]  $category 
+     * @param   [array|int]  $category
      *
      */
     private function setCategory($category) {
@@ -558,9 +548,9 @@ class ShopProduct extends Model
     }
 
     /**
-     * Set sub category 
+     * Set sub category
      *
-     * @param   [int]  $category 
+     * @param   [int]  $category
      *
      */
     private function setCategoryStore($category) {
@@ -568,9 +558,9 @@ class ShopProduct extends Model
         return $this;
     }
     /**
-     * Set array brand 
+     * Set array brand
      *
-     * @param   [array|int]  $brand 
+     * @param   [array|int]  $brand
      *
      */
     private function setBrand($brand) {
@@ -582,7 +572,7 @@ class ShopProduct extends Model
         return $this;
     }
     /**
-     * Set product promotion 
+     * Set product promotion
      *
      */
     private function setPromotion($id = 0) {
@@ -600,9 +590,9 @@ class ShopProduct extends Model
     }
 
     /**
-     * Set array ID product 
+     * Set array ID product
      *
-     * @param   [array|int]  $arrID 
+     * @param   [array|int]  $arrID
      *
      */
     private function setArrayID($arrID) {
@@ -614,11 +604,11 @@ class ShopProduct extends Model
         return $this;
     }
 
-    
+
     /**
-     * Set array supplier 
+     * Set array supplier
      *
-     * @param   [array|int]  $supplier 
+     * @param   [array|int]  $supplier
      *
      */
     private function setSupplier($supplier) {
@@ -663,7 +653,7 @@ class ShopProduct extends Model
 
     /**
      * Get product to array Catgory
-     * @param   [array|int]  $arrCategory 
+     * @param   [array|int]  $arrCategory
      */
     public function getProductToCategory($arrCategory) {
         $this->setCategory($arrCategory);
@@ -671,7 +661,7 @@ class ShopProduct extends Model
     }
     /**
      * Get product to array Catgory
-     * @param   [array|int]  $arrCategory 
+     * @param   [array|int]  $arrCategory
      */
     public function getProductOutStock($id) {
         $this->setOutStock($id);
@@ -680,7 +670,7 @@ class ShopProduct extends Model
 
     /**
      * Get product to  Catgory store
-     * @param   [int]  $category 
+     * @param   [int]  $category
      */
     public function getProductToCategoryStore($category) {
         $this->setCategoryStore($category);
@@ -689,16 +679,16 @@ class ShopProduct extends Model
 
     /**
      * Get product to array Brand
-     * @param   [array|int]  $arrBrand 
+     * @param   [array|int]  $arrBrand
      */
     public function getProductToBrand($arrBrand) {
         $this->setBrand($arrBrand);
         return $this;
     }
-    
+
     /**
      * Get product to array Supplier
-     * @param   [array|int]  $arrSupplier 
+     * @param   [array|int]  $arrSupplier
      */
     private function getProductToSupplier($arrSupplier) {
         $this->setSupplier($arrSupplier);
@@ -754,7 +744,7 @@ class ShopProduct extends Model
         }
         return $this;
     }
-    
+
     /**
      * Get product top
      *
@@ -786,7 +776,7 @@ class ShopProduct extends Model
         $this->setProductMostView($id);
         return $this;
     }
-    
+
     /**
      * Get product most buy
      *
@@ -847,7 +837,7 @@ class ShopProduct extends Model
 
         $query = $query->with('promotionPrice');
         $query = $query->with('store');
-            
+
 
         if (count($this->lc_category)) {
             $tablePTC = (new ShopProductCategory)->getTable();
@@ -873,7 +863,7 @@ class ShopProduct extends Model
             $query = $query->whereIn($this->getTable().'.kind', $this->lc_kind);
         }
 
-        
+
         if ($this->lc_property !== 'all') {
             $query = $query->where($this->getTable().'.property', $this->lc_property);
         }

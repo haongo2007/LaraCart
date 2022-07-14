@@ -49,9 +49,10 @@ class ProductCollection extends JsonResource
             'weight' => $this->weight,
             'weight_class' => $this->weight_class,
             'width' => $this->width,
+            'top' => $this->top,
             'attributes' => new ProductAttributeColorCollection($this->attributesParent)
         ];
-        
+
         return $res;
     }
 }

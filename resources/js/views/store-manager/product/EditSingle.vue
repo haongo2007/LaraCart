@@ -12,24 +12,24 @@ const languageResource = new LanguageResource();
 export default {
   name: 'ProductEditSingle',
   components: { ProductDetail },
-  data(){
+  data: function() {
     return {
       loading: true,
-      spiner:null,
-    	languages: {},
+      spiner: null,
+      languages: {},
       componentInfo: {},
       stepContent: {},
       product: {},
-  		temp: {
-			  id: 0,
-			  kind: 0,
+      temp: {
+        id: 0,
+        kind: 0,
         store_id: 0,
-			  descriptions: {},
+        descriptions: {},
       },
       rules: {
         descriptions: [],
       },
-  	};
+    };
   },
   created(){
     this.spiner = this.$loading({
@@ -43,10 +43,10 @@ export default {
       this.product = data;
 
       this.fetchLanguages(data.store_id);
+      console.log(this.temp);
     }).catch(err => {
       console.log(err);
     });
-
   },
   methods: {
     fetchLanguages(id) {
@@ -59,7 +59,7 @@ export default {
           console.log(err);
         });
     },
-	  setTemp(){
+    setTemp(){
       var that = this;
       const data = Object.assign({}, this.languages);
       Object.keys(data).forEach(function(key, index) {
@@ -67,7 +67,7 @@ export default {
         if (that.product.descriptions.hasOwnProperty(index)) {
           that.$set(that.temp.descriptions[key], 'description', that.product.descriptions[index].description);
           that.$set(that.temp.descriptions[key], 'title', that.product.descriptions[index].name);
-          that.$set(that.temp.descriptions[key], 'keyword', that.product.descriptions[index].keyword != '' ? that.product.descriptions[index].keyword.split(',') : []);
+          that.$set(that.temp.descriptions[key], 'keyword', that.product.descriptions[index].keyword !== '' ? that.product.descriptions[index].keyword.split(',') : []);
           that.$set(that.temp.descriptions[key], 'content', that.product.descriptions[index].content);
         }
 

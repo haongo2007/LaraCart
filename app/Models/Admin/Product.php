@@ -63,7 +63,7 @@ class Product extends ShopProduct
             'sku__desc' => trans('product.admin.sort_order.sku_desc'),
             'sku__asc'  => trans('product.admin.sort_order.sku_asc'),
         ];
-        
+
         $keyword          = Arr::get($dataSearch,'keyword', '');
         $categories       = Arr::get($dataSearch,'category', []);
         $sort_order       = Arr::get($dataSearch,'sort_order', 'id__desc');
@@ -248,7 +248,7 @@ class Product extends ShopProduct
     public static function getTotalProduct() {
         return self::count();
     }
-    
+
 
     /**
      * Render html option price in admin
@@ -272,7 +272,7 @@ class Product extends ShopProduct
             }
         }
         return $html;
-    }    
+    }
     /**
      * Get Sum order total In Week
      *

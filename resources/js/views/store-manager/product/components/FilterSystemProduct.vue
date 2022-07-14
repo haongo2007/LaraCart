@@ -10,18 +10,29 @@
         <el-row :gutter="24">
           <el-col :span="12">
             <el-button-group>
-              <el-button v-waves type="success" :disabled="dataLoading" @click="handleDownload" v-permission="['export.product']">
+              <el-button v-waves v-permission="['export.product']" type="success" :disabled="dataLoading" @click="handleDownload">
                 <svg-icon icon-class="excel" />
               </el-button>
-              <el-button v-permission="['delete.single.product','delete.group.product','delete.bundle.product']" 
-              type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" @click="handerDeleteAll" />
-              <el-dropdown trigger="click" placement="top-start" split-button type="primary" 
-                @command="handleCommand" 
-                @click="$router.push({ name: 'ProductCreateSingle'})" v-permission="['create.single.product']">
+              <el-button
+                v-permission="['delete.single.product','delete.group.product','delete.bundle.product']"
+                type="danger"
+                icon="el-icon-delete"
+                :disabled="multiSelectRow.length == 0 ? true : false"
+                @click="handerDeleteAll"
+              />
+              <el-dropdown
+                v-permission="['create.single.product']"
+                trigger="click"
+                placement="top-start"
+                split-button
+                type="primary"
+                @command="handleCommand"
+                @click="$router.push({ name: 'ProductCreateSingle'})"
+              >
                 <i class="el-icon-plus" />
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="ProductCreateBundle" v-permission="['create.bundle.product']">{{ $t('form.product_bundle') }}</el-dropdown-item>
-                  <el-dropdown-item command="ProductCreateGroup" v-permission="['create.group.product']">{{ $t('form.product_group') }}</el-dropdown-item>
+                  <el-dropdown-item v-permission="['create.bundle.product']" command="ProductCreateBundle">{{ $t('form.product_bundle') }}</el-dropdown-item>
+                  <el-dropdown-item v-permission="['create.group.product']" command="ProductCreateGroup">{{ $t('form.product_group') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </el-button-group>
@@ -122,7 +133,7 @@ const productResource = new ProductResource();
 const categoryResource = new CategoryResource();
 export default {
   name: 'FilterSystemProduct',
-  directives: { waves,permission },
+  directives: { waves, permission },
   props: {
     dataLoading: {
       type: Boolean,
@@ -248,6 +259,7 @@ export default {
       this.multiSelectRow = data;
     });
     EventBus.$on('handleDeleting', this.handleDeleting);
+    EventBus.$on('handleUpdateTop', this.handleUpdateTop);
   },
   methods: {
     getList() {
@@ -362,6 +374,21 @@ export default {
     },
     handleCommand(command) {
       this.$router.push({ name: command });
+    },
+    handleUpdateTop(params){
+      productResource.updateTop(params.id, params).then((res) => {
+        if (res.success){
+          this.$message({
+            type: 'success',
+            message: 'Update successfully',
+          });
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'danger',
+          message: 'Delete error',
+        });
+      });
     },
   },
 };
