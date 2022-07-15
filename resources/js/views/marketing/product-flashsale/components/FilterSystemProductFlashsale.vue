@@ -10,10 +10,21 @@
         <el-row :gutter="20">
           <el-col :span="24">
             <el-button-group>
-              <el-button type="primary" icon="el-icon-plus" :disabled="dataLoading" class="filter-item" 
-              @click="$router.push({ name: 'UserCreate'}).catch(() => {})" v-permission="['create.flashsale']" />
-              <el-button type="danger" icon="el-icon-delete" :disabled="multiSelectRow.length == 0 ? true : false" 
-              @click="handerDeleteAll" v-permission="['delete.flashsale']"/>
+              <el-button
+                v-permission="['create.flashsale']"
+                type="primary"
+                icon="el-icon-plus"
+                :disabled="dataLoading"
+                class="filter-item"
+                @click="handleCreate()"
+              />
+              <el-button
+                v-permission="['delete.flashsale']"
+                type="danger"
+                icon="el-icon-delete"
+                :disabled="multiSelectRow.length == 0 ? true : false"
+                @click="handerDeleteAll"
+              />
             </el-button-group>
           </el-col>
         </el-row>
@@ -41,7 +52,6 @@
 
 <script>
 
-import { parseTime } from '@/filters';
 import EventBus from '@/components/FileManager/eventBus';
 import ProductFlashsaleResource from '@/api/product-flashsale';
 import permission from '@/directive/permission'; // Permission directive (v-permission)
@@ -66,7 +76,7 @@ export default {
       list: null,
       total: 0,
       roles: [],
-      multiSelectRow:[]
+      multiSelectRow: [],
     };
   },
   watch: {
@@ -142,6 +152,9 @@ export default {
           message: 'Delete canceled',
         });
       });
+    },
+    handleCreate() {
+      this.$emit('handleListenCreateForm', true);
     },
   },
 };

@@ -23,14 +23,15 @@
             width="400"
             trigger="click"
           >
-            <attributes-product 
-              :is-new="scope.row.is_new" 
-              :data-currency="scope.row.currency" 
-              :data-exchange-rate="scope.row.exchange_rate" 
-              :data-atribute-group="dataAttributeGroup" 
-              :data-attribute="scope.row.attribute" 
-              :data-product="scope.row.product_id" 
-              @handleAttributeProduct="handleAttributeProduct" />
+            <attributes-product
+              :is-new="scope.row.is_new"
+              :data-currency="scope.row.currency"
+              :data-exchange-rate="scope.row.exchange_rate"
+              :data-atribute-group="dataAttributeGroup"
+              :data-attribute="scope.row.attribute"
+              :data-product="scope.row.product_id"
+              @handleAttributeProduct="handleAttributeProduct"
+            />
             <el-button slot="reference" icon="el-icon-s-tools" size="mini" type="primary" @click="setCurrentIndex(scope.$index)" />
           </el-popover>
         </template>
@@ -84,8 +85,8 @@
         min-width="150"
       >
         <template slot-scope="scope">
-          <span v-if="!scope.row.is_new" v-html="methodAttributePrice(scope.row.attribute)"></span>
-          <span v-else v-html="methodAttributePrice(scope.row.groups)"></span>
+          <span v-if="!scope.row.is_new" v-html="methodAttributePrice(scope.row.attribute)" />
+          <span v-else v-html="methodAttributePrice(scope.row.groups)" />
         </template>
       </el-table-column>
       <el-table-column
@@ -117,20 +118,20 @@
         <template slot-scope="scope">
           <span v-if="!scope.row.is_new">{{ (scope.row.tax.label == '' ? scope.row.tax.value : scope.row.tax) | toThousandFilter(scope.row.currency) }}</span>
           <el-autocomplete
-            @focus="setCurrentIndex(scope.$index)" 
             v-model="temp[scope.$index].tax.value"
             style="width: 100%"
             value-key="name"
+            v-else
             class="inline-input"
             :fetch-suggestions="querySearchTaxAsync"
             :placeholder="$t('table.tax')"
+            @focus="setCurrentIndex(scope.$index)"
             @select="handleSelectTax"
             @change="handleSelectTax"
-            v-else
           />
         </template>
       </el-table-column>
-      
+
       <el-table-column
         :label="$t('table.actions')"
         min-width="100"
@@ -162,9 +163,9 @@ const defaultForm = {
   qty: 0,
   total_price: 0,
   tax: {
-        label: '',
-        value: '0',
-      },
+    label: '',
+    value: '0',
+  },
   currency: '',
 };
 const taxResource = new TaxResource();
@@ -210,7 +211,7 @@ export default {
       var results = queryString ? product.filter(this.createFilter(queryString)) : product;
 
       if (results.length == 0) {
-        productResource.list({ keyword: queryString,storeId:this.dataProducts.stores.id }).then(response => {
+        productResource.list({ keyword: queryString, storeId: this.dataProducts.stores.id }).then(response => {
           this.products = response.data;
           results = response.data;
 		      cb(results);
@@ -229,20 +230,20 @@ export default {
     },
     handleSelect(item) {
     	const index = this.currentIndex;
-    	this.$set(this.temp[index],'product_id',item.id);
-    	this.$set(this.temp[index],'order_id', this.$route.params.id);
-    	this.$set(this.temp[index],'sku', item.sku);
-    	this.$set(this.temp[index],'price', item.price * this.dataProducts.exchange_rate);
-    	this.$set(this.temp[index],'qty', 1);
-    	this.$set(this.temp[index],'total_price', item.price * this.dataProducts.exchange_rate);
-    	this.$set(this.temp[index],'attribute', {...item.attributes});
-    	this.$set(this.temp[index],'currency', this.dataProducts.currency);
-      this.$set(this.temp[index],'exchange_rate', this.dataProducts.exchange_rate);
-    	this.$set(this.temp[index],'groups',[]);
+    	this.$set(this.temp[index], 'product_id', item.id);
+    	this.$set(this.temp[index], 'order_id', this.$route.params.id);
+    	this.$set(this.temp[index], 'sku', item.sku);
+    	this.$set(this.temp[index], 'price', item.price * this.dataProducts.exchange_rate);
+    	this.$set(this.temp[index], 'qty', 1);
+    	this.$set(this.temp[index], 'total_price', item.price * this.dataProducts.exchange_rate);
+    	this.$set(this.temp[index], 'attribute', { ...item.attributes });
+    	this.$set(this.temp[index], 'currency', this.dataProducts.currency);
+      this.$set(this.temp[index], 'exchange_rate', this.dataProducts.exchange_rate);
+    	this.$set(this.temp[index], 'groups', []);
       this.temp[index].tax = {
         label: '',
-        value: String( (item.price * item.tax / 100) * this.dataProducts.exchange_rate ),
-      }
+        value: String((item.price * item.tax / 100) * this.dataProducts.exchange_rate),
+      };
     },
     setCurrentIndex(index){
     	this.currentIndex = index;
@@ -251,17 +252,17 @@ export default {
       let sumVariant = 0;
       if (this.temp[this.currentIndex].hasOwnProperty('groups')) {
         this.temp[this.currentIndex].groups.forEach((item) => {
-          let key = Object.keys(item.text)[0];
+          const key = Object.keys(item.text)[0];
           item = item.text[key].split('__');
           sumVariant += parseInt(item[1]);
         });
       }
-      let old_total = this.temp[this.currentIndex].total_price / this.dataProducts.exchange_rate;
-      this.temp[this.currentIndex].total_price = (( (this.temp[this.currentIndex].price / this.dataProducts.exchange_rate) + sumVariant) * qty) * this.dataProducts.exchange_rate;
+      const old_total = this.temp[this.currentIndex].total_price / this.dataProducts.exchange_rate;
+      this.temp[this.currentIndex].total_price = (((this.temp[this.currentIndex].price / this.dataProducts.exchange_rate) + sumVariant) * qty) * this.dataProducts.exchange_rate;
 
       if (this.temp[this.currentIndex].tax.hasOwnProperty('value') && this.temp[this.currentIndex].tax.value > 0) {
-        let tax_percent = old_total / this.temp[this.currentIndex].tax.value;
-        this.temp[this.currentIndex].tax.value = String( (this.temp[this.currentIndex].total_price * tax_percent / 100) * this.dataProducts.exchange_rate ) ;
+        const tax_percent = old_total / this.temp[this.currentIndex].tax.value;
+        this.temp[this.currentIndex].tax.value = String((this.temp[this.currentIndex].total_price * tax_percent / 100) * this.dataProducts.exchange_rate);
       }
     },
     handleDeleteProduct(row, is_new = false){
@@ -307,19 +308,18 @@ export default {
     },
     handleAttributeProduct(obj){
       const that = this;
-      let index = this.currentIndex;
+      const index = this.currentIndex;
       if (this.temp[index].groups.length == 0) {
         this.temp[index].groups.push(obj);
       } else {
-        this.temp[index].groups.forEach((item,key) => {
+        this.temp[index].groups.forEach((item, key) => {
           if (item.group == obj.group) {
             that.temp[index].groups.splice(key);
             that.temp[index].groups.push(obj);
-          }else{
+          } else {
             that.temp[index].groups.push(obj);
           }
-        })
-        
+        });
       }
       this.handleChangePrice(this.temp[index].qty);
     },
@@ -359,21 +359,21 @@ export default {
     },
     methodAttributePrice(att){
       let result = '';
-      if (typeof att == 'object') {
-        for(let prop in att) {
-          let key = Object.keys(att[prop].text);
-          let item = att[prop].text[key].split('__');
-          result += this.dataAttributeGroup[key]+': '+item[0]+' - '+ changeCurrency(item[1],this.dataProducts.exchange_rate,this.dataProducts.currency)+'<br>';
+      if (typeof att === 'object') {
+        for (const prop in att) {
+          const key = Object.keys(att[prop].text);
+          const item = att[prop].text[key].split('__');
+          result += this.dataAttributeGroup[key] + ': ' + item[0] + ' - ' + changeCurrency(item[1], this.dataProducts.exchange_rate, this.dataProducts.currency) + '<br>';
         }
-      }else if(typeof att == 'undefined'){
+      } else if (typeof att === 'undefined'){
         return;
-      }else{
-        att = att.replace(/&quot;/g, "\"");
-        let reAtt = JSON.parse(att);
-        for(let props in reAtt){
-          for(let prop in reAtt[props]) {
-            let item = reAtt[props][prop].split('__');
-            result += this.dataAttributeGroup[prop]+': '+item[0]+'<span class="el-badge__content el-badge__content--warning">'+ changeCurrency(item[1],this.dataProducts.exchange_rate,this.dataProducts.currency) +'</span><br>';
+      } else {
+        att = att.replace(/&quot;/g, '"');
+        const reAtt = JSON.parse(att);
+        for (const props in reAtt){
+          for (const prop in reAtt[props]) {
+            const item = reAtt[props][prop].split('__');
+            result += this.dataAttributeGroup[prop] + ': ' + item[0] + '<span class="el-badge__content el-badge__content--warning">' + changeCurrency(item[1], this.dataProducts.exchange_rate, this.dataProducts.currency) + '</span><br>';
           }
         }
       }
@@ -393,10 +393,10 @@ export default {
           this.taxs = response.data;
           results = response.data;
         })
-        .catch(err => {
-          console.log(err);
-        });
-      }      
+          .catch(err => {
+            console.log(err);
+          });
+      }
       cb(results);
     },
     handleSelectTax(item) {
@@ -404,8 +404,8 @@ export default {
       if (item.hasOwnProperty('value')) {
         val = item.value;
       }
-      let subtotal = this.temp[this.currentIndex].total_price;
-      let qty = this.temp[this.currentIndex].qty;
+      const subtotal = this.temp[this.currentIndex].total_price;
+      const qty = this.temp[this.currentIndex].qty;
       this.temp[this.currentIndex].tax.value = String(subtotal * val / 100);
     },
   },

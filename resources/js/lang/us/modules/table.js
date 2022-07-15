@@ -59,7 +59,7 @@ export default {
   'name': 'Name',
   'title': 'Title',
   'importance': 'IMP',
-  'type': 'Category',
+  'type': 'Type',
   'remark': 'Comments',
   'search': 'Search',
   'add': 'Add',

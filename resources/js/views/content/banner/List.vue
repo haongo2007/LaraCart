@@ -22,11 +22,11 @@
           <span>{{ scope.row.id }}</span>
         </template>
       </el-table-column>
-      
-      <el-table-column :label="$t('table.store')" min-width="150"  v-if="checkOnlyStore">
+
+      <el-table-column v-if="checkOnlyStore" :label="$t('table.store')" min-width="150">
         <template slot-scope="scope">
           <el-tag type="success">
-            <i class="el-icon-s-shop"></i>
+            <i class="el-icon-s-shop" />
             {{ scope.row.store.descriptions_current_lang[0].title && scope.row.store.descriptions_current_lang[0].title }}
           </el-tag>
         </template>
@@ -36,7 +36,7 @@
         <template slot-scope="scope">
           <el-image :src="scope.row.image+'&w=300'" fit="cover" style="max-height: 150px;">
             <div slot="error" class="image-slot">
-              <i class="el-icon-picture-outline"></i>
+              <i class="el-icon-picture-outline" />
             </div>
           </el-image>
         </template>
@@ -65,8 +65,8 @@
           <span>{{ scope.row.click }}</span>
         </template>
       </el-table-column>
-      
-      <el-table-column :label="$t('table.type')"  prop="type" min-width="100">
+
+      <el-table-column :label="$t('table.type')" prop="type" min-width="100">
         <template slot-scope="scope">
           <span>{{ scope.row.type }}</span>
         </template>
@@ -83,9 +83,16 @@
       <el-table-column :label="$t('table.actions')" align="center" min-width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row}">
           <el-button-group>
-            <el-button :loading="loadingButtonUpdate" type="primary" size="mini" icon="el-icon-edit" class="filter-item" 
-            @click="UpdateForm(row)" v-permission="['edit.banner']"/>
-            <el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" v-permission="['delete.banner']"/>
+            <el-button
+              v-permission="['edit.banner']"
+              :loading="loadingButtonUpdate"
+              type="primary"
+              size="mini"
+              icon="el-icon-edit"
+              class="filter-item"
+              @click="UpdateForm(row)"
+            />
+            <el-button v-permission="['delete.banner']" type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
         </template>
       </el-table-column>
@@ -109,15 +116,15 @@
               v-for="item in listBannerType"
               :key="item.id"
               :label="item.name"
-              :value="item.code">
-            </el-option>
+              :value="item.code"
+            />
           </el-select>
         </el-form-item>
 
         <el-form-item :label="$t('form.target')" prop="target">
           <el-select v-model="temp.target" filterable placeholder="Select">
-            <el-option label="_self" value="_self"/>
-            <el-option label="_blank" value="_blank"/>
+            <el-option label="_self" value="_self" />
+            <el-option label="_blank" value="_blank" />
           </el-select>
         </el-form-item>
 
@@ -125,7 +132,7 @@
           <el-button size="small" type="success" @click="handleVisibleStorage()">Pick Image</el-button>
         </el-form-item>
         <div class="image-uploading" style="margin-left: 80px;position: relative;margin-bottom: 22px">
-          <i v-if="temp.image" class="el-icon-close" @click="resetImageUpload()" style="position: absolute;top: 15px;right: 15px"/>
+          <i v-if="temp.image" class="el-icon-close" style="position: absolute;top: 15px;right: 15px" @click="resetImageUpload()" />
           <el-image v-if="temp.image" :src="temp.image+'&w=644'">
             <div slot="placeholder" class="image-slot">
               <i class="el-icon-loading" />
@@ -138,7 +145,7 @@
         </el-form-item>
 
         <el-form-item :label="$t('form.sort')" prop="sort">
-          <el-input type="number" v-model.number="temp.sort" :placeholder="$t('form.sort')" :min="1"/>
+          <el-input v-model.number="temp.sort" type="number" :placeholder="$t('form.sort')" :min="1" />
         </el-form-item>
 
         <el-form-item :label="$t('form.status')">
@@ -147,7 +154,8 @@
             active-color="#13ce66"
             inactive-color="#ff4949"
             active-value="1"
-            inactive-value="0"/>
+            inactive-value="0"
+          />
         </el-form-item>
 
       </el-form>
@@ -162,10 +170,11 @@
     </el-dialog>
     <el-dialog
       :show-close="false"
-      title="Please Choose store you want add banner"
+      :title="$t('form.choose_store_for_banner')"
       :visible.sync="confirmStoreDialog"
       :before-close="handleConfirm"
-      width="30%">
+      width="30%"
+    >
       <div>
         <el-radio v-for="(item,index) in storeList" :key="index" v-model="temp.store_id" :label="index">
           {{ item.descriptions_current_lang[0].title }}
@@ -200,22 +209,22 @@ import { checkOnlyStore } from '@/utils';
 const bannerResource = new BannerResource();
 
 const dataForm = {
-    id:0,
-    store_id:0,
-    title:'',
-    url:'',
-    sort:1,
-    type:'',
-    target:'',
-    status:'0',
-    image:'',
-    html:'',
-}
+  id: 0,
+  store_id: 0,
+  title: '',
+  url: '',
+  sort: 1,
+  type: '',
+  target: '',
+  status: '0',
+  image: '',
+  html: '',
+};
 const bannerTypeResource = new BannerTypeResource();
 export default {
   name: 'BannerList',
-  components: { Pagination,FilterSystemBanner,RightPanel,FileManager,JsonEditor },
-  directives:{ permission },
+  components: { Pagination, FilterSystemBanner, RightPanel, FileManager, JsonEditor },
+  directives: { permission },
   data() {
     return {
       list: [],
@@ -229,16 +238,16 @@ export default {
       },
       rules: {
       },
-      temp: Object.assign({},dataForm),
+      temp: Object.assign({}, dataForm),
       dialogStatus: '',
       dialogFormVisible: false,
-      confirmStoreDialog:false,
+      confirmStoreDialog: false,
       listBannerType: [],
       componentStorage: '',
       dialogStorageVisible: false,
-      loadingButtonCreate:false,
-      loadingButtonUpdate:false,
-    }
+      loadingButtonCreate: false,
+      loadingButtonUpdate: false,
+    };
   },
   computed: {
     checkOnlyStore,
@@ -247,7 +256,7 @@ export default {
       return storeList;
     },
   },
-  methods:{
+  methods: {
     handleConfirm(done){
       if (this.temp.store_id > 0) {
         this.CreateForm();
@@ -255,7 +264,7 @@ export default {
       }
     },
     handleReset(done){
-      this.temp = Object.assign({},dataForm);
+      this.temp = Object.assign({}, dataForm);
       done();
     },
     confirmChooseStore(){
@@ -288,7 +297,7 @@ export default {
       EventBus.$emit('handleDeleting', row);
     },
     resetTemp() {
-      this.temp = Object.assign({},dataForm);
+      this.temp = Object.assign({}, dataForm);
     },
     handleVisibleStorage(){
       this.$store.commit('fm/setDisks', 'banner');
@@ -318,14 +327,14 @@ export default {
       }
       if (store_ck && store_ck.length == 1) {
         this.temp.store_id = store_ck[0];
-      }else{
+      } else {
         if (this.temp.store_id == 0) {
           this.confirmStoreDialog = true;
           return false;
         }
       }
       // reset form add;
-      let {data} = await bannerTypeResource.list({store_id:this.temp.store_id});
+      const { data } = await bannerTypeResource.list({ store_id: this.temp.store_id });
       this.loadingButtonCreate = false;
       this.listBannerType = data;
       this.dialogStatus = 'create';
@@ -365,10 +374,10 @@ export default {
     },
     async UpdateForm(row){
       this.loadingButtonUpdate = true;
-      this.temp = Object.assign(this.temp,row);
+      this.temp = Object.assign(this.temp, row);
       this.temp.status = String(this.temp.status);
       this.temp.store_id = row.store.id;
-      let {data} = await bannerTypeResource.list({store_id:this.temp.store_id});
+      const { data } = await bannerTypeResource.list({ store_id: this.temp.store_id });
       this.listBannerType = data;
       this.dialogStatus = 'update';
       this.dialogFormVisible = true;
@@ -380,7 +389,7 @@ export default {
           const loading = this.$loading({
             target: '.el-dialog__body',
           });
-          bannerResource.update(this.temp.id,this.temp).then((res) => {
+          bannerResource.update(this.temp.id, this.temp).then((res) => {
             if (res) {
               loading.close();
               this.dialogFormVisible = false;
@@ -403,7 +412,7 @@ export default {
         }
       });
     },
-  }
+  },
 };
 </script>
 
