@@ -5,6 +5,8 @@ use App\Models\Admin\Discount;
 use App\Http\Controllers\Controller;
 use App\Models\Front\ShopLanguage;
 use App\Models\Front\ShopDiscount;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 use App\Http\Resources\DiscountCollection;
 use Validator;
 
@@ -27,44 +29,24 @@ class DiscountController extends Controller
     }
 
 /**
- * Form create new
+ * Store new 
  * @return [type] [description]
  */
-    public function create()
-    {
-        $data = [
-            'title' => trans($this->plugin->pathPlugin.'::lang.admin.add_new_title'),
-            'subTitle' => '',
-            'title_description' => trans($this->plugin->pathPlugin.'::lang.admin.add_new_des'),
-            'icon' => 'fa fa-plus',
-            'discount' => [],
-            'url_action' => bc_route_admin('admin_discount.create'),
-        ];
-        return view($this->plugin->pathPlugin.'::Admin')
-            ->with($data);
-    }
-
-/**
- * Post create new 
- * @return [type] [description]
- */
-    public function postCreate()
+    public function store()
     {
         $data = request()->all();
         $validator = Validator::make($data, [
-            'code'   => 'required|regex:/(^([0-9A-Za-z\-\._]+)$)/|discount_unique|string|max:50',
+            'code'   => 'required|regex:/(^([0-9A-Za-z\-\._]+)$)/|unique:'.Discount::class.',code|string|max:50',
             'limit'  => 'required|numeric|min:1',
             'reward' => 'required|numeric|min:0',
             'type'   => 'required',
         ], [
-            'code.regex' => trans($this->plugin->pathPlugin.'::lang.admin.code_validate'),
-            'code.discount_unique' => trans($this->plugin->pathPlugin.'::lang.discount_unique'),
+            'code.regex' => trans('discount.admin.code_validate'),
+            'code.discount_unique' => trans('discount.discount_unique'),
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         $dataInsert = [
             'code'       => $data['code'],
@@ -74,63 +56,38 @@ class DiscountController extends Controller
             'data'       => $data['data'],
             'login'      => empty($data['login']) ? 0 : 1,
             'status'     => empty($data['status']) ? 0 : 1,
-            'store_id'   => session('adminStoreId'),
+            'store_id'   => $data['store_id'],
         ];
         if(!empty($data['expires_at'])) {
             $dataInsert['expires_at'] = $data['expires_at'];
         }
-        AdminDiscount::createDiscountAdmin($dataInsert);
+        $discounted = Discount::createDiscountAdmin($dataInsert);
 
-        return redirect()->route('admin_discount.index')->with('success', trans($this->plugin->pathPlugin.'::lang.admin.create_success'));
-
-    }
-
-    /**
-     * Form edit
-     */
-    public function edit($id)
-    {
-        $discount = AdminDiscount::getDiscountAdmin($id);
-        if (!$discount) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
-        }
-
-        $data = [
-            'title'             => trans($this->plugin->pathPlugin.'::lang.admin.edit'),
-            'subTitle'          => '',
-            'title_description' => '',
-            'icon'              => 'fa fa-pencil-square-o',
-            'discount'          => $discount,
-            'url_action'        => bc_route_admin('admin_discount.edit', ['id' => $discount['id']]),
-        ];
-        return view($this->plugin->pathPlugin.'::Admin')
-            ->with($data);
+        return response()->json(new JsonResponse(['id'=>$discounted->id]), Response::HTTP_OK);
     }
 
     /**
      * update
      */
-    public function postEdit($id)
+    public function update($id)
     {
-        $discount = AdminDiscount::getDiscountAdmin($id);
+        $discount = Discount::getDiscountAdmin($id);
         if (!$discount) {
-            return redirect()->route('admin.data_not_found')->with(['url' => url()->full()]);
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
         }
         $data = request()->all();
         $validator = Validator::make($data, [
-            'code' => 'required|regex:/(^([0-9A-Za-z\-\._]+)$)/|discount_unique:' . $discount->id . '|string|max:50',
+            'code' => 'required|regex:/(^([0-9A-Za-z\-\._]+)$)/|unique:'.Discount::class.',code,'.$id.'|string|max:50',
             'limit' => 'required|numeric|min:1',
             'reward' => 'required|numeric|min:0',
             'type' => 'required',
         ], [
-            'code.regex' => trans($this->plugin->pathPlugin.'::lang.admin.code_validate'),
-            'code.discount_unique' => trans($this->plugin->pathPlugin.'::lang.discount_unique'),
+            'code.regex' => trans('discount.admin.code_validate'),
+            'code.discount_unique' => trans('discount.discount_unique'),
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         //Edit
         $dataUpdate = [
@@ -141,47 +98,24 @@ class DiscountController extends Controller
             'data'       => $data['data'],
             'login'      => empty($data['login']) ? 0 : 1,
             'status'     => empty($data['status']) ? 0 : 1,
-            'store_id'   => session('adminStoreId'),
         ];
         if(!empty($data['expires_at'])) {
             $dataUpdate['expires_at'] = $data['expires_at'];
         }
         $discount->update($dataUpdate);
 
-        return redirect()->route('admin_discount.index')
-            ->with('success', trans($this->plugin->pathPlugin.'::lang.admin.edit_success'));
-
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
     /*
     Delete list item
     Need mothod destroy to boot deleting in model
     */
-    public function deleteList()
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return 0;
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            $arrDontPermission = [];
-            foreach ($arrID as $key => $id) {
-                if(!$this->checkPermisisonItem($id)) {
-                    $arrDontPermission[] = $id;
-                }
-            }
-            if (count($arrDontPermission)) {
-                return response()->json(['error' => 1, 'msg' => trans('admin.remove_dont_permisison') . ': ' . json_encode($arrDontPermission)]);
-            }
-            AdminDiscount::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $id);
+        Discount::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
-    /**
-     * Check permisison item
-     */
-    public function checkPermisisonItem($id) {
-        return AdminDiscount::getDiscountAdmin($id);
-    }
 }

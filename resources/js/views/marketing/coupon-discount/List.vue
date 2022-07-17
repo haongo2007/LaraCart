@@ -68,9 +68,11 @@
         </template>
       </el-table-column>
 
-      <el-table-column :label="$t('table.login_required')" min-width="150">
-        <template slot-scope="scope">
-          <span>{{ scope.row.login }}</span>
+      <el-table-column :label="$t('table.login_required')" class-name="status-col" width="150" prop="login_required">
+        <template slot-scope="{row}">
+          <el-tag :type="row.login | statusFilter">
+            {{ row.login | statusFilter(true) }}
+          </el-tag>
         </template>
       </el-table-column>
 
@@ -93,12 +95,13 @@
         <template slot-scope="{row}">
           <el-button-group>
             <el-button
+              :loading="loadingButtonUpdate"
               v-permission="['edit.coupon']"
               type="primary"
               size="mini"
               icon="el-icon-edit"
               class="filter-item"
-              @click="$router.push({ name: 'UserEdit',params:{id:row.id} })"
+              @click="UpdateForm(row)"
             />
             <el-button v-permission="['delete.coupon']" type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
@@ -110,12 +113,12 @@
     <el-dialog :title="$t('form.'+dialogStatus)" :visible.sync="dialogFormVisible" :before-close="handleReset" class="dialog-custom">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="150px" style="width: 75%; margin:0 auto;">
 
-        <el-form-item :label="$t('form.code')" prop="code">
+        <el-form-item :label="$t('form.code')" prop="code" :placeholder="$t('form.code')">
           <el-input v-model="temp.code" />
         </el-form-item>
 
         <el-form-item :label="$t('form.reward')" prop="reward">
-          <el-input v-model="temp.reward" />
+          <el-input v-model.number="temp.reward" type="number" :placeholder="$t('form.reward')" :min="1" />
         </el-form-item>
 
         <el-form-item :label="$t('form.type')" prop="type">
@@ -132,16 +135,14 @@
           <el-input v-model.number="temp.limit" type="number" :placeholder="$t('form.limit')" :min="1" />
         </el-form-item>
 
-        <el-form-item :label="$t('form.expires')" prop="expires">
+        <el-form-item :label="$t('form.expires')" prop="expires_at">
           <el-date-picker
-            v-model="temp.expires"
             style="width: 100%"
-            type="daterange"
-            align="right"
-            unlink-panels
-            range-separator="To"
-            :start-placeholder="$t('form.start_date')"
-            :end-placeholder="$t('form.end_date')"
+            v-model="temp.expires_at"
+            type="date"
+            placeholder="Pick a day"
+            format="yyyy-MM-dd"
+            :picker-options="pickerOptions"
           />
         </el-form-item>
 
@@ -203,6 +204,7 @@ import permission from '@/directive/permission'; // Permission directive (v-perm
 import { checkOnlyStore } from '@/utils';
 import Cookies from 'js-cookie';
 import CouponResource from '@/api/coupon-discount';
+import { parseTime } from '@/filters';
 
 const couponResource = new CouponResource();
 
@@ -211,12 +213,13 @@ const dataForm = {
   store_id: 0,
   code: '',
   reward: '',
-  type: '',
+  type: '%',
   data: '',
   limit: '1',
-  expires: '',
   login: '',
   status: '',
+  expires_at:'',
+  used:0,
 };
 
 export default {
@@ -229,7 +232,49 @@ export default {
       total: 0,
       loading: true,
       temp: Object.assign({}, dataForm),
-      rules:{},
+      rules:{
+        code: [
+          {
+            required: true,
+            message: 'code is required',
+            trigger: 'blur',
+          },
+        ],
+        limit: [
+          {
+            required: true,
+            message: 'limit is required',
+            trigger: 'blur',
+          },
+          {
+            type: 'number',
+            message: 'limit must be a number',
+            trigger: 'blur',
+          },
+        ],
+        reward: [
+          {
+            required: true,
+            message: 'reward is required',
+            trigger: 'blur',
+          },
+          {
+            type: 'number',
+            message: 'reward must be a number',
+            trigger: 'blur',
+          },
+        ],
+        type: [
+          {
+            required: true,
+            message: 'type is required',
+            trigger: 'blur',
+          },
+        ],
+        expires_at: [
+          { type: 'date', required: true, message: 'date is required', trigger: 'blur' }
+        ],
+      },
       typeList: [{
         name: 'Point',
         value: 'Point',
@@ -244,9 +289,37 @@ export default {
         role: '',
       },
       loadingButtonCreate: false,
+      loadingButtonUpdate:false,
       dialogFormVisible: false,
       confirmStoreDialog: false,
       dialogStatus: '',
+      pickerOptions:{
+        disabledDate(time) {
+          return time.getTime() < Date.now();
+        },
+        shortcuts: [{
+          text: 'Yesterday',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() - 3600 * 1000 * 24);
+            picker.$emit('pick', date);
+          }
+        }, {
+          text: 'A week',
+          onClick(picker) {
+            const date = new Date();
+            date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', date);
+          }
+        },{
+          text: 'A Month',
+          onClick(picker) {
+            const date = new Date();
+            date.setMonth(date.getMonth() + 1);
+            picker.$emit('pick', date);
+          }
+        }]
+      }
     };
   },
   computed: {
@@ -258,6 +331,7 @@ export default {
   },
   methods: {
     handleListenData(data){
+      console.log(this.storeList);
       if (data.hasOwnProperty('list')) {
         this.list = data.list;
       }
@@ -297,9 +371,41 @@ export default {
       this.CreateForm();
     },
     createData(){
-      console.log(this.temp);
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const loading = this.$loading({
+            target: '.el-dialog',
+          });
+          this.temp.expires_at = parseTime(this.temp.expires_at, '{y}-{m}-{d} {h}:{i}:{s}');
+          couponResource.store(this.temp).then((res) => {
+            if (res) {
+              loading.close();
+              this.dialogFormVisible = false;
+              this.$message({
+                type: 'success',
+                message: 'Create successfully',
+              });
+              this.$set(this.temp,'store',this.storeList[this.temp.store_id]);
+              this.temp.id = res.data.id;
+              this.list.push(this.temp);
+              // reloadRedirectToList('BannerList');
+              this.handleReset();
+            } else {
+              this.$message({
+                type: 'error',
+                message: 'Create failed',
+              });
+              loading.close();
+            }
+          }).catch(err => {
+            loading.close();
+          });
+        }
+      });
     },
-    updateData(){},
+    updateData(){
+      
+    },
     async CreateForm(){
       this.loadingButtonCreate = true;
       let store_ck = Cookies.get('store');
@@ -321,6 +427,16 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate();
       });
+    },
+    async UpdateForm(row){
+      this.loadingButtonUpdate = true;
+      this.temp = Object.assign(this.temp, row);
+      this.temp.status = String(this.temp.status);
+      this.temp.login = String(this.temp.login);
+      this.temp.store_id = row.store.id;
+      this.dialogStatus = 'update';
+      this.dialogFormVisible = true;
+      this.loadingButtonUpdate = false;
     },
   },
 };

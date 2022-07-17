@@ -50,6 +50,12 @@
         </template>
       </el-table-column>
 
+      <el-table-column :label="$t('table.sort')">
+        <template slot-scope="scope">
+          <span>{{ scope.row.sort }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column :label="$t('table.start_date')" min-width="170">
         <template v-if="scope.row.promotion.date_start" slot-scope="scope">
           <span>{{ scope.row.promotion.date_start }}</span>
@@ -85,7 +91,7 @@
               size="mini"
               icon="el-icon-edit"
               class="filter-item"
-              @click="$router.push({ name: 'UserEdit',params:{id:row.id} })"
+              @click="UpdateForm(row)"
             />
             <el-button v-permission="['delete.flashsale']" type="danger" size="mini" icon="el-icon-delete" @click="handleDeleting(row)" />
           </el-button-group>
@@ -97,7 +103,7 @@
     <el-dialog :title="$t('form.'+dialogStatus)" :visible.sync="dialogFormVisible" :before-close="handleReset" class="dialog-custom">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="150px" style="width: 75%; margin:0 auto;">
 
-        <el-form-item :label="$t('form.product')" prop="product">
+        <el-form-item :label="$t('form.product')" prop="product_id">
           <el-autocomplete
             v-model="temp.product_name"
             style="width: 100%;"
@@ -117,13 +123,14 @@
           <el-input v-model.number="temp.sort" type="number" :placeholder="$t('form.sort')" :min="1" />
         </el-form-item>
 
-        <el-form-item :label="$t('form.price')" prop="price">
-          <el-input v-model.number="temp.price" type="number" :placeholder="$t('form.price')" :min="1" />
+        <el-form-item :label="$t('form.price')" prop="price_promotion">
+          <el-input v-model.number="temp.price_promotion" type="number" :placeholder="$t('form.price')" :min="1" />
         </el-form-item>
 
-        <el-form-item :label="$t('form.sale_date')" prop="sale_date">
+        <el-form-item :label="$t('form.sale_date')" prop="rangedate">
           <el-date-picker
-            v-model="temp.sale_date"
+            :loading="loadingButtonUpdate"
+            v-model="temp.rangedate"
             style="width: 100%"
             type="daterange"
             align="right"
@@ -136,7 +143,7 @@
 
         <el-form-item :label="$t('form.status')">
           <el-switch
-            v-model="temp.status"
+            v-model="temp.status_promotion"
             active-color="#13ce66"
             inactive-color="#ff4949"
             active-value="1"
@@ -182,7 +189,11 @@ import permission from '@/directive/permission'; // Permission directive (v-perm
 import { checkOnlyStore } from '@/utils';
 import Cookies from 'js-cookie';
 import ProductResource from '@/api/product';
+import ProductFlashsaleResource from '@/api/product-flashsale';
+import reloadRedirectToList from '@/utils';
+import { parseTime } from '@/filters';
 
+const productFlashsaleResource = new ProductFlashsaleResource();
 const productResource = new ProductResource();
 
 const dataForm = {
@@ -192,9 +203,11 @@ const dataForm = {
   product_id: '',
   stock: '',
   sort: '',
-  price: '',
-  sale_date: '',
-  status: '',
+  price_promotion: '',
+  date_start: '',
+  date_end: '',
+  status_promotion:'',
+  rangedate:[],
 };
 
 export default {
@@ -207,7 +220,54 @@ export default {
       total: 0,
       loading: true,
       temp: Object.assign({}, dataForm),
-      rules: {},
+      rules:{
+        product_id: [
+          {
+            required: true,
+            message: 'product is required',
+            trigger: 'blur',
+          },
+        ],
+        stock: [
+          {
+            required: true,
+            message: 'stock is required',
+            trigger: 'blur',
+          },
+          {
+            type: 'number',
+            message: 'stock must be a number',
+            trigger: 'blur',
+          },
+        ],
+        sort: [
+          {
+            required: true,
+            message: 'sort is required',
+            trigger: 'blur',
+          },
+          {
+            type: 'number',
+            message: 'sort must be a number',
+            trigger: 'blur',
+          },
+        ],
+        price_promotion: [
+          {
+            required: true,
+            message: 'price promotion is required',
+            trigger: 'blur',
+          },
+          {
+            type: 'number',
+            message: 'price promotion must be a number',
+            trigger: 'blur',
+          },
+        ],
+        rangedate: [
+          { type: 'array', required: true, message: 'start date and end date is required', trigger: 'blur' }
+        ],
+      },
       products: [],
       typeList: [{
         name: 'Point',
@@ -223,6 +283,7 @@ export default {
         role: '',
       },
       loadingButtonCreate: false,
+      loadingButtonUpdate: false,
       dialogFormVisible: false,
       confirmStoreDialog: false,
       dialogStatus: '',
@@ -265,6 +326,10 @@ export default {
       this.temp = Object.assign({}, dataForm);
       done();
     },
+    cbGetProduct(res){
+      const selectedProd = this.products.filter(prod => prod.id == this.temp.product_id);
+      this.temp.product_name = selectedProd[0].name;
+    },
     querySearchAsync(queryString, cb) {
       var product = this.products;
       var results = queryString ? product.filter(this.createFilter(queryString)) : product;
@@ -273,7 +338,11 @@ export default {
         productResource.list({ keyword: queryString, storeId: this.temp.store_id }).then(response => {
           this.products = response.data;
           results = response.data;
-          cb(results);
+          if (cb){
+            cb(results);
+          } else {
+            this.cbGetProduct(results);
+          }
         })
           .catch(err => {
             console.log(err);
@@ -290,7 +359,6 @@ export default {
     handleSelect(item) {
       this.temp.product_id = item.id;
       this.temp.product_name = item.name;
-      console.log(this.temp);
     },
     handleConfirm(done){
       if (this.temp.store_id > 0) {
@@ -303,9 +371,39 @@ export default {
       this.CreateForm();
     },
     createData(){
-      console.log(this.temp);
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const loading = this.$loading({
+            target: '.el-dialog',
+          });
+          this.temp.date_start = parseTime(this.temp.rangedate[0], '{y}-{m}-{d} {h}:{i}:{s}');
+          this.temp.date_end = parseTime(this.temp.rangedate[1], '{y}-{m}-{d} {h}:{i}:{s}');
+          productFlashsaleResource.store(this.temp).then((res) => {
+            if (res) {
+              loading.close();
+              this.dialogFormVisible = false;
+              this.$message({
+                type: 'success',
+                message: 'Create successfully',
+              });
+              reloadRedirectToList('ProductFlashSale');
+              this.handleReset();
+            } else {
+              this.$message({
+                type: 'error',
+                message: 'Create failed',
+              });
+              loading.close();
+            }
+          }).catch(err => {
+            loading.close();
+          });
+        }
+      });
     },
-    updateData(){},
+    updateData(){
+
+    },
     async CreateForm(){
       this.loadingButtonCreate = true;
       let store_ck = Cookies.get('store');
@@ -330,6 +428,23 @@ export default {
     },
     handleCreate() {
       this.$emit('handleListenCreateForm', true);
+    },
+    async UpdateForm(row){
+      this.loadingButtonUpdate = true;
+      this.temp.product_id = row.product.id;
+      this.temp.store_id = row.product.store.id;
+      this.querySearchAsync();
+      this.temp.date_start = row.promotion.date_start;
+      this.temp.date_end = row.promotion.date_end;
+      this.temp.stock = row.stock;
+      this.temp.sort = row.sort;
+      this.temp.status_promotion = String(row.promotion.status_promotion);
+      this.temp.price_promotion = row.promotion.price_promotion;
+      this.temp.rangedate = [this.temp.date_start,this.temp.date_end];
+      console.log(this.temp);
+      this.dialogStatus = 'update';
+      this.dialogFormVisible = true;
+      this.loadingButtonUpdate = false;
     },
   },
 };

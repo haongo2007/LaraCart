@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\ProductFlashSale;
 use App\Models\Front\ShopProductPromotion;
 use App\Http\Resources\ProductFlashSaleCollection;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 use Validator;
 
 class ProductFlashSaleController extends Controller
@@ -29,12 +31,12 @@ class ProductFlashSaleController extends Controller
      * Post create new item in admin
      * @return [type] [description]
      */
-    public function postCreate()
+    public function store()
     {
         $data = request()->all();
 
         $validator = Validator::make($data, [
-            'product_id'      => 'required|unique:"'.PluginModel::class.'",product_id',
+            'product_id'      => 'required|unique:"'.ProductFlashSale::class.'",product_id',
             'stock'           => 'required|numeric|min:1',
             'sort'            => 'required|numeric|min:0',
             'price_promotion' => 'required|numeric|min:1',
@@ -43,17 +45,16 @@ class ProductFlashSaleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
         $dataInsert = [
             'product_id' => $data['product_id'],
             'stock' => (int)$data['stock'],
             'sort' => (int)$data['sort'],
+            'store_id' => (int)$data['store_id'],
         ];
 
-        (new PluginModel)->create($dataInsert);
+        $pflashsale = ProductFlashSale::create($dataInsert);
 
         (new ShopProductPromotion)->updateOrCreate(
             ['product_id' => $data['product_id']],
@@ -64,90 +65,24 @@ class ProductFlashSaleController extends Controller
                 'status_promotion' => (!empty($data['status_promotion']) ? 1 : 0),
             ]
         );
-        return redirect()->route('admin_productsale.index')->with('success', trans($this->plugin->pathPlugin.'::lang.admin.create_success'));
+        return response()->json(new JsonResponse(['id'=>$pflashsale->id]), Response::HTTP_OK);
 
     }
-
-    /**
-     * Form edit
-     */
-    public function edit($id)
-    {
-        $obj = (new PluginModel)->getProduct($id);
-        if(!$obj) {
-            return 'No data';
-        }
-        $data = [
-            'title' => trans($this->plugin->pathPlugin.'::lang.admin.list'),
-            'title_action' => '<i class="fa fa-plus" aria-hidden="true"></i> ' . trans($this->plugin->pathPlugin.'::lang.admin.edit'),
-            'subTitle' => '',
-            'icon' => 'fa fa-indent',
-            'urlDeleteItem' => bc_route_admin('admin_productsale.delete'),
-            'removeList' => 0, // 1 - Enable function delete list item
-            'buttonRefresh' => 0, // 1 - Enable button refresh
-            'buttonSort' => 0, // 1 - Enable button sort
-            'css' => '', 
-            'js' => '',
-            'url_action' => bc_route_admin('admin_productsale.edit', ['id' => $obj['id']]),
-            'obj' => $obj,
-            'id' => $id,
-        ];
-
-        $listTh = [
-            'id' => trans($this->plugin->pathPlugin.'::lang.admin.id'),
-            'product_id' => trans($this->plugin->pathPlugin.'::lang.admin.product'),
-            'stock' => trans($this->plugin->pathPlugin.'::lang.admin.stock'),
-            'sold' => trans($this->plugin->pathPlugin.'::lang.admin.sold'),
-            'sort' => trans($this->plugin->pathPlugin.'::lang.admin.sort'),
-            'date_start' => trans($this->plugin->pathPlugin.'::lang.admin.date_start'),
-            'date_end' => trans($this->plugin->pathPlugin.'::lang.admin.date_end'),
-            'price_promotion' => trans($this->plugin->pathPlugin.'::lang.admin.price_promotion'),
-            'status_promotion' => trans($this->plugin->pathPlugin.'::lang.admin.status_promotion'),
-            'action' => trans($this->plugin->pathPlugin.'::lang.admin.action'),
-        ];
-        $dataTmp = (new PluginModel)->getAllProductFlashSale();
-
-        $dataTr = [];
-        foreach ($dataTmp as $key => $row) {
-            $dataTr[] = [
-                'id' => $row['id'],
-                'product_id' => $row['product_id'],
-                'stock' => $row['stock'],
-                'sale' => $row['sale'],
-                'sort' => $row['sort'],
-                'date_start' => bc_datetime_to_date($row['date_start']),
-                'date_end' => bc_datetime_to_date($row['date_end']),
-                'price_promotion' => $row['price_promotion'],
-                'status_promotion' => $row['status_promotion'] ? '<span class="badge badge-success">ON</span>' : '<span class="badge badge-danger">OFF</span>',
-                'action' => '
-                    <a href="' . bc_route_admin('admin_productsale.edit', ['id' => $row['id']]) . '"><span title="' . trans($this->plugin->pathPlugin.'::lang.admin.edit') . '" type="button" class="btn btn-flat btn-primary"><i class="fa fa-edit"></i></span></a>&nbsp;
-    
-                  <span onclick="deleteItem(' . $row['id'] . ');"  title="' . trans($this->plugin->pathPlugin.'::lang.admin.delete') . '" class="btn btn-flat btn-danger"><i class="fas fa-trash-alt"></i></span>
-                  ',
-            ];
-        }
-
-        $data['listTh'] = $listTh;
-        $data['dataTr'] = $dataTr;
-        $data['pagination'] = $dataTmp->appends(request()->except(['_token', '_pjax']))->links($this->templatePathAdmin.'component.pagination');
-        $data['resultItems'] = trans($this->plugin->pathPlugin.'::lang.admin.result_item', ['item_from' => $dataTmp->firstItem(), 'item_to' => $dataTmp->lastItem(), 'item_total' => $dataTmp->total()]);
-
-        $data['layout'] = 'edit';
-        $data['pathPlugin'] = $this->plugin->pathPlugin;
-        $data['productsList'] = (new PluginModel)->getAllProductNotGroup();
-        return view($this->plugin->pathPlugin.'::Admin')->with($data);
-    }
-
 
     /**
      * update status
      */
-    public function postEdit($id)
+    public function update($id)
     {
-        $obj = (new PluginModel)->find($id);
+        $pflashsale = (new ProductFlashSale)->find($id);
         $data = request()->all();
+
+        if (!$pflashsale) {
+            return response()->json(new JsonResponse([], trans('admin.data_not_found')), Response::HTTP_NOT_FOUND);
+        }
+        
         $validator = Validator::make($data, [
-            'product_id'      => 'required|unique:"'.PluginModel::class.'",product_id,' . $id . '',
+            'product_id'      => 'required|unique:"'.ProductFlashSale::class.'",product_id,' . $id . '',
             'stock'           => 'required|numeric|min:1',
             'sort'            => 'required|numeric|min:0',
             'price_promotion' => 'required|numeric|min:1',
@@ -156,48 +91,41 @@ class ProductFlashSaleController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput($data);
+            return response()->json(new JsonResponse([], $validator->errors()), Response::HTTP_FORBIDDEN);
         }
-    //Edit
+        //Edit
 
-    $dataUpdate = [
-        'product_id' => $data['product_id'],
-        'stock'      => (int)$data['stock'],
-        'sort'       => (int)$data['sort'],
-    ];
+        $dataUpdate = [
+            'product_id' => $data['product_id'],
+            'stock'      => (int)$data['stock'],
+            'sort'       => (int)$data['sort'],
+        ];
 
-    $obj->update($dataUpdate);
+        $pflashsale->update($dataUpdate);
 
-    (new ShopProductPromotion)->where('product_id', $data['product_id'])
-    ->update(
-        [
-            'price_promotion' => $data['price_promotion'],
-            'date_start' => $data['date_start'],
-            'date_end' => $data['date_end'],
-            'status_promotion' => (!empty($data['status_promotion']) ? 1 : 0),
-        ]
-    );
+        (new ShopProductPromotion)->where('product_id', $data['product_id'])
+        ->update(
+            [
+                'price_promotion' => $data['price_promotion'],
+                'date_start' => $data['date_start'],
+                'date_end' => $data['date_end'],
+                'status_promotion' => (!empty($data['status_promotion']) ? 1 : 0),
+            ]
+        );
 
-    return redirect()->back()->with('success', bc_language_render($this->plugin->pathPlugin.'::lang.admin.edit_success'));
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
 
     }
-
+    
     /*
     Delete list item
     Need mothod destroy to boot deleting in model
     */
-    public function deleteList()
+    public function destroy($id)
     {
-        if (!request()->ajax()) {
-            return response()->json(['error' => 1, 'msg' => bc_language_render('admin.method_not_allow')]);
-        } else {
-            $ids = request('ids');
-            $arrID = explode(',', $ids);
-            PluginModel::destroy($arrID);
-            return response()->json(['error' => 0, 'msg' => '']);
-        }
+        $arrID = explode(',', $id);
+        ProductFlashSale::destroy($arrID);
+        return response()->json(new JsonResponse(), Response::HTTP_OK);
     }
 
 }

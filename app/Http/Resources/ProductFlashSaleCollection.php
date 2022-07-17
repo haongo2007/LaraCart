@@ -42,6 +42,7 @@ class ProductFlashSaleCollection extends JsonResource
             'stock'         => $this->stock,
             'sold'          => $this->sold,
             'promotion'     => $this->promotion,
+            'sort'          => $this->sort,
         ];
     }
 }
