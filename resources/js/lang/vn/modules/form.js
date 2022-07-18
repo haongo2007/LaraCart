@@ -1,4 +1,5 @@
 export default {
+  'please_enter_currency': 'Vui lòng nhập giá tiền đúng với tiền tệ',
   'product': 'Sản phẩm',
   'reward': 'Thưởng',
   'limit': 'Giới hạn',
@@ -127,6 +128,7 @@ export default {
   mi_quantity: 'SL tối thiểu',
   stock: 'Số lượng',
   promotion_price: 'Giá ưu đãi',
+  current_price: 'Giá hiện tại',
   sale_date: 'Ngày Ưu đãi',
   cost: 'Giá nhập',
   price: 'Giá bán',

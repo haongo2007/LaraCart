@@ -123,8 +123,14 @@
           <el-input v-model.number="temp.sort" type="number" :placeholder="$t('form.sort')" :min="1" />
         </el-form-item>
 
-        <el-form-item :label="$t('form.price')" prop="price_promotion">
-          <el-input v-model.number="temp.price_promotion" type="number" :placeholder="$t('form.price')" :min="1" />
+        <el-form-item :label="$t('form.current_price')" v-if="temp.current_price">
+          <el-input disabled v-model="temp.current_price" type="number" :placeholder="$t('form.current_price')">
+            <template slot="append">{{ currency.symbol }}</template>
+          </el-input>
+        </el-form-item>
+
+        <el-form-item :label="$t('form.promotion_price')" prop="price_promotion">
+          <el-input v-model.number="temp.price_promotion" type="number" :placeholder="currency ? $t('form.please_enter_currency') + currency.code : $t('form.promotion_price')" :min="1" />
         </el-form-item>
 
         <el-form-item :label="$t('form.sale_date')" prop="rangedate">
@@ -187,10 +193,10 @@ import FilterSystemProductFlashsale from './components/FilterSystemProductFlashs
 import EventBus from '@/components/FileManager/eventBus';
 import permission from '@/directive/permission'; // Permission directive (v-permission)
 import { checkOnlyStore } from '@/utils';
+import reloadRedirectToList from '@/utils';
 import Cookies from 'js-cookie';
 import ProductResource from '@/api/product';
 import ProductFlashsaleResource from '@/api/product-flashsale';
-import reloadRedirectToList from '@/utils';
 import { parseTime } from '@/filters';
 
 const productFlashsaleResource = new ProductFlashsaleResource();
@@ -204,10 +210,11 @@ const dataForm = {
   stock: '',
   sort: '',
   price_promotion: '',
+  current_price: '',
   date_start: '',
   date_end: '',
-  status_promotion:'',
-  rangedate:[],
+  status_promotion: '',
+  rangedate: [],
 };
 
 export default {
@@ -219,6 +226,7 @@ export default {
       list: [],
       total: 0,
       loading: true,
+      currency:{},
       temp: Object.assign({}, dataForm),
       rules:{
         product_id: [
@@ -280,7 +288,6 @@ export default {
         page: 1,
         limit: 15,
         keyword: '',
-        role: '',
       },
       loadingButtonCreate: false,
       loadingButtonUpdate: false,
@@ -329,6 +336,7 @@ export default {
     cbGetProduct(res){
       const selectedProd = this.products.filter(prod => prod.id == this.temp.product_id);
       this.temp.product_name = selectedProd[0].name;
+      this.temp.current_price = selectedProd[0].price;
     },
     querySearchAsync(queryString, cb) {
       var product = this.products;
@@ -359,6 +367,8 @@ export default {
     handleSelect(item) {
       this.temp.product_id = item.id;
       this.temp.product_name = item.name;
+      this.temp.current_price = item.price;
+      this.currency = item.currency;
     },
     handleConfirm(done){
       if (this.temp.store_id > 0) {
@@ -387,7 +397,6 @@ export default {
                 message: 'Create successfully',
               });
               reloadRedirectToList('ProductFlashSale');
-              this.handleReset();
             } else {
               this.$message({
                 type: 'error',
@@ -395,6 +404,7 @@ export default {
               });
               loading.close();
             }
+            // eslint-disable-next-line handle-callback-err
           }).catch(err => {
             loading.close();
           });
@@ -402,7 +412,37 @@ export default {
       });
     },
     updateData(){
-
+      this.temp.rangedate[0] = new Date(this.temp.rangedate[0]);
+      this.temp.rangedate[1] = new Date(this.temp.rangedate[1]);
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const loading = this.$loading({
+            target: '.el-dialog__body',
+          });
+          this.temp.date_start = parseTime(this.temp.rangedate[0], '{y}-{m}-{d} {h}:{i}:{s}');
+          this.temp.date_end = parseTime(this.temp.rangedate[1], '{y}-{m}-{d} {h}:{i}:{s}');
+          productFlashsaleResource.update(this.temp.id, this.temp).then((res) => {
+            if (res) {
+              loading.close();
+              this.dialogFormVisible = false;
+              this.$message({
+                type: 'success',
+                message: 'Update successfully',
+              });
+              reloadRedirectToList('ProductFlashSale');
+            } else {
+              this.$message({
+                type: 'error',
+                message: 'Update failed',
+              });
+              loading.close();
+            }
+            // eslint-disable-next-line handle-callback-err
+          }).catch(err => {
+            loading.close();
+          });
+        }
+      });
     },
     async CreateForm(){
       this.loadingButtonCreate = true;
@@ -430,10 +470,12 @@ export default {
       this.$emit('handleListenCreateForm', true);
     },
     async UpdateForm(row){
+      console.log(row);
       this.loadingButtonUpdate = true;
       this.temp.product_id = row.product.id;
       this.temp.store_id = row.product.store.id;
       this.querySearchAsync();
+      this.temp.id = row.id;
       this.temp.date_start = row.promotion.date_start;
       this.temp.date_end = row.promotion.date_end;
       this.temp.stock = row.stock;
@@ -441,7 +483,6 @@ export default {
       this.temp.status_promotion = String(row.promotion.status_promotion);
       this.temp.price_promotion = row.promotion.price_promotion;
       this.temp.rangedate = [this.temp.date_start,this.temp.date_end];
-      console.log(this.temp);
       this.dialogStatus = 'update';
       this.dialogFormVisible = true;
       this.loadingButtonUpdate = false;

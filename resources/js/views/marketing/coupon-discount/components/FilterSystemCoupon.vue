@@ -36,12 +36,7 @@
       <div class="drawer-item">
 
         <el-row :gutter="24">
-          <el-col :span="12">
-            <el-select v-model="dataQuery.role" multiple collapse-tags :placeholder="$t('table.role')" clearable style="width: 100%" class="filter-item" @change="handleFilter">
-              <el-option v-for="item in roles" :key="item.id" :label="item.name | uppercaseFirst" :value="item.name" />
-            </el-select>
-          </el-col>
-          <el-col :span="12">
+          <el-col :span="24">
             <el-input v-model="dataQuery.keyword" :placeholder="$t('table.keyword')" style="width: 100%;" class="filter-item" @keyup.enter.native="handleFilter" />
           </el-col>
         </el-row>

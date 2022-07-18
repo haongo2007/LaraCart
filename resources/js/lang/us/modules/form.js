@@ -1,4 +1,5 @@
 export default {
+  'please_enter_currency': 'Please enter the correct price for the currency ',
   'product': 'Product',
   'reward': 'Reward',
   'limit': 'Limit',
@@ -127,6 +128,7 @@ export default {
   'mi_quantity': 'Minimum SL',
   'stock': 'Stock',
   'promotion_price': 'Promotion price',
+  'current_price': 'Current price',
   'sale_date': 'Sale date',
   'cost': 'Cost',
   'price': 'Price',

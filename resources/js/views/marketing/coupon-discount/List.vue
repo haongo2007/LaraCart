@@ -95,8 +95,8 @@
         <template slot-scope="{row}">
           <el-button-group>
             <el-button
-              :loading="loadingButtonUpdate"
               v-permission="['edit.coupon']"
+              :loading="loadingButtonUpdate"
               type="primary"
               size="mini"
               icon="el-icon-edit"
@@ -137,8 +137,8 @@
 
         <el-form-item :label="$t('form.expires')" prop="expires_at">
           <el-date-picker
-            style="width: 100%"
             v-model="temp.expires_at"
+            style="width: 100%"
             type="date"
             placeholder="Pick a day"
             format="yyyy-MM-dd"
@@ -201,10 +201,10 @@ import RightPanel from '@/components/RightPanel';
 import FilterSystemCoupon from './components/FilterSystemCoupon';
 import EventBus from '@/components/FileManager/eventBus';
 import permission from '@/directive/permission'; // Permission directive (v-permission)
-import { checkOnlyStore } from '@/utils';
 import Cookies from 'js-cookie';
 import CouponResource from '@/api/coupon-discount';
 import { parseTime } from '@/filters';
+import { checkOnlyStore } from '@/utils';
 
 const couponResource = new CouponResource();
 
@@ -218,8 +218,8 @@ const dataForm = {
   limit: '1',
   login: '',
   status: '',
-  expires_at:'',
-  used:0,
+  expires_at: '',
+  used: 0,
 };
 
 export default {
@@ -232,7 +232,7 @@ export default {
       total: 0,
       loading: true,
       temp: Object.assign({}, dataForm),
-      rules:{
+      rules: {
         code: [
           {
             required: true,
@@ -272,7 +272,7 @@ export default {
           },
         ],
         expires_at: [
-          { type: 'date', required: true, message: 'date is required', trigger: 'blur' }
+          { type: 'date', required: true, message: 'date is required', trigger: 'blur' },
         ],
       },
       typeList: [{
@@ -286,14 +286,13 @@ export default {
         page: 1,
         limit: 15,
         keyword: '',
-        role: '',
       },
       loadingButtonCreate: false,
-      loadingButtonUpdate:false,
+      loadingButtonUpdate: false,
       dialogFormVisible: false,
       confirmStoreDialog: false,
       dialogStatus: '',
-      pickerOptions:{
+      pickerOptions: {
         disabledDate(time) {
           return time.getTime() < Date.now();
         },
@@ -303,23 +302,23 @@ export default {
             const date = new Date();
             date.setTime(date.getTime() - 3600 * 1000 * 24);
             picker.$emit('pick', date);
-          }
+          },
         }, {
           text: 'A week',
           onClick(picker) {
             const date = new Date();
             date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
             picker.$emit('pick', date);
-          }
-        },{
+          },
+        }, {
           text: 'A Month',
           onClick(picker) {
             const date = new Date();
             date.setMonth(date.getMonth() + 1);
             picker.$emit('pick', date);
-          }
-        }]
-      }
+          },
+        }],
+      },
     };
   },
   computed: {
@@ -331,7 +330,6 @@ export default {
   },
   methods: {
     handleListenData(data){
-      console.log(this.storeList);
       if (data.hasOwnProperty('list')) {
         this.list = data.list;
       }
@@ -385,7 +383,7 @@ export default {
                 type: 'success',
                 message: 'Create successfully',
               });
-              this.$set(this.temp,'store',this.storeList[this.temp.store_id]);
+              this.$set(this.temp, 'store', this.storeList[this.temp.store_id]);
               this.temp.id = res.data.id;
               this.list.push(this.temp);
               // reloadRedirectToList('BannerList');
@@ -397,6 +395,7 @@ export default {
               });
               loading.close();
             }
+            // eslint-disable-next-line handle-callback-err
           }).catch(err => {
             loading.close();
           });
@@ -404,7 +403,39 @@ export default {
       });
     },
     updateData(){
-      
+      this.temp.expires_at = new Date(this.temp.expires_at);
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const loading = this.$loading({
+            target: '.el-dialog__body',
+          });
+          this.temp.expires_at = parseTime(this.temp.expires_at, '{y}-{m}-{d} {h}:{i}:{s}');
+          couponResource.update(this.temp.id, this.temp).then((res) => {
+            if (res) {
+              loading.close();
+              this.dialogFormVisible = false;
+              this.$message({
+                type: 'success',
+                message: 'Update successfully',
+              });
+              const index = this.list.findIndex((item) => item.id === this.temp.id);
+              if (index > -1) {
+                this.$set(this.list, index, { ...this.temp });
+              }
+              this.handleReset();
+            } else {
+              this.$message({
+                type: 'error',
+                message: 'Update failed',
+              });
+              loading.close();
+            }
+            // eslint-disable-next-line handle-callback-err
+          }).catch(err => {
+            loading.close();
+          });
+        }
+      });
     },
     async CreateForm(){
       this.loadingButtonCreate = true;

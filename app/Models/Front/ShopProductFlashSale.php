@@ -1,12 +1,7 @@
 <?php
 namespace App\Models\Front;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use App\Models\Front\ShopProduct;
-use App\Models\Front\ShopProductPromotion;
 
 class ShopProductFlashSale extends Model
 {
@@ -20,6 +15,10 @@ class ShopProductFlashSale extends Model
     {
         return $this->belongsTo(ShopProduct::class, 'product_id', 'id');
     }
+    public function productDesc()
+    {
+        return $this->belongsTo(ShopProductDescription::class, 'product_id', 'product_id');
+    }
     public function promotion()
     {
         return $this->belongsTo(ShopProductPromotion::class, 'product_id','product_id');
@@ -32,7 +31,7 @@ class ShopProductFlashSale extends Model
      */
     public function getProduct($pid) {
         $select = $this->table.'.*, pr.price_promotion, pr.date_start, pr.date_end, pr.status_promotion';
-        return 
+        return
         $this->leftjoin('shop_product_promotion as pr', 'pr.product_id', $this->table.'.product_id')
         ->selectRaw($select)
         ->where($this->table.'.id', $pid)
@@ -47,6 +46,7 @@ class ShopProductFlashSale extends Model
     public function getAllProductFlashSale(array $dataSearch) {
         $limit   = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
         $storeId = $dataSearch['store_id'] ?? session('adminStoreId');
+        $keyword = $dataSearch['keyword'] ?? '';
         if (!is_array($storeId)) {
             $storeId = [$storeId];
         }
@@ -54,6 +54,12 @@ class ShopProductFlashSale extends Model
         {
             $query->where('date_start', '<=', date('Y-m-d'))->where('date_end', '>=', date('Y-m-d'))->where('status_promotion',1);
         });
+        if ($keyword) {
+            $productFlash = $productFlash
+                            ->leftJoin('shop_product_description', 'shop_product_description.product_id', self::getTable().'.product_id')
+                            ->where('shop_product_description.name', 'like', '%' . $keyword . '%')
+                            ->groupBy(self::getTable().'.product_id');
+        }
         $productFlash = $productFlash->paginate($limit);
         return $productFlash;
     }
@@ -71,7 +77,7 @@ class ShopProductFlashSale extends Model
             ->get()
             ->pluck('name', 'id');
     }
-    
+
 
     /**
      * Get product flash

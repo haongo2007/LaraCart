@@ -28,10 +28,9 @@ class Discount extends ShopDiscount
      */
     public function getDiscountListAdmin(array $dataSearch) {
 
-        $sort_order = $dataSearch['sort_order'] ?? 'id_desc';
-        $keyword = $dataSearch['keyword'] ?? '';
+        $keyword          = $dataSearch['keyword'] ?? '';
         $limit            = lc_clean($dataSearch['limit'] ?? self::ITEM_PER_PAGE);
-
+        $sort_order       = $dataSearch['sort_order'] ?? 'id__desc';
         $arrSort = [
             'id__desc' => trans('discount.admin.sort_order.id_desc'),
             'id__asc' => trans('discount.admin.sort_order.id_asc'),
@@ -40,10 +39,15 @@ class Discount extends ShopDiscount
         ];
 
 
-        $sort_order       = $dataSearch['sort_order'] ?? '';
-        $arrSort          = $dataSearch['arrSort'] ?? '';
         $discountList = (new Discount)
             ->whereIn('store_id', session('adminStoreId'));
+
+        if ($keyword) {
+            $discountList = $discountList->where(function ($sql) use($keyword){
+                $sql->where('data', 'like', '%' . $keyword . '%')
+                    ->orwhere('code','like','%' . $keyword . '%');
+            });
+        }
 
         if ($sort_order && array_key_exists($sort_order, $arrSort)) {
             $field = explode('__', $sort_order)[0];
