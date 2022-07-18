@@ -1,5 +1,5 @@
 <?php
-// resources/lang/vi/shop.php
+// resources/lang/vn/shop.php
 
 return [
     'all_product'        => 'Tất cả sản phẩm',

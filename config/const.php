@@ -31,7 +31,7 @@ return [
 	// list ID admin guard
 	'LC_GUARD_ADMIN' => ['1'], // admin
 	// list ID language guard
-	'LC_GUARD_LANGUAGE' => ['1','2'], // vi=> en
+	'LC_GUARD_LANGUAGE' => ['1','2'], // vn=> us
 	// list ID currency guard
 	'LC_GUARD_CURRENCY' => ['1','2'], // vndong => usd
 	// list ID ROLES guard

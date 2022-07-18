@@ -18,7 +18,7 @@ class CmsContent extends Model
     protected $guarded = [];
     protected $connection = LC_CONNECTION;
 
-    protected  $lc_category = []; 
+    protected  $lc_category = [];
 
     public function category()
     {
@@ -179,20 +179,20 @@ class CmsContent extends Model
 
         DB::connection(LC_CONNECTION)->table($this->table)->insert(
             [
-                ['id' => 1, 'alias' =>  'demo-alias-content-1', 'image' => '/data/cms-image/cms_content_1.jpg', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => 1],                    
-                ['id' => 2, 'alias' =>  'demo-alias-content-2', 'image' => '/data/cms-image/cms_content_2.jpg', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => 1],                    
+                ['id' => 1, 'alias' =>  'demo-alias-content-1', 'image' => '/data/cms-image/cms_content_1.jpg', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => 1],
+                ['id' => 2, 'alias' =>  'demo-alias-content-2', 'image' => '/data/cms-image/cms_content_2.jpg', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => 1],
             ]
         );
 
         DB::connection(LC_CONNECTION)->table($this->table.'_description')->insert(
             [
-                ['content_id' => '1', 'lang' => 'en', 'title' => 'Demo cms content 1', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="/data/cms-image/cms.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
+                ['content_id' => '1', 'lang' => 'us', 'title' => 'Demo cms content 1', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="/data/cms-image/cms.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '1', 'lang' => 'vi', 'title' => 'Demo cms content 1', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="/data/cms-image/cms.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
+                ['content_id' => '1', 'lang' => 'vn', 'title' => 'Demo cms content 1', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="/data/cms-image/cms.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '2', 'lang' => 'en', 'title' => 'Demo cms content 2', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="/data/cms-image/cms.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
+                ['content_id' => '2', 'lang' => 'us', 'title' => 'Demo cms content 2', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="/data/cms-image/cms.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '2', 'lang' => 'vi', 'title' => 'Demo cms content 2', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="/data/cms-image/cms.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
+                ['content_id' => '2', 'lang' => 'vn', 'title' => 'Demo cms content 2', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="/data/cms-image/cms.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
             ]
         );
@@ -207,11 +207,11 @@ class CmsContent extends Model
     public function start() {
         return new CmsContent;
     }
-    
+
     /**
-     * Set array category 
+     * Set array category
      *
-     * @param   [array|int]  $category 
+     * @param   [array|int]  $category
      *
      */
     private function setCategory($category) {
@@ -225,7 +225,7 @@ class CmsContent extends Model
 
     /**
      * Get content to array Catgory
-     * @param   [array|int]  $arrCategory 
+     * @param   [array|int]  $arrCategory
      */
     public function getContentToCategory($arrCategory) {
         $this->setCategory($arrCategory);
@@ -276,6 +276,6 @@ class CmsContent extends Model
         }
 
         return $query;
-    }    
+    }
 
 }

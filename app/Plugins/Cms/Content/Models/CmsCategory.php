@@ -198,10 +198,10 @@ class CmsCategory extends Model
 
         DB::connection(LC_CONNECTION)->table($this->table.'_description')->insert(
             [
-                ['category_id' => '1', 'lang' => 'en', 'title' => 'Category CMS 1', 'keyword' => '', 'description' => ''],
-                ['category_id' => '1', 'lang' => 'vi', 'title' => 'Danh mục CMS 1', 'keyword' => '', 'description' => ''],
-                ['category_id' => '2', 'lang' => 'en', 'title' => 'Category CMS 2', 'keyword' => '', 'description' => ''],
-                ['category_id' => '2', 'lang' => 'vi', 'title' => 'Danh mục CMS 2', 'keyword' => '', 'description' => ''],
+                ['category_id' => '1', 'lang' => 'us', 'title' => 'Category CMS 1', 'keyword' => '', 'description' => ''],
+                ['category_id' => '1', 'lang' => 'vn', 'title' => 'Danh mục CMS 1', 'keyword' => '', 'description' => ''],
+                ['category_id' => '2', 'lang' => 'us', 'title' => 'Category CMS 2', 'keyword' => '', 'description' => ''],
+                ['category_id' => '2', 'lang' => 'vn', 'title' => 'Danh mục CMS 2', 'keyword' => '', 'description' => ''],
             ]
         );
     }

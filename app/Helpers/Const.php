@@ -10,7 +10,7 @@ define('LC_PROPERTY_DOWNLOAD', 'download');
 // list ID admin guard
 define('LC_GUARD_ADMIN', ['1']); // admin
 // list ID language guard
-define('LC_GUARD_LANGUAGE', ['1', '2']); // vi, en
+define('LC_GUARD_LANGUAGE', ['1', '2']); // vn, us
 // list ID currency guard
 define('LC_GUARD_CURRENCY', ['1', '2']); // vndong , usd
 // list ID ROLES guard

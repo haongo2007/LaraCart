@@ -1,5 +1,5 @@
 <?php
-// resources/lang/en/lang.php
+// resources/lang/us/lang.php
 
 return [
     'all_product'        => 'All products',
