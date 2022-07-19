@@ -2,11 +2,13 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Admin\Role;
 use App\Http\Resources\RoleCollection;
 use App\Helper\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Validator;
 /**
  * Class RoleController
@@ -22,8 +24,11 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $searchParams = request()->all();
-        $data = (new Role)->getRolesListAdmin($searchParams);
+        if (!Cache::has('cache_role')) {
+            $searchParams = request()->all();
+            lc_set_cache('cache_role', (new Role)->getRolesListAdmin($searchParams),session('adminStoreId'));
+        }
+        $data = Cache::get('cache_role');
         return RoleCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

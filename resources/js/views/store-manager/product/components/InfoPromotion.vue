@@ -85,7 +85,7 @@ export default {
   created() {
     if (Object.keys(this.dataProduct).length > 0) {
       if (this.dataProduct.promotion_price){
-        this.temp.price_promotion = this.dataProduct.promotion_price.price_promotion;
+        this.temp.price_promotion = this.dataProduct.promotion_price.price_promotion * this.dataProduct.currency.exchange_rate;
         this.date_promotion[0] = parseTime(this.dataProduct.promotion_price.date_start, '{y}-{m}-{d} {h}:{i}:{s}');
         this.date_promotion[1] = parseTime(this.dataProduct.promotion_price.date_end, '{y}-{m}-{d} {h}:{i}:{s}');
       }
@@ -98,7 +98,7 @@ export default {
     },
     nextStep() {
       const active = this.dataActive + 1;
-      if (this.date_promotion.length) {
+      if (this.date_promotion != null) {
         this.temp.date_promotion.start = parseTime(this.date_promotion[0], '{d}-{m}-{y} {h}:{i}:{s}');
         this.temp.date_promotion.end = parseTime(this.date_promotion[1], '{d}-{m}-{y} {h}:{i}:{s}');
       }

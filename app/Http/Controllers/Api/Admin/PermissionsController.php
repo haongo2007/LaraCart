@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Models\Admin\Permission;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use App\Http\Resources\PermissionCollection;
 use App\Helper\JsonResponse;
@@ -14,17 +15,13 @@ use Illuminate\Support\Facades\Route;
 
 class PermissionsController extends Controller
 {
-
-
-    public function __construct()
-    {
-        
-    }
-
     public function index()
     {
-        $searchParams = request()->all();
-        $data = (new Permission)->getPermissionsListAdmin($searchParams);
+        if (!Cache::has('cache_permission')) {
+            $searchParams = request()->all();
+            lc_set_cache('cache_permission', (new Permission)->getPermissionsListAdmin($searchParams),session('adminStoreId'));
+        }
+        $data = Cache::get('cache_permission');
         return PermissionCollection::collection($data)->additional(['message' => 'Successfully']);
     }
 

@@ -108,15 +108,15 @@ class Role extends Model
         $contain = Arr::get($dataSearch, 'contain', '');
 
         $rolesList     = (new self);
-        
+
         if ($contain) {
             $rolesList = $rolesList->where(function ($sql) use ($contain) {
                 $sql->where('name', 'like', '%' . $contain . '%');
             });
         }
-        
+
         if ($limit == 'all') {
-            $limit = '';
+            return $rolesList->get();
         }
         $rolesList = $rolesList->paginate($limit);
 

@@ -105,14 +105,14 @@ class Permission extends Model
         $contain = Arr::get($dataSearch, 'contain', '');
 
         $permissionsList     = (new self);
-        
+
         if ($contain) {
             $permissionsList = $permissionsList->where(function ($sql) use ($contain) {
                 $sql->where('name', 'like', '%' . $contain . '%');
             });
         }
         if ($limit == 'all') {
-            $limit = '';
+            return $permissionsList->get();
         }
         $permissionsList = $permissionsList->paginate($limit);
 

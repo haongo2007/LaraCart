@@ -356,7 +356,7 @@ public function createProductGroup()
 
         //Promoton price
         if (isset($data['price_promotion']) && isset($data['date_promotion']) && $data['price_promotion'] > 0 && in_array($data['kind'], [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])) {
-            $arrPromotion['price_promotion'] = $data['price_promotion'];
+            $arrPromotion['price_promotion'] = $data['price_promotion'] / $currency->exchange_rate;
             $arrPromotion['date_start'] = $data['date_promotion']->start ? Carbon::parse($data['date_promotion']->start)->format('Y-m-d H:i:s') : null;
             $arrPromotion['date_end'] = $data['date_promotion']->end ? Carbon::parse($data['date_promotion']->end)->format('Y-m-d H:i:s') : null;
             $product->promotionPrice()->create($arrPromotion);
@@ -746,7 +746,7 @@ public function createProductGroup()
         //Promoton price
         if (isset($data['price_promotion']) && isset($data['date_promotion']) && $data['price_promotion'] > 0 && in_array($product['kind'], [LC_PRODUCT_SINGLE, LC_PRODUCT_BUILD])) {
             $product->promotionPrice()->delete();
-            $arrPromotion['price_promotion'] = $data['price_promotion'];
+            $arrPromotion['price_promotion'] = $data['price_promotion'] / $currency->exchange_rate;
             $arrPromotion['date_start'] = $data['date_promotion']->start ? Carbon::parse($data['date_promotion']->start)->format('Y-m-d H:i:s') : null;
             $arrPromotion['date_end'] = $data['date_promotion']->end ? Carbon::parse($data['date_promotion']->end)->format('Y-m-d H:i:s') : null;
             $product->promotionPrice()->create($arrPromotion);

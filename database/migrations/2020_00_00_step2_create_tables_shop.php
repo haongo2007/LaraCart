@@ -704,7 +704,7 @@ class CreateTablesShop extends Migration
 
         Schema::create('shop_product_promotion', function (Blueprint $table) {
             $table->integer('product_id')->primary();
-            $table->integer('price_promotion');
+            $table->float('price_promotion');
             $table->dateTime('date_start')->nullable();
             $table->dateTime('date_end')->nullable();
             $table->integer('status_promotion')->default(1);
