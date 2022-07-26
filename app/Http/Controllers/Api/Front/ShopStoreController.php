@@ -54,9 +54,8 @@ class ShopStoreController extends Controller
 
         $languages = ShopLanguage::getListActive($storeId);
         $currencies = ShopCurrency::getListActive($storeId);
-        $slider = ShopBanner::where([['store_id',$storeId],['type','slider_home'],['status',1]])->get();
         $brands = ShopBrand::where([['store_id',$storeId],['status',1]])->get();
-        $banner = ShopBanner::where([['store_id',$storeId],['type','banner_home'],['status',1]])->get();
+        $banner = ShopBanner::where([['store_id',$storeId],['status',1]])->get();
         $categories = new CategoryCollection(ShopCategory::where([['store_id',$storeId],['parent',0]])->get());
         $info = ShopStore::with('descriptionsCurrentLang')->find($storeId);
 
@@ -72,7 +71,6 @@ class ShopStoreController extends Controller
         $data['method']['shipping']         = $shippingMethod;
         $data['method']['payment']          = $paymentMethod;
 
-        $data['display']['slider']          = $slider;
         $data['display']['banner']          = $banner;
         $data['display']['product']         = Config::getListConfigByCode(['storeId' => $storeId,'code' => 'display_config','keyBy' => 'key']);
 
