@@ -193,8 +193,8 @@ class ShopProduct extends Model
         if ($filter_color || $filter_size) {
             $name = array_filter(array_merge(explode(',', $filter_color),explode(',', $filter_size)));
             $product_id = ShopProductAttribute::select('product_id')->Where(function ($query) use($name) {
-                for ($i = 0; $i < count($name); $i++){
-                    $query->orwhere('name', 'like',  '%' . $name[$i] .'%');
+                foreach($name as $value){
+                    $query->orwhere('name', 'like',  '%' . $value .'%');
                 }
             })->groupBy('product_id')->get()->pluck('product_id')->toArray();
             $products = $products->getProductFromListID($product_id);
