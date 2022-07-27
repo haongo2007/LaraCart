@@ -51,6 +51,6 @@ return [
     |
     */
 
-    'prefix' => 'api/'.config('const.LC_ADMIN_PREFIX').'/sanctum'
+    'prefix' => 'api/sanctum'
 
 ];

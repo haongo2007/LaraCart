@@ -1,54 +1,65 @@
 <?php
 
-namespace BlackCart\Core\Front\Controllers\Auth;
+namespace App\Http\Controllers\Api\Front\Auth;
 
-use App\Http\Controllers\RootFrontController;
-use BlackCart\Core\Front\Models\ShopEmailTemplate;
-use BlackCart\Core\Front\Models\ShopCustomer;
-use BlackCart\Core\Front\Models\ShopCountry;
-use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Http\Controllers\Controller;
+use App\Models\Front\ShopCustomer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use BlackCart\Core\Front\Controllers\Auth\AuthTrait;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Api\Front\Auth\AuthTrait;
 
-class RegisterController extends RootFrontController
+class AuthController extends Controller
 {
+    use AuthTrait;
     /*
     |--------------------------------------------------------------------------
-    | Register Controller
+    | Auth Controller
     |--------------------------------------------------------------------------
     |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
+    | This controller handles authenticating users for the application and
+    | redirecting them to your home screen. The controller uses a trait
+    | to conveniently provide its functionality to your applications.
     |
      */
-
-    use RegistersUsers;
-    use AuthTrait;
-
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
-    // protected $redirectTo = '/home';
-    protected function redirectTo()
+    public function login(Request $request)
     {
-        return bc_route('customer.index');
-    }
+        try {
+            $request->validate([
+                'email' => 'email|required',
+                'password' => 'required'
+            ]);
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->middleware('guest');
+            $credentials = request(['email', 'password']);
+
+            if (!Auth::attempt($credentials)) {
+                return response()->json([
+                    'status_code' => 500,
+                    'message' => 'Unauthorized'
+                ]);
+            }
+            
+            $store_id = request()->header('x-store');
+            $user = ShopCustomer::where([['email', $request->email],['store_id',$store_id]])->first();
+
+            if (!Hash::check($request->password, $user->password, [])) {
+                throw new \Exception('Error in Login');
+            }
+            $user->tokens()->delete();
+            $tokenResult = $user->createToken('authToken')->plainTextToken;
+
+            return response()->json([
+                'status_code' => 200,
+                'access_token' => $tokenResult,
+                'token_type' => 'Bearer',
+            ]);
+        } catch (\Exception $error) {
+            return response()->json([
+                'status_code' => 500,
+                'message' => 'Error in Login',
+                'error' => $error,
+            ]);
+        }
     }
 
     /**
@@ -73,7 +84,7 @@ class RegisterController extends RootFrontController
      * @param  array  $data
      * @return \BlackCart\Core\Front\Models\ShopCustomer
      */
-    protected function create(array $data)
+    protected function createNewCustomer(array $data)
     {
         $data['country'] = strtoupper($data['country'] ?? '');
         $dataMap = $this->mappDataInsert($data);
@@ -129,64 +140,6 @@ class RegisterController extends RootFrontController
         return $user;
     }
     
-    public function showRegistrationForm()
-    {
-        return redirect(bc_route('register'));
-        // return view('auth.register');
-    }
-
-    protected function registered(Request $request, $user)
-    {
-        redirect()->route('home')->with(['register_success' => trans('account.register_success')]);
-    }
-
-
-    /**
-     * Process front form register
-     *
-     * @param [type] ...$params
-     * @return void
-     */
-    public function showRegisterFormProcessFront(...$params) {
-        if (config('app.seoLang')) {
-            $lang = $params[0] ?? '';
-            bc_lang_switch($lang);
-        }
-        return $this->_showRegisterForm();
-    }
-
-
-    /**
-     * Form register
-     *
-     * @return  [type]  [return description]
-     */
-    private function _showRegisterForm()
-    {
-        if (session('customer')) {
-            return redirect()->route('home');
-        }
-        $viewCaptcha = '';
-        if(bc_captcha_method() && in_array('register', bc_captcha_page())) {
-            if (view()->exists(bc_captcha_method()->pathPlugin.'::render')){
-                $dataView = [
-                    'titleButton' => trans('account.signup'),
-                    'idForm' => 'form-process',
-                    'idButtonForm' => 'button-form-process',
-                ];
-                $viewCaptcha = view(bc_captcha_method()->pathPlugin.'::render', $dataView)->render();
-            }
-        }
-        bc_check_view($this->templatePath . '.Auth.register');
-        return view($this->templatePath . '.Auth.register',
-            array(
-                'title'       => trans('account.title_register'),
-                'countries'   => ShopCountry::getCodeAll(),
-                'layout_page' => 'shop_auth',
-                'viewCaptcha' => $viewCaptcha,
-            )
-        );
-    }
 
 
     /**
@@ -205,7 +158,7 @@ class RegisterController extends RootFrontController
                         ->with(['register_state' => true]);
         }
         $data = $request->all();
-        $user = $this->create($data);
+        $user = $this->createNewCustomer($data);
         $dataMap = $this->mappDataInsert($data);
         if ($user) {
             if (bc_config('welcome_customer')) {
@@ -270,5 +223,17 @@ class RegisterController extends RootFrontController
                     : redirect($this->redirectPath());
     }
 
-
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout(Request $request)
+    {
+        auth()->user()->tokens()->delete();
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'logout success',
+            'error' => null,
+        ]);
+    }
 }

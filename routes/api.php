@@ -36,8 +36,6 @@ Route::group([
         'namespace' => 'Api\Front',
         'middleware' => LC_FRONT_MIDDLEWARE,
     ],function() {
-
-    Route::post('auth/login', 'Auth\LoginController@login');
         
     foreach (glob(__DIR__ . '/Front/*.php') as $filename) {
         require $filename;
