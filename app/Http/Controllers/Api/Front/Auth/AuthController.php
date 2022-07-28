@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Api\Front\Auth\AuthTrait;
+use Illuminate\Http\Response;
+use App\Helper\JsonResponse;
 
 class AuthController extends Controller
 {
@@ -33,10 +35,8 @@ class AuthController extends Controller
             $credentials = request(['email', 'password']);
 
             if (!Auth::attempt($credentials)) {
-                return response()->json([
-                    'status_code' => 500,
-                    'message' => 'Unauthorized'
-                ]);
+                $data['message'] = trans('auth.failed');
+                return response()->json(new JsonResponse($data), Response::HTTP_UNAUTHORIZED);
             }
             
             $store_id = request()->header('x-store');
@@ -48,17 +48,12 @@ class AuthController extends Controller
             $user->tokens()->delete();
             $tokenResult = $user->createToken('authToken')->plainTextToken;
 
-            return response()->json([
-                'status_code' => 200,
-                'access_token' => $tokenResult,
-                'token_type' => 'Bearer',
-            ]);
+            $data['access_token'] = $tokenResult;
+            $data['token_type'] = 'Bearer';
+            $data['message'] = trans('auth.login_success');
+            return response()->json(new JsonResponse($data), Response::HTTP_OK);
         } catch (\Exception $error) {
-            return response()->json([
-                'status_code' => 500,
-                'message' => 'Error in Login',
-                'error' => $error,
-            ]);
+            return response()->json(new JsonResponse([],$error), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -230,10 +225,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         auth()->user()->tokens()->delete();
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'logout success',
-            'error' => null,
-        ]);
+
+        return response()->json(new JsonResponse(['message' => trans('auth.logout_success')]), Response::HTTP_OK);
     }
 }
