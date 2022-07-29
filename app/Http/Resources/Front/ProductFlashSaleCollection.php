@@ -17,6 +17,7 @@ class ProductFlashSaleCollection extends JsonResource
     {
         $res = [
             'product' => new ProductCollection($this->product),
+            'timeup'=> $this->product->promotionPrice->date_end,
         ];
         
         return $res;
