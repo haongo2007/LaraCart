@@ -277,10 +277,10 @@ export default {
       },
       typeList: [{
         name: 'Point',
-        value: 'Point',
+        value: 'point',
       }, {
         name: 'Percent',
-        value: '%',
+        value: 'percent',
       }],
       listQuery: {
         page: 1,

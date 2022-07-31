@@ -18,7 +18,7 @@ class ShopDiscountController extends Controller
     public function checkCoupon(Request $request)
     {
         $code = $request->code;
-        $uID = $request->uID;
+        $uID = $request->user()->id ?? null;
         $total =  $request->total;
         $storeId = request()->header('x-store');
         $check = (new ShopDiscount)->check($code, $uID,$storeId);

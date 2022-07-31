@@ -746,7 +746,7 @@ class CreateTablesShop extends Migration
             $table->increments('id');
             $table->string('code', 50)->unique();
             $table->integer('reward')->default(2);
-            $table->string('type', 10)->default('point')->comment('point - Point; percent - %');
+            $table->enum('type', ['point', 'percent'])->default('point');
             $table->string('data', 300)->nullable();
             $table->integer('limit')->default(1);
             $table->integer('used')->default(0);
