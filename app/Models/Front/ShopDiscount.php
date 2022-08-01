@@ -158,7 +158,7 @@ class ShopDiscount extends Model
         if ($check['type'] == 'percent') {
             $value = $total * $check['reward'] / 100;
         } else {
-            $value = lc_currency_value($check['reward']);
+            $value = $check['reward'];
         }
         $value = ($value > $total) ? -$total : -$value;
         return $value;
