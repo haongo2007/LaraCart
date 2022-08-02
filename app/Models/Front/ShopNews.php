@@ -1,5 +1,4 @@
 <?php
-#black-cart/Core/Front/Models/ShopNews.php
 namespace App\Models\Front;
 
 use App\Models\Front\ShopNewsDescription;
@@ -13,6 +12,7 @@ class ShopNews extends Model
     public $table = 'shop_news';
     protected $guarded = [];
     protected $connection = LC_CONNECTION;
+    protected  $lc_store_id = 0;
 
     public function descriptions()
     {
@@ -110,6 +110,15 @@ class ShopNews extends Model
         return $news;
     }
 
+    /**
+     * Set store id
+     *
+     */
+    public function setStore($id) {
+        $this->lc_store_id = (int)$id;
+        return $this;
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -147,6 +156,15 @@ class ShopNews extends Model
                 ->orWhere($tableDescription . '.description', 'like', '%' . $this->lc_keyword . '%');
             });
         }
+        
+        $storeId = $this->lc_store_id ? $this->lc_store_id : config('app.storeId');
+        //Process store
+        if (!empty($this->lc_store_id) || config('app.storeId') != 1) {
+            //If the store is specified or the default is not the primary store
+            //Only get products from eligible stores
+            $query = $query->where($this->getTable().'.store_id', $storeId);
+        }
+        //End store
 
         $query = $query->where('status', 1)
         ->where('store_id', config('app.storeId'));

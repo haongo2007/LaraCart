@@ -127,6 +127,7 @@ class DataStoreSeeder extends Seeder
             ['group' => '', 'code' => 'display_config', 'key' => 'product_most_buy', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.most_buy_product', 'store_id' => $storeId],
             ['group' => '', 'code' => 'display_config', 'key' => 'product_most_view', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.most_buy_view', 'store_id' => $storeId],
             ['group' => '', 'code' => 'display_config', 'key' => 'product_latest', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.product_latest', 'store_id' => $storeId],
+            ['group' => '', 'code' => 'display_config', 'key' => 'news_list', 'value' => '8', 'sort' => '0', 'detail' => 'lang::admin.news_list', 'store_id' => $storeId],
 
             ['group' => '', 'code' => 'order_config', 'key' => 'shop_allow_guest', 'value' => '1', 'sort' => '11', 'detail' => 'lang::order.admin.shop_allow_guest', 'store_id' => $storeId],
             ['group' => '', 'code' => 'order_config', 'key' => 'product_preorder', 'value' => '1', 'sort' => '18', 'detail' => 'lang::order.admin.product_preorder', 'store_id' => $storeId],

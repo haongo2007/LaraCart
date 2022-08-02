@@ -12,11 +12,99 @@ use App\Models\Front\ShopCategory;
 use App\Models\Front\ShopBanner;
 use App\Models\Front\ShopBrand;
 use App\Models\Front\ShopProduct;
+use App\Models\Front\ShopNews;
 use App\Models\Front\ShopAttributeGroup;
 use App\Http\Resources\Front\CategoryCollection;
+use App\Models\Front\ShopProductFlashSale;
+use Illuminate\Http\Request;
+use App\Http\Resources\Front\ProductCollection;
+use App\Http\Resources\Front\ProductFlashSaleCollection;
+use App\Http\Resources\Front\BlogsCollection;
+use Cache;
 
 class ShopStoreController extends Controller
 {   
+
+    /**
+     * Get info homepage cache
+     *
+     * @return  [mix]
+     */
+    public function index(Request $request) 
+    {
+        $storeId = $request->header('x-store');
+        $flash_sale = $request->flash_sale ?? false;
+        $sale = $request->sale ?? false;
+        $top = $request->top ?? false;
+        $top_rated = $request->top_rated ?? false;
+        $most_view = $request->most_view ?? false;
+        $most_buy = $request->most_buy ?? false;
+        $latest = $request->latest ?? false;
+
+        $instance = (new ShopProduct)->setStore($storeId);
+        $data = [];
+        if (!Cache::has($storeId.'_cache_product_special_'.lc_get_locale())) {
+            if ($flash_sale) {
+                $flashSaleProducts = (new ShopProductFlashSale)->getAllProductFlashSale(['store_id'=>$storeId]);
+                $data['flashSaleProducts'] = ProductFlashSaleCollection::collection($flashSaleProducts);
+            }
+            if ($latest) {
+                $latestProducts = $instance->setLimit(lc_config('product_latest',$storeId))->getData();
+                $data['latestProducts'] = ProductCollection::collection($latestProducts);
+            }
+
+            if ($sale) {
+                $saleProducts = $instance->getProductPromotion(1)->setLimit(lc_config('product_sale',$storeId))->getData();
+                $data['saleProducts'] = ProductCollection::collection($saleProducts);
+            }
+
+            if ($top) {
+                $topProducts = $instance->getProductPromotion(0)->getProductTop(1)->setLimit(lc_config('product_top',$storeId))->getData();
+                $data['topProducts'] = ProductCollection::collection($topProducts);
+            }
+
+            if ($top_rated) {
+                $topRatedProducts = $instance->getProductPromotion(0)
+                                             ->getProductTop(0)
+                                             ->getProductTopRated(1)
+                                             ->setLimit(lc_config('product_top_rated',$storeId))->getData();
+                $data['topRatedProducts'] = ProductCollection::collection($topRatedProducts);
+            }
+
+            if ($most_view) {
+                $mostViewProducts = $instance->getProductPromotion(0)
+                                              ->getProductTop(0)
+                                              ->getProductMostView(1)
+                                              ->setLimit(lc_config('product_most_view',$storeId))->getData();
+                $data['mostViewProducts'] = ProductCollection::collection($mostViewProducts);
+            }
+
+            if ($most_buy) {
+                $mostBuyProducts = $instance->getProductPromotion(0)
+                                              ->getProductTop(0)
+                                              ->getProductMostView(0)
+                                              ->getProductMostBuy(1)
+                                              ->setLimit(lc_config('product_most_view',$storeId))->getData();
+                $data['mostBuyProducts'] = ProductCollection::collection($mostBuyProducts);
+            }
+
+            $blogs  = (new ShopNews)->setStore($storeId)
+                                    ->setLimit(lc_config('news_list'))
+                                    ->setSort(['id', 'desc'])
+                                    ->getData();
+            $data['blogs'] = BlogsCollection::collection($blogs);
+
+            lc_set_cache($storeId.'_cache_product_special_'.lc_get_locale(), $data,$storeId);
+        }
+        $data = Cache::get($storeId.'_cache_product_special_'.lc_get_locale());
+        return response()->json(new JsonResponse($data), Response::HTTP_OK);
+    }
+
+    /**
+     * Get info store init store
+     *
+     * @return  [infoStore]
+     */
     public function getInfo()
     {
         $storeId = request()->header('x-store');

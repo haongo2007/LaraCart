@@ -169,12 +169,10 @@ class ShopCheckoutController extends Controller
         foreach ($products as $product) {
             if ($product['selectedVariant']) {
                 $variants = [];
-                foreach ($product['selectedVariant'] as $key1 => $variant) {
-                    foreach ($variant['attributes'] as $key2 => $attribute) {
-                        $index_val = $attribute['value_index'];
-                        $reference = $product['variants'][$key2][$attribute['value_index']];
-                        $variants[$key1][$attribute['group_id']] = $reference['name'].'__'.$reference['price'];
-                    }
+                foreach ($product['selectedVariant']['attributes'] as $key1 => $attribute) {
+                    $index_val = $attribute['value_index'];
+                    $reference = $product['variants'][$key1][$index_val];
+                    $variants[$key1][$attribute['group_id']] = $reference['name'].'__'.$reference['price'];
                 }
             }
             $arrDetail['product_id']  = $product['id'];
@@ -183,7 +181,7 @@ class ShopCheckoutController extends Controller
             $arrDetail['qty']         = $product['qty'];
             $arrDetail['store_id']    = $storeId;
             $arrDetail['attribute']   = (!empty($variants) ? json_encode($variants) : null);
-            $arrDetail['total_price'] = lc_currency_value($product['sale_price'] ? $product['sale_price']['price_promotion'] : $product['price']) * $product['qty'] + $product['sumVariantPrice'];
+            $arrDetail['total_price'] = lc_currency_value($product['final_price']) * $product['qty'] + $product['sumVariantPrice'];
             $arrProductDetail[]          = $arrDetail;
         }
 
