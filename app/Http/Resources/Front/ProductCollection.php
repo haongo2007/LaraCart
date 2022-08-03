@@ -68,7 +68,7 @@ class ProductRelatedCollection extends JsonResource
                 'price'=> $value->price,
                 'ratings'=> $value->rate_count == 0 ? 0 : $value->rate_point / $value->rate_count,
                 'review'=> $value->rate_count,
-                'final_price'=> $value->promotionPrice,
+                'final_price'=> $value->promotionPrice ? $value->promotionPrice->price_promotion : $value->price,
                 'short_desc'=> $value->getText(),
                 'slug'=> $value->alias,
                 'sm_pictures'=> $value->image.'&w=575',

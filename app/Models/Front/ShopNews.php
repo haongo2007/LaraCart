@@ -81,7 +81,44 @@ class ShopNews extends Model
         return $query->orderBy($sortBy, $sortOrder);
     }
 
+    public function getBlogList($params){
 
+        $sortBy         = 'sort';
+        $sortOrder      = 'asc';
+        $filter_sort    = $params['filter_sort'] ?? 'id_desc';
+        $filter_keyword = $params['filter_keyword'] ?? '';
+        $filter_category    = $params['category'] ?? '';
+        $limit              = $params['perPage'] ?? lc_config('news_list');
+        $storeId            = $params['storeId'];
+
+        $filterArrSort = [
+            'sort_desc' => ['sort', 'desc'],
+            'sort_asc' => ['sort', 'asc'],
+            'id_desc' => ['id', 'desc'],
+            'id_asc' => ['id', 'asc'],
+        ];
+
+        if (array_key_exists($filter_sort, $filterArrSort)) {
+            $sortBy = $filterArrSort[$filter_sort][0];
+            $sortOrder = $filterArrSort[$filter_sort][1];
+        }
+        $blogs = new self;
+        if ($filter_keyword) {
+            $blogs = $blogs->setKeyword($filter_keyword);
+        }
+        if ($filter_category) {
+            $categoriId = ShopCategory::select('id')->where('alias',$filter_category)->pluck('id')->first();
+            $blogs = $blogs->getProductToCategory($categoriId);
+        }
+
+        $blogs = $blogs
+            ->setLimit($limit)
+            ->setPaginate()
+            ->setSort([$sortBy, $sortOrder])
+            ->setStore($storeId)
+            ->getData();
+        return $blogs;
+    }
     /**
      * Get news detail
      *

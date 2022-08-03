@@ -14,13 +14,14 @@ class ShopNewsController extends Controller
      * Render news
      * @return [type] [description]
      */
-    private function index()
+    public function index(Request $request)
     {
-        $data = (new ShopNews)
-            ->setLimit(lc_config('news_list'))
-            ->setPaginate()
-            ->getData();
-        return response()->json(new JsonResponse($data), Response::HTTP_OK);
+        $storeId = $request->header('x-store');
+        $params = array_filter($request->all());
+        $params['storeId'] = $storeId;
+        $blogs = (new ShopNews)->getBlogList($params);
+        $data = BlogsCollection::collection($blogs);
+        return $data;
     }
 
     /**
